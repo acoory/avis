@@ -132,7 +132,12 @@ export class RepairDecisionService {
 
     const providedRepairTypeIds = new Set(items.map((item) => item.repairTypeId));
     const missingMandatoryRepairTypes = manufacturer.repairRules
-      .filter((rule) => rule.mandatory && !providedRepairTypeIds.has(rule.repairTypeId))
+      .filter(
+        (rule) =>
+          rule.mandatory &&
+          rule.repairType.code !== 'REVISION' &&
+          !providedRepairTypeIds.has(rule.repairTypeId),
+      )
       .map((rule) => ({
         repairTypeId: rule.repairType.id,
         repairTypeCode: rule.repairType.code,

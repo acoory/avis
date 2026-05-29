@@ -719,8 +719,8 @@ function DecisionSummaryPanel({
           <div className="flex items-start gap-3">
             <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
             <div>
-              <p className="font-semibold">Aucune reparation obligatoire manquante</p>
-              <p className="mt-1 text-sm">Les obligations constructeur connues sont couvertes.</p>
+              <p className="font-semibold">Aucun blocage constructeur détecté</p>
+              <p className="mt-1 text-sm">Tu peux vérifier les recommandations et alertes ci-dessous.</p>
             </div>
           </div>
         </div>

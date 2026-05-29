@@ -23,6 +23,7 @@ type RepairRuleSeed = {
   mandatory?: boolean;
   thresholdAmount?: string;
   customInternalCost?: string | null;
+  comment?: string;
 };
 
 function repairRuleComment(
@@ -540,10 +541,13 @@ async function main() {
       {
         code: 'REVISION',
         status: manufacturerSeed.revisionRequired
-          ? ManufacturerRepairRuleStatus.MANDATORY
+          ? ManufacturerRepairRuleStatus.TO_CHECK
           : ManufacturerRepairRuleStatus.ALLOWED,
-        mandatory: manufacturerSeed.revisionRequired,
+        mandatory: false,
         customInternalCost: manufacturerSeed.servicingCost,
+        comment: manufacturerSeed.revisionRequired
+          ? 'Revision conseillée si elle est à faire sur le véhicule et rentable.'
+          : undefined,
       },
     ];
 
@@ -563,7 +567,7 @@ async function main() {
           mandatory: rule.mandatory ?? rule.status === ManufacturerRepairRuleStatus.MANDATORY,
           thresholdAmount: rule.thresholdAmount ?? null,
           customInternalCost: rule.customInternalCost ?? null,
-          comment: repairRuleComment(repairType.name, manufacturer.name, rule.status),
+          comment: rule.comment ?? repairRuleComment(repairType.name, manufacturer.name, rule.status),
         },
         create: {
           manufacturerId: manufacturer.id,
@@ -573,7 +577,7 @@ async function main() {
           mandatory: rule.mandatory ?? rule.status === ManufacturerRepairRuleStatus.MANDATORY,
           thresholdAmount: rule.thresholdAmount ?? null,
           customInternalCost: rule.customInternalCost ?? null,
-          comment: repairRuleComment(repairType.name, manufacturer.name, rule.status),
+          comment: rule.comment ?? repairRuleComment(repairType.name, manufacturer.name, rule.status),
         },
       });
     }
