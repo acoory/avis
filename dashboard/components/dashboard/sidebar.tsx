@@ -16,12 +16,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/auth.store";
+import { Role } from "@/types/auth";
 
 const navigation = [
   { label: "Buy Back", href: "/dashboard", icon: Gauge },
   { label: "Controles", href: "/dashboard/vehicle-checks", icon: ClipboardList },
   { label: "Agences", href: "/dashboard/agencies", icon: MapPin },
-  { label: "Utilisateurs", href: "/dashboard/users", icon: Users },
+  { label: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["ADMIN", "MANAGER"] as Role[] },
   { label: "Vehicules", href: "/dashboard/vehicles", icon: Car },
   { label: "Types reparations", href: "/dashboard/repair-types", icon: Wrench },
   { label: "Constructeurs", href: "/dashboard/manufacturers", icon: Building2 },
@@ -36,6 +38,8 @@ type SidebarProps = {
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const user = useAuthStore((state) => state.user);
+  const visibleNavigation = navigation.filter((item) => !item.roles || (user && item.roles.includes(user.role)));
 
   return (
     <>
@@ -63,7 +67,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           </Button>
         </div>
         <nav className="space-y-1 p-4">
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
 

@@ -9,6 +9,7 @@ import { ManufacturerRulesModule } from './manufacturer-rules/manufacturer-rules
 import { ManufacturersModule } from './manufacturers/manufacturers.module';
 import { RepairTypesModule } from './repair-types/repair-types.module';
 import { VehicleChecksModule } from './vehicle-checks/vehicle-checks.module';
+import { VehicleCheckItemsModule } from './vehicle-check-items/vehicle-check-items.module';
 import { VehicleModelsModule } from './vehicle-models/vehicle-models.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ExportsModule } from './exports/exports.module';
@@ -28,6 +29,7 @@ import { ExportsModule } from './exports/exports.module';
     ManufacturerRulesModule,
     ManufacturerRepairRulesModule,
     VehicleChecksModule,
+    VehicleCheckItemsModule,
     DashboardModule,
     ExportsModule,
   ],

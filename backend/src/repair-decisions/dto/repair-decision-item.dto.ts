@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 export class RepairDecisionItemDto {
   @IsUUID()
@@ -13,4 +13,8 @@ export class RepairDecisionItemDto {
   @IsOptional()
   @IsString()
   comment?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  partOrderRequired?: boolean;
 }

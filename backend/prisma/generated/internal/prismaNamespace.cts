@@ -1278,7 +1278,8 @@ export const UserScalarFieldEnum = {
   isActive: 'isActive',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  managerId: 'managerId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1406,6 +1407,11 @@ export const VehicleCheckItemScalarFieldEnum = {
   decisionStatus: 'decisionStatus',
   decisionMessage: 'decisionMessage',
   comment: 'comment',
+  partOrderRequired: 'partOrderRequired',
+  partOrderStatus: 'partOrderStatus',
+  partOrderPrice: 'partOrderPrice',
+  partOrderReference: 'partOrderReference',
+  partOrderedAt: 'partOrderedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1589,6 +1595,20 @@ export type EnumRepairDecisionStatusFieldRefInput<$PrismaModel> = FieldRefInputT
  * Reference to a field of type 'RepairDecisionStatus[]'
  */
 export type ListEnumRepairDecisionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RepairDecisionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PartOrderStatus'
+ */
+export type EnumPartOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartOrderStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PartOrderStatus[]'
+ */
+export type ListEnumPartOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartOrderStatus[]'>
     
 
 

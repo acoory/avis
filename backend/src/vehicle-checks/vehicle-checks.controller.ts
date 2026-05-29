@@ -18,13 +18,13 @@ export class VehicleChecksController {
   ) {}
 
   @Get()
-  findAll(@Query() query: ListVehicleChecksQueryDto) {
-    return this.vehicleChecksService.findAll(query);
+  findAll(@CurrentUser() user: CurrentUserPayload, @Query() query: ListVehicleChecksQueryDto) {
+    return this.vehicleChecksService.findAll(query, user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vehicleChecksService.findOne(id);
+  findOne(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.vehicleChecksService.findOne(id, user);
   }
 
   @Post()
@@ -33,18 +33,18 @@ export class VehicleChecksController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateVehicleCheckDto) {
-    return this.vehicleChecksService.update(id, dto);
+  update(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string, @Body() dto: UpdateVehicleCheckDto) {
+    return this.vehicleChecksService.update(id, dto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.vehicleChecksService.remove(id);
+  remove(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.vehicleChecksService.remove(id, user);
   }
 
   @Post(':id/complete')
-  complete(@Param('id') id: string) {
-    return this.vehicleChecksService.complete(id);
+  complete(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.vehicleChecksService.complete(id, user);
   }
 
   @Post('preview-decision')

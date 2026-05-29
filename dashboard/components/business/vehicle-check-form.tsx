@@ -36,6 +36,7 @@ type DraftRepairLine = {
   repairTypeId: string;
   quantity: number;
   comment: string;
+  partOrderRequired: boolean;
 };
 
 type VehicleCheckFormProps = {
@@ -103,6 +104,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
               repairTypeId: item.repairType.id,
               quantity: item.quantity,
               comment: item.comment ?? "",
+              partOrderRequired: item.partOrderRequired,
             }))
           : [],
       );
@@ -122,6 +124,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           repairTypeId: line.repairTypeId,
           quantity: line.quantity,
           comment: line.comment || undefined,
+          partOrderRequired: line.partOrderRequired,
         })),
     [lines],
   );
@@ -164,6 +167,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
         repairTypeId: repairTypes[0]?.id ?? "",
         quantity: 1,
         comment: "",
+        partOrderRequired: false,
       },
     ]);
   }
@@ -479,6 +483,16 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                   </div>
                 </div>
 
+                <label className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-700">
+                  <input
+                    checked={line.partOrderRequired}
+                    className="h-4 w-4 accent-teal-700"
+                    type="checkbox"
+                    onChange={(event) => updateLine(line.id, { partOrderRequired: event.target.checked })}
+                  />
+                  <span>Pièce à commander</span>
+                </label>
+
                 {previewLine ? (
                   <div className="flex flex-col gap-2 rounded-md bg-gray-50 p-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
@@ -683,6 +697,7 @@ function DecisionSummaryPanel({
   preview: RepairDecisionPreview | null;
 }) {
   const mandatoryItems = preview?.missingMandatoryRepairTypes ?? [];
+  const recommendedItems = preview?.recommendedRepairTypes ?? [];
   const generalAlerts =
     preview?.alerts.filter(
       (alert) => !mandatoryItems.some((item) => item.message === alert),
@@ -726,6 +741,22 @@ function DecisionSummaryPanel({
         </div>
       )}
 
+      {recommendedItems.length ? (
+        <div className="rounded-md border border-sky-200 bg-sky-50 p-4 text-sky-800">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <p className="font-semibold">Recommandations constructeur</p>
+              <div className="mt-2 space-y-1 text-sm">
+                {recommendedItems.map((item) => (
+                  <p key={item.repairTypeId}>{item.message}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {generalAlerts.length ? (
         <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-amber-800">
           <div className="flex items-start gap-3">
@@ -749,6 +780,7 @@ function DecisionSummaryPanel({
         <Summary label="Cout interne" value={formatMoney(preview.totalInternalCost)} />
         <Summary label="Franchise constructeur" value={formatMoney(preview.constructorAllowanceAmount)} />
         <Summary label="Ecart franchise" value={formatMoney(preview.allowanceDifferenceAmount)} />
+        <Summary label="Pieces a commander" value={partOrderSummaryLabel(preview.items)} />
       </div>
 
       <div className="rounded-md border border-gray-200">
@@ -757,14 +789,15 @@ function DecisionSummaryPanel({
           <p className="mt-1 text-xs text-gray-500">{preview.decisionSummary}</p>
         </div>
         <div className="divide-y divide-gray-100">
-          {preview.items.map((item) => (
-            <div className="space-y-2 p-3" key={item.repairTypeId}>
+          {preview.items.map((item, index) => (
+            <div className="space-y-2 p-3" key={`${item.repairTypeId}-${index}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-medium text-gray-950">
                     {item.repairTypeName} x{item.quantity}
                   </p>
                   <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
+                  {item.partOrderRequired ? <PartOrderDraftBadge /> : null}
                 </div>
                 <DecisionBadge status={item.decisionStatus} />
               </div>
@@ -789,6 +822,24 @@ function Summary({ label, value }: { label: string; value: string }) {
       <p className="mt-2 text-lg font-semibold text-gray-950">{value}</p>
     </div>
   );
+}
+
+function PartOrderDraftBadge() {
+  return (
+    <span className="mt-2 inline-flex rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+      Pièce à commander
+    </span>
+  );
+}
+
+function partOrderSummaryLabel(items: RepairDecisionPreview["items"]) {
+  const count = items.filter((item) => item.partOrderRequired).length;
+
+  if (!count) {
+    return "Aucune";
+  }
+
+  return `${count} pièce${count > 1 ? "s" : ""}`;
 }
 
 function ValidationRecap({
@@ -847,6 +898,7 @@ function ValidationRecap({
             <RecapLine label="Economie estimee" value={formatMoney(preview?.totalInternalSavingAmount)} />
             <RecapLine label="Franchise constructeur" value={formatMoney(preview?.constructorAllowanceAmount)} />
             <RecapLine label="Ecart franchise" value={formatMoney(preview?.allowanceDifferenceAmount)} />
+            <RecapLine label="Pieces a commander" value={partOrderSummaryLabel(preview?.items ?? [])} />
           </div>
 
           <div className="rounded-md border border-gray-200">
@@ -854,14 +906,15 @@ function ValidationRecap({
               Reparations
             </div>
             <div className="divide-y divide-gray-100">
-              {preview?.items.map((item) => (
-                <div className="space-y-2 p-3" key={item.repairTypeId}>
+              {preview?.items.map((item, index) => (
+                <div className="space-y-2 p-3" key={`${item.repairTypeId}-${index}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-medium text-gray-950">
                         {item.repairTypeName} x{item.quantity}
                       </p>
                       <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
+                      {item.partOrderRequired ? <PartOrderDraftBadge /> : null}
                     </div>
                     <DecisionBadge status={item.decisionStatus} />
                   </div>

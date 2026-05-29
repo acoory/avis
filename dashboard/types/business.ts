@@ -6,6 +6,7 @@ export type RepairDecisionStatus =
   | "FORBIDDEN"
   | "MANDATORY"
   | "WARNING";
+export type PartOrderStatus = "NOT_REQUIRED" | "TO_ORDER" | "ORDERED";
 
 export type Agency = {
   id: string;
@@ -79,6 +80,11 @@ export type VehicleCheck = {
     id: string;
     quantity: number;
     comment?: string | null;
+    partOrderRequired: boolean;
+    partOrderStatus: PartOrderStatus;
+    partOrderPrice?: string | null;
+    partOrderReference?: string | null;
+    partOrderedAt?: string | null;
     decisionStatus: RepairDecisionStatus;
     decisionMessage?: string | null;
     repairType: RepairType;
@@ -89,6 +95,7 @@ export type RepairDecisionInputItem = {
   repairTypeId: string;
   quantity: number;
   comment?: string;
+  partOrderRequired?: boolean;
 };
 
 export type RepairDecisionPreview = {
@@ -112,6 +119,7 @@ export type RepairDecisionPreview = {
     decisionStatus: RepairDecisionStatus;
     decisionMessage: string;
     comment?: string;
+    partOrderRequired: boolean;
   }>;
   missingMandatoryRepairTypes: Array<{
     repairTypeId: string;
@@ -119,7 +127,15 @@ export type RepairDecisionPreview = {
     repairTypeName: string;
     message: string;
   }>;
+  recommendedRepairTypes?: Array<{
+    repairTypeId: string;
+    repairTypeCode: string;
+    repairTypeName: string;
+    message: string;
+  }>;
 };
+
+export type VehicleCheckItem = NonNullable<VehicleCheck["items"]>[number];
 
 export type CreateVehicleCheckPayload = {
   agencyId: string;
@@ -142,5 +158,6 @@ export type DashboardSummary = {
   totalExternalCost: string;
   totalDifferenceAmount: string;
   alertItemsCount: number;
+  partOrdersToPlaceCount?: number;
   recentVehicleChecks: VehicleCheck[];
 };

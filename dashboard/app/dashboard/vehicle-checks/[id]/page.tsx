@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
-import { VehicleCheck } from "@/types/business";
+import { VehicleCheck, VehicleCheckItem } from "@/types/business";
 
 export default function VehicleCheckDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -18,6 +18,17 @@ export default function VehicleCheckDetailsPage() {
   useEffect(() => {
     void businessService.vehicleCheck(params.id).then(setVehicleCheck);
   }, [params.id]);
+
+  function handlePartOrderUpdated(updatedItem: VehicleCheckItem) {
+    setVehicleCheck((current) =>
+      current
+        ? {
+            ...current,
+            items: current.items?.map((item) => (item.id === updatedItem.id ? updatedItem : item)),
+          }
+        : current,
+    );
+  }
 
   if (!vehicleCheck) {
     return <PageHeader title="Controle" description="Chargement du controle..." />;
@@ -70,7 +81,7 @@ export default function VehicleCheckDetailsPage() {
         </Card>
       </div>
       <div className="mt-6">
-        <RepairItemsTable vehicleCheck={vehicleCheck} />
+        <RepairItemsTable vehicleCheck={vehicleCheck} onPartOrderUpdated={handlePartOrderUpdated} />
       </div>
       <Card className="mt-6">
         <CardHeader>

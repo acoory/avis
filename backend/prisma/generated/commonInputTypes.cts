@@ -298,6 +298,13 @@ export type EnumRepairDecisionStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel> | $Enums.RepairDecisionStatus
 }
 
+export type EnumPartOrderStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartOrderStatusFilter<$PrismaModel> | $Enums.PartOrderStatus
+}
+
 export type IntWithAggregatesFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -322,6 +329,16 @@ export type EnumRepairDecisionStatusWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
+}
+
+export type EnumPartOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.PartOrderStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartOrderStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartOrderStatusFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -610,6 +627,13 @@ export type NestedEnumRepairDecisionStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel> | $Enums.RepairDecisionStatus
 }
 
+export type NestedEnumPartOrderStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartOrderStatusFilter<$PrismaModel> | $Enums.PartOrderStatus
+}
+
 export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -645,6 +669,16 @@ export type NestedEnumRepairDecisionStatusWithAggregatesFilter<$PrismaModel = ne
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPartOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.PartOrderStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartOrderStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartOrderStatusFilter<$PrismaModel>
 }
 
 

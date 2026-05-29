@@ -1,5 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, RepairDecisionStatus, VehicleCheckStatus } from '../../prisma/generated/client.cjs';
+import {
+  PartOrderStatus,
+  Prisma,
+  RepairDecisionStatus,
+  Role,
+  VehicleCheckStatus,
+} from '../../prisma/generated/client.cjs';
+import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { normalizeLicensePlate } from '../common/utils/license-plate';
 import { PrismaService } from '../prisma/prisma.service';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
@@ -38,8 +45,10 @@ export class VehicleChecksService {
     private readonly repairDecisionService: RepairDecisionService,
   ) {}
 
-  findAll(query: ListVehicleChecksQueryDto = {}) {
-    const where: Prisma.VehicleCheckWhereInput = {};
+  findAll(query: ListVehicleChecksQueryDto = {}, user: CurrentUserPayload) {
+    const where: Prisma.VehicleCheckWhereInput = {
+      ...this.scopeWhere(user),
+    };
 
     if (query.dateFrom || query.dateTo) {
       where.checkDate = {
@@ -55,9 +64,12 @@ export class VehicleChecksService {
     });
   }
 
-  async findOne(id: string) {
-    const vehicleCheck = await this.prisma.vehicleCheck.findUnique({
-      where: { id },
+  async findOne(id: string, user: CurrentUserPayload) {
+    const vehicleCheck = await this.prisma.vehicleCheck.findFirst({
+      where: {
+        id,
+        ...this.scopeWhere(user),
+      },
       include: vehicleCheckInclude,
     });
 
@@ -102,6 +114,10 @@ export class VehicleChecksService {
             decisionStatus: item.decisionStatus,
             decisionMessage: item.decisionMessage,
             comment: item.comment,
+            partOrderRequired: item.partOrderRequired,
+            partOrderStatus: item.partOrderRequired
+              ? PartOrderStatus.TO_ORDER
+              : PartOrderStatus.NOT_REQUIRED,
           })),
         },
       },
@@ -109,8 +125,8 @@ export class VehicleChecksService {
     });
   }
 
-  async update(id: string, dto: UpdateVehicleCheckDto) {
-    const existing = await this.findOne(id);
+  async update(id: string, dto: UpdateVehicleCheckDto, user: CurrentUserPayload) {
+    const existing = await this.findOne(id, user);
 
     if (existing.status === VehicleCheckStatus.COMPLETED) {
       throw new BadRequestException('Completed vehicle checks cannot be edited');
@@ -170,6 +186,10 @@ export class VehicleChecksService {
               decisionStatus: item.decisionStatus,
               decisionMessage: item.decisionMessage,
               comment: item.comment,
+              partOrderRequired: item.partOrderRequired,
+              partOrderStatus: item.partOrderRequired
+                ? PartOrderStatus.TO_ORDER
+                : PartOrderStatus.NOT_REQUIRED,
             })),
           },
         },
@@ -178,8 +198,8 @@ export class VehicleChecksService {
     });
   }
 
-  async complete(id: string) {
-    const vehicleCheck = await this.findOne(id);
+  async complete(id: string, user: CurrentUserPayload) {
+    const vehicleCheck = await this.findOne(id, user);
 
     if (!vehicleCheck.items.length) {
       throw new BadRequestException('A vehicle check must contain at least one repair item');
@@ -200,10 +220,26 @@ export class VehicleChecksService {
     });
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(id: string, user: CurrentUserPayload) {
+    await this.findOne(id, user);
     await this.prisma.vehicleCheck.delete({ where: { id } });
     return { success: true };
+  }
+
+  private scopeWhere(user: CurrentUserPayload): Prisma.VehicleCheckWhereInput {
+    if (user.role === Role.ADMIN) {
+      return {};
+    }
+
+    if (user.role === Role.MANAGER) {
+      return {
+        OR: [{ collaboratorId: user.sub }, { collaborator: { managerId: user.sub } }],
+      };
+    }
+
+    return {
+      collaboratorId: user.sub,
+    };
   }
 
   private async ensureReferences(agencyId: string, manufacturerId: string, vehicleModelId?: string) {

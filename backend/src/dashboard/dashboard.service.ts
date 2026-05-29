@@ -1,25 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/client';
-import { RepairDecisionStatus, VehicleCheckStatus } from '../../prisma/generated/client.cjs';
+import {
+  PartOrderStatus,
+  Prisma,
+  RepairDecisionStatus,
+  Role,
+  VehicleCheckStatus,
+} from '../../prisma/generated/client.cjs';
+import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
+import { DashboardQueryDto } from './dto/dashboard-query.dto';
 
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async summary() {
+  async summary(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+    const vehicleCheckScope = this.vehicleCheckScope(user, query);
+    const vehicleCheckItemScope = this.vehicleCheckItemScope(user, query);
     const [
       vehicleChecksCount,
       completedVehicleChecksCount,
       draftVehicleChecksCount,
       totals,
       alertItemsCount,
+      partOrdersToPlaceCount,
       recentVehicleChecks,
     ] = await Promise.all([
-      this.prisma.vehicleCheck.count(),
-      this.prisma.vehicleCheck.count({ where: { status: VehicleCheckStatus.COMPLETED } }),
-      this.prisma.vehicleCheck.count({ where: { status: VehicleCheckStatus.DRAFT } }),
+      this.prisma.vehicleCheck.count({ where: vehicleCheckScope }),
+      this.prisma.vehicleCheck.count({
+        where: { ...vehicleCheckScope, status: VehicleCheckStatus.COMPLETED },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: { ...vehicleCheckScope, status: VehicleCheckStatus.DRAFT },
+      }),
       this.prisma.vehicleCheck.aggregate({
+        where: vehicleCheckScope,
         _sum: {
           totalInternalSavingAmount: true,
           totalInternalCost: true,
@@ -29,6 +45,7 @@ export class DashboardService {
       }),
       this.prisma.vehicleCheckItem.count({
         where: {
+          ...vehicleCheckItemScope,
           decisionStatus: {
             in: [
               RepairDecisionStatus.FORBIDDEN,
@@ -39,7 +56,14 @@ export class DashboardService {
           },
         },
       }),
+      this.prisma.vehicleCheckItem.count({
+        where: {
+          ...vehicleCheckItemScope,
+          partOrderStatus: PartOrderStatus.TO_ORDER,
+        },
+      }),
       this.prisma.vehicleCheck.findMany({
+        where: vehicleCheckScope,
         take: 8,
         orderBy: { createdAt: 'desc' },
         include: {
@@ -54,6 +78,9 @@ export class DashboardService {
           agency: true,
           manufacturer: true,
           vehicleModel: true,
+          items: {
+            include: { repairType: true },
+          },
         },
       }),
     ]);
@@ -67,6 +94,7 @@ export class DashboardService {
       totalExternalCost: this.money(totals._sum.totalExternalCost),
       totalDifferenceAmount: this.money(totals._sum.totalDifferenceAmount),
       alertItemsCount,
+      partOrdersToPlaceCount,
       recentVehicleChecks: recentVehicleChecks.map((check) => ({
         id: check.id,
         checkNumber: check.checkNumber,
@@ -81,13 +109,16 @@ export class DashboardService {
         vehicleModel: check.vehicleModel,
         agency: check.agency,
         collaborator: check.collaborator,
+        items: check.items,
       })),
     };
   }
 
-  async savingsByManufacturer() {
+  async savingsByManufacturer(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+    const where = this.vehicleCheckScope(user, query);
     const grouped = await this.prisma.vehicleCheck.groupBy({
       by: ['manufacturerId'],
+      where,
       _count: { _all: true },
       _sum: {
         totalInternalSavingAmount: true,
@@ -117,9 +148,11 @@ export class DashboardService {
     }));
   }
 
-  async savingsByCollaborator() {
+  async savingsByCollaborator(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+    const where = this.vehicleCheckScope(user, query);
     const grouped = await this.prisma.vehicleCheck.groupBy({
       by: ['collaboratorId'],
+      where,
       _count: { _all: true },
       _sum: {
         totalInternalSavingAmount: true,
@@ -154,9 +187,11 @@ export class DashboardService {
     });
   }
 
-  async repairTypeFrequency() {
+  async repairTypeFrequency(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+    const where = this.vehicleCheckItemScope(user, query);
     const grouped = await this.prisma.vehicleCheckItem.groupBy({
       by: ['repairTypeId', 'decisionStatus'],
+      where,
       _count: { _all: true },
       _sum: {
         quantity: true,
@@ -194,5 +229,61 @@ export class DashboardService {
 
   private money(value?: Decimal | null): string {
     return (value ?? new Decimal(0)).toFixed(2);
+  }
+
+  private vehicleCheckScope(user: CurrentUserPayload, query: DashboardQueryDto = {}): Prisma.VehicleCheckWhereInput {
+    const periodWhere = this.periodWhere(query);
+
+    if (user.role === Role.ADMIN) {
+      return periodWhere;
+    }
+
+    if (user.role === Role.MANAGER) {
+      return {
+        ...periodWhere,
+        OR: [{ collaboratorId: user.sub }, { collaborator: { managerId: user.sub } }],
+      };
+    }
+
+    return {
+      ...periodWhere,
+      collaboratorId: user.sub,
+    };
+  }
+
+  private vehicleCheckItemScope(user: CurrentUserPayload, query: DashboardQueryDto = {}): Prisma.VehicleCheckItemWhereInput {
+    const vehicleCheckScope = this.vehicleCheckScope(user, query);
+    if (!Object.keys(vehicleCheckScope).length) {
+      return {};
+    }
+
+    return {
+      vehicleCheck: vehicleCheckScope,
+    };
+  }
+
+  private periodWhere(query: DashboardQueryDto): Prisma.VehicleCheckWhereInput {
+    if (!query.dateFrom && !query.dateTo) {
+      return {};
+    }
+
+    return {
+      checkDate: {
+        ...(query.dateFrom ? { gte: this.startOfDay(query.dateFrom) } : {}),
+        ...(query.dateTo ? { lte: this.endOfDay(query.dateTo) } : {}),
+      },
+    };
+  }
+
+  private startOfDay(value: string) {
+    const date = new Date(value);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  private endOfDay(value: string) {
+    const date = new Date(value);
+    date.setHours(23, 59, 59, 999);
+    return date;
   }
 }

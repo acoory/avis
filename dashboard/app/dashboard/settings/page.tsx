@@ -8,10 +8,10 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Parametres applicatifs</CardTitle>
-          <CardDescription>Les preferences et politiques d'acces seront ajoutees dans une phase suivante.</CardDescription>
+          <CardDescription>Les preferences et politiques d&apos;acces seront ajoutees dans une phase suivante.</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500">Aucune configuration metier n'est exposee dans cette V1.</p>
+          <p className="text-sm text-gray-500">Aucune configuration metier n&apos;est exposee dans cette V1.</p>
         </CardContent>
       </Card>
     </>

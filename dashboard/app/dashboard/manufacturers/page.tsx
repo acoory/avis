@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/dashboard/data-table";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { Manufacturer } from "@/types/business";
@@ -22,14 +24,19 @@ export default function ManufacturersPage() {
       <DataTable
         data={manufacturers}
         emptyMessage="Aucun constructeur pour le moment."
-        minWidth={860}
+        minWidth={960}
         columns={[
           {
             id: "name",
             header: "Constructeur",
             className: "px-4 py-3 font-medium text-gray-950",
             cell: (manufacturer) => (
-              <Link href={`/dashboard/manufacturers/${manufacturer.id}/rules`}>{manufacturer.name}</Link>
+              <Link
+                className="font-semibold text-teal-700 underline-offset-4 hover:underline"
+                href={`/dashboard/manufacturers/${manufacturer.id}/rules`}
+              >
+                {manufacturer.name}
+              </Link>
             ),
             sortValue: (manufacturer) => manufacturer.name,
             searchValue: (manufacturer) => manufacturer.name,
@@ -65,6 +72,18 @@ export default function ManufacturersPage() {
             cell: (manufacturer) => manufacturer._count?.repairRules ?? 0,
             sortValue: (manufacturer) => manufacturer._count?.repairRules ?? 0,
             searchValue: (manufacturer) => manufacturer._count?.repairRules ?? 0,
+          },
+          {
+            id: "view",
+            header: "Voir",
+            cell: (manufacturer) => (
+              <Button asChild size="sm" variant="outline">
+                <Link href={`/dashboard/manufacturers/${manufacturer.id}/rules`}>
+                  <Eye className="h-4 w-4" />
+                  Regles
+                </Link>
+              </Button>
+            ),
           },
         ]}
       />

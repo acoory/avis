@@ -8,16 +8,22 @@ import {
   RepairDecisionInputItem,
   RepairDecisionPreview,
   VehicleCheck,
+  VehicleCheckItem,
   VehicleModel,
 } from "@/types/business";
 
+type PeriodParams = {
+  dateFrom?: string;
+  dateTo?: string;
+};
+
 export const businessService = {
-  async dashboardSummary() {
-    const { data } = await api.get<DashboardSummary>("/dashboard/summary");
+  async dashboardSummary(params?: PeriodParams) {
+    const { data } = await api.get<DashboardSummary>("/dashboard/summary", { params });
     return data;
   },
 
-  async savingsByManufacturer() {
+  async savingsByManufacturer(params?: PeriodParams) {
     const { data } = await api.get<
       Array<{
         manufacturerId: string;
@@ -27,11 +33,25 @@ export const businessService = {
         totalInternalCost: string;
         allowanceDifferenceAmount: string;
       }>
-    >("/dashboard/savings-by-manufacturer");
+    >("/dashboard/savings-by-manufacturer", { params });
     return data;
   },
 
-  async repairTypeFrequency() {
+  async savingsByCollaborator(params?: PeriodParams) {
+    const { data } = await api.get<
+      Array<{
+        collaboratorId: string;
+        collaboratorName: string;
+        collaboratorEmail: string | null;
+        vehicleChecksCount: number;
+        totalInternalSavingAmount: string;
+        totalInternalCost: string;
+      }>
+    >("/dashboard/savings-by-collaborator", { params });
+    return data;
+  },
+
+  async repairTypeFrequency(params?: PeriodParams) {
     const { data } = await api.get<
       Array<{
         repairTypeId: string;
@@ -43,11 +63,11 @@ export const businessService = {
         totalInternalSavingAmount: string;
         totalInternalCost: string;
       }>
-    >("/dashboard/repair-type-frequency");
+    >("/dashboard/repair-type-frequency", { params });
     return data;
   },
 
-  async vehicleChecks(params?: { dateFrom?: string; dateTo?: string }) {
+  async vehicleChecks(params?: PeriodParams) {
     const { data } = await api.get<VehicleCheck[]>("/vehicle-checks", { params });
     return data;
   },
@@ -69,6 +89,19 @@ export const businessService = {
 
   async completeVehicleCheck(id: string) {
     const { data } = await api.post<VehicleCheck>(`/vehicle-checks/${id}/complete`);
+    return data;
+  },
+
+  async updatePartOrder(
+    id: string,
+    payload: {
+      partOrderRequired?: boolean;
+      partOrderStatus?: "NOT_REQUIRED" | "TO_ORDER" | "ORDERED";
+      partOrderPrice?: number;
+      partOrderReference?: string;
+    },
+  ) {
+    const { data } = await api.patch<VehicleCheckItem>(`/vehicle-check-items/${id}/part-order`, payload);
     return data;
   },
 

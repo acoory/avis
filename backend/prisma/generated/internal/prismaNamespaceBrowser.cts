@@ -91,7 +91,8 @@ export const UserScalarFieldEnum = {
   isActive: 'isActive',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  managerId: 'managerId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -219,6 +220,11 @@ export const VehicleCheckItemScalarFieldEnum = {
   decisionStatus: 'decisionStatus',
   decisionMessage: 'decisionMessage',
   comment: 'comment',
+  partOrderRequired: 'partOrderRequired',
+  partOrderStatus: 'partOrderStatus',
+  partOrderPrice: 'partOrderPrice',
+  partOrderReference: 'partOrderReference',
+  partOrderedAt: 'partOrderedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

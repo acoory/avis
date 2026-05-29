@@ -48,3 +48,12 @@ export const ManufacturerRepairRuleStatus = {
 } as const
 
 export type ManufacturerRepairRuleStatus = (typeof ManufacturerRepairRuleStatus)[keyof typeof ManufacturerRepairRuleStatus]
+
+
+export const PartOrderStatus = {
+  NOT_REQUIRED: 'NOT_REQUIRED',
+  TO_ORDER: 'TO_ORDER',
+  ORDERED: 'ORDERED'
+} as const
+
+export type PartOrderStatus = (typeof PartOrderStatus)[keyof typeof PartOrderStatus]

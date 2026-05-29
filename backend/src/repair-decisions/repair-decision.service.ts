@@ -19,6 +19,7 @@ type DecisionLine = {
   decisionStatus: RepairDecisionStatus;
   decisionMessage: string;
   comment?: string;
+  partOrderRequired: boolean;
 };
 
 type DecisionResult = {
@@ -32,6 +33,12 @@ type DecisionResult = {
   alerts: string[];
   items: DecisionLine[];
   missingMandatoryRepairTypes: Array<{
+    repairTypeId: string;
+    repairTypeCode: string;
+    repairTypeName: string;
+    message: string;
+  }>;
+  recommendedRepairTypes: Array<{
     repairTypeId: string;
     repairTypeCode: string;
     repairTypeName: string;
@@ -111,6 +118,7 @@ export class RepairDecisionService {
           decision.message ??
           `Economie estimee : ${this.money(netSavingAmount)} EUR.`,
         comment: item.comment,
+        partOrderRequired: item.partOrderRequired ?? false,
       } satisfies DecisionLine;
     });
 
@@ -149,6 +157,24 @@ export class RepairDecisionService {
       alerts.push(mandatory.message);
     }
 
+    const recommendedRepairTypes = manufacturer.repairRules
+      .filter(
+        (rule) =>
+          rule.repairType.code === 'REVISION' &&
+          !providedRepairTypeIds.has(rule.repairTypeId) &&
+          (manufacturer.rule?.revisionRequired ||
+            rule.status === ManufacturerRepairRuleStatus.TO_CHECK ||
+            rule.status === ManufacturerRepairRuleStatus.MANDATORY),
+      )
+      .map((rule) => ({
+        repairTypeId: rule.repairType.id,
+        repairTypeCode: rule.repairType.code,
+        repairTypeName: rule.repairType.name,
+        message:
+          rule.comment ??
+          'Revision conseillée si elle est à faire sur le véhicule et rentable.',
+      }));
+
     const forbiddenCount = lines.filter((line) => line.decisionStatus === RepairDecisionStatus.FORBIDDEN).length;
     const toCheckCount = lines.filter((line) => line.decisionStatus === RepairDecisionStatus.TO_CHECK).length;
     const warningCount = lines.filter((line) => line.decisionStatus === RepairDecisionStatus.WARNING).length;
@@ -164,6 +190,9 @@ export class RepairDecisionService {
     if (missingMandatoryRepairTypes.length) {
       summaryParts.push(`${missingMandatoryRepairTypes.length} obligatoire(s) manquante(s)`);
     }
+    if (recommendedRepairTypes.length) {
+      summaryParts.push(`${recommendedRepairTypes.length} recommandation(s)`);
+    }
 
     return {
       manufacturerId: manufacturer.id,
@@ -176,6 +205,7 @@ export class RepairDecisionService {
       alerts,
       items: lines,
       missingMandatoryRepairTypes,
+      recommendedRepairTypes,
     };
   }
 

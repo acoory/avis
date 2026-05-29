@@ -231,7 +231,7 @@ export function DataTable<T>({
             </thead>
             <tbody className="divide-y divide-gray-100">
               {visibleRows.map((row, rowIndex) => (
-                <tr className="hover:bg-gray-50" key={rowIndex}>
+                <tr className="transition-colors hover:bg-teal-50/40" key={rowIndex}>
                   {columns.map((column) => (
                     <td className={column.className ?? "px-4 py-3 text-gray-600"} key={column.id}>
                       {column.cell(row)}
