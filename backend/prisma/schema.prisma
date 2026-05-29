@@ -1,0 +1,254 @@
+generator client {
+  provider               = "prisma-client"
+  output                 = "./generated"
+  moduleFormat           = "cjs"
+  generatedFileExtension = "cts"
+  importFileExtension    = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  COLLABORATOR
+}
+
+enum VehicleCheckStatus {
+  DRAFT
+  COMPLETED
+  CANCELLED
+}
+
+enum RepairDecisionStatus {
+  ACCEPTED
+  TO_CHECK
+  NOT_PROFITABLE
+  FORBIDDEN
+  MANDATORY
+  WARNING
+}
+
+enum ManufacturerRepairRuleStatus {
+  ALLOWED
+  FORBIDDEN
+  TO_CHECK
+  MANDATORY
+  CONDITIONAL
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  password         String
+  firstName        String
+  lastName         String
+  role             Role      @default(COLLABORATOR)
+  refreshTokenHash String?
+  isActive         Boolean   @default(true)
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  vehicleChecks VehicleCheck[] @relation("VehicleCheckCollaborator")
+
+  @@index([role])
+  @@index([isActive])
+}
+
+model Agency {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vehicleChecks VehicleCheck[]
+
+  @@unique([name, city])
+  @@index([city])
+}
+
+model Manufacturer {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  models      VehicleModel[]
+  rule        ManufacturerRule?
+  repairRules ManufacturerRepairRule[]
+  checks      VehicleCheck[]
+}
+
+model VehicleModel {
+  id             String   @id @default(uuid())
+  manufacturerId String
+  name           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  manufacturer Manufacturer   @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
+  checks       VehicleCheck[]
+
+  @@unique([manufacturerId, name])
+  @@index([manufacturerId])
+}
+
+model RepairType {
+  id                          String   @id @default(uuid())
+  name                        String
+  code                        String   @unique
+  defaultInternalSavingAmount Decimal  @default(0) @db.Decimal(12, 2)
+  defaultInternalCost         Decimal  @default(0) @db.Decimal(12, 2)
+  isActive                    Boolean  @default(true)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  manufacturerRepairRules ManufacturerRepairRule[]
+  vehicleCheckItems       VehicleCheckItem[]
+  externalQuoteItems      ExternalQuoteItem[]
+
+  @@index([isActive])
+}
+
+model ManufacturerRule {
+  id                         String   @id @default(uuid())
+  manufacturerId             String   @unique
+  constructorAllowanceAmount Decimal  @default(0) @db.Decimal(12, 2)
+  laborRate                  Decimal? @db.Decimal(12, 2)
+  paintRate                  Decimal? @db.Decimal(12, 2)
+  partsDiscountRate          Decimal? @db.Decimal(5, 2)
+  dentRemovalCost            Decimal? @db.Decimal(12, 2)
+  servicingCost              Decimal? @db.Decimal(12, 2)
+  revisionRequired           Boolean  @default(false)
+  notes                      String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  manufacturer Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
+}
+
+model ManufacturerRepairRule {
+  id                         String                       @id @default(uuid())
+  manufacturerId             String
+  repairTypeId               String
+  status                     ManufacturerRepairRuleStatus @default(ALLOWED)
+  allowed                    Boolean                      @default(true)
+  mandatory                  Boolean                      @default(false)
+  thresholdAmount            Decimal?                     @db.Decimal(12, 2)
+  thresholdPercentage        Decimal?                     @db.Decimal(5, 2)
+  customInternalSavingAmount Decimal?                     @db.Decimal(12, 2)
+  customInternalCost         Decimal?                     @db.Decimal(12, 2)
+  comment                    String?
+  createdAt                  DateTime                     @default(now())
+  updatedAt                  DateTime                     @updatedAt
+
+  manufacturer Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
+  repairType   RepairType   @relation(fields: [repairTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([manufacturerId, repairTypeId])
+  @@index([manufacturerId])
+  @@index([repairTypeId])
+  @@index([status])
+}
+
+model VehicleCheck {
+  id                         String             @id @default(uuid())
+  checkNumber                String             @unique
+  collaboratorId             String
+  agencyId                   String
+  manufacturerId             String
+  vehicleModelId             String?
+  licensePlate               String
+  mileage                    Int?
+  checkDate                  DateTime           @default(now())
+  city                       String
+  status                     VehicleCheckStatus @default(DRAFT)
+  totalInternalSavingAmount  Decimal            @default(0) @db.Decimal(12, 2)
+  totalInternalCost          Decimal            @default(0) @db.Decimal(12, 2)
+  totalExternalCost          Decimal            @default(0) @db.Decimal(12, 2)
+  totalDifferenceAmount      Decimal            @default(0) @db.Decimal(12, 2)
+  constructorAllowanceAmount Decimal            @default(0) @db.Decimal(12, 2)
+  allowanceDifferenceAmount  Decimal            @default(0) @db.Decimal(12, 2)
+  decisionSummary            String?
+  notes                      String?
+  createdAt                  DateTime           @default(now())
+  updatedAt                  DateTime           @updatedAt
+
+  collaborator   User               @relation("VehicleCheckCollaborator", fields: [collaboratorId], references: [id], onDelete: Restrict)
+  agency         Agency             @relation(fields: [agencyId], references: [id], onDelete: Restrict)
+  manufacturer   Manufacturer       @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  vehicleModel   VehicleModel?      @relation(fields: [vehicleModelId], references: [id], onDelete: SetNull)
+  items          VehicleCheckItem[]
+  externalQuotes ExternalQuote[]
+
+  @@index([collaboratorId])
+  @@index([agencyId])
+  @@index([manufacturerId])
+  @@index([vehicleModelId])
+  @@index([checkDate])
+  @@index([status])
+  @@index([licensePlate])
+}
+
+model VehicleCheckItem {
+  id                        String               @id @default(uuid())
+  vehicleCheckId            String
+  repairTypeId              String
+  quantity                  Int                  @default(1)
+  unitInternalSavingAmount  Decimal              @default(0) @db.Decimal(12, 2)
+  totalInternalSavingAmount Decimal              @default(0) @db.Decimal(12, 2)
+  unitInternalCost          Decimal              @default(0) @db.Decimal(12, 2)
+  totalInternalCost         Decimal              @default(0) @db.Decimal(12, 2)
+  decisionStatus            RepairDecisionStatus @default(ACCEPTED)
+  decisionMessage           String?
+  comment                   String?
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+
+  vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  repairType   RepairType   @relation(fields: [repairTypeId], references: [id], onDelete: Restrict)
+
+  @@index([vehicleCheckId])
+  @@index([repairTypeId])
+  @@index([decisionStatus])
+}
+
+model ExternalQuote {
+  id             String   @id @default(uuid())
+  vehicleCheckId String
+  expertName     String
+  quoteReference String?
+  quoteDate      DateTime @default(now())
+  totalAmount    Decimal  @default(0) @db.Decimal(12, 2)
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  vehicleCheck VehicleCheck        @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  items        ExternalQuoteItem[]
+
+  @@index([vehicleCheckId])
+  @@index([quoteDate])
+}
+
+model ExternalQuoteItem {
+  id              String   @id @default(uuid())
+  externalQuoteId String
+  repairTypeId    String?
+  label           String
+  quantity        Int      @default(1)
+  unitPrice       Decimal  @default(0) @db.Decimal(12, 2)
+  totalPrice      Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  externalQuote ExternalQuote @relation(fields: [externalQuoteId], references: [id], onDelete: Cascade)
+  repairType    RepairType?   @relation(fields: [repairTypeId], references: [id], onDelete: SetNull)
+
+  @@index([externalQuoteId])
+  @@index([repairTypeId])
+}
