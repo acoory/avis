@@ -11,6 +11,8 @@ RUN pnpm install --frozen-lockfile
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 ARG NEXT_PUBLIC_SITE_URL
