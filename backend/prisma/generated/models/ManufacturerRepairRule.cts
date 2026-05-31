@@ -44,6 +44,7 @@ export type ManufacturerRepairRuleMinAggregateOutputType = {
   id: string | null
   manufacturerId: string | null
   repairTypeId: string | null
+  vehiclePartId: string | null
   status: $Enums.ManufacturerRepairRuleStatus | null
   allowed: boolean | null
   mandatory: boolean | null
@@ -60,6 +61,7 @@ export type ManufacturerRepairRuleMaxAggregateOutputType = {
   id: string | null
   manufacturerId: string | null
   repairTypeId: string | null
+  vehiclePartId: string | null
   status: $Enums.ManufacturerRepairRuleStatus | null
   allowed: boolean | null
   mandatory: boolean | null
@@ -76,6 +78,7 @@ export type ManufacturerRepairRuleCountAggregateOutputType = {
   id: number
   manufacturerId: number
   repairTypeId: number
+  vehiclePartId: number
   status: number
   allowed: number
   mandatory: number
@@ -108,6 +111,7 @@ export type ManufacturerRepairRuleMinAggregateInputType = {
   id?: true
   manufacturerId?: true
   repairTypeId?: true
+  vehiclePartId?: true
   status?: true
   allowed?: true
   mandatory?: true
@@ -124,6 +128,7 @@ export type ManufacturerRepairRuleMaxAggregateInputType = {
   id?: true
   manufacturerId?: true
   repairTypeId?: true
+  vehiclePartId?: true
   status?: true
   allowed?: true
   mandatory?: true
@@ -140,6 +145,7 @@ export type ManufacturerRepairRuleCountAggregateInputType = {
   id?: true
   manufacturerId?: true
   repairTypeId?: true
+  vehiclePartId?: true
   status?: true
   allowed?: true
   mandatory?: true
@@ -243,6 +249,7 @@ export type ManufacturerRepairRuleGroupByOutputType = {
   id: string
   manufacturerId: string
   repairTypeId: string
+  vehiclePartId: string | null
   status: $Enums.ManufacturerRepairRuleStatus
   allowed: boolean
   mandatory: boolean
@@ -282,6 +289,7 @@ export type ManufacturerRepairRuleWhereInput = {
   id?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
   manufacturerId?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
   repairTypeId?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
+  vehiclePartId?: Prisma.StringNullableFilter<"ManufacturerRepairRule"> | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFilter<"ManufacturerRepairRule"> | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFilter<"ManufacturerRepairRule"> | boolean
   mandatory?: Prisma.BoolFilter<"ManufacturerRepairRule"> | boolean
@@ -294,12 +302,14 @@ export type ManufacturerRepairRuleWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"ManufacturerRepairRule"> | Date | string
   manufacturer?: Prisma.XOR<Prisma.ManufacturerScalarRelationFilter, Prisma.ManufacturerWhereInput>
   repairType?: Prisma.XOR<Prisma.RepairTypeScalarRelationFilter, Prisma.RepairTypeWhereInput>
+  vehiclePart?: Prisma.XOR<Prisma.VehiclePartNullableScalarRelationFilter, Prisma.VehiclePartWhereInput> | null
 }
 
 export type ManufacturerRepairRuleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   manufacturerId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   allowed?: Prisma.SortOrder
   mandatory?: Prisma.SortOrder
@@ -312,16 +322,18 @@ export type ManufacturerRepairRuleOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   manufacturer?: Prisma.ManufacturerOrderByWithRelationInput
   repairType?: Prisma.RepairTypeOrderByWithRelationInput
+  vehiclePart?: Prisma.VehiclePartOrderByWithRelationInput
 }
 
 export type ManufacturerRepairRuleWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  manufacturerId_repairTypeId?: Prisma.ManufacturerRepairRuleManufacturerIdRepairTypeIdCompoundUniqueInput
+  manufacturerId_repairTypeId_vehiclePartId?: Prisma.ManufacturerRepairRuleManufacturerIdRepairTypeIdVehiclePartIdCompoundUniqueInput
   AND?: Prisma.ManufacturerRepairRuleWhereInput | Prisma.ManufacturerRepairRuleWhereInput[]
   OR?: Prisma.ManufacturerRepairRuleWhereInput[]
   NOT?: Prisma.ManufacturerRepairRuleWhereInput | Prisma.ManufacturerRepairRuleWhereInput[]
   manufacturerId?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
   repairTypeId?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
+  vehiclePartId?: Prisma.StringNullableFilter<"ManufacturerRepairRule"> | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFilter<"ManufacturerRepairRule"> | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFilter<"ManufacturerRepairRule"> | boolean
   mandatory?: Prisma.BoolFilter<"ManufacturerRepairRule"> | boolean
@@ -334,12 +346,14 @@ export type ManufacturerRepairRuleWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"ManufacturerRepairRule"> | Date | string
   manufacturer?: Prisma.XOR<Prisma.ManufacturerScalarRelationFilter, Prisma.ManufacturerWhereInput>
   repairType?: Prisma.XOR<Prisma.RepairTypeScalarRelationFilter, Prisma.RepairTypeWhereInput>
-}, "id" | "manufacturerId_repairTypeId">
+  vehiclePart?: Prisma.XOR<Prisma.VehiclePartNullableScalarRelationFilter, Prisma.VehiclePartWhereInput> | null
+}, "id" | "manufacturerId_repairTypeId_vehiclePartId">
 
 export type ManufacturerRepairRuleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   manufacturerId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   allowed?: Prisma.SortOrder
   mandatory?: Prisma.SortOrder
@@ -364,6 +378,7 @@ export type ManufacturerRepairRuleScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ManufacturerRepairRule"> | string
   manufacturerId?: Prisma.StringWithAggregatesFilter<"ManufacturerRepairRule"> | string
   repairTypeId?: Prisma.StringWithAggregatesFilter<"ManufacturerRepairRule"> | string
+  vehiclePartId?: Prisma.StringNullableWithAggregatesFilter<"ManufacturerRepairRule"> | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusWithAggregatesFilter<"ManufacturerRepairRule"> | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolWithAggregatesFilter<"ManufacturerRepairRule"> | boolean
   mandatory?: Prisma.BoolWithAggregatesFilter<"ManufacturerRepairRule"> | boolean
@@ -390,12 +405,14 @@ export type ManufacturerRepairRuleCreateInput = {
   updatedAt?: Date | string
   manufacturer: Prisma.ManufacturerCreateNestedOneWithoutRepairRulesInput
   repairType: Prisma.RepairTypeCreateNestedOneWithoutManufacturerRepairRulesInput
+  vehiclePart?: Prisma.VehiclePartCreateNestedOneWithoutManufacturerRepairRulesInput
 }
 
 export type ManufacturerRepairRuleUncheckedCreateInput = {
   id?: string
   manufacturerId: string
   repairTypeId: string
+  vehiclePartId?: string | null
   status?: $Enums.ManufacturerRepairRuleStatus
   allowed?: boolean
   mandatory?: boolean
@@ -422,12 +439,14 @@ export type ManufacturerRepairRuleUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   manufacturer?: Prisma.ManufacturerUpdateOneRequiredWithoutRepairRulesNestedInput
   repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutManufacturerRepairRulesNestedInput
+  vehiclePart?: Prisma.VehiclePartUpdateOneWithoutManufacturerRepairRulesNestedInput
 }
 
 export type ManufacturerRepairRuleUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -444,6 +463,7 @@ export type ManufacturerRepairRuleCreateManyInput = {
   id?: string
   manufacturerId: string
   repairTypeId: string
+  vehiclePartId?: string | null
   status?: $Enums.ManufacturerRepairRuleStatus
   allowed?: boolean
   mandatory?: boolean
@@ -474,6 +494,7 @@ export type ManufacturerRepairRuleUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -496,15 +517,17 @@ export type ManufacturerRepairRuleOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ManufacturerRepairRuleManufacturerIdRepairTypeIdCompoundUniqueInput = {
+export type ManufacturerRepairRuleManufacturerIdRepairTypeIdVehiclePartIdCompoundUniqueInput = {
   manufacturerId: string
   repairTypeId: string
+  vehiclePartId: string
 }
 
 export type ManufacturerRepairRuleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   manufacturerId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   allowed?: Prisma.SortOrder
   mandatory?: Prisma.SortOrder
@@ -528,6 +551,7 @@ export type ManufacturerRepairRuleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   manufacturerId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   allowed?: Prisma.SortOrder
   mandatory?: Prisma.SortOrder
@@ -544,6 +568,7 @@ export type ManufacturerRepairRuleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   manufacturerId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   allowed?: Prisma.SortOrder
   mandatory?: Prisma.SortOrder
@@ -647,6 +672,48 @@ export type ManufacturerRepairRuleUncheckedUpdateManyWithoutRepairTypeNestedInpu
   deleteMany?: Prisma.ManufacturerRepairRuleScalarWhereInput | Prisma.ManufacturerRepairRuleScalarWhereInput[]
 }
 
+export type ManufacturerRepairRuleCreateNestedManyWithoutVehiclePartInput = {
+  create?: Prisma.XOR<Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput> | Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput[] | Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput[]
+  createMany?: Prisma.ManufacturerRepairRuleCreateManyVehiclePartInputEnvelope
+  connect?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+}
+
+export type ManufacturerRepairRuleUncheckedCreateNestedManyWithoutVehiclePartInput = {
+  create?: Prisma.XOR<Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput> | Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput[] | Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput[]
+  createMany?: Prisma.ManufacturerRepairRuleCreateManyVehiclePartInputEnvelope
+  connect?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+}
+
+export type ManufacturerRepairRuleUpdateManyWithoutVehiclePartNestedInput = {
+  create?: Prisma.XOR<Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput> | Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput[] | Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput[]
+  upsert?: Prisma.ManufacturerRepairRuleUpsertWithWhereUniqueWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleUpsertWithWhereUniqueWithoutVehiclePartInput[]
+  createMany?: Prisma.ManufacturerRepairRuleCreateManyVehiclePartInputEnvelope
+  set?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  disconnect?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  delete?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  connect?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  update?: Prisma.ManufacturerRepairRuleUpdateWithWhereUniqueWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleUpdateWithWhereUniqueWithoutVehiclePartInput[]
+  updateMany?: Prisma.ManufacturerRepairRuleUpdateManyWithWhereWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleUpdateManyWithWhereWithoutVehiclePartInput[]
+  deleteMany?: Prisma.ManufacturerRepairRuleScalarWhereInput | Prisma.ManufacturerRepairRuleScalarWhereInput[]
+}
+
+export type ManufacturerRepairRuleUncheckedUpdateManyWithoutVehiclePartNestedInput = {
+  create?: Prisma.XOR<Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput> | Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput[] | Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput[]
+  upsert?: Prisma.ManufacturerRepairRuleUpsertWithWhereUniqueWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleUpsertWithWhereUniqueWithoutVehiclePartInput[]
+  createMany?: Prisma.ManufacturerRepairRuleCreateManyVehiclePartInputEnvelope
+  set?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  disconnect?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  delete?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  connect?: Prisma.ManufacturerRepairRuleWhereUniqueInput | Prisma.ManufacturerRepairRuleWhereUniqueInput[]
+  update?: Prisma.ManufacturerRepairRuleUpdateWithWhereUniqueWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleUpdateWithWhereUniqueWithoutVehiclePartInput[]
+  updateMany?: Prisma.ManufacturerRepairRuleUpdateManyWithWhereWithoutVehiclePartInput | Prisma.ManufacturerRepairRuleUpdateManyWithWhereWithoutVehiclePartInput[]
+  deleteMany?: Prisma.ManufacturerRepairRuleScalarWhereInput | Prisma.ManufacturerRepairRuleScalarWhereInput[]
+}
+
 export type EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput = {
   set?: $Enums.ManufacturerRepairRuleStatus
 }
@@ -664,11 +731,13 @@ export type ManufacturerRepairRuleCreateWithoutManufacturerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   repairType: Prisma.RepairTypeCreateNestedOneWithoutManufacturerRepairRulesInput
+  vehiclePart?: Prisma.VehiclePartCreateNestedOneWithoutManufacturerRepairRulesInput
 }
 
 export type ManufacturerRepairRuleUncheckedCreateWithoutManufacturerInput = {
   id?: string
   repairTypeId: string
+  vehiclePartId?: string | null
   status?: $Enums.ManufacturerRepairRuleStatus
   allowed?: boolean
   mandatory?: boolean
@@ -714,6 +783,7 @@ export type ManufacturerRepairRuleScalarWhereInput = {
   id?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
   manufacturerId?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
   repairTypeId?: Prisma.StringFilter<"ManufacturerRepairRule"> | string
+  vehiclePartId?: Prisma.StringNullableFilter<"ManufacturerRepairRule"> | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFilter<"ManufacturerRepairRule"> | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFilter<"ManufacturerRepairRule"> | boolean
   mandatory?: Prisma.BoolFilter<"ManufacturerRepairRule"> | boolean
@@ -739,11 +809,13 @@ export type ManufacturerRepairRuleCreateWithoutRepairTypeInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   manufacturer: Prisma.ManufacturerCreateNestedOneWithoutRepairRulesInput
+  vehiclePart?: Prisma.VehiclePartCreateNestedOneWithoutManufacturerRepairRulesInput
 }
 
 export type ManufacturerRepairRuleUncheckedCreateWithoutRepairTypeInput = {
   id?: string
   manufacturerId: string
+  vehiclePartId?: string | null
   status?: $Enums.ManufacturerRepairRuleStatus
   allowed?: boolean
   mandatory?: boolean
@@ -782,9 +854,68 @@ export type ManufacturerRepairRuleUpdateManyWithWhereWithoutRepairTypeInput = {
   data: Prisma.XOR<Prisma.ManufacturerRepairRuleUpdateManyMutationInput, Prisma.ManufacturerRepairRuleUncheckedUpdateManyWithoutRepairTypeInput>
 }
 
+export type ManufacturerRepairRuleCreateWithoutVehiclePartInput = {
+  id?: string
+  status?: $Enums.ManufacturerRepairRuleStatus
+  allowed?: boolean
+  mandatory?: boolean
+  thresholdAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  thresholdPercentage?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comment?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  manufacturer: Prisma.ManufacturerCreateNestedOneWithoutRepairRulesInput
+  repairType: Prisma.RepairTypeCreateNestedOneWithoutManufacturerRepairRulesInput
+}
+
+export type ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput = {
+  id?: string
+  manufacturerId: string
+  repairTypeId: string
+  status?: $Enums.ManufacturerRepairRuleStatus
+  allowed?: boolean
+  mandatory?: boolean
+  thresholdAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  thresholdPercentage?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comment?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ManufacturerRepairRuleCreateOrConnectWithoutVehiclePartInput = {
+  where: Prisma.ManufacturerRepairRuleWhereUniqueInput
+  create: Prisma.XOR<Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput>
+}
+
+export type ManufacturerRepairRuleCreateManyVehiclePartInputEnvelope = {
+  data: Prisma.ManufacturerRepairRuleCreateManyVehiclePartInput | Prisma.ManufacturerRepairRuleCreateManyVehiclePartInput[]
+  skipDuplicates?: boolean
+}
+
+export type ManufacturerRepairRuleUpsertWithWhereUniqueWithoutVehiclePartInput = {
+  where: Prisma.ManufacturerRepairRuleWhereUniqueInput
+  update: Prisma.XOR<Prisma.ManufacturerRepairRuleUpdateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedUpdateWithoutVehiclePartInput>
+  create: Prisma.XOR<Prisma.ManufacturerRepairRuleCreateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedCreateWithoutVehiclePartInput>
+}
+
+export type ManufacturerRepairRuleUpdateWithWhereUniqueWithoutVehiclePartInput = {
+  where: Prisma.ManufacturerRepairRuleWhereUniqueInput
+  data: Prisma.XOR<Prisma.ManufacturerRepairRuleUpdateWithoutVehiclePartInput, Prisma.ManufacturerRepairRuleUncheckedUpdateWithoutVehiclePartInput>
+}
+
+export type ManufacturerRepairRuleUpdateManyWithWhereWithoutVehiclePartInput = {
+  where: Prisma.ManufacturerRepairRuleScalarWhereInput
+  data: Prisma.XOR<Prisma.ManufacturerRepairRuleUpdateManyMutationInput, Prisma.ManufacturerRepairRuleUncheckedUpdateManyWithoutVehiclePartInput>
+}
+
 export type ManufacturerRepairRuleCreateManyManufacturerInput = {
   id?: string
   repairTypeId: string
+  vehiclePartId?: string | null
   status?: $Enums.ManufacturerRepairRuleStatus
   allowed?: boolean
   mandatory?: boolean
@@ -810,11 +941,13 @@ export type ManufacturerRepairRuleUpdateWithoutManufacturerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutManufacturerRepairRulesNestedInput
+  vehiclePart?: Prisma.VehiclePartUpdateOneWithoutManufacturerRepairRulesNestedInput
 }
 
 export type ManufacturerRepairRuleUncheckedUpdateWithoutManufacturerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -830,6 +963,7 @@ export type ManufacturerRepairRuleUncheckedUpdateWithoutManufacturerInput = {
 export type ManufacturerRepairRuleUncheckedUpdateManyWithoutManufacturerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -845,6 +979,7 @@ export type ManufacturerRepairRuleUncheckedUpdateManyWithoutManufacturerInput = 
 export type ManufacturerRepairRuleCreateManyRepairTypeInput = {
   id?: string
   manufacturerId: string
+  vehiclePartId?: string | null
   status?: $Enums.ManufacturerRepairRuleStatus
   allowed?: boolean
   mandatory?: boolean
@@ -870,11 +1005,13 @@ export type ManufacturerRepairRuleUpdateWithoutRepairTypeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   manufacturer?: Prisma.ManufacturerUpdateOneRequiredWithoutRepairRulesNestedInput
+  vehiclePart?: Prisma.VehiclePartUpdateOneWithoutManufacturerRepairRulesNestedInput
 }
 
 export type ManufacturerRepairRuleUncheckedUpdateWithoutRepairTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -890,6 +1027,71 @@ export type ManufacturerRepairRuleUncheckedUpdateWithoutRepairTypeInput = {
 export type ManufacturerRepairRuleUncheckedUpdateManyWithoutRepairTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
+  allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  thresholdAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  thresholdPercentage?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalSavingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ManufacturerRepairRuleCreateManyVehiclePartInput = {
+  id?: string
+  manufacturerId: string
+  repairTypeId: string
+  status?: $Enums.ManufacturerRepairRuleStatus
+  allowed?: boolean
+  mandatory?: boolean
+  thresholdAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  thresholdPercentage?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comment?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ManufacturerRepairRuleUpdateWithoutVehiclePartInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
+  allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  thresholdAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  thresholdPercentage?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalSavingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  manufacturer?: Prisma.ManufacturerUpdateOneRequiredWithoutRepairRulesNestedInput
+  repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutManufacturerRepairRulesNestedInput
+}
+
+export type ManufacturerRepairRuleUncheckedUpdateWithoutVehiclePartInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
+  repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
+  allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  thresholdAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  thresholdPercentage?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalSavingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  customInternalCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ManufacturerRepairRuleUncheckedUpdateManyWithoutVehiclePartInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
+  repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumManufacturerRepairRuleStatusFieldUpdateOperationsInput | $Enums.ManufacturerRepairRuleStatus
   allowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   mandatory?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -908,6 +1110,7 @@ export type ManufacturerRepairRuleSelect<ExtArgs extends runtime.Types.Extension
   id?: boolean
   manufacturerId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   status?: boolean
   allowed?: boolean
   mandatory?: boolean
@@ -920,12 +1123,14 @@ export type ManufacturerRepairRuleSelect<ExtArgs extends runtime.Types.Extension
   updatedAt?: boolean
   manufacturer?: boolean | Prisma.ManufacturerDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs>
 }, ExtArgs["result"]["manufacturerRepairRule"]>
 
 export type ManufacturerRepairRuleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   manufacturerId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   status?: boolean
   allowed?: boolean
   mandatory?: boolean
@@ -938,12 +1143,14 @@ export type ManufacturerRepairRuleSelectCreateManyAndReturn<ExtArgs extends runt
   updatedAt?: boolean
   manufacturer?: boolean | Prisma.ManufacturerDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs>
 }, ExtArgs["result"]["manufacturerRepairRule"]>
 
 export type ManufacturerRepairRuleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   manufacturerId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   status?: boolean
   allowed?: boolean
   mandatory?: boolean
@@ -956,12 +1163,14 @@ export type ManufacturerRepairRuleSelectUpdateManyAndReturn<ExtArgs extends runt
   updatedAt?: boolean
   manufacturer?: boolean | Prisma.ManufacturerDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs>
 }, ExtArgs["result"]["manufacturerRepairRule"]>
 
 export type ManufacturerRepairRuleSelectScalar = {
   id?: boolean
   manufacturerId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   status?: boolean
   allowed?: boolean
   mandatory?: boolean
@@ -974,18 +1183,21 @@ export type ManufacturerRepairRuleSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ManufacturerRepairRuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "manufacturerId" | "repairTypeId" | "status" | "allowed" | "mandatory" | "thresholdAmount" | "thresholdPercentage" | "customInternalSavingAmount" | "customInternalCost" | "comment" | "createdAt" | "updatedAt", ExtArgs["result"]["manufacturerRepairRule"]>
+export type ManufacturerRepairRuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "manufacturerId" | "repairTypeId" | "vehiclePartId" | "status" | "allowed" | "mandatory" | "thresholdAmount" | "thresholdPercentage" | "customInternalSavingAmount" | "customInternalCost" | "comment" | "createdAt" | "updatedAt", ExtArgs["result"]["manufacturerRepairRule"]>
 export type ManufacturerRepairRuleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   manufacturer?: boolean | Prisma.ManufacturerDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs>
 }
 export type ManufacturerRepairRuleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   manufacturer?: boolean | Prisma.ManufacturerDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs>
 }
 export type ManufacturerRepairRuleIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   manufacturer?: boolean | Prisma.ManufacturerDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs>
 }
 
 export type $ManufacturerRepairRulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -993,11 +1205,13 @@ export type $ManufacturerRepairRulePayload<ExtArgs extends runtime.Types.Extensi
   objects: {
     manufacturer: Prisma.$ManufacturerPayload<ExtArgs>
     repairType: Prisma.$RepairTypePayload<ExtArgs>
+    vehiclePart: Prisma.$VehiclePartPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     manufacturerId: string
     repairTypeId: string
+    vehiclePartId: string | null
     status: $Enums.ManufacturerRepairRuleStatus
     allowed: boolean
     mandatory: boolean
@@ -1404,6 +1618,7 @@ export interface Prisma__ManufacturerRepairRuleClient<T, Null = never, ExtArgs e
   readonly [Symbol.toStringTag]: "PrismaPromise"
   manufacturer<T extends Prisma.ManufacturerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ManufacturerDefaultArgs<ExtArgs>>): Prisma.Prisma__ManufacturerClient<runtime.Types.Result.GetResult<Prisma.$ManufacturerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   repairType<T extends Prisma.RepairTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RepairTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__RepairTypeClient<runtime.Types.Result.GetResult<Prisma.$RepairTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  vehiclePart<T extends Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ManufacturerRepairRule$vehiclePartArgs<ExtArgs>>): Prisma.Prisma__VehiclePartClient<runtime.Types.Result.GetResult<Prisma.$VehiclePartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1436,6 +1651,7 @@ export interface ManufacturerRepairRuleFieldRefs {
   readonly id: Prisma.FieldRef<"ManufacturerRepairRule", 'String'>
   readonly manufacturerId: Prisma.FieldRef<"ManufacturerRepairRule", 'String'>
   readonly repairTypeId: Prisma.FieldRef<"ManufacturerRepairRule", 'String'>
+  readonly vehiclePartId: Prisma.FieldRef<"ManufacturerRepairRule", 'String'>
   readonly status: Prisma.FieldRef<"ManufacturerRepairRule", 'ManufacturerRepairRuleStatus'>
   readonly allowed: Prisma.FieldRef<"ManufacturerRepairRule", 'Boolean'>
   readonly mandatory: Prisma.FieldRef<"ManufacturerRepairRule", 'Boolean'>
@@ -1844,6 +2060,25 @@ export type ManufacturerRepairRuleDeleteManyArgs<ExtArgs extends runtime.Types.E
    * Limit how many ManufacturerRepairRules to delete.
    */
   limit?: number
+}
+
+/**
+ * ManufacturerRepairRule.vehiclePart
+ */
+export type ManufacturerRepairRule$vehiclePartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehiclePart
+   */
+  select?: Prisma.VehiclePartSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehiclePart
+   */
+  omit?: Prisma.VehiclePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehiclePartInclude<ExtArgs> | null
+  where?: Prisma.VehiclePartWhereInput
 }
 
 /**

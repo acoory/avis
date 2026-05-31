@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcrypt';
 import {
@@ -43,20 +42,55 @@ function repairRuleComment(
 }
 
 async function main() {
-  const adminPassword = await bcrypt.hash('test1234', 12);
+  const anthonyPassword = await bcrypt.hash('AnthonyCory123', 10);
+  const laurentAdminPassword = await bcrypt.hash('LaurentMekwinski123', 10);
+  const laurentManagerPassword = await bcrypt.hash('LaurentMekwinski123', 10);
 
-  const admin = await prisma.user.upsert({
-    where: { email: 'iprod5@live.fr' },
+  await prisma.user.upsert({
+    where: { email: 'laurent.mekwinski@abg.com' },
     update: {
       role: Role.ADMIN,
       isActive: true,
     },
     create: {
-      email: 'iprod5@live.fr',
-      password: adminPassword,
+      email: 'laurent.mekwinski@abg.com',
+      password: laurentAdminPassword,
+      firstName: 'Laurent',
+      lastName: 'Mekwinski',
+      role: Role.ADMIN,
+      isActive: true,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'laurent.manager@abg.com' },
+    update: {
+      role: Role.MANAGER,
+      isActive: true,
+    },
+    create: {
+      email: 'laurent.manager@abg.com',
+      password: laurentManagerPassword,
+      firstName: 'Laurent',
+      lastName: 'Mekwinski',
+      role: Role.MANAGER,
+      isActive: true,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'anthony.cory@abg.com' },
+    update: {
+      role: Role.COLLABORATOR,
+      isActive: true,
+    },
+    create: {
+      email: 'anthony.cory@abg.com',
+      password: anthonyPassword,
       firstName: 'Anthony',
       lastName: 'Cory',
-      role: Role.ADMIN,
+      role: Role.COLLABORATOR,
+      isActive: true,
     },
   });
 
@@ -64,8 +98,6 @@ async function main() {
     data: [
       { name: 'Agence Marseille', city: 'Marseille' },
       { name: 'Agence Paris', city: 'Paris' },
-      { name: 'Agence Lyon', city: 'Lyon' },
-      { name: 'Agence Lille', city: 'Lille' },
     ],
     skipDuplicates: true,
   });
@@ -75,74 +107,187 @@ async function main() {
       code: 'LUGGAGE_COVER',
       name: 'Cache bagages',
       defaultInternalSavingAmount: '400',
-      defaultInternalCost: '0',
     },
     {
       code: 'SERVICING',
       name: 'Servicing',
       defaultInternalSavingAmount: '70',
-      defaultInternalCost: '0',
     },
     {
       code: 'TIRE',
       name: 'Pneu',
       defaultInternalSavingAmount: '40',
-      defaultInternalCost: '0',
     },
     {
       code: 'RIM',
       name: 'Jante',
       defaultInternalSavingAmount: '20',
-      defaultInternalCost: '0',
     },
     {
       code: 'UPHOLSTERY',
       name: 'Sellerie',
       defaultInternalSavingAmount: '300',
-      defaultInternalCost: '0',
     },
     {
       code: 'OPTIC',
       name: 'Optique',
       defaultInternalSavingAmount: '800',
-      defaultInternalCost: '0',
     },
     {
       code: 'BODYWORK',
       name: 'Carrosserie',
       defaultInternalSavingAmount: '60',
-      defaultInternalCost: '0',
     },
     {
       code: 'CABLE',
       name: 'Cable',
       defaultInternalSavingAmount: '400',
-      defaultInternalCost: '0',
     },
-    {
-      code: 'DENT_REMOVAL',
-      name: 'Debosselage',
-      defaultInternalSavingAmount: '0',
-      defaultInternalCost: '60',
-    },
+    // {
+    //   code: 'DENT_REMOVAL',
+    //   name: 'Debosselage',
+    //   defaultInternalSavingAmount: '60',
+    // },
     {
       code: 'WINDSHIELD_REPAIR',
       name: 'Pare-brise reparation',
       defaultInternalSavingAmount: '0',
-      defaultInternalCost: '0',
     },
     {
       code: 'WINDSHIELD_REPLACEMENT',
       name: 'Pare-brise remplacement',
       defaultInternalSavingAmount: '0',
-      defaultInternalCost: '0',
+    },
+    // {
+    //   code: 'REVISION',
+    //   name: 'Revision',
+    //   defaultInternalSavingAmount: '0',
+    // },
+  ];
+
+  const vehicleParts = [
+    { code: 'UNKNOWN', name: 'Non precise', category: 'GENERAL' },
+    {
+      code: 'FRONT_LEFT_SIDE_MOLDING',
+      name: 'Baguette latérale avant gauche',
+      category: 'BAGUETTE',
     },
     {
-      code: 'REVISION',
-      name: 'Revision',
-      defaultInternalSavingAmount: '0',
-      defaultInternalCost: '250',
+      code: 'FRONT_RIGHT_SIDE_MOLDING',
+      name: 'Baguette latérale avant droite',
+      category: 'BAGUETTE',
     },
+    {
+      code: 'REAR_LEFT_SIDE_MOLDING',
+      name: 'Baguette latérale arrière gauche',
+      category: 'BAGUETTE',
+    },
+    {
+      code: 'REAR_RIGHT_SIDE_MOLDING',
+      name: 'Baguette latérale arrière droite',
+      category: 'BAGUETTE',
+    },
+    { code: 'FRONT_BUMPER', name: 'Pare-chocs avant', category: 'CARROSSERIE' },
+    {
+      code: 'REAR_BUMPER',
+      name: 'Pare-chocs arrière',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'FRONT_LEFT_DOOR',
+      name: 'Porte avant gauche',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'FRONT_RIGHT_DOOR',
+      name: 'Porte avant droite',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'REAR_LEFT_DOOR',
+      name: 'Porte arrière gauche',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'REAR_RIGHT_DOOR',
+      name: 'Porte arrière droite',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'FRONT_LEFT_FENDER',
+      name: 'Aile avant gauche',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'FRONT_RIGHT_FENDER',
+      name: 'Aile avant droite',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'REAR_LEFT_FENDER',
+      name: 'Aile arrière gauche',
+      category: 'CARROSSERIE',
+    },
+    {
+      code: 'REAR_RIGHT_FENDER',
+      name: 'Aile arrière droite',
+      category: 'CARROSSERIE',
+    },
+    { code: 'HOOD', name: 'Capot', category: 'CARROSSERIE' },
+    { code: 'ROOF', name: 'Toit', category: 'CARROSSERIE' },
+    { code: 'TAILGATE', name: 'Hayon', category: 'CARROSSERIE' },
+    { code: 'TRUNK', name: 'Coffre', category: 'CARROSSERIE' },
+    {
+      code: 'LEFT_MIRROR',
+      name: 'Rétroviseur gauche',
+      category: 'RETROVISEUR',
+    },
+    {
+      code: 'RIGHT_MIRROR',
+      name: 'Rétroviseur droit',
+      category: 'RETROVISEUR',
+    },
+    { code: 'WINDSHIELD', name: 'Pare-brise', category: 'VITRAGE' },
+    { code: 'REAR_WINDOW', name: 'Lunette arrière', category: 'VITRAGE' },
+    {
+      code: 'FRONT_LEFT_HEADLIGHT',
+      name: 'Phare avant gauche',
+      category: 'OPTIQUE',
+    },
+    {
+      code: 'FRONT_RIGHT_HEADLIGHT',
+      name: 'Phare avant droit',
+      category: 'OPTIQUE',
+    },
+    {
+      code: 'REAR_LEFT_LIGHT',
+      name: 'Feu arrière gauche',
+      category: 'OPTIQUE',
+    },
+    {
+      code: 'REAR_RIGHT_LIGHT',
+      name: 'Feu arrière droit',
+      category: 'OPTIQUE',
+    },
+    { code: 'FRONT_LEFT_RIM', name: 'Jante avant gauche', category: 'JANTE' },
+    { code: 'FRONT_RIGHT_RIM', name: 'Jante avant droite', category: 'JANTE' },
+    { code: 'REAR_LEFT_RIM', name: 'Jante arrière gauche', category: 'JANTE' },
+    { code: 'REAR_RIGHT_RIM', name: 'Jante arrière droite', category: 'JANTE' },
+    { code: 'FRONT_LEFT_TIRE', name: 'Pneu avant gauche', category: 'PNEU' },
+    { code: 'FRONT_RIGHT_TIRE', name: 'Pneu avant droit', category: 'PNEU' },
+    { code: 'REAR_LEFT_TIRE', name: 'Pneu arrière gauche', category: 'PNEU' },
+    { code: 'REAR_RIGHT_TIRE', name: 'Pneu arrière droit', category: 'PNEU' },
+    { code: 'DRIVER_SEAT', name: 'Siège conducteur', category: 'SELLERIE' },
+    { code: 'PASSENGER_SEAT', name: 'Siège passager', category: 'SELLERIE' },
+    { code: 'REAR_BENCH', name: 'Banquette arrière', category: 'SELLERIE' },
+    { code: 'LUGGAGE_COVER', name: 'Cache bagages', category: 'ACCESSOIRE' },
+    { code: 'KEY', name: 'Clé', category: 'ACCESSOIRE' },
+    {
+      code: 'CHARGING_CABLE',
+      name: 'Câble de recharge',
+      category: 'ACCESSOIRE',
+    },
+    { code: 'WHEEL_COVER', name: 'Enjoliveur', category: 'ACCESSOIRE' },
   ];
 
   for (const repairType of repairTypes) {
@@ -151,11 +296,27 @@ async function main() {
       update: {
         name: repairType.name,
         defaultInternalSavingAmount: repairType.defaultInternalSavingAmount,
-        defaultInternalCost: repairType.defaultInternalCost,
         isActive: true,
       },
       create: {
         ...repairType,
+        isActive: true,
+      },
+    });
+  }
+
+  for (const [index, vehiclePart] of vehicleParts.entries()) {
+    await prisma.vehiclePart.upsert({
+      where: { code: vehiclePart.code },
+      update: {
+        name: vehiclePart.name,
+        category: vehiclePart.category,
+        displayOrder: index,
+        isActive: true,
+      },
+      create: {
+        ...vehiclePart,
+        displayOrder: index,
         isActive: true,
       },
     });
@@ -250,7 +411,8 @@ async function main() {
       servicingCost: '90',
       revisionRequired: false,
       forbiddenDentRemoval: true,
-      notes: 'Franchises variables selon Fiesta, S-Max, Galaxy, Mondeo, Max et Tourneo.',
+      notes:
+        'Franchises variables selon Fiesta, S-Max, Galaxy, Mondeo, Max et Tourneo.',
       models: ['Fiesta', 'Focus', 'Puma', 'Kuga', 'Tourneo'],
     },
     {
@@ -263,7 +425,8 @@ async function main() {
       servicingCost: '250',
       revisionRequired: true,
       forbiddenDentRemoval: false,
-      notes: 'Certaines reparations doivent etre verifiees selon seuil et montant facture.',
+      notes:
+        'Certaines reparations doivent etre verifiees selon seuil et montant facture.',
       models: ['Classe A', 'Classe C', 'GLA', 'GLC'],
     },
     {
@@ -380,7 +543,8 @@ async function main() {
       servicingCost: '200',
       revisionRequired: true,
       forbiddenDentRemoval: false,
-      notes: 'Toyota/Lexus : revisions imperatives, franchises variables selon modele.',
+      notes:
+        'Toyota/Lexus : revisions imperatives, franchises variables selon modele.',
       models: ['Yaris', 'Corolla', 'RAV4', 'C-HR'],
     },
     {
@@ -393,7 +557,8 @@ async function main() {
       servicingCost: '200',
       revisionRequired: true,
       forbiddenDentRemoval: false,
-      notes: 'Toyota/Lexus : revisions imperatives, franchises variables selon modele.',
+      notes:
+        'Toyota/Lexus : revisions imperatives, franchises variables selon modele.',
       models: ['UX', 'NX', 'RX', 'ES'],
     },
     {
@@ -406,7 +571,8 @@ async function main() {
       servicingCost: '250',
       revisionRequired: false,
       forbiddenDentRemoval: false,
-      notes: 'Regles Buy Back Volvo : seuils selon pneus, vitrage et interieur.',
+      notes:
+        'Regles Buy Back Volvo : seuils selon pneus, vitrage et interieur.',
       models: ['XC40', 'XC60', 'XC90', 'V60'],
     },
     {
@@ -445,7 +611,8 @@ async function main() {
       servicingCost: '200',
       revisionRequired: false,
       forbiddenDentRemoval: false,
-      notes: 'Regles Buy Back Hyundai : attention vehicule touche dans sa structure.',
+      notes:
+        'Regles Buy Back Hyundai : attention vehicule touche dans sa structure.',
       models: ['i20', 'i30', 'Kona', 'Tucson'],
     },
     {
@@ -467,7 +634,9 @@ async function main() {
     await Promise.all(
       repairTypes.map(async (repairType) => [
         repairType.code,
-        await prisma.repairType.findUniqueOrThrow({ where: { code: repairType.code } }),
+        await prisma.repairType.findUniqueOrThrow({
+          where: { code: repairType.code },
+        }),
       ]),
     ),
   );
@@ -526,7 +695,11 @@ async function main() {
       { code: 'TIRE', status: ManufacturerRepairRuleStatus.ALLOWED },
       { code: 'RIM', status: ManufacturerRepairRuleStatus.ALLOWED },
       { code: 'UPHOLSTERY', status: ManufacturerRepairRuleStatus.ALLOWED },
-      { code: 'OPTIC', status: ManufacturerRepairRuleStatus.CONDITIONAL, thresholdAmount: '300' },
+      {
+        code: 'OPTIC',
+        status: ManufacturerRepairRuleStatus.CONDITIONAL,
+        thresholdAmount: '300',
+      },
       { code: 'BODYWORK', status: ManufacturerRepairRuleStatus.ALLOWED },
       { code: 'CABLE', status: ManufacturerRepairRuleStatus.ALLOWED },
       {
@@ -536,8 +709,14 @@ async function main() {
           : ManufacturerRepairRuleStatus.ALLOWED,
         customInternalCost: manufacturerSeed.dentRemovalCost,
       },
-      { code: 'WINDSHIELD_REPAIR', status: ManufacturerRepairRuleStatus.ALLOWED },
-      { code: 'WINDSHIELD_REPLACEMENT', status: ManufacturerRepairRuleStatus.ALLOWED },
+      {
+        code: 'WINDSHIELD_REPAIR',
+        status: ManufacturerRepairRuleStatus.ALLOWED,
+      },
+      {
+        code: 'WINDSHIELD_REPLACEMENT',
+        status: ManufacturerRepairRuleStatus.ALLOWED,
+      },
       {
         code: 'REVISION',
         status: manufacturerSeed.revisionRequired
@@ -553,37 +732,151 @@ async function main() {
 
     for (const rule of defaultRepairRules) {
       const repairType = repairTypesByCode[rule.code];
-
-      await prisma.manufacturerRepairRule.upsert({
+      if (!repairType) {
+        console.warn(`Skipping default manufacturer rule for missing repair type: ${rule.code}`);
+        continue;
+      }
+      const existingRule = await prisma.manufacturerRepairRule.findFirst({
         where: {
-          manufacturerId_repairTypeId: {
-            manufacturerId: manufacturer.id,
-            repairTypeId: repairType.id,
-          },
-        },
-        update: {
-          status: rule.status,
-          allowed: rule.status !== ManufacturerRepairRuleStatus.FORBIDDEN,
-          mandatory: rule.mandatory ?? rule.status === ManufacturerRepairRuleStatus.MANDATORY,
-          thresholdAmount: rule.thresholdAmount ?? null,
-          customInternalCost: rule.customInternalCost ?? null,
-          comment: rule.comment ?? repairRuleComment(repairType.name, manufacturer.name, rule.status),
-        },
-        create: {
           manufacturerId: manufacturer.id,
           repairTypeId: repairType.id,
-          status: rule.status,
-          allowed: rule.status !== ManufacturerRepairRuleStatus.FORBIDDEN,
-          mandatory: rule.mandatory ?? rule.status === ManufacturerRepairRuleStatus.MANDATORY,
-          thresholdAmount: rule.thresholdAmount ?? null,
-          customInternalCost: rule.customInternalCost ?? null,
-          comment: rule.comment ?? repairRuleComment(repairType.name, manufacturer.name, rule.status),
+          vehiclePartId: null,
         },
       });
+
+      const ruleData = {
+        manufacturerId: manufacturer.id,
+        repairTypeId: repairType.id,
+        vehiclePartId: null,
+        status: rule.status,
+        allowed: rule.status !== ManufacturerRepairRuleStatus.FORBIDDEN,
+        mandatory:
+          rule.mandatory ??
+          rule.status === ManufacturerRepairRuleStatus.MANDATORY,
+        thresholdAmount: rule.thresholdAmount ?? null,
+        customInternalCost: rule.customInternalCost ?? null,
+        comment:
+          rule.comment ??
+          repairRuleComment(repairType.name, manufacturer.name, rule.status),
+      };
+
+      if (existingRule) {
+        await prisma.manufacturerRepairRule.update({
+          where: { id: existingRule.id },
+          data: {
+            status: ruleData.status,
+            allowed: ruleData.allowed,
+            mandatory: ruleData.mandatory,
+            thresholdAmount: ruleData.thresholdAmount,
+            customInternalCost: ruleData.customInternalCost,
+            comment: ruleData.comment,
+          },
+        });
+      } else {
+        await prisma.manufacturerRepairRule.create({
+          data: ruleData,
+        });
+      }
+    }
+
+    const specificRules = [
+      {
+        repairTypeCode: 'DENT_REMOVAL',
+        vehiclePartCode: 'FRONT_LEFT_SIDE_MOLDING',
+        status:
+          manufacturer.name === 'Volkswagen'
+            ? ManufacturerRepairRuleStatus.FORBIDDEN
+            : ManufacturerRepairRuleStatus.ALLOWED,
+      },
+      {
+        repairTypeCode: 'DENT_REMOVAL',
+        vehiclePartCode: 'FRONT_RIGHT_SIDE_MOLDING',
+        status:
+          manufacturer.name === 'Volkswagen'
+            ? ManufacturerRepairRuleStatus.FORBIDDEN
+            : ManufacturerRepairRuleStatus.ALLOWED,
+      },
+      {
+        repairTypeCode: 'DENT_REMOVAL',
+        vehiclePartCode: 'REAR_LEFT_SIDE_MOLDING',
+        status:
+          manufacturer.name === 'Volkswagen'
+            ? ManufacturerRepairRuleStatus.FORBIDDEN
+            : ManufacturerRepairRuleStatus.ALLOWED,
+      },
+      {
+        repairTypeCode: 'DENT_REMOVAL',
+        vehiclePartCode: 'REAR_RIGHT_SIDE_MOLDING',
+        status:
+          manufacturer.name === 'Volkswagen'
+            ? ManufacturerRepairRuleStatus.FORBIDDEN
+            : ManufacturerRepairRuleStatus.ALLOWED,
+      },
+      {
+        repairTypeCode: 'OPTIC',
+        vehiclePartCode: 'FRONT_LEFT_HEADLIGHT',
+        status:
+          manufacturer.name === 'Mercedes'
+            ? ManufacturerRepairRuleStatus.TO_CHECK
+            : ManufacturerRepairRuleStatus.ALLOWED,
+      },
+      {
+        repairTypeCode: 'OPTIC',
+        vehiclePartCode: 'FRONT_RIGHT_HEADLIGHT',
+        status:
+          manufacturer.name === 'Mercedes'
+            ? ManufacturerRepairRuleStatus.TO_CHECK
+            : ManufacturerRepairRuleStatus.ALLOWED,
+      },
+    ].filter((rule) => rule.status !== ManufacturerRepairRuleStatus.ALLOWED);
+
+    for (const rule of specificRules) {
+      const repairType = repairTypesByCode[rule.repairTypeCode];
+      if (!repairType) {
+        console.warn(`Skipping specific manufacturer rule for missing repair type: ${rule.repairTypeCode}`);
+        continue;
+      }
+      const vehiclePart = await prisma.vehiclePart.findUniqueOrThrow({
+        where: { code: rule.vehiclePartCode },
+      });
+      const existingRule = await prisma.manufacturerRepairRule.findFirst({
+        where: {
+          manufacturerId: manufacturer.id,
+          repairTypeId: repairType.id,
+          vehiclePartId: vehiclePart.id,
+        },
+      });
+      const comment = repairRuleComment(
+        repairType.name,
+        manufacturer.name,
+        rule.status,
+      );
+
+      if (existingRule) {
+        await prisma.manufacturerRepairRule.update({
+          where: { id: existingRule.id },
+          data: {
+            status: rule.status,
+            allowed: rule.status !== ManufacturerRepairRuleStatus.FORBIDDEN,
+            mandatory: false,
+            comment,
+          },
+        });
+      } else {
+        await prisma.manufacturerRepairRule.create({
+          data: {
+            manufacturerId: manufacturer.id,
+            repairTypeId: repairType.id,
+            vehiclePartId: vehiclePart.id,
+            status: rule.status,
+            allowed: rule.status !== ManufacturerRepairRuleStatus.FORBIDDEN,
+            mandatory: false,
+            comment,
+          },
+        });
+      }
     }
   }
-
-  console.info(`Seed completed. Admin: ${admin.email}`);
 }
 
 main()

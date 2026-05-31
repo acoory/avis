@@ -48,6 +48,7 @@ export type VehicleCheckItemMinAggregateOutputType = {
   id: string | null
   vehicleCheckId: string | null
   repairTypeId: string | null
+  vehiclePartId: string | null
   quantity: number | null
   unitInternalSavingAmount: runtime.Decimal | null
   totalInternalSavingAmount: runtime.Decimal | null
@@ -69,6 +70,7 @@ export type VehicleCheckItemMaxAggregateOutputType = {
   id: string | null
   vehicleCheckId: string | null
   repairTypeId: string | null
+  vehiclePartId: string | null
   quantity: number | null
   unitInternalSavingAmount: runtime.Decimal | null
   totalInternalSavingAmount: runtime.Decimal | null
@@ -90,6 +92,7 @@ export type VehicleCheckItemCountAggregateOutputType = {
   id: number
   vehicleCheckId: number
   repairTypeId: number
+  vehiclePartId: number
   quantity: number
   unitInternalSavingAmount: number
   totalInternalSavingAmount: number
@@ -131,6 +134,7 @@ export type VehicleCheckItemMinAggregateInputType = {
   id?: true
   vehicleCheckId?: true
   repairTypeId?: true
+  vehiclePartId?: true
   quantity?: true
   unitInternalSavingAmount?: true
   totalInternalSavingAmount?: true
@@ -152,6 +156,7 @@ export type VehicleCheckItemMaxAggregateInputType = {
   id?: true
   vehicleCheckId?: true
   repairTypeId?: true
+  vehiclePartId?: true
   quantity?: true
   unitInternalSavingAmount?: true
   totalInternalSavingAmount?: true
@@ -173,6 +178,7 @@ export type VehicleCheckItemCountAggregateInputType = {
   id?: true
   vehicleCheckId?: true
   repairTypeId?: true
+  vehiclePartId?: true
   quantity?: true
   unitInternalSavingAmount?: true
   totalInternalSavingAmount?: true
@@ -281,6 +287,7 @@ export type VehicleCheckItemGroupByOutputType = {
   id: string
   vehicleCheckId: string
   repairTypeId: string
+  vehiclePartId: string
   quantity: number
   unitInternalSavingAmount: runtime.Decimal
   totalInternalSavingAmount: runtime.Decimal
@@ -325,6 +332,7 @@ export type VehicleCheckItemWhereInput = {
   id?: Prisma.StringFilter<"VehicleCheckItem"> | string
   vehicleCheckId?: Prisma.StringFilter<"VehicleCheckItem"> | string
   repairTypeId?: Prisma.StringFilter<"VehicleCheckItem"> | string
+  vehiclePartId?: Prisma.StringFilter<"VehicleCheckItem"> | string
   quantity?: Prisma.IntFilter<"VehicleCheckItem"> | number
   unitInternalSavingAmount?: Prisma.DecimalFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -342,12 +350,14 @@ export type VehicleCheckItemWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheckItem"> | Date | string
   vehicleCheck?: Prisma.XOR<Prisma.VehicleCheckScalarRelationFilter, Prisma.VehicleCheckWhereInput>
   repairType?: Prisma.XOR<Prisma.RepairTypeScalarRelationFilter, Prisma.RepairTypeWhereInput>
+  vehiclePart?: Prisma.XOR<Prisma.VehiclePartScalarRelationFilter, Prisma.VehiclePartWhereInput>
 }
 
 export type VehicleCheckItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   vehicleCheckId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitInternalSavingAmount?: Prisma.SortOrder
   totalInternalSavingAmount?: Prisma.SortOrder
@@ -365,6 +375,7 @@ export type VehicleCheckItemOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   vehicleCheck?: Prisma.VehicleCheckOrderByWithRelationInput
   repairType?: Prisma.RepairTypeOrderByWithRelationInput
+  vehiclePart?: Prisma.VehiclePartOrderByWithRelationInput
 }
 
 export type VehicleCheckItemWhereUniqueInput = Prisma.AtLeast<{
@@ -374,6 +385,7 @@ export type VehicleCheckItemWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.VehicleCheckItemWhereInput | Prisma.VehicleCheckItemWhereInput[]
   vehicleCheckId?: Prisma.StringFilter<"VehicleCheckItem"> | string
   repairTypeId?: Prisma.StringFilter<"VehicleCheckItem"> | string
+  vehiclePartId?: Prisma.StringFilter<"VehicleCheckItem"> | string
   quantity?: Prisma.IntFilter<"VehicleCheckItem"> | number
   unitInternalSavingAmount?: Prisma.DecimalFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -391,12 +403,14 @@ export type VehicleCheckItemWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheckItem"> | Date | string
   vehicleCheck?: Prisma.XOR<Prisma.VehicleCheckScalarRelationFilter, Prisma.VehicleCheckWhereInput>
   repairType?: Prisma.XOR<Prisma.RepairTypeScalarRelationFilter, Prisma.RepairTypeWhereInput>
+  vehiclePart?: Prisma.XOR<Prisma.VehiclePartScalarRelationFilter, Prisma.VehiclePartWhereInput>
 }, "id">
 
 export type VehicleCheckItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   vehicleCheckId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitInternalSavingAmount?: Prisma.SortOrder
   totalInternalSavingAmount?: Prisma.SortOrder
@@ -426,6 +440,7 @@ export type VehicleCheckItemScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"VehicleCheckItem"> | string
   vehicleCheckId?: Prisma.StringWithAggregatesFilter<"VehicleCheckItem"> | string
   repairTypeId?: Prisma.StringWithAggregatesFilter<"VehicleCheckItem"> | string
+  vehiclePartId?: Prisma.StringWithAggregatesFilter<"VehicleCheckItem"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"VehicleCheckItem"> | number
   unitInternalSavingAmount?: Prisma.DecimalWithAggregatesFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalWithAggregatesFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -462,12 +477,14 @@ export type VehicleCheckItemCreateInput = {
   updatedAt?: Date | string
   vehicleCheck: Prisma.VehicleCheckCreateNestedOneWithoutItemsInput
   repairType: Prisma.RepairTypeCreateNestedOneWithoutVehicleCheckItemsInput
+  vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
 }
 
 export type VehicleCheckItemUncheckedCreateInput = {
   id?: string
   vehicleCheckId: string
   repairTypeId: string
+  vehiclePartId: string
   quantity?: number
   unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -504,12 +521,14 @@ export type VehicleCheckItemUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleCheck?: Prisma.VehicleCheckUpdateOneRequiredWithoutItemsNestedInput
   repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
+  vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleCheckId?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -531,6 +550,7 @@ export type VehicleCheckItemCreateManyInput = {
   id?: string
   vehicleCheckId: string
   repairTypeId: string
+  vehiclePartId: string
   quantity?: number
   unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -571,6 +591,7 @@ export type VehicleCheckItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleCheckId?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -602,6 +623,7 @@ export type VehicleCheckItemCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   vehicleCheckId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitInternalSavingAmount?: Prisma.SortOrder
   totalInternalSavingAmount?: Prisma.SortOrder
@@ -632,6 +654,7 @@ export type VehicleCheckItemMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   vehicleCheckId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitInternalSavingAmount?: Prisma.SortOrder
   totalInternalSavingAmount?: Prisma.SortOrder
@@ -653,6 +676,7 @@ export type VehicleCheckItemMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   vehicleCheckId?: Prisma.SortOrder
   repairTypeId?: Prisma.SortOrder
+  vehiclePartId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitInternalSavingAmount?: Prisma.SortOrder
   totalInternalSavingAmount?: Prisma.SortOrder
@@ -721,6 +745,48 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutRepairTypeNestedInput = {
   deleteMany?: Prisma.VehicleCheckItemScalarWhereInput | Prisma.VehicleCheckItemScalarWhereInput[]
 }
 
+export type VehicleCheckItemCreateNestedManyWithoutVehiclePartInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput> | Prisma.VehicleCheckItemCreateWithoutVehiclePartInput[] | Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput | Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput[]
+  createMany?: Prisma.VehicleCheckItemCreateManyVehiclePartInputEnvelope
+  connect?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+}
+
+export type VehicleCheckItemUncheckedCreateNestedManyWithoutVehiclePartInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput> | Prisma.VehicleCheckItemCreateWithoutVehiclePartInput[] | Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput | Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput[]
+  createMany?: Prisma.VehicleCheckItemCreateManyVehiclePartInputEnvelope
+  connect?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+}
+
+export type VehicleCheckItemUpdateManyWithoutVehiclePartNestedInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput> | Prisma.VehicleCheckItemCreateWithoutVehiclePartInput[] | Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput | Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput[]
+  upsert?: Prisma.VehicleCheckItemUpsertWithWhereUniqueWithoutVehiclePartInput | Prisma.VehicleCheckItemUpsertWithWhereUniqueWithoutVehiclePartInput[]
+  createMany?: Prisma.VehicleCheckItemCreateManyVehiclePartInputEnvelope
+  set?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  disconnect?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  delete?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  connect?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  update?: Prisma.VehicleCheckItemUpdateWithWhereUniqueWithoutVehiclePartInput | Prisma.VehicleCheckItemUpdateWithWhereUniqueWithoutVehiclePartInput[]
+  updateMany?: Prisma.VehicleCheckItemUpdateManyWithWhereWithoutVehiclePartInput | Prisma.VehicleCheckItemUpdateManyWithWhereWithoutVehiclePartInput[]
+  deleteMany?: Prisma.VehicleCheckItemScalarWhereInput | Prisma.VehicleCheckItemScalarWhereInput[]
+}
+
+export type VehicleCheckItemUncheckedUpdateManyWithoutVehiclePartNestedInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput> | Prisma.VehicleCheckItemCreateWithoutVehiclePartInput[] | Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput[]
+  connectOrCreate?: Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput | Prisma.VehicleCheckItemCreateOrConnectWithoutVehiclePartInput[]
+  upsert?: Prisma.VehicleCheckItemUpsertWithWhereUniqueWithoutVehiclePartInput | Prisma.VehicleCheckItemUpsertWithWhereUniqueWithoutVehiclePartInput[]
+  createMany?: Prisma.VehicleCheckItemCreateManyVehiclePartInputEnvelope
+  set?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  disconnect?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  delete?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  connect?: Prisma.VehicleCheckItemWhereUniqueInput | Prisma.VehicleCheckItemWhereUniqueInput[]
+  update?: Prisma.VehicleCheckItemUpdateWithWhereUniqueWithoutVehiclePartInput | Prisma.VehicleCheckItemUpdateWithWhereUniqueWithoutVehiclePartInput[]
+  updateMany?: Prisma.VehicleCheckItemUpdateManyWithWhereWithoutVehiclePartInput | Prisma.VehicleCheckItemUpdateManyWithWhereWithoutVehiclePartInput[]
+  deleteMany?: Prisma.VehicleCheckItemScalarWhereInput | Prisma.VehicleCheckItemScalarWhereInput[]
+}
+
 export type VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput = {
   create?: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutVehicleCheckInput, Prisma.VehicleCheckItemUncheckedCreateWithoutVehicleCheckInput> | Prisma.VehicleCheckItemCreateWithoutVehicleCheckInput[] | Prisma.VehicleCheckItemUncheckedCreateWithoutVehicleCheckInput[]
   connectOrCreate?: Prisma.VehicleCheckItemCreateOrConnectWithoutVehicleCheckInput | Prisma.VehicleCheckItemCreateOrConnectWithoutVehicleCheckInput[]
@@ -763,14 +829,6 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput = 
   deleteMany?: Prisma.VehicleCheckItemScalarWhereInput | Prisma.VehicleCheckItemScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumRepairDecisionStatusFieldUpdateOperationsInput = {
   set?: $Enums.RepairDecisionStatus
 }
@@ -797,11 +855,13 @@ export type VehicleCheckItemCreateWithoutRepairTypeInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleCheck: Prisma.VehicleCheckCreateNestedOneWithoutItemsInput
+  vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
 }
 
 export type VehicleCheckItemUncheckedCreateWithoutRepairTypeInput = {
   id?: string
   vehicleCheckId: string
+  vehiclePartId: string
   quantity?: number
   unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -852,6 +912,7 @@ export type VehicleCheckItemScalarWhereInput = {
   id?: Prisma.StringFilter<"VehicleCheckItem"> | string
   vehicleCheckId?: Prisma.StringFilter<"VehicleCheckItem"> | string
   repairTypeId?: Prisma.StringFilter<"VehicleCheckItem"> | string
+  vehiclePartId?: Prisma.StringFilter<"VehicleCheckItem"> | string
   quantity?: Prisma.IntFilter<"VehicleCheckItem"> | number
   unitInternalSavingAmount?: Prisma.DecimalFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -867,6 +928,74 @@ export type VehicleCheckItemScalarWhereInput = {
   partOrderedAt?: Prisma.DateTimeNullableFilter<"VehicleCheckItem"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"VehicleCheckItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheckItem"> | Date | string
+}
+
+export type VehicleCheckItemCreateWithoutVehiclePartInput = {
+  id?: string
+  quantity?: number
+  unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: $Enums.RepairDecisionStatus
+  decisionMessage?: string | null
+  comment?: string | null
+  partOrderRequired?: boolean
+  partOrderStatus?: $Enums.PartOrderStatus
+  partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: string | null
+  partOrderedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleCheck: Prisma.VehicleCheckCreateNestedOneWithoutItemsInput
+  repairType: Prisma.RepairTypeCreateNestedOneWithoutVehicleCheckItemsInput
+}
+
+export type VehicleCheckItemUncheckedCreateWithoutVehiclePartInput = {
+  id?: string
+  vehicleCheckId: string
+  repairTypeId: string
+  quantity?: number
+  unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: $Enums.RepairDecisionStatus
+  decisionMessage?: string | null
+  comment?: string | null
+  partOrderRequired?: boolean
+  partOrderStatus?: $Enums.PartOrderStatus
+  partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: string | null
+  partOrderedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VehicleCheckItemCreateOrConnectWithoutVehiclePartInput = {
+  where: Prisma.VehicleCheckItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput>
+}
+
+export type VehicleCheckItemCreateManyVehiclePartInputEnvelope = {
+  data: Prisma.VehicleCheckItemCreateManyVehiclePartInput | Prisma.VehicleCheckItemCreateManyVehiclePartInput[]
+  skipDuplicates?: boolean
+}
+
+export type VehicleCheckItemUpsertWithWhereUniqueWithoutVehiclePartInput = {
+  where: Prisma.VehicleCheckItemWhereUniqueInput
+  update: Prisma.XOR<Prisma.VehicleCheckItemUpdateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedUpdateWithoutVehiclePartInput>
+  create: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedCreateWithoutVehiclePartInput>
+}
+
+export type VehicleCheckItemUpdateWithWhereUniqueWithoutVehiclePartInput = {
+  where: Prisma.VehicleCheckItemWhereUniqueInput
+  data: Prisma.XOR<Prisma.VehicleCheckItemUpdateWithoutVehiclePartInput, Prisma.VehicleCheckItemUncheckedUpdateWithoutVehiclePartInput>
+}
+
+export type VehicleCheckItemUpdateManyWithWhereWithoutVehiclePartInput = {
+  where: Prisma.VehicleCheckItemScalarWhereInput
+  data: Prisma.XOR<Prisma.VehicleCheckItemUpdateManyMutationInput, Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehiclePartInput>
 }
 
 export type VehicleCheckItemCreateWithoutVehicleCheckInput = {
@@ -887,11 +1016,13 @@ export type VehicleCheckItemCreateWithoutVehicleCheckInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   repairType: Prisma.RepairTypeCreateNestedOneWithoutVehicleCheckItemsInput
+  vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
 }
 
 export type VehicleCheckItemUncheckedCreateWithoutVehicleCheckInput = {
   id?: string
   repairTypeId: string
+  vehiclePartId: string
   quantity?: number
   unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -938,6 +1069,7 @@ export type VehicleCheckItemUpdateManyWithWhereWithoutVehicleCheckInput = {
 export type VehicleCheckItemCreateManyRepairTypeInput = {
   id?: string
   vehicleCheckId: string
+  vehiclePartId: string
   quantity?: number
   unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -973,11 +1105,13 @@ export type VehicleCheckItemUpdateWithoutRepairTypeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleCheck?: Prisma.VehicleCheckUpdateOneRequiredWithoutItemsNestedInput
+  vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateWithoutRepairTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleCheckId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -998,6 +1132,91 @@ export type VehicleCheckItemUncheckedUpdateWithoutRepairTypeInput = {
 export type VehicleCheckItemUncheckedUpdateManyWithoutRepairTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleCheckId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: Prisma.EnumRepairDecisionStatusFieldUpdateOperationsInput | $Enums.RepairDecisionStatus
+  decisionMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
+  partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VehicleCheckItemCreateManyVehiclePartInput = {
+  id?: string
+  vehicleCheckId: string
+  repairTypeId: string
+  quantity?: number
+  unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: $Enums.RepairDecisionStatus
+  decisionMessage?: string | null
+  comment?: string | null
+  partOrderRequired?: boolean
+  partOrderStatus?: $Enums.PartOrderStatus
+  partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: string | null
+  partOrderedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VehicleCheckItemUpdateWithoutVehiclePartInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: Prisma.EnumRepairDecisionStatusFieldUpdateOperationsInput | $Enums.RepairDecisionStatus
+  decisionMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
+  partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleCheck?: Prisma.VehicleCheckUpdateOneRequiredWithoutItemsNestedInput
+  repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
+}
+
+export type VehicleCheckItemUncheckedUpdateWithoutVehiclePartInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  vehicleCheckId?: Prisma.StringFieldUpdateOperationsInput | string
+  repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: Prisma.EnumRepairDecisionStatusFieldUpdateOperationsInput | $Enums.RepairDecisionStatus
+  decisionMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
+  partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VehicleCheckItemUncheckedUpdateManyWithoutVehiclePartInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  vehicleCheckId?: Prisma.StringFieldUpdateOperationsInput | string
+  repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1018,6 +1237,7 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutRepairTypeInput = {
 export type VehicleCheckItemCreateManyVehicleCheckInput = {
   id?: string
   repairTypeId: string
+  vehiclePartId: string
   quantity?: number
   unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1053,11 +1273,13 @@ export type VehicleCheckItemUpdateWithoutVehicleCheckInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
+  vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateWithoutVehicleCheckInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1078,6 +1300,7 @@ export type VehicleCheckItemUncheckedUpdateWithoutVehicleCheckInput = {
 export type VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1101,6 +1324,7 @@ export type VehicleCheckItemSelect<ExtArgs extends runtime.Types.Extensions.Inte
   id?: boolean
   vehicleCheckId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   quantity?: boolean
   unitInternalSavingAmount?: boolean
   totalInternalSavingAmount?: boolean
@@ -1118,12 +1342,14 @@ export type VehicleCheckItemSelect<ExtArgs extends runtime.Types.Extensions.Inte
   updatedAt?: boolean
   vehicleCheck?: boolean | Prisma.VehicleCheckDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vehicleCheckItem"]>
 
 export type VehicleCheckItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   vehicleCheckId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   quantity?: boolean
   unitInternalSavingAmount?: boolean
   totalInternalSavingAmount?: boolean
@@ -1141,12 +1367,14 @@ export type VehicleCheckItemSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   updatedAt?: boolean
   vehicleCheck?: boolean | Prisma.VehicleCheckDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vehicleCheckItem"]>
 
 export type VehicleCheckItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   vehicleCheckId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   quantity?: boolean
   unitInternalSavingAmount?: boolean
   totalInternalSavingAmount?: boolean
@@ -1164,12 +1392,14 @@ export type VehicleCheckItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   updatedAt?: boolean
   vehicleCheck?: boolean | Prisma.VehicleCheckDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vehicleCheckItem"]>
 
 export type VehicleCheckItemSelectScalar = {
   id?: boolean
   vehicleCheckId?: boolean
   repairTypeId?: boolean
+  vehiclePartId?: boolean
   quantity?: boolean
   unitInternalSavingAmount?: boolean
   totalInternalSavingAmount?: boolean
@@ -1187,18 +1417,21 @@ export type VehicleCheckItemSelectScalar = {
   updatedAt?: boolean
 }
 
-export type VehicleCheckItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vehicleCheckId" | "repairTypeId" | "quantity" | "unitInternalSavingAmount" | "totalInternalSavingAmount" | "unitInternalCost" | "totalInternalCost" | "decisionStatus" | "decisionMessage" | "comment" | "partOrderRequired" | "partOrderStatus" | "partOrderPrice" | "partOrderReference" | "partOrderedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheckItem"]>
+export type VehicleCheckItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vehicleCheckId" | "repairTypeId" | "vehiclePartId" | "quantity" | "unitInternalSavingAmount" | "totalInternalSavingAmount" | "unitInternalCost" | "totalInternalCost" | "decisionStatus" | "decisionMessage" | "comment" | "partOrderRequired" | "partOrderStatus" | "partOrderPrice" | "partOrderReference" | "partOrderedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheckItem"]>
 export type VehicleCheckItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleCheck?: boolean | Prisma.VehicleCheckDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
 }
 export type VehicleCheckItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleCheck?: boolean | Prisma.VehicleCheckDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
 }
 export type VehicleCheckItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleCheck?: boolean | Prisma.VehicleCheckDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
+  vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
 }
 
 export type $VehicleCheckItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1206,11 +1439,13 @@ export type $VehicleCheckItemPayload<ExtArgs extends runtime.Types.Extensions.In
   objects: {
     vehicleCheck: Prisma.$VehicleCheckPayload<ExtArgs>
     repairType: Prisma.$RepairTypePayload<ExtArgs>
+    vehiclePart: Prisma.$VehiclePartPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     vehicleCheckId: string
     repairTypeId: string
+    vehiclePartId: string
     quantity: number
     unitInternalSavingAmount: runtime.Decimal
     totalInternalSavingAmount: runtime.Decimal
@@ -1622,6 +1857,7 @@ export interface Prisma__VehicleCheckItemClient<T, Null = never, ExtArgs extends
   readonly [Symbol.toStringTag]: "PrismaPromise"
   vehicleCheck<T extends Prisma.VehicleCheckDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheckDefaultArgs<ExtArgs>>): Prisma.Prisma__VehicleCheckClient<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   repairType<T extends Prisma.RepairTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RepairTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__RepairTypeClient<runtime.Types.Result.GetResult<Prisma.$RepairTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  vehiclePart<T extends Prisma.VehiclePartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehiclePartDefaultArgs<ExtArgs>>): Prisma.Prisma__VehiclePartClient<runtime.Types.Result.GetResult<Prisma.$VehiclePartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1654,6 +1890,7 @@ export interface VehicleCheckItemFieldRefs {
   readonly id: Prisma.FieldRef<"VehicleCheckItem", 'String'>
   readonly vehicleCheckId: Prisma.FieldRef<"VehicleCheckItem", 'String'>
   readonly repairTypeId: Prisma.FieldRef<"VehicleCheckItem", 'String'>
+  readonly vehiclePartId: Prisma.FieldRef<"VehicleCheckItem", 'String'>
   readonly quantity: Prisma.FieldRef<"VehicleCheckItem", 'Int'>
   readonly unitInternalSavingAmount: Prisma.FieldRef<"VehicleCheckItem", 'Decimal'>
   readonly totalInternalSavingAmount: Prisma.FieldRef<"VehicleCheckItem", 'Decimal'>

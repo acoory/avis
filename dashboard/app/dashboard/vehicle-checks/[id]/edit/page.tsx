@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { VehicleCheckForm } from "@/components/business/vehicle-check-form";
+import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +25,7 @@ export default function EditVehicleCheckPage() {
   }, [params.id]);
 
   if (isLoading) {
-    return <PageHeader title="Modifier le controle" description="Chargement du brouillon..." />;
+    return <LoadingScreen />;
   }
 
   if (!vehicleCheck) {

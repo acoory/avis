@@ -28,7 +28,7 @@ const vehicleCheckInclude = {
   manufacturer: true,
   vehicleModel: true,
   items: {
-    include: { repairType: true },
+    include: { repairType: true, vehiclePart: true },
     orderBy: { createdAt: 'asc' as const },
   },
   externalQuotes: {
@@ -60,7 +60,7 @@ export class VehicleChecksService {
     return this.prisma.vehicleCheck.findMany({
       where,
       include: vehicleCheckInclude,
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ checkDate: 'desc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -82,7 +82,10 @@ export class VehicleChecksService {
 
   async create(collaboratorId: string, dto: CreateVehicleCheckDto) {
     await this.ensureReferences(dto.agencyId, dto.manufacturerId, dto.vehicleModelId);
-    const decision = await this.repairDecisionService.preview(dto.manufacturerId, dto.items);
+    await this.ensureVehicleParts(dto.items.map((item) => item.vehiclePartId));
+    const decision = dto.items.length
+      ? await this.repairDecisionService.preview(dto.manufacturerId, dto.items)
+      : await this.emptyDecisionForManufacturer(dto.manufacturerId);
     const checkNumber = await this.generateCheckNumber();
 
     return this.prisma.vehicleCheck.create({
@@ -106,6 +109,7 @@ export class VehicleChecksService {
         items: {
           create: decision.items.map((item) => ({
             repairTypeId: item.repairTypeId,
+            vehiclePartId: item.vehiclePartId,
             quantity: item.quantity,
             unitInternalSavingAmount: item.unitInternalSavingAmount,
             totalInternalSavingAmount: item.totalInternalSavingAmount,
@@ -136,6 +140,9 @@ export class VehicleChecksService {
     const manufacturerId = dto.manufacturerId ?? existing.manufacturerId;
     const vehicleModelId = dto.vehicleModelId ?? existing.vehicleModelId ?? undefined;
     await this.ensureReferences(agencyId, manufacturerId, vehicleModelId);
+    if (dto.items) {
+      await this.ensureVehicleParts(dto.items.map((item) => item.vehiclePartId));
+    }
 
     if (!dto.items) {
       return this.prisma.vehicleCheck.update({
@@ -154,7 +161,9 @@ export class VehicleChecksService {
       });
     }
 
-    const decision = await this.repairDecisionService.preview(manufacturerId, dto.items);
+    const decision = dto.items.length
+      ? await this.repairDecisionService.preview(manufacturerId, dto.items)
+      : await this.emptyDecisionForManufacturer(manufacturerId);
 
     return this.prisma.$transaction(async (tx) => {
       await tx.vehicleCheckItem.deleteMany({ where: { vehicleCheckId: id } });
@@ -178,6 +187,7 @@ export class VehicleChecksService {
           items: {
             create: decision.items.map((item) => ({
               repairTypeId: item.repairTypeId,
+              vehiclePartId: item.vehiclePartId,
               quantity: item.quantity,
               unitInternalSavingAmount: item.unitInternalSavingAmount,
               totalInternalSavingAmount: item.totalInternalSavingAmount,
@@ -200,10 +210,6 @@ export class VehicleChecksService {
 
   async complete(id: string, user: CurrentUserPayload) {
     const vehicleCheck = await this.findOne(id, user);
-
-    if (!vehicleCheck.items.length) {
-      throw new BadRequestException('A vehicle check must contain at least one repair item');
-    }
 
     const hasForbiddenItem = vehicleCheck.items.some(
       (item) => item.decisionStatus === RepairDecisionStatus.FORBIDDEN,
@@ -260,6 +266,51 @@ export class VehicleChecksService {
     if (vehicleModel && vehicleModel.manufacturerId !== manufacturerId) {
       throw new BadRequestException('Vehicle model does not belong to selected manufacturer');
     }
+  }
+
+  private async ensureVehicleParts(vehiclePartIds: Array<string | undefined>) {
+    const uniqueVehiclePartIds = [
+      ...new Set(vehiclePartIds.filter((vehiclePartId): vehiclePartId is string => Boolean(vehiclePartId))),
+    ];
+
+    if (!uniqueVehiclePartIds.length) {
+      return;
+    }
+
+    const vehicleParts = await this.prisma.vehiclePart.findMany({
+      where: { id: { in: uniqueVehiclePartIds }, isActive: true },
+      select: { id: true },
+    });
+
+    if (vehicleParts.length !== uniqueVehiclePartIds.length) {
+      throw new NotFoundException('One or more vehicle parts were not found');
+    }
+  }
+
+  private async emptyDecisionForManufacturer(manufacturerId: string) {
+    const manufacturer = await this.prisma.manufacturer.findUnique({
+      where: { id: manufacturerId },
+      include: { rule: true },
+    });
+
+    if (!manufacturer) {
+      throw new NotFoundException('Manufacturer not found');
+    }
+
+    const constructorAllowanceAmount = manufacturer.rule?.constructorAllowanceAmount ?? '0';
+
+    return {
+      totalInternalSavingAmount: '0.00',
+      totalInternalCost: '0.00',
+      constructorAllowanceAmount: this.money(constructorAllowanceAmount),
+      allowanceDifferenceAmount: this.money(constructorAllowanceAmount),
+      decisionSummary: 'Aucun degat constate.',
+      items: [],
+    };
+  }
+
+  private money(value: Prisma.Decimal | string) {
+    return new Prisma.Decimal(value).toFixed(2);
   }
 
   private startOfDay(value: string) {

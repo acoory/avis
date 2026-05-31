@@ -389,6 +389,7 @@ export const ModelName = {
   Manufacturer: 'Manufacturer',
   VehicleModel: 'VehicleModel',
   RepairType: 'RepairType',
+  VehiclePart: 'VehiclePart',
   ManufacturerRule: 'ManufacturerRule',
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "vehicleCheckItem" | "externalQuote" | "externalQuoteItem"
+    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "vehicleCheckItem" | "externalQuote" | "externalQuoteItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -781,6 +782,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RepairTypeCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RepairTypeCountAggregateOutputType> | number
+        }
+      }
+    }
+    VehiclePart: {
+      payload: Prisma.$VehiclePartPayload<ExtArgs>
+      fields: Prisma.VehiclePartFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VehiclePartFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VehiclePartFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>
+        }
+        findFirst: {
+          args: Prisma.VehiclePartFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VehiclePartFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>
+        }
+        findMany: {
+          args: Prisma.VehiclePartFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>[]
+        }
+        create: {
+          args: Prisma.VehiclePartCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>
+        }
+        createMany: {
+          args: Prisma.VehiclePartCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VehiclePartCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>[]
+        }
+        delete: {
+          args: Prisma.VehiclePartDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>
+        }
+        update: {
+          args: Prisma.VehiclePartUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>
+        }
+        deleteMany: {
+          args: Prisma.VehiclePartDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VehiclePartUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VehiclePartUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>[]
+        }
+        upsert: {
+          args: Prisma.VehiclePartUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehiclePartPayload>
+        }
+        aggregate: {
+          args: Prisma.VehiclePartAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVehiclePart>
+        }
+        groupBy: {
+          args: Prisma.VehiclePartGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehiclePartGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VehiclePartCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehiclePartCountAggregateOutputType> | number
         }
       }
     }
@@ -1322,13 +1397,26 @@ export const RepairTypeScalarFieldEnum = {
   name: 'name',
   code: 'code',
   defaultInternalSavingAmount: 'defaultInternalSavingAmount',
-  defaultInternalCost: 'defaultInternalCost',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type RepairTypeScalarFieldEnum = (typeof RepairTypeScalarFieldEnum)[keyof typeof RepairTypeScalarFieldEnum]
+
+
+export const VehiclePartScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  category: 'category',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehiclePartScalarFieldEnum = (typeof VehiclePartScalarFieldEnum)[keyof typeof VehiclePartScalarFieldEnum]
 
 
 export const ManufacturerRuleScalarFieldEnum = {
@@ -1353,6 +1441,7 @@ export const ManufacturerRepairRuleScalarFieldEnum = {
   id: 'id',
   manufacturerId: 'manufacturerId',
   repairTypeId: 'repairTypeId',
+  vehiclePartId: 'vehiclePartId',
   status: 'status',
   allowed: 'allowed',
   mandatory: 'mandatory',
@@ -1399,6 +1488,7 @@ export const VehicleCheckItemScalarFieldEnum = {
   id: 'id',
   vehicleCheckId: 'vehicleCheckId',
   repairTypeId: 'repairTypeId',
+  vehiclePartId: 'vehiclePartId',
   quantity: 'quantity',
   unitInternalSavingAmount: 'unitInternalSavingAmount',
   totalInternalSavingAmount: 'totalInternalSavingAmount',
@@ -1543,20 +1633,6 @@ export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMo
 
 
 /**
- * Reference to a field of type 'ManufacturerRepairRuleStatus'
- */
-export type EnumManufacturerRepairRuleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ManufacturerRepairRuleStatus'>
-    
-
-
-/**
- * Reference to a field of type 'ManufacturerRepairRuleStatus[]'
- */
-export type ListEnumManufacturerRepairRuleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ManufacturerRepairRuleStatus[]'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1567,6 +1643,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ManufacturerRepairRuleStatus'
+ */
+export type EnumManufacturerRepairRuleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ManufacturerRepairRuleStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ManufacturerRepairRuleStatus[]'
+ */
+export type ListEnumManufacturerRepairRuleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ManufacturerRepairRuleStatus[]'>
     
 
 
@@ -1740,6 +1830,7 @@ export type GlobalOmitConfig = {
   manufacturer?: Prisma.ManufacturerOmit
   vehicleModel?: Prisma.VehicleModelOmit
   repairType?: Prisma.RepairTypeOmit
+  vehiclePart?: Prisma.VehiclePartOmit
   manufacturerRule?: Prisma.ManufacturerRuleOmit
   manufacturerRepairRule?: Prisma.ManufacturerRepairRuleOmit
   vehicleCheck?: Prisma.VehicleCheckOmit

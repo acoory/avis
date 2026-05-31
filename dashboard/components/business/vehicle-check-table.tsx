@@ -19,6 +19,7 @@ export function VehicleCheckTable({ vehicleChecks, onDateFilterChange }: Vehicle
   return (
     <DataTable
       data={vehicleChecks}
+      initialSort={{ column: "checkDate", direction: "desc" }}
       dateFilter={{
         label: "Date",
         getValue: (check) => check.checkDate,
@@ -26,7 +27,7 @@ export function VehicleCheckTable({ vehicleChecks, onDateFilterChange }: Vehicle
         onChange: onDateFilterChange,
       }}
       emptyMessage="Aucun controle pour le moment."
-      minWidth={1180}
+      minWidth={1040}
       columns={[
         {
           id: "checkNumber",
@@ -73,17 +74,10 @@ export function VehicleCheckTable({ vehicleChecks, onDateFilterChange }: Vehicle
         },
         {
           id: "totalInternalSavingAmount",
-          header: "Economie",
+          header: "Economie reference",
           cell: (check) => formatMoney(check.totalInternalSavingAmount),
           sortValue: (check) => Number(check.totalInternalSavingAmount),
           searchValue: (check) => check.totalInternalSavingAmount,
-        },
-        {
-          id: "totalInternalCost",
-          header: "Cout interne",
-          cell: (check) => formatMoney(check.totalInternalCost),
-          sortValue: (check) => Number(check.totalInternalCost),
-          searchValue: (check) => check.totalInternalCost,
         },
         {
           id: "status",
@@ -130,12 +124,19 @@ export function RepairItemsTable({
       minWidth={1180}
       columns={[
         {
+          id: "vehiclePart",
+          header: "Element",
+          className: "px-4 py-3 font-medium text-gray-950",
+          cell: (item) => item.vehiclePart.name,
+          sortValue: (item) => item.vehiclePart.name,
+          searchValue: (item) => item.vehiclePart.name,
+        },
+        {
           id: "repairType",
           header: "Reparation",
-          className: "px-4 py-3 font-medium text-gray-950",
           cell: (item) => item.repairType.name,
           sortValue: (item) => item.repairType.name,
-          searchValue: (item) => item.repairType.name,
+          searchValue: (item) => `${item.repairType.name} ${item.vehiclePart.name}`,
         },
         {
           id: "quantity",
@@ -267,7 +268,7 @@ function PartOrderCell({
         partOrderPrice: numericPrice,
         partOrderReference: reference || undefined,
       });
-      onPartOrderUpdated(updatedItem);
+      onPartOrderUpdated?.(updatedItem);
       toast.success("Commande pièce confirmée.");
     } catch {
       toast.error("Impossible de confirmer la commande pièce.");

@@ -51,7 +51,6 @@ export class DashboardService {
               RepairDecisionStatus.FORBIDDEN,
               RepairDecisionStatus.TO_CHECK,
               RepairDecisionStatus.WARNING,
-              RepairDecisionStatus.NOT_PROFITABLE,
             ],
           },
         },
@@ -79,7 +78,7 @@ export class DashboardService {
           manufacturer: true,
           vehicleModel: true,
           items: {
-            include: { repairType: true },
+            include: { repairType: true, vehiclePart: true },
           },
         },
       }),

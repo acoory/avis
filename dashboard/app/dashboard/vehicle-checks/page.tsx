@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ExportButton } from "@/components/business/export-button";
 import { VehicleCheckTable } from "@/components/business/vehicle-check-table";
+import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
 import { businessService } from "@/services/business.service";
@@ -42,8 +43,11 @@ export default function VehicleChecksPage() {
           </Button>
         </div>
       </div>
-      {isLoading ? <p className="text-sm text-gray-500">Chargement des controles...</p> : null}
-      <VehicleCheckTable vehicleChecks={vehicleChecks} onDateFilterChange={loadVehicleChecks} />
+      {isLoading && vehicleChecks.length === 0 ? (
+        <LoadingScreen fullScreen={false} />
+      ) : (
+        <VehicleCheckTable vehicleChecks={vehicleChecks} onDateFilterChange={loadVehicleChecks} />
+      )}
     </>
   );
 }

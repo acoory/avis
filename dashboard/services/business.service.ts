@@ -3,6 +3,8 @@ import {
   Agency,
   DashboardSummary,
   Manufacturer,
+  ManufacturerRepairRule,
+  ManufacturerRepairRuleStatus,
   RepairType,
   CreateVehicleCheckPayload,
   RepairDecisionInputItem,
@@ -10,6 +12,7 @@ import {
   VehicleCheck,
   VehicleCheckItem,
   VehicleModel,
+  VehiclePart,
 } from "@/types/business";
 
 type PeriodParams = {
@@ -127,6 +130,59 @@ export const businessService = {
 
   async repairTypes() {
     const { data } = await api.get<RepairType[]>("/repair-types");
+    return data;
+  },
+
+  async createRepairType(payload: {
+    code: string;
+    name: string;
+    defaultInternalSavingAmount: string;
+    isActive?: boolean;
+  }) {
+    const { data } = await api.post<RepairType>("/repair-types", payload);
+    return data;
+  },
+
+  async updateRepairType(
+    id: string,
+    payload: {
+      code?: string;
+      name?: string;
+      defaultInternalSavingAmount?: string;
+      isActive?: boolean;
+    },
+  ) {
+    const { data } = await api.patch<RepairType>(`/repair-types/${id}`, payload);
+    return data;
+  },
+
+  async vehicleParts() {
+    const { data } = await api.get<VehiclePart[]>("/vehicle-parts");
+    return data;
+  },
+
+  async createManufacturerRepairRule(
+    manufacturerId: string,
+    payload: {
+      repairTypeId: string;
+      vehiclePartId?: string;
+      status: ManufacturerRepairRuleStatus;
+    },
+  ) {
+    const { data } = await api.post<ManufacturerRepairRule>(
+      `/manufacturers/${manufacturerId}/repair-rules`,
+      payload,
+    );
+    return data;
+  },
+
+  async updateManufacturerRepairRule(
+    id: string,
+    payload: {
+      status: ManufacturerRepairRuleStatus;
+    },
+  ) {
+    const { data } = await api.patch<ManufacturerRepairRule>(`/manufacturer-repair-rules/${id}`, payload);
     return data;
   },
 };

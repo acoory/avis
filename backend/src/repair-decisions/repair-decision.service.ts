@@ -11,6 +11,9 @@ type DecisionLine = {
   repairTypeId: string;
   repairTypeCode: string;
   repairTypeName: string;
+  vehiclePartId: string;
+  vehiclePartCode: string;
+  vehiclePartName: string;
   quantity: number;
   unitInternalSavingAmount: string;
   totalInternalSavingAmount: string;
@@ -36,15 +39,23 @@ type DecisionResult = {
     repairTypeId: string;
     repairTypeCode: string;
     repairTypeName: string;
+    vehiclePartId: string | null;
+    vehiclePartCode: string | null;
+    vehiclePartName: string | null;
     message: string;
   }>;
   recommendedRepairTypes: Array<{
     repairTypeId: string;
     repairTypeCode: string;
     repairTypeName: string;
+    vehiclePartId: string | null;
+    vehiclePartCode: string | null;
+    vehiclePartName: string | null;
     message: string;
   }>;
 };
+
+const repairTypeCodesWithoutVehiclePart = new Set(['SERVICING']);
 
 @Injectable()
 export class RepairDecisionService {
@@ -60,7 +71,7 @@ export class RepairDecisionService {
       include: {
         rule: true,
         repairRules: {
-          include: { repairType: true },
+          include: { repairType: true, vehiclePart: true },
         },
       },
     });
@@ -79,28 +90,80 @@ export class RepairDecisionService {
     }
 
     const repairTypesById = new Map(repairTypes.map((repairType) => [repairType.id, repairType]));
-    const rulesByRepairTypeId = new Map(
-      manufacturer.repairRules.map((rule) => [rule.repairTypeId, rule]),
-    );
+    const unknownVehiclePart = items.some((item) => {
+      const repairType = repairTypesById.get(item.repairTypeId);
+      return repairType && !item.vehiclePartId && this.isVehiclePartOptional(repairType.code);
+    })
+      ? await this.ensureUnknownVehiclePart()
+      : null;
+    const vehiclePartIds = [
+      ...new Set(
+        items
+          .map((item) => item.vehiclePartId)
+          .filter((vehiclePartId): vehiclePartId is string => Boolean(vehiclePartId)),
+      ),
+    ];
+    const vehicleParts = await this.prisma.vehiclePart.findMany({
+      where: {
+        id: {
+          in: unknownVehiclePart ? [...vehiclePartIds, unknownVehiclePart.id] : vehiclePartIds,
+        },
+        isActive: true,
+      },
+    });
 
-    const lines = items.map((item) => {
+    if (vehicleParts.length !== vehiclePartIds.length + (unknownVehiclePart ? 1 : 0)) {
+      throw new NotFoundException('One or more vehicle parts were not found');
+    }
+
+    const vehiclePartsById = new Map(vehicleParts.map((vehiclePart) => [vehiclePart.id, vehiclePart]));
+    const normalizedItems = items.map((item) => {
       const repairType = repairTypesById.get(item.repairTypeId);
       if (!repairType) {
         throw new NotFoundException('Repair type not found');
       }
 
-      const repairRule = rulesByRepairTypeId.get(item.repairTypeId);
+      if (item.vehiclePartId) {
+        return {
+          ...item,
+          repairType,
+          vehiclePartId: item.vehiclePartId,
+        };
+      }
+
+      if (this.isVehiclePartOptional(repairType.code) && unknownVehiclePart) {
+        return {
+          ...item,
+          repairType,
+          vehiclePartId: unknownVehiclePart.id,
+        };
+      }
+
+      throw new BadRequestException(`Vehicle part is required for ${repairType.name}`);
+    });
+    const rulesByRepairTypeAndPartId = new Map(
+      manufacturer.repairRules.map((rule) => [this.ruleKey(rule.repairTypeId, rule.vehiclePartId), rule]),
+    );
+
+    const lines = normalizedItems.map((item) => {
+      const repairType = item.repairType;
+      const vehiclePart = vehiclePartsById.get(item.vehiclePartId);
+      if (!vehiclePart) {
+        throw new NotFoundException('Vehicle part not found');
+      }
+
+      const repairRule =
+        rulesByRepairTypeAndPartId.get(this.ruleKey(item.repairTypeId, item.vehiclePartId)) ??
+        rulesByRepairTypeAndPartId.get(this.ruleKey(item.repairTypeId, null));
       const unitInternalSavingAmount =
         repairRule?.customInternalSavingAmount ?? repairType.defaultInternalSavingAmount;
-      const unitInternalCost = repairRule?.customInternalCost ?? repairType.defaultInternalCost;
+      const unitInternalCost = new Decimal(0);
       const totalInternalSavingAmount = unitInternalSavingAmount.mul(item.quantity);
       const totalInternalCost = unitInternalCost.mul(item.quantity);
-      const netSavingAmount = totalInternalSavingAmount.minus(totalInternalCost);
       const decision = this.resolveLineDecision({
         manufacturerName: manufacturer.name,
         repairTypeName: repairType.name,
         totalInternalSavingAmount,
-        totalInternalCost,
         repairRule,
       });
 
@@ -108,6 +171,9 @@ export class RepairDecisionService {
         repairTypeId: repairType.id,
         repairTypeCode: repairType.code,
         repairTypeName: repairType.name,
+        vehiclePartId: vehiclePart.id,
+        vehiclePartCode: vehiclePart.code,
+        vehiclePartName: vehiclePart.name,
         quantity: item.quantity,
         unitInternalSavingAmount: this.money(unitInternalSavingAmount),
         totalInternalSavingAmount: this.money(totalInternalSavingAmount),
@@ -116,7 +182,7 @@ export class RepairDecisionService {
         decisionStatus: decision.status,
         decisionMessage:
           decision.message ??
-          `Economie estimee : ${this.money(netSavingAmount)} EUR.`,
+          `Economie reference : ${this.money(totalInternalSavingAmount)} EUR.`,
         comment: item.comment,
         partOrderRequired: item.partOrderRequired ?? false,
       } satisfies DecisionLine;
@@ -131,26 +197,32 @@ export class RepairDecisionService {
       new Decimal(0),
     );
     const constructorAllowanceAmount = manufacturer.rule?.constructorAllowanceAmount ?? new Decimal(0);
-    const allowanceDifferenceAmount = constructorAllowanceAmount.minus(totalInternalCost);
+    const allowanceDifferenceAmount = constructorAllowanceAmount;
     const alerts: string[] = [];
 
-    if (allowanceDifferenceAmount.lt(0)) {
-      alerts.push('Attention, le total des couts internes depasse la franchise constructeur.');
-    }
-
-    const providedRepairTypeIds = new Set(items.map((item) => item.repairTypeId));
+    const providedRepairTypeIds = new Set(normalizedItems.map((item) => item.repairTypeId));
+    const providedRepairTypeAndPartIds = new Set(
+      normalizedItems.map((item) => this.ruleKey(item.repairTypeId, item.vehiclePartId)),
+    );
     const missingMandatoryRepairTypes = manufacturer.repairRules
       .filter(
         (rule) =>
           rule.mandatory &&
           rule.repairType.code !== 'REVISION' &&
-          !providedRepairTypeIds.has(rule.repairTypeId),
+          (rule.vehiclePartId
+            ? !providedRepairTypeAndPartIds.has(this.ruleKey(rule.repairTypeId, rule.vehiclePartId))
+            : !providedRepairTypeIds.has(rule.repairTypeId)),
       )
       .map((rule) => ({
         repairTypeId: rule.repairType.id,
         repairTypeCode: rule.repairType.code,
         repairTypeName: rule.repairType.name,
-        message: `${rule.repairType.name} obligatoire avant restitution.`,
+        vehiclePartId: rule.vehiclePart?.id ?? null,
+        vehiclePartCode: rule.vehiclePart?.code ?? null,
+        vehiclePartName: rule.vehiclePart?.name ?? null,
+        message: rule.vehiclePart
+          ? `${rule.vehiclePart.name} - ${rule.repairType.name} obligatoire avant restitution.`
+          : `${rule.repairType.name} obligatoire avant restitution.`,
       }));
 
     for (const mandatory of missingMandatoryRepairTypes) {
@@ -170,6 +242,9 @@ export class RepairDecisionService {
         repairTypeId: rule.repairType.id,
         repairTypeCode: rule.repairType.code,
         repairTypeName: rule.repairType.name,
+        vehiclePartId: rule.vehiclePart?.id ?? null,
+        vehiclePartCode: rule.vehiclePart?.code ?? null,
+        vehiclePartName: rule.vehiclePart?.name ?? null,
         message:
           rule.comment ??
           'Revision conseillée si elle est à faire sur le véhicule et rentable.',
@@ -180,8 +255,7 @@ export class RepairDecisionService {
     const warningCount = lines.filter((line) => line.decisionStatus === RepairDecisionStatus.WARNING).length;
     const summaryParts = [
       `${lines.length} ligne(s) analysee(s)`,
-      `${this.money(totalInternalSavingAmount)} EUR d'economie estimee`,
-      `${this.money(totalInternalCost)} EUR de cout interne`,
+      `${this.money(totalInternalSavingAmount)} EUR d'economie reference`,
     ];
 
     if (forbiddenCount) summaryParts.push(`${forbiddenCount} interdite(s)`);
@@ -213,13 +287,11 @@ export class RepairDecisionService {
     manufacturerName,
     repairTypeName,
     totalInternalSavingAmount,
-    totalInternalCost,
     repairRule,
   }: {
     manufacturerName: string;
     repairTypeName: string;
     totalInternalSavingAmount: Decimal;
-    totalInternalCost: Decimal;
     repairRule?: {
       status: ManufacturerRepairRuleStatus;
       allowed: boolean;
@@ -240,13 +312,6 @@ export class RepairDecisionService {
       return {
         status: RepairDecisionStatus.MANDATORY,
         message: repairRule.comment ?? `${repairTypeName} obligatoire avant restitution.`,
-      };
-    }
-
-    if (totalInternalSavingAmount.lte(totalInternalCost)) {
-      return {
-        status: RepairDecisionStatus.NOT_PROFITABLE,
-        message: `${repairTypeName} non rentable selon les montants internes.`,
       };
     }
 
@@ -281,5 +346,27 @@ export class RepairDecisionService {
 
   private money(value: Decimal | string): string {
     return new Decimal(value).toFixed(2);
+  }
+
+  private isVehiclePartOptional(repairTypeCode: string) {
+    return repairTypeCodesWithoutVehiclePart.has(repairTypeCode);
+  }
+
+  private async ensureUnknownVehiclePart() {
+    return this.prisma.vehiclePart.upsert({
+      where: { code: 'UNKNOWN' },
+      update: { isActive: true },
+      create: {
+        code: 'UNKNOWN',
+        name: 'Non precise',
+        category: 'GENERAL',
+        displayOrder: 0,
+        isActive: true,
+      },
+    });
+  }
+
+  private ruleKey(repairTypeId: string, vehiclePartId: string | null) {
+    return `${repairTypeId}:${vehiclePartId ?? 'ANY'}`;
   }
 }

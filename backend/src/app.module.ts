@@ -11,6 +11,7 @@ import { RepairTypesModule } from './repair-types/repair-types.module';
 import { VehicleChecksModule } from './vehicle-checks/vehicle-checks.module';
 import { VehicleCheckItemsModule } from './vehicle-check-items/vehicle-check-items.module';
 import { VehicleModelsModule } from './vehicle-models/vehicle-models.module';
+import { VehiclePartsModule } from './vehicle-parts/vehicle-parts.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ExportsModule } from './exports/exports.module';
 
@@ -25,6 +26,7 @@ import { ExportsModule } from './exports/exports.module';
     AgenciesModule,
     ManufacturersModule,
     VehicleModelsModule,
+    VehiclePartsModule,
     RepairTypesModule,
     ManufacturerRulesModule,
     ManufacturerRepairRulesModule,

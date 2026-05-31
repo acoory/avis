@@ -22,6 +22,10 @@ type DataTableProps<T> = {
   data: T[];
   emptyMessage?: string;
   minWidth?: number;
+  initialSort?: {
+    column: string;
+    direction: SortDirection;
+  };
   dateFilter?: {
     label: string;
     getValue: (row: T) => string | Date | null | undefined;
@@ -37,11 +41,12 @@ export function DataTable<T>({
   data,
   emptyMessage = "Aucune donnee.",
   minWidth = 760,
+  initialSort,
   dateFilter,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
-  const [sortColumn, setSortColumn] = useState<string | null>(columns[0]?.id ?? null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [sortColumn, setSortColumn] = useState<string | null>(initialSort?.column ?? null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(initialSort?.direction ?? "asc");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [dateFrom, setDateFrom] = useState("");
@@ -80,7 +85,7 @@ export function DataTable<T>({
 
   const sortedData = useMemo(() => {
     const column = columns.find((item) => item.id === sortColumn);
-    if (!column?.sortValue) {
+    if (!sortColumn || !column?.sortValue) {
       return filteredData;
     }
 

@@ -43,6 +43,11 @@ export type VehicleModel = Prisma.VehicleModelModel
  */
 export type RepairType = Prisma.RepairTypeModel
 /**
+ * Model VehiclePart
+ * 
+ */
+export type VehiclePart = Prisma.VehiclePartModel
+/**
  * Model ManufacturerRule
  * 
  */

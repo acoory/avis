@@ -1,11 +1,15 @@
 "use client";
 
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { VehicleCheckActions } from "@/components/business/vehicle-check-actions";
 import { VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { RepairItemsTable, VehicleCheckTable } from "@/components/business/vehicle-check-table";
+import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
@@ -14,9 +18,13 @@ import { VehicleCheck, VehicleCheckItem } from "@/types/business";
 export default function VehicleCheckDetailsPage() {
   const params = useParams<{ id: string }>();
   const [vehicleCheck, setVehicleCheck] = useState<VehicleCheck | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    void businessService.vehicleCheck(params.id).then(setVehicleCheck);
+    void businessService
+      .vehicleCheck(params.id)
+      .then(setVehicleCheck)
+      .finally(() => setIsLoading(false));
   }, [params.id]);
 
   function handlePartOrderUpdated(updatedItem: VehicleCheckItem) {
@@ -30,12 +38,24 @@ export default function VehicleCheckDetailsPage() {
     );
   }
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   if (!vehicleCheck) {
-    return <PageHeader title="Controle" description="Chargement du controle..." />;
+    return <PageHeader title="Controle introuvable" description="Impossible de charger ce controle." />;
   }
 
   return (
     <>
+      <div className="mb-4">
+        <Button asChild size="sm" variant="outline">
+          <Link href="/dashboard/vehicle-checks">
+            <ChevronLeft className="h-4 w-4" />
+            Retour aux controles
+          </Link>
+        </Button>
+      </div>
       <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <PageHeader
@@ -46,21 +66,13 @@ export default function VehicleCheckDetailsPage() {
         </div>
         <VehicleCheckActions vehicleCheck={vehicleCheck} onCompleted={setVehicleCheck} />
       </div>
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Economie</CardTitle>
+            <CardTitle>Economie reference</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-semibold text-teal-700">
             {formatMoney(vehicleCheck.totalInternalSavingAmount)}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Cout interne</CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold text-gray-950">
-            {formatMoney(vehicleCheck.totalInternalCost)}
           </CardContent>
         </Card>
         <Card>
@@ -69,14 +81,6 @@ export default function VehicleCheckDetailsPage() {
           </CardHeader>
           <CardContent className="text-2xl font-semibold text-gray-950">
             {formatMoney(vehicleCheck.constructorAllowanceAmount)}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Ecart</CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-semibold text-gray-950">
-            {formatMoney(vehicleCheck.allowanceDifferenceAmount)}
           </CardContent>
         </Card>
       </div>

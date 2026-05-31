@@ -13,6 +13,10 @@ export class ManufacturersService {
       include: {
         _count: { select: { models: true, repairRules: true, checks: true } },
         rule: true,
+        repairRules: {
+          include: { repairType: true, vehiclePart: true },
+          orderBy: [{ repairType: { name: 'asc' } }, { vehiclePart: { displayOrder: 'asc' } }],
+        },
       },
       orderBy: { name: 'asc' },
     });
@@ -25,8 +29,8 @@ export class ManufacturersService {
         models: { orderBy: { name: 'asc' } },
         rule: true,
         repairRules: {
-          include: { repairType: true },
-          orderBy: { repairType: { name: 'asc' } },
+          include: { repairType: true, vehiclePart: true },
+          orderBy: [{ repairType: { name: 'asc' } }, { vehiclePart: { displayOrder: 'asc' } }],
         },
       },
     });

@@ -2,18 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BarChart3,
-  Building2,
-  Car,
-  ClipboardList,
-  Gauge,
-  MapPin,
-  Settings,
-  Users,
-  Wrench,
-  X,
-} from "lucide-react";
+import { BarChart3, Building2, Car, ClipboardList, Gauge, MapPin, Settings, Users, Wrench, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
@@ -22,13 +11,13 @@ import { Role } from "@/types/auth";
 const navigation = [
   { label: "Buy Back", href: "/dashboard", icon: Gauge },
   { label: "Controles", href: "/dashboard/vehicle-checks", icon: ClipboardList },
-  { label: "Agences", href: "/dashboard/agencies", icon: MapPin },
+  { label: "Agences", href: "/dashboard/agencies", icon: MapPin, roles: ["ADMIN"] as Role[] },
   { label: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["ADMIN", "MANAGER"] as Role[] },
-  { label: "Vehicules", href: "/dashboard/vehicles", icon: Car },
-  { label: "Types reparations", href: "/dashboard/repair-types", icon: Wrench },
-  { label: "Constructeurs", href: "/dashboard/manufacturers", icon: Building2 },
-  { label: "Rapports", href: "/dashboard/reports", icon: BarChart3 },
-  { label: "Parametres", href: "/dashboard/settings", icon: Settings },
+  // { label: "Vehicules", href: "/dashboard/vehicles", icon: Car },
+  { label: "Types reparations", href: "/dashboard/repair-types", icon: Wrench, roles: ["ADMIN"] as Role[] },
+  { label: "Constructeurs", href: "/dashboard/manufacturers", icon: Building2, roles: ["ADMIN"] as Role[] },
+  // { label: "Rapports", href: "/dashboard/reports", icon: BarChart3 },
+  // { label: "Parametres", href: "/dashboard/settings", icon: Settings },
 ];
 
 type SidebarProps = {
@@ -44,10 +33,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   return (
     <>
       <div
-        className={cn(
-          "fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden",
-          isOpen ? "opacity-100" : "pointer-events-none opacity-0",
-        )}
+        className={cn("fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden", isOpen ? "opacity-100" : "pointer-events-none opacity-0")}
         aria-hidden="true"
         onClick={onClose}
       />

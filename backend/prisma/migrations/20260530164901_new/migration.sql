@@ -1,0 +1,2 @@
+-- RenameIndex
+ALTER INDEX "ManufacturerRepairRule_manufacturerId_repairTypeId_vehiclePartI" RENAME TO "ManufacturerRepairRule_manufacturerId_repairTypeId_vehicleP_key";

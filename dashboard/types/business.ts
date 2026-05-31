@@ -7,6 +7,12 @@ export type RepairDecisionStatus =
   | "MANDATORY"
   | "WARNING";
 export type PartOrderStatus = "NOT_REQUIRED" | "TO_ORDER" | "ORDERED";
+export type ManufacturerRepairRuleStatus =
+  | "ALLOWED"
+  | "FORBIDDEN"
+  | "TO_CHECK"
+  | "MANDATORY"
+  | "CONDITIONAL";
 
 export type Agency = {
   id: string;
@@ -18,11 +24,25 @@ export type Manufacturer = {
   id: string;
   name: string;
   rule?: ManufacturerRule | null;
+  repairRules?: ManufacturerRepairRule[];
   _count?: {
     models: number;
     repairRules: number;
     checks: number;
   };
+};
+
+export type ManufacturerRepairRule = {
+  id: string;
+  repairTypeId: string;
+  vehiclePartId?: string | null;
+  status: ManufacturerRepairRuleStatus;
+  allowed: boolean;
+  mandatory: boolean;
+  comment?: string | null;
+  repairType: RepairType;
+  vehiclePart?: VehiclePart | null;
+  manufacturer?: Manufacturer;
 };
 
 export type VehicleModel = {
@@ -37,7 +57,15 @@ export type RepairType = {
   name: string;
   code: string;
   defaultInternalSavingAmount: string;
-  defaultInternalCost: string;
+  isActive: boolean;
+};
+
+export type VehiclePart = {
+  id: string;
+  name: string;
+  code: string;
+  category?: string | null;
+  displayOrder: number;
   isActive: boolean;
 };
 
@@ -88,11 +116,13 @@ export type VehicleCheck = {
     decisionStatus: RepairDecisionStatus;
     decisionMessage?: string | null;
     repairType: RepairType;
+    vehiclePart: VehiclePart;
   }>;
 };
 
 export type RepairDecisionInputItem = {
   repairTypeId: string;
+  vehiclePartId?: string;
   quantity: number;
   comment?: string;
   partOrderRequired?: boolean;
@@ -111,6 +141,9 @@ export type RepairDecisionPreview = {
     repairTypeId: string;
     repairTypeCode: string;
     repairTypeName: string;
+    vehiclePartId: string;
+    vehiclePartCode: string;
+    vehiclePartName: string;
     quantity: number;
     unitInternalSavingAmount: string;
     totalInternalSavingAmount: string;
@@ -125,12 +158,18 @@ export type RepairDecisionPreview = {
     repairTypeId: string;
     repairTypeCode: string;
     repairTypeName: string;
+    vehiclePartId?: string | null;
+    vehiclePartCode?: string | null;
+    vehiclePartName?: string | null;
     message: string;
   }>;
   recommendedRepairTypes?: Array<{
     repairTypeId: string;
     repairTypeCode: string;
     repairTypeName: string;
+    vehiclePartId?: string | null;
+    vehiclePartCode?: string | null;
+    vehiclePartName?: string | null;
     message: string;
   }>;
 };

@@ -28,7 +28,6 @@ type CollaboratorSaving = {
   collaboratorName: string;
   collaboratorEmail: string | null;
   totalInternalSavingAmount: string;
-  totalInternalCost: string;
   vehicleChecksCount: number;
 };
 
@@ -100,7 +99,7 @@ export default function DashboardPage() {
       current.itemsCount += itemsToOrder.length;
       current.checksCount += 1;
       current.estimatedAmount += itemsToOrder.reduce(
-        (total, item) => total + Number(item.partOrderPrice ?? item.repairType.defaultInternalCost ?? 0),
+        (total, item) => total + Number(item.partOrderPrice ?? 0),
         0,
       );
       grouped.set(key, current);
@@ -115,7 +114,6 @@ export default function DashboardPage() {
         name: row.collaboratorName,
         controles: row.vehicleChecksCount,
         economies: Number(row.totalInternalSavingAmount),
-        coutInterne: Number(row.totalInternalCost),
       })),
     [byCollaborator],
   );
@@ -187,18 +185,11 @@ export default function DashboardPage() {
                       <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${Number(value).toLocaleString("fr-FR")}€`} />
                       <Tooltip
                         formatter={(value, name) => [
-                          name === "economies" || name === "coutInterne"
-                            ? formatMoney(Number(value))
-                            : value,
-                          name === "economies"
-                            ? "Economies"
-                            : name === "coutInterne"
-                              ? "Cout interne"
-                              : "Controles",
+                          name === "economies" ? formatMoney(Number(value)) : value,
+                          name === "economies" ? "Economies" : "Controles",
                         ]}
                       />
                       <Bar dataKey="economies" fill="#0f766e" name="Economies" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="coutInterne" fill="#94a3b8" name="Cout interne" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -214,7 +205,6 @@ export default function DashboardPage() {
                       <th className="py-3 font-medium">Collaborateur</th>
                       <th className="py-3 font-medium">Controles</th>
                       <th className="py-3 font-medium">Economies</th>
-                      <th className="py-3 font-medium">Cout interne</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -228,12 +218,11 @@ export default function DashboardPage() {
                         <td className="py-3 font-semibold text-teal-700">
                           {formatMoney(row.totalInternalSavingAmount)}
                         </td>
-                        <td className="py-3 text-gray-700">{formatMoney(row.totalInternalCost)}</td>
                       </tr>
                     ))}
                     {!byCollaborator.length ? (
                       <tr>
-                        <td className="py-6 text-center text-gray-500" colSpan={4}>
+                        <td className="py-6 text-center text-gray-500" colSpan={3}>
                           Aucune donnee collaborateur pour le moment.
                         </td>
                       </tr>

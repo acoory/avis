@@ -1,7 +1,11 @@
-import { IsBoolean, IsDecimal, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDecimal, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ManufacturerRepairRuleStatus } from '../../../prisma/generated/client.cjs';
 
 export class UpdateManufacturerRepairRuleDto {
+  @IsOptional()
+  @IsUUID()
+  vehiclePartId?: string;
+
   @IsOptional()
   @IsEnum(ManufacturerRepairRuleStatus)
   status?: ManufacturerRepairRuleStatus;

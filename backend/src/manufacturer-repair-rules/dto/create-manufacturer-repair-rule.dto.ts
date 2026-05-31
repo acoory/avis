@@ -5,6 +5,10 @@ export class CreateManufacturerRepairRuleDto {
   @IsUUID()
   repairTypeId: string;
 
+  @IsOptional()
+  @IsUUID()
+  vehiclePartId?: string;
+
   @IsEnum(ManufacturerRepairRuleStatus)
   status: ManufacturerRepairRuleStatus;
 

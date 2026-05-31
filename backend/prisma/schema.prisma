@@ -112,7 +112,6 @@ model RepairType {
   name                        String
   code                        String   @unique
   defaultInternalSavingAmount Decimal  @default(0) @db.Decimal(12, 2)
-  defaultInternalCost         Decimal  @default(0) @db.Decimal(12, 2)
   isActive                    Boolean  @default(true)
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime @updatedAt
@@ -121,6 +120,24 @@ model RepairType {
   vehicleCheckItems       VehicleCheckItem[]
   externalQuoteItems      ExternalQuoteItem[]
 
+  @@index([isActive])
+}
+
+model VehiclePart {
+  id           String   @id @default(uuid())
+  name         String
+  code         String   @unique
+  category     String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  manufacturerRepairRules ManufacturerRepairRule[]
+  vehicleCheckItems       VehicleCheckItem[]
+
+  @@index([category])
+  @@index([displayOrder])
   @@index([isActive])
 }
 
@@ -145,6 +162,7 @@ model ManufacturerRepairRule {
   id                         String                       @id @default(uuid())
   manufacturerId             String
   repairTypeId               String
+  vehiclePartId              String?
   status                     ManufacturerRepairRuleStatus @default(ALLOWED)
   allowed                    Boolean                      @default(true)
   mandatory                  Boolean                      @default(false)
@@ -158,10 +176,12 @@ model ManufacturerRepairRule {
 
   manufacturer Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
   repairType   RepairType   @relation(fields: [repairTypeId], references: [id], onDelete: Cascade)
+  vehiclePart  VehiclePart? @relation(fields: [vehiclePartId], references: [id], onDelete: Cascade)
 
-  @@unique([manufacturerId, repairTypeId])
+  @@unique([manufacturerId, repairTypeId, vehiclePartId])
   @@index([manufacturerId])
   @@index([repairTypeId])
+  @@index([vehiclePartId])
   @@index([status])
 }
 
@@ -208,6 +228,7 @@ model VehicleCheckItem {
   id                        String               @id @default(uuid())
   vehicleCheckId            String
   repairTypeId              String
+  vehiclePartId             String
   quantity                  Int                  @default(1)
   unitInternalSavingAmount  Decimal              @default(0) @db.Decimal(12, 2)
   totalInternalSavingAmount Decimal              @default(0) @db.Decimal(12, 2)
@@ -226,9 +247,11 @@ model VehicleCheckItem {
 
   vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
   repairType   RepairType   @relation(fields: [repairTypeId], references: [id], onDelete: Restrict)
+  vehiclePart  VehiclePart  @relation(fields: [vehiclePartId], references: [id], onDelete: Restrict)
 
   @@index([vehicleCheckId])
   @@index([repairTypeId])
+  @@index([vehiclePartId])
   @@index([decisionStatus])
   @@index([partOrderStatus])
 }

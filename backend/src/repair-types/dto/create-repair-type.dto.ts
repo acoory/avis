@@ -10,9 +10,6 @@ export class CreateRepairTypeDto {
   @IsDecimal()
   defaultInternalSavingAmount: string;
 
-  @IsDecimal()
-  defaultInternalCost: string;
-
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;

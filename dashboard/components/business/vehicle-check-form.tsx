@@ -8,6 +8,7 @@ import {
   FileText,
   Plus,
   Save,
+  Search,
   Trash2,
   X,
 } from "lucide-react";
@@ -29,11 +30,13 @@ import {
   RepairType,
   VehicleCheck,
   VehicleModel,
+  VehiclePart,
 } from "@/types/business";
 
 type DraftRepairLine = {
   id: string;
   repairTypeId: string;
+  vehiclePartId: string;
   quantity: number;
   comment: string;
   partOrderRequired: boolean;
@@ -50,6 +53,8 @@ const formSteps = [
   { title: "Observations", description: "Commentaire final et enregistrement." },
 ];
 
+const repairTypeCodesWithoutVehiclePart = new Set(["SERVICING"]);
+
 export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -58,6 +63,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
   const [vehicleModels, setVehicleModels] = useState<VehicleModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [vehicleParts, setVehicleParts] = useState<VehiclePart[]>([]);
   const [agencyId, setAgencyId] = useState("");
   const [manufacturerId, setManufacturerId] = useState("");
   const [vehicleModelId, setVehicleModelId] = useState("");
@@ -81,10 +87,12 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       businessService.agencies(),
       businessService.manufacturers(),
       businessService.repairTypes(),
-    ]).then(([agenciesData, manufacturersData, repairTypesData]) => {
+      businessService.vehicleParts(),
+    ]).then(([agenciesData, manufacturersData, repairTypesData, vehiclePartsData]) => {
       setAgencies(agenciesData);
       setManufacturers(manufacturersData);
       setRepairTypes(repairTypesData);
+      setVehicleParts(vehiclePartsData);
       setAgencyId(initialVehicleCheck?.agency?.id ?? agenciesData[0]?.id ?? "");
       setManufacturerId(initialVehicleCheck?.manufacturer?.id ?? manufacturersData[0]?.id ?? "");
       setVehicleModelId(initialVehicleCheck?.vehicleModel?.id ?? "");
@@ -102,6 +110,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           ? initialVehicleCheck.items.map((item) => ({
               id: item.id,
               repairTypeId: item.repairType.id,
+              vehiclePartId: item.vehiclePart.id,
               quantity: item.quantity,
               comment: item.comment ?? "",
               partOrderRequired: item.partOrderRequired,
@@ -116,21 +125,33 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     void businessService.vehicleModels(manufacturerId).then(setVehicleModels);
   }, [manufacturerId]);
 
+  function isVehiclePartOptional(repairTypeId: string) {
+    const repairType = repairTypes.find((item) => item.id === repairTypeId);
+    return repairType ? repairTypeCodesWithoutVehiclePart.has(repairType.code) : false;
+  }
+
   const decisionItems = useMemo<RepairDecisionInputItem[]>(
     () =>
       lines
-        .filter((line) => line.repairTypeId && line.quantity > 0)
+        .filter(
+          (line) =>
+            line.repairTypeId &&
+            (line.vehiclePartId || isVehiclePartOptional(line.repairTypeId)) &&
+            line.quantity > 0,
+        )
         .map((line) => ({
           repairTypeId: line.repairTypeId,
+          vehiclePartId: line.vehiclePartId || undefined,
           quantity: line.quantity,
           comment: line.comment || undefined,
           partOrderRequired: line.partOrderRequired,
         })),
-    [lines],
+    [lines, repairTypes],
   );
 
   useEffect(() => {
     if (!manufacturerId || !decisionItems.length) {
+      setPreview(null);
       return;
     }
 
@@ -157,7 +178,22 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
   const selectedAgency = agencies.find((agency) => agency.id === agencyId);
   const selectedManufacturer = manufacturers.find((manufacturer) => manufacturer.id === manufacturerId);
-  const activePreview = manufacturerId && decisionItems.length ? preview : null;
+  const emptyPreview = manufacturerId
+    ? {
+        manufacturerId,
+        manufacturerName: selectedManufacturer?.name ?? "",
+        constructorAllowanceAmount: selectedManufacturer?.rule?.constructorAllowanceAmount ?? "0.00",
+        totalInternalSavingAmount: "0.00",
+        totalInternalCost: "0.00",
+        allowanceDifferenceAmount: selectedManufacturer?.rule?.constructorAllowanceAmount ?? "0.00",
+        decisionSummary: "Aucun degat constate.",
+        alerts: [],
+        items: [],
+        missingMandatoryRepairTypes: [],
+        recommendedRepairTypes: [],
+      }
+    : null;
+  const activePreview = manufacturerId ? (decisionItems.length ? preview : emptyPreview) : null;
 
   function addLine() {
     setLines((current) => [
@@ -165,6 +201,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       {
         id: crypto.randomUUID(),
         repairTypeId: repairTypes[0]?.id ?? "",
+        vehiclePartId: "",
         quantity: 1,
         comment: "",
         partOrderRequired: false,
@@ -174,6 +211,28 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
   function updateLine(id: string, patch: Partial<DraftRepairLine>) {
     setLines((current) => current.map((line) => (line.id === id ? { ...line, ...patch } : line)));
+  }
+
+  function changeRepairType(id: string, repairTypeId: string) {
+    setLines((current) =>
+      current.map((line) => {
+        if (line.id !== id) {
+          return line;
+        }
+
+        const nextVehiclePartId = repairTypeCodesWithoutVehiclePart.has(
+          repairTypes.find((item) => item.id === repairTypeId)?.code ?? "",
+        )
+          ? ""
+          : line.vehiclePartId;
+
+        return {
+          ...line,
+          repairTypeId,
+          vehiclePartId: nextVehiclePartId,
+        };
+      }),
+    );
   }
 
   function removeLine(id: string) {
@@ -194,6 +253,12 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     );
   }
 
+  function setQuantity(id: string, rawValue: string) {
+    const digitsOnly = rawValue.replace(/\D/g, "");
+    const nextQuantity = digitsOnly ? Math.max(1, Number(digitsOnly)) : 1;
+    updateLine(id, { quantity: nextQuantity });
+  }
+
   function buildPayload() {
     return {
       agencyId,
@@ -209,8 +274,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   function validateRequiredFields() {
-    if (!agencyId || !manufacturerId || !licensePlate || !city || !decisionItems.length) {
-      toast.error("Renseigne les informations vehicule et au moins une reparation.");
+    if (!agencyId || !manufacturerId || !licensePlate || !city) {
+      toast.error("Renseigne les informations vehicule obligatoires.");
       return false;
     }
 
@@ -220,11 +285,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   function validateCurrentStep() {
     if (activeStep === 0 && (!agencyId || !manufacturerId || !licensePlate || !city)) {
       toast.error("Renseigne l'agence, le constructeur, l'immatriculation et la ville.");
-      return false;
-    }
-
-    if (activeStep === 1 && !decisionItems.length) {
-      toast.error("Ajoute au moins une reparation observee.");
       return false;
     }
 
@@ -407,11 +467,21 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
         <CardContent className="space-y-3 p-4 pt-0 md:p-6 md:pt-0">
           {!lines.length ? (
             <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-600">
-              Aucune reparation ajoutee pour le moment.
+              <p>Aucune reparation ajoutee pour le moment.</p>
+              <p className="mt-1 text-gray-500">
+                Si le vehicule n'a aucun degat particulier, tu peux passer directement a l'etape suivante.
+              </p>
             </div>
           ) : null}
           {lines.map((line, index) => {
-            const previewLine = activePreview?.items.find((item) => item.repairTypeId === line.repairTypeId);
+            const previewLine = activePreview?.items.find(
+              (item) =>
+                item.repairTypeId === line.repairTypeId &&
+                (line.vehiclePartId
+                  ? item.vehiclePartId === line.vehiclePartId
+                  : item.vehiclePartCode === "UNKNOWN"),
+            );
+            const lineRequiresNoVehiclePart = isVehiclePartOptional(line.repairTypeId);
 
             return (
               <div className="space-y-3 rounded-md border border-gray-200 bg-white p-3" key={line.id}>
@@ -428,13 +498,28 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                   </Button>
                 </div>
 
-                <div className="grid gap-3 lg:grid-cols-[1fr_160px_1fr]">
+                <div className="grid gap-3 lg:grid-cols-[1fr_1fr_140px]">
+                  <div className="space-y-2">
+                    <Label>Element</Label>
+                    {lineRequiresNoVehiclePart ? (
+                      <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-sm text-gray-500 md:py-2.5">
+                        Aucun element requis pour ce type.
+                      </div>
+                    ) : (
+                      <VehiclePartAutocomplete
+                        vehicleParts={vehicleParts}
+                        value={line.vehiclePartId}
+                        onChange={(vehiclePartId) => updateLine(line.id, { vehiclePartId })}
+                      />
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label>Type</Label>
                     <select
                       className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
                       value={line.repairTypeId}
-                      onChange={(event) => updateLine(line.id, { repairTypeId: event.target.value })}
+                      onChange={(event) => changeRepairType(line.id, event.target.value)}
                     >
                       {repairTypes.map((repairType) => (
                         <option key={repairType.id} value={repairType.id}>
@@ -442,6 +527,26 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                         </option>
                       ))}
                     </select>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {repairTypes
+                        .filter((repairType) => repairType.isActive)
+                        .slice(0, 10)
+                        .map((repairType) => (
+                          <button
+                            className={[
+                              "rounded-md px-2 py-1 text-xs font-medium",
+                              repairType.id === line.repairTypeId
+                                ? "bg-teal-50 text-teal-800"
+                                : "bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-800",
+                            ].join(" ")}
+                            key={repairType.id}
+                            type="button"
+                            onClick={() => changeRepairType(line.id, repairType.id)}
+                          >
+                            {repairType.name}
+                          </button>
+                        ))}
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -455,12 +560,12 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                         -
                       </button>
                       <Input
-                        className="h-12 rounded-none border-0 text-center text-base shadow-none focus:border-0 md:h-12"
+                        className="h-12 rounded-none border-0 px-1 text-center text-base font-semibold shadow-none focus:border-0"
                         inputMode="numeric"
-                        min={1}
-                        type="number"
-                        value={line.quantity}
-                        onChange={(event) => updateLine(line.id, { quantity: Number(event.target.value) || 1 })}
+                        pattern="[0-9]*"
+                        type="text"
+                        value={String(line.quantity)}
+                        onChange={(event) => setQuantity(line.id, event.target.value)}
                       />
                       <button
                         className="h-12 border-l border-gray-200 text-lg font-semibold text-gray-700"
@@ -471,16 +576,16 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                       </button>
                     </div>
                   </div>
+                </div>
 
-                  <div className="space-y-2">
+                <div className="space-y-2">
                     <Label>Commentaire</Label>
                     <Input
                       className="h-12 text-base md:h-10 md:text-sm"
-                      placeholder="Ex: pare-choc av droit"
+                      placeholder="Ex: rayure profonde"
                       value={line.comment}
                       onChange={(event) => updateLine(line.id, { comment: event.target.value })}
                     />
-                  </div>
                 </div>
 
                 <label className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-700">
@@ -500,7 +605,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                       <span>{previewLine.decisionMessage}</span>
                     </div>
                     <span className="font-medium text-gray-950">
-                      {formatMoney(previewLine.totalInternalSavingAmount)} economie | {formatMoney(previewLine.totalInternalCost)} cout
+                      {formatMoney(previewLine.totalInternalSavingAmount)} economie reference
                     </span>
                   </div>
                 ) : null}
@@ -541,7 +646,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 p-3 shadow-lg backdrop-blur md:hidden">
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-gray-500">Economie estimee</span>
+          <span className="text-gray-500">Economie reference</span>
           <span className="font-semibold text-teal-700">{formatMoney(activePreview?.totalInternalSavingAmount)}</span>
         </div>
         <StepActions
@@ -687,6 +792,129 @@ function StepActions({
   );
 }
 
+function VehiclePartAutocomplete({
+  vehicleParts,
+  value,
+  onChange,
+}: {
+  vehicleParts: VehiclePart[];
+  value: string;
+  onChange: (vehiclePartId: string) => void;
+}) {
+  const selectedPart = vehicleParts.find((vehiclePart) => vehiclePart.id === value);
+  const [query, setQuery] = useState(selectedPart?.name ?? "");
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setQuery(selectedPart?.name ?? "");
+  }, [selectedPart?.name]);
+
+  const filteredVehicleParts = useMemo(() => {
+    const normalizedQuery = normalizeSearchText(query);
+    const visibleVehicleParts = vehicleParts.filter((vehiclePart) => vehiclePart.code !== "UNKNOWN");
+
+    if (!normalizedQuery) {
+      return visibleVehicleParts.slice(0, 10);
+    }
+
+    return visibleVehicleParts
+      .filter((vehiclePart) =>
+        normalizeSearchText(`${vehiclePart.name} ${vehiclePart.code} ${vehiclePart.category ?? ""}`).includes(
+          normalizedQuery,
+        ),
+      )
+      .slice(0, 10);
+  }, [query, vehicleParts]);
+  const availableCategories = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          vehicleParts
+            .map((vehiclePart) => vehiclePart.category)
+            .filter((category): category is string => Boolean(category) && category !== "GENERAL"),
+        ),
+      ),
+    [vehicleParts],
+  );
+
+  function selectVehiclePart(vehiclePart: VehiclePart) {
+    onChange(vehiclePart.id);
+    setQuery(vehiclePart.name);
+    setIsOpen(false);
+  }
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Input
+          autoComplete="off"
+          className="h-12 pl-9 text-base md:h-10 md:text-sm"
+          placeholder="Rechercher un element..."
+          value={query}
+          onBlur={() => {
+            window.setTimeout(() => {
+              setIsOpen(false);
+              setQuery(selectedPart?.name ?? "");
+            }, 120);
+          }}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+        />
+      </div>
+
+      {isOpen ? (
+        <div className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg">
+          {filteredVehicleParts.length ? (
+            filteredVehicleParts.map((vehiclePart) => (
+              <button
+                className={[
+                  "flex w-full items-start justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-teal-50",
+                  vehiclePart.id === value ? "bg-teal-50 text-teal-900" : "text-gray-800",
+                ].join(" ")}
+                key={vehiclePart.id}
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => selectVehiclePart(vehiclePart)}
+              >
+                <span className="font-medium">{vehiclePart.name}</span>
+                {vehiclePart.category ? (
+                  <span className="shrink-0 rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+                    {vehiclePart.category.toLowerCase()}
+                  </span>
+                ) : null}
+              </button>
+            ))
+          ) : (
+            <div className="px-3 py-2 text-sm text-gray-500">Aucun element trouve</div>
+          )}
+        </div>
+      ) : null}
+
+      {availableCategories.length ? (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {availableCategories.map((category) => (
+            <button
+              className="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-teal-50 hover:text-teal-800"
+              key={category}
+              type="button"
+              onClick={() => {
+                setQuery(category.toLowerCase());
+                setIsOpen(true);
+              }}
+            >
+              {category.toLowerCase()}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function DecisionSummaryPanel({
   agencyName,
   manufacturerName,
@@ -706,7 +934,7 @@ function DecisionSummaryPanel({
   if (!preview) {
     return (
       <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-        Ajoute au moins une reparation pour afficher la synthese.
+        Aucune reparation renseignee. Tu peux continuer si le vehicule n'a aucun degat particulier.
       </div>
     );
   }
@@ -721,7 +949,8 @@ function DecisionSummaryPanel({
               <p className="font-semibold">A faire obligatoirement</p>
               <div className="mt-2 space-y-1 text-sm">
                 {mandatoryItems.map((item) => (
-                  <p key={item.repairTypeId}>
+                  <p key={`${item.repairTypeId}-${item.vehiclePartId ?? "any"}`}>
+                    {item.vehiclePartName ? `${item.vehiclePartName} - ` : ""}
                     {item.repairTypeName} doit etre ajoute avant la restitution.
                   </p>
                 ))}
@@ -734,8 +963,14 @@ function DecisionSummaryPanel({
           <div className="flex items-start gap-3">
             <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
             <div>
-              <p className="font-semibold">Aucun blocage constructeur détecté</p>
-              <p className="mt-1 text-sm">Tu peux vérifier les recommandations et alertes ci-dessous.</p>
+              <p className="font-semibold">
+                {preview.items.length ? "Aucun blocage constructeur détecté" : "Aucun degat signale"}
+              </p>
+              <p className="mt-1 text-sm">
+                {preview.items.length
+                  ? "Tu peux vérifier les recommandations et alertes ci-dessous."
+                  : "Tu peux continuer et valider le controle tel quel si besoin."}
+              </p>
             </div>
           </div>
         </div>
@@ -749,7 +984,7 @@ function DecisionSummaryPanel({
               <p className="font-semibold">Recommandations constructeur</p>
               <div className="mt-2 space-y-1 text-sm">
                 {recommendedItems.map((item) => (
-                  <p key={item.repairTypeId}>{item.message}</p>
+                  <p key={`${item.repairTypeId}-${item.vehiclePartId ?? "any"}`}>{item.message}</p>
                 ))}
               </div>
             </div>
@@ -776,10 +1011,8 @@ function DecisionSummaryPanel({
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Summary label="Constructeur" value={manufacturerName} />
         <Summary label="Agence" value={agencyName} />
-        <Summary label="Economie totale" value={formatMoney(preview.totalInternalSavingAmount)} />
-        <Summary label="Cout interne" value={formatMoney(preview.totalInternalCost)} />
+        <Summary label="Economie reference" value={formatMoney(preview.totalInternalSavingAmount)} />
         <Summary label="Franchise constructeur" value={formatMoney(preview.constructorAllowanceAmount)} />
-        <Summary label="Ecart franchise" value={formatMoney(preview.allowanceDifferenceAmount)} />
         <Summary label="Pieces a commander" value={partOrderSummaryLabel(preview.items)} />
       </div>
 
@@ -789,26 +1022,31 @@ function DecisionSummaryPanel({
           <p className="mt-1 text-xs text-gray-500">{preview.decisionSummary}</p>
         </div>
         <div className="divide-y divide-gray-100">
-          {preview.items.map((item, index) => (
-            <div className="space-y-2 p-3" key={`${item.repairTypeId}-${index}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-medium text-gray-950">
-                    {item.repairTypeName} x{item.quantity}
-                  </p>
-                  <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
-                  {item.partOrderRequired ? <PartOrderDraftBadge /> : null}
+          {preview.items.length ? (
+            preview.items.map((item, index) => (
+              <div className="space-y-2 p-3" key={`${item.repairTypeId}-${item.vehiclePartId}-${index}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm text-gray-500">{item.vehiclePartName}</p>
+                    <p className="font-medium text-gray-950">
+                      {item.repairTypeName} x{item.quantity}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
+                    {item.partOrderRequired ? <PartOrderDraftBadge /> : null}
+                  </div>
+                  <DecisionBadge status={item.decisionStatus} />
                 </div>
-                <DecisionBadge status={item.decisionStatus} />
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <span>{item.comment?.trim() ? item.comment : "Sans commentaire"}</span>
+                  <span className="font-medium text-gray-950">
+                    {formatMoney(item.totalInternalSavingAmount)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>{item.comment?.trim() ? item.comment : "Sans commentaire"}</span>
-                <span className="font-medium text-gray-950">
-                  {formatMoney(item.totalInternalSavingAmount)}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="p-3 text-sm text-gray-600">Aucun degat signale.</div>
+          )}
         </div>
       </div>
     </>
@@ -895,9 +1133,8 @@ function ValidationRecap({
             <RecapLine label="Modele" value={vehicleModelName} />
             <RecapLine label="Agence" value={selectedAgencyName} />
             <RecapLine label="Ville" value={city} />
-            <RecapLine label="Economie estimee" value={formatMoney(preview?.totalInternalSavingAmount)} />
+            <RecapLine label="Economie reference" value={formatMoney(preview?.totalInternalSavingAmount)} />
             <RecapLine label="Franchise constructeur" value={formatMoney(preview?.constructorAllowanceAmount)} />
-            <RecapLine label="Ecart franchise" value={formatMoney(preview?.allowanceDifferenceAmount)} />
             <RecapLine label="Pieces a commander" value={partOrderSummaryLabel(preview?.items ?? [])} />
           </div>
 
@@ -906,26 +1143,31 @@ function ValidationRecap({
               Reparations
             </div>
             <div className="divide-y divide-gray-100">
-              {preview?.items.map((item, index) => (
-                <div className="space-y-2 p-3" key={`${item.repairTypeId}-${index}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium text-gray-950">
-                        {item.repairTypeName} x{item.quantity}
-                      </p>
-                      <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
-                      {item.partOrderRequired ? <PartOrderDraftBadge /> : null}
+              {preview?.items.length ? (
+                preview.items.map((item, index) => (
+                  <div className="space-y-2 p-3" key={`${item.repairTypeId}-${item.vehiclePartId}-${index}`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-gray-500">{item.vehiclePartName}</p>
+                        <p className="font-medium text-gray-950">
+                          {item.repairTypeName} x{item.quantity}
+                        </p>
+                        <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
+                        {item.partOrderRequired ? <PartOrderDraftBadge /> : null}
+                      </div>
+                      <DecisionBadge status={item.decisionStatus} />
                     </div>
-                    <DecisionBadge status={item.decisionStatus} />
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <span>{item.comment?.trim() ? item.comment : "Sans commentaire"}</span>
+                      <span className="font-medium text-gray-950">
+                        {formatMoney(item.totalInternalSavingAmount)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>{item.comment?.trim() ? item.comment : "Sans commentaire"}</span>
-                    <span className="font-medium text-gray-950">
-                      {formatMoney(item.totalInternalSavingAmount)}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="p-3 text-sm text-gray-600">Aucun degat signale.</div>
+              )}
             </div>
           </div>
 
@@ -964,4 +1206,12 @@ function RecapLine({ label, value }: { label: string; value: string }) {
       <p className="mt-1 text-sm font-semibold text-gray-950">{value || "-"}</p>
     </div>
   );
+}
+
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }

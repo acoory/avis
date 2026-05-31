@@ -5,7 +5,7 @@ export default function RepairsPage() {
   return (
     <>
       <PageHeader title="Reparations" description="Placeholder pour le futur suivi des reparations." />
-      <DataTablePlaceholder columns={["Vehicule", "Type", "Cout interne", "Statut"]} title="Reparations" />
+      <DataTablePlaceholder columns={["Vehicule", "Type", "Economie reference", "Statut"]} title="Reparations" />
     </>
   );
 }

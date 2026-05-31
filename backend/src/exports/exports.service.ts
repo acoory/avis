@@ -38,7 +38,7 @@ export class ExportsService {
           vehicleModel: true,
           agency: true,
           items: {
-            include: { repairType: true },
+            include: { repairType: true, vehiclePart: true },
           },
         },
         orderBy: { checkDate: 'desc' },
@@ -88,7 +88,7 @@ export class ExportsService {
     worksheet.getRow(1).height = 28;
 
     worksheet.getRow(2).height = 8;
-    worksheet.getRow(3).values = [undefined, ...columns.map((column) => column.header)];
+    worksheet.getRow(3).values = columns.map((column) => column.header);
     this.styleSummaryHeader(worksheet, 3);
 
     for (const check of vehicleChecks) {
@@ -123,9 +123,7 @@ export class ExportsService {
       { header: 'Agence', key: 'agency', width: 24 },
       { header: 'Modele', key: 'vehicleModel', width: 18 },
       { header: 'Kilometrage', key: 'mileage', width: 14 },
-      { header: 'Cout interne total', key: 'totalInternalCost', width: 18 },
       { header: 'Franchise constructeur', key: 'constructorAllowanceAmount', width: 22 },
-      { header: 'Ecart franchise', key: 'allowanceDifferenceAmount', width: 18 },
       { header: 'Statut', key: 'status', width: 14 },
       { header: 'Commentaire', key: 'decisionSummary', width: 52 },
     ];
@@ -136,16 +134,47 @@ export class ExportsService {
         agency: check.agency.name,
         vehicleModel: check.vehicleModel?.name ?? '',
         mileage: check.mileage ?? null,
-        totalInternalCost: this.number(check.totalInternalCost),
         constructorAllowanceAmount: this.number(check.constructorAllowanceAmount),
-        allowanceDifferenceAmount: this.number(check.allowanceDifferenceAmount),
         status: check.status,
         decisionSummary: check.decisionSummary ?? check.notes ?? '',
       });
     }
-    detailsWorksheet.getColumn('totalInternalCost').numFmt = '#,##0.00 €';
     detailsWorksheet.getColumn('constructorAllowanceAmount').numFmt = '#,##0.00 €';
-    detailsWorksheet.getColumn('allowanceDifferenceAmount').numFmt = '#,##0.00 €';
+
+    const linesWorksheet = workbook.addWorksheet('Lignes reparations');
+    linesWorksheet.columns = [
+      { header: 'Numero controle', key: 'checkNumber', width: 18 },
+      { header: 'Date du contrôle', key: 'checkDate', width: 16 },
+      { header: 'Constructeur', key: 'manufacturer', width: 18 },
+      { header: 'Immatriculation', key: 'licensePlate', width: 18 },
+      { header: 'Element', key: 'vehiclePart', width: 32 },
+      { header: 'Type de réparation', key: 'repairType', width: 24 },
+      { header: 'Quantite', key: 'quantity', width: 10 },
+      { header: 'Decision', key: 'decisionStatus', width: 16 },
+      { header: 'Message', key: 'decisionMessage', width: 52 },
+      { header: 'Commentaire', key: 'comment', width: 32 },
+      { header: 'Economie', key: 'totalInternalSavingAmount', width: 16 },
+    ];
+    this.styleSimpleHeader(linesWorksheet);
+    for (const check of vehicleChecks) {
+      for (const item of check.items) {
+        linesWorksheet.addRow({
+          checkNumber: check.checkNumber,
+          checkDate: check.checkDate,
+          manufacturer: check.manufacturer.name,
+          licensePlate: formatLicensePlate(check.licensePlate),
+          vehiclePart: item.vehiclePart.name,
+          repairType: item.repairType.name,
+          quantity: item.quantity,
+          decisionStatus: item.decisionStatus,
+          decisionMessage: item.decisionMessage ?? '',
+          comment: item.comment ?? '',
+          totalInternalSavingAmount: this.number(item.totalInternalSavingAmount),
+        });
+      }
+    }
+    linesWorksheet.getColumn('checkDate').numFmt = 'dd/mm/yyyy';
+    linesWorksheet.getColumn('totalInternalSavingAmount').numFmt = '#,##0.00 €';
 
     const xlsxBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(xlsxBuffer);

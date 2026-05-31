@@ -28,12 +28,10 @@ export type AggregateRepairType = {
 
 export type RepairTypeAvgAggregateOutputType = {
   defaultInternalSavingAmount: runtime.Decimal | null
-  defaultInternalCost: runtime.Decimal | null
 }
 
 export type RepairTypeSumAggregateOutputType = {
   defaultInternalSavingAmount: runtime.Decimal | null
-  defaultInternalCost: runtime.Decimal | null
 }
 
 export type RepairTypeMinAggregateOutputType = {
@@ -41,7 +39,6 @@ export type RepairTypeMinAggregateOutputType = {
   name: string | null
   code: string | null
   defaultInternalSavingAmount: runtime.Decimal | null
-  defaultInternalCost: runtime.Decimal | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,7 +49,6 @@ export type RepairTypeMaxAggregateOutputType = {
   name: string | null
   code: string | null
   defaultInternalSavingAmount: runtime.Decimal | null
-  defaultInternalCost: runtime.Decimal | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -63,7 +59,6 @@ export type RepairTypeCountAggregateOutputType = {
   name: number
   code: number
   defaultInternalSavingAmount: number
-  defaultInternalCost: number
   isActive: number
   createdAt: number
   updatedAt: number
@@ -73,12 +68,10 @@ export type RepairTypeCountAggregateOutputType = {
 
 export type RepairTypeAvgAggregateInputType = {
   defaultInternalSavingAmount?: true
-  defaultInternalCost?: true
 }
 
 export type RepairTypeSumAggregateInputType = {
   defaultInternalSavingAmount?: true
-  defaultInternalCost?: true
 }
 
 export type RepairTypeMinAggregateInputType = {
@@ -86,7 +79,6 @@ export type RepairTypeMinAggregateInputType = {
   name?: true
   code?: true
   defaultInternalSavingAmount?: true
-  defaultInternalCost?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -97,7 +89,6 @@ export type RepairTypeMaxAggregateInputType = {
   name?: true
   code?: true
   defaultInternalSavingAmount?: true
-  defaultInternalCost?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -108,7 +99,6 @@ export type RepairTypeCountAggregateInputType = {
   name?: true
   code?: true
   defaultInternalSavingAmount?: true
-  defaultInternalCost?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -206,7 +196,6 @@ export type RepairTypeGroupByOutputType = {
   name: string
   code: string
   defaultInternalSavingAmount: runtime.Decimal
-  defaultInternalCost: runtime.Decimal
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -240,7 +229,6 @@ export type RepairTypeWhereInput = {
   name?: Prisma.StringFilter<"RepairType"> | string
   code?: Prisma.StringFilter<"RepairType"> | string
   defaultInternalSavingAmount?: Prisma.DecimalFilter<"RepairType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFilter<"RepairType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFilter<"RepairType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"RepairType"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RepairType"> | Date | string
@@ -254,7 +242,6 @@ export type RepairTypeOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   defaultInternalSavingAmount?: Prisma.SortOrder
-  defaultInternalCost?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -271,7 +258,6 @@ export type RepairTypeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RepairTypeWhereInput | Prisma.RepairTypeWhereInput[]
   name?: Prisma.StringFilter<"RepairType"> | string
   defaultInternalSavingAmount?: Prisma.DecimalFilter<"RepairType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFilter<"RepairType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFilter<"RepairType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"RepairType"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RepairType"> | Date | string
@@ -285,7 +271,6 @@ export type RepairTypeOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   defaultInternalSavingAmount?: Prisma.SortOrder
-  defaultInternalCost?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -304,7 +289,6 @@ export type RepairTypeScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"RepairType"> | string
   code?: Prisma.StringWithAggregatesFilter<"RepairType"> | string
   defaultInternalSavingAmount?: Prisma.DecimalWithAggregatesFilter<"RepairType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalWithAggregatesFilter<"RepairType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolWithAggregatesFilter<"RepairType"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"RepairType"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"RepairType"> | Date | string
@@ -315,7 +299,6 @@ export type RepairTypeCreateInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -329,7 +312,6 @@ export type RepairTypeUncheckedCreateInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -343,7 +325,6 @@ export type RepairTypeUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -357,7 +338,6 @@ export type RepairTypeUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -371,7 +351,6 @@ export type RepairTypeCreateManyInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -382,7 +361,6 @@ export type RepairTypeUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -393,7 +371,6 @@ export type RepairTypeUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -404,7 +381,6 @@ export type RepairTypeCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   defaultInternalSavingAmount?: Prisma.SortOrder
-  defaultInternalCost?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -412,7 +388,6 @@ export type RepairTypeCountOrderByAggregateInput = {
 
 export type RepairTypeAvgOrderByAggregateInput = {
   defaultInternalSavingAmount?: Prisma.SortOrder
-  defaultInternalCost?: Prisma.SortOrder
 }
 
 export type RepairTypeMaxOrderByAggregateInput = {
@@ -420,7 +395,6 @@ export type RepairTypeMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   defaultInternalSavingAmount?: Prisma.SortOrder
-  defaultInternalCost?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -431,7 +405,6 @@ export type RepairTypeMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   defaultInternalSavingAmount?: Prisma.SortOrder
-  defaultInternalCost?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -439,7 +412,6 @@ export type RepairTypeMinOrderByAggregateInput = {
 
 export type RepairTypeSumOrderByAggregateInput = {
   defaultInternalSavingAmount?: Prisma.SortOrder
-  defaultInternalCost?: Prisma.SortOrder
 }
 
 export type RepairTypeScalarRelationFilter = {
@@ -509,7 +481,6 @@ export type RepairTypeCreateWithoutManufacturerRepairRulesInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -522,7 +493,6 @@ export type RepairTypeUncheckedCreateWithoutManufacturerRepairRulesInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -551,7 +521,6 @@ export type RepairTypeUpdateWithoutManufacturerRepairRulesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -564,7 +533,6 @@ export type RepairTypeUncheckedUpdateWithoutManufacturerRepairRulesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -577,7 +545,6 @@ export type RepairTypeCreateWithoutVehicleCheckItemsInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -590,7 +557,6 @@ export type RepairTypeUncheckedCreateWithoutVehicleCheckItemsInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -619,7 +585,6 @@ export type RepairTypeUpdateWithoutVehicleCheckItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -632,7 +597,6 @@ export type RepairTypeUncheckedUpdateWithoutVehicleCheckItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -645,7 +609,6 @@ export type RepairTypeCreateWithoutExternalQuoteItemsInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -658,7 +621,6 @@ export type RepairTypeUncheckedCreateWithoutExternalQuoteItemsInput = {
   name: string
   code: string
   defaultInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -687,7 +649,6 @@ export type RepairTypeUpdateWithoutExternalQuoteItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -700,7 +661,6 @@ export type RepairTypeUncheckedUpdateWithoutExternalQuoteItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   defaultInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  defaultInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -762,7 +722,6 @@ export type RepairTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   name?: boolean
   code?: boolean
   defaultInternalSavingAmount?: boolean
-  defaultInternalCost?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -777,7 +736,6 @@ export type RepairTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   name?: boolean
   code?: boolean
   defaultInternalSavingAmount?: boolean
-  defaultInternalCost?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -788,7 +746,6 @@ export type RepairTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   name?: boolean
   code?: boolean
   defaultInternalSavingAmount?: boolean
-  defaultInternalCost?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -799,13 +756,12 @@ export type RepairTypeSelectScalar = {
   name?: boolean
   code?: boolean
   defaultInternalSavingAmount?: boolean
-  defaultInternalCost?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RepairTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "defaultInternalSavingAmount" | "defaultInternalCost" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["repairType"]>
+export type RepairTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "defaultInternalSavingAmount" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["repairType"]>
 export type RepairTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   manufacturerRepairRules?: boolean | Prisma.RepairType$manufacturerRepairRulesArgs<ExtArgs>
   vehicleCheckItems?: boolean | Prisma.RepairType$vehicleCheckItemsArgs<ExtArgs>
@@ -827,7 +783,6 @@ export type $RepairTypePayload<ExtArgs extends runtime.Types.Extensions.Internal
     name: string
     code: string
     defaultInternalSavingAmount: runtime.Decimal
-    defaultInternalCost: runtime.Decimal
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -1261,7 +1216,6 @@ export interface RepairTypeFieldRefs {
   readonly name: Prisma.FieldRef<"RepairType", 'String'>
   readonly code: Prisma.FieldRef<"RepairType", 'String'>
   readonly defaultInternalSavingAmount: Prisma.FieldRef<"RepairType", 'Decimal'>
-  readonly defaultInternalCost: Prisma.FieldRef<"RepairType", 'Decimal'>
   readonly isActive: Prisma.FieldRef<"RepairType", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"RepairType", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"RepairType", 'DateTime'>

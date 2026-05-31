@@ -56,6 +56,7 @@ export const ModelName = {
   Manufacturer: 'Manufacturer',
   VehicleModel: 'VehicleModel',
   RepairType: 'RepairType',
+  VehiclePart: 'VehiclePart',
   ManufacturerRule: 'ManufacturerRule',
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
@@ -135,13 +136,26 @@ export const RepairTypeScalarFieldEnum = {
   name: 'name',
   code: 'code',
   defaultInternalSavingAmount: 'defaultInternalSavingAmount',
-  defaultInternalCost: 'defaultInternalCost',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type RepairTypeScalarFieldEnum = (typeof RepairTypeScalarFieldEnum)[keyof typeof RepairTypeScalarFieldEnum]
+
+
+export const VehiclePartScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  category: 'category',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehiclePartScalarFieldEnum = (typeof VehiclePartScalarFieldEnum)[keyof typeof VehiclePartScalarFieldEnum]
 
 
 export const ManufacturerRuleScalarFieldEnum = {
@@ -166,6 +180,7 @@ export const ManufacturerRepairRuleScalarFieldEnum = {
   id: 'id',
   manufacturerId: 'manufacturerId',
   repairTypeId: 'repairTypeId',
+  vehiclePartId: 'vehiclePartId',
   status: 'status',
   allowed: 'allowed',
   mandatory: 'mandatory',
@@ -212,6 +227,7 @@ export const VehicleCheckItemScalarFieldEnum = {
   id: 'id',
   vehicleCheckId: 'vehicleCheckId',
   repairTypeId: 'repairTypeId',
+  vehiclePartId: 'vehiclePartId',
   quantity: 'quantity',
   unitInternalSavingAmount: 'unitInternalSavingAmount',
   totalInternalSavingAmount: 'totalInternalSavingAmount',

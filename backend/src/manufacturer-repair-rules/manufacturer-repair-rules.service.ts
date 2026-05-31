@@ -13,27 +13,40 @@ export class ManufacturerRepairRulesService {
 
     return this.prisma.manufacturerRepairRule.findMany({
       where: { manufacturerId },
-      include: { repairType: true, manufacturer: true },
-      orderBy: { repairType: { name: 'asc' } },
+      include: { repairType: true, vehiclePart: true, manufacturer: true },
+      orderBy: [{ repairType: { name: 'asc' } }, { vehiclePart: { displayOrder: 'asc' } }],
     });
   }
 
   async create(manufacturerId: string, dto: CreateManufacturerRepairRuleDto) {
     await this.ensureManufacturerExists(manufacturerId);
     await this.ensureRepairTypeExists(dto.repairTypeId);
+    if (dto.vehiclePartId) await this.ensureVehiclePartExists(dto.vehiclePartId);
 
     const allowed = dto.allowed ?? dto.status !== ManufacturerRepairRuleStatus.FORBIDDEN;
     const mandatory = dto.mandatory ?? dto.status === ManufacturerRepairRuleStatus.MANDATORY;
+    const existingRule = await this.prisma.manufacturerRepairRule.findFirst({
+      where: {
+        manufacturerId,
+        repairTypeId: dto.repairTypeId,
+        vehiclePartId: dto.vehiclePartId ?? null,
+      },
+    });
+
+    if (existingRule) {
+      throw new ConflictException('Repair rule already exists for this manufacturer, repair type and vehicle part');
+    }
 
     try {
       return await this.prisma.manufacturerRepairRule.create({
         data: {
           ...dto,
           manufacturerId,
+          vehiclePartId: dto.vehiclePartId ?? null,
           allowed,
           mandatory,
         },
-        include: { repairType: true, manufacturer: true },
+        include: { repairType: true, vehiclePart: true, manufacturer: true },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -44,12 +57,34 @@ export class ManufacturerRepairRulesService {
   }
 
   async update(id: string, dto: UpdateManufacturerRepairRuleDto) {
-    await this.ensureExists(id);
+    const existing = await this.ensureExists(id);
+    if (dto.vehiclePartId) await this.ensureVehiclePartExists(dto.vehiclePartId);
+
+    const repairTypeId = existing.repairTypeId;
+    const vehiclePartId = dto.vehiclePartId ?? existing.vehiclePartId;
+    const duplicateRule = await this.prisma.manufacturerRepairRule.findFirst({
+      where: {
+        id: { not: id },
+        manufacturerId: existing.manufacturerId,
+        repairTypeId,
+        vehiclePartId: vehiclePartId ?? null,
+      },
+    });
+
+    if (duplicateRule) {
+      throw new ConflictException('Repair rule already exists for this manufacturer, repair type and vehicle part');
+    }
+
+    const data = {
+      ...dto,
+      allowed: dto.allowed ?? (dto.status ? dto.status !== ManufacturerRepairRuleStatus.FORBIDDEN : undefined),
+      mandatory: dto.mandatory ?? (dto.status ? dto.status === ManufacturerRepairRuleStatus.MANDATORY : undefined),
+    };
 
     return this.prisma.manufacturerRepairRule.update({
       where: { id },
-      data: dto,
-      include: { repairType: true, manufacturer: true },
+      data,
+      include: { repairType: true, vehiclePart: true, manufacturer: true },
     });
   }
 
@@ -60,10 +95,14 @@ export class ManufacturerRepairRulesService {
   }
 
   private async ensureExists(id: string) {
-    const rule = await this.prisma.manufacturerRepairRule.findUnique({ where: { id }, select: { id: true } });
+    const rule = await this.prisma.manufacturerRepairRule.findUnique({
+      where: { id },
+      select: { id: true, manufacturerId: true, repairTypeId: true, vehiclePartId: true },
+    });
     if (!rule) {
       throw new NotFoundException('Manufacturer repair rule not found');
     }
+    return rule;
   }
 
   private async ensureManufacturerExists(id: string) {
@@ -77,6 +116,13 @@ export class ManufacturerRepairRulesService {
     const repairType = await this.prisma.repairType.findUnique({ where: { id }, select: { id: true } });
     if (!repairType) {
       throw new NotFoundException('Repair type not found');
+    }
+  }
+
+  private async ensureVehiclePartExists(id: string) {
+    const vehiclePart = await this.prisma.vehiclePart.findUnique({ where: { id }, select: { id: true } });
+    if (!vehiclePart) {
+      throw new NotFoundException('Vehicle part not found');
     }
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Pencil } from "lucide-react";
+import { CheckCircle2, Pencil, Printer } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,16 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
   return (
     <div className="flex flex-col gap-2 sm:items-end">
       <div className="flex gap-2">
+        <Button asChild variant="outline">
+          <Link
+            href={`/dashboard/vehicle-checks/${vehicleCheck.id}/print?autoprint=1`}
+            rel="noreferrer"
+            target="_blank"
+          >
+            <Printer className="h-4 w-4" />
+            PDF
+          </Link>
+        </Button>
         <Button asChild variant="outline">
           <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>
             <Pencil className="h-4 w-4" />

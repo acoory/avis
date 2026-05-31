@@ -33,7 +33,7 @@ export class VehicleCheckItemsService {
         partOrderReference: status === PartOrderStatus.NOT_REQUIRED ? null : dto.partOrderReference,
         partOrderedAt: status === PartOrderStatus.ORDERED ? new Date() : undefined,
       },
-      include: { repairType: true },
+      include: { repairType: true, vehiclePart: true },
     });
   }
 }

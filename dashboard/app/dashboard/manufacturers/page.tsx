@@ -3,20 +3,86 @@
 import Link from "next/link";
 import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { DataTable } from "@/components/dashboard/data-table";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
-import { Manufacturer } from "@/types/business";
+import {
+  Manufacturer,
+  ManufacturerRepairRule,
+  ManufacturerRepairRuleStatus,
+  RepairType,
+} from "@/types/business";
+import { useAuthStore } from "@/stores/auth.store";
+
+const editableStatuses: Array<{ value: ManufacturerRepairRuleStatus; label: string }> = [
+  { value: "ALLOWED", label: "OUI" },
+  { value: "FORBIDDEN", label: "NON" },
+  { value: "TO_CHECK", label: "A verifier" },
+  { value: "MANDATORY", label: "Obligatoire" },
+];
 
 export default function ManufacturersPage() {
+  const user = useAuthStore((state) => state.user);
+  const canEditRules = user?.role === "ADMIN";
   const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
+  const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [savingCell, setSavingCell] = useState<string | null>(null);
 
   useEffect(() => {
-    void businessService.manufacturers().then(setManufacturers);
+    void Promise.all([businessService.manufacturers(), businessService.repairTypes()]).then(
+      ([manufacturersData, repairTypesData]) => {
+        setManufacturers(manufacturersData);
+        setRepairTypes(repairTypesData.filter((repairType) => repairType.isActive));
+      },
+    );
   }, []);
+
+  async function updateMatrixRule(
+    manufacturer: Manufacturer,
+    repairType: RepairType,
+    status: ManufacturerRepairRuleStatus,
+  ) {
+    const existingRule = findGeneralRule(manufacturer, repairType.id);
+    const cellKey = matrixCellKey(manufacturer.id, repairType.id);
+    setSavingCell(cellKey);
+
+    try {
+      const savedRule = existingRule
+        ? await businessService.updateManufacturerRepairRule(existingRule.id, { status })
+        : await businessService.createManufacturerRepairRule(manufacturer.id, {
+            repairTypeId: repairType.id,
+            status,
+          });
+
+      setManufacturers((current) =>
+        current.map((item) =>
+          item.id === manufacturer.id
+            ? {
+                ...item,
+                repairRules: upsertRepairRule(item.repairRules ?? [], savedRule),
+                _count: {
+                  models: item._count?.models ?? 0,
+                  checks: item._count?.checks ?? 0,
+                  repairRules: existingRule
+                    ? item._count?.repairRules ?? 0
+                    : (item._count?.repairRules ?? 0) + 1,
+                },
+              }
+            : item,
+        ),
+      );
+      toast.success("Regle constructeur mise a jour.");
+    } catch {
+      toast.error("Impossible de modifier cette regle constructeur.");
+    } finally {
+      setSavingCell(null);
+    }
+  }
 
   return (
     <>
@@ -87,6 +153,103 @@ export default function ManufacturersPage() {
           },
         ]}
       />
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Matrice constructeur</CardTitle>
+        </CardHeader>
+        <CardContent className="overflow-x-auto">
+          <table className="w-full min-w-[1120px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+                <th className="sticky left-0 z-10 bg-gray-50 px-3 py-3 font-medium">Constructeur</th>
+                {repairTypes.map((repairType) => (
+                  <th className="px-3 py-3 text-center font-medium" key={repairType.id}>
+                    {repairType.name}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {manufacturers.map((manufacturer) => (
+                <tr key={manufacturer.id}>
+                  <td className="sticky left-0 z-10 bg-white px-3 py-3 font-semibold text-gray-950">
+                    {manufacturer.name}
+                  </td>
+                  {repairTypes.map((repairType) => {
+                    const rule = findGeneralRule(manufacturer, repairType.id);
+                    const cellKey = matrixCellKey(manufacturer.id, repairType.id);
+
+                    return (
+                      <td className="px-3 py-3 text-center" key={repairType.id}>
+                        <RuleStatusSelect
+                          disabled={!canEditRules || savingCell === cellKey}
+                          isSaving={savingCell === cellKey}
+                          status={rule?.status ?? "ALLOWED"}
+                          onChange={(status) => void updateMatrixRule(manufacturer, repairType, status)}
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
     </>
   );
+}
+
+function RuleStatusSelect({
+  disabled,
+  isSaving,
+  status,
+  onChange,
+}: {
+  disabled: boolean;
+  isSaving: boolean;
+  status: ManufacturerRepairRuleStatus;
+  onChange: (status: ManufacturerRepairRuleStatus) => void;
+}) {
+  return (
+    <select
+      className={[
+        "h-9 w-full min-w-28 rounded-md border px-2 text-xs font-medium shadow-sm",
+        status === "FORBIDDEN"
+          ? "border-red-200 bg-red-50 text-red-700"
+          : status === "TO_CHECK" || status === "CONDITIONAL" || status === "MANDATORY"
+            ? "border-amber-200 bg-amber-50 text-amber-700"
+            : "border-emerald-200 bg-emerald-50 text-emerald-700",
+        disabled ? "cursor-not-allowed opacity-70" : "cursor-pointer",
+      ].join(" ")}
+      disabled={disabled}
+      title={disabled ? "Edition reservee aux administrateurs" : "Modifier la regle constructeur"}
+      value={status === "CONDITIONAL" ? "TO_CHECK" : status}
+      onChange={(event) => onChange(event.target.value as ManufacturerRepairRuleStatus)}
+    >
+      {editableStatuses.map((option) => (
+        <option key={option.value} value={option.value}>
+          {isSaving ? "..." : option.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function findGeneralRule(manufacturer: Manufacturer, repairTypeId: string) {
+  return manufacturer.repairRules?.find((item) => item.repairTypeId === repairTypeId && !item.vehiclePartId);
+}
+
+function upsertRepairRule(rules: ManufacturerRepairRule[], savedRule: ManufacturerRepairRule) {
+  const existingIndex = rules.findIndex((rule) => rule.id === savedRule.id);
+
+  if (existingIndex === -1) {
+    return [...rules, savedRule];
+  }
+
+  return rules.map((rule) => (rule.id === savedRule.id ? savedRule : rule));
+}
+
+function matrixCellKey(manufacturerId: string, repairTypeId: string) {
+  return `${manufacturerId}:${repairTypeId}`;
 }

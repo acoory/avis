@@ -14,10 +14,6 @@ export class UpdateRepairTypeDto {
   defaultInternalSavingAmount?: string;
 
   @IsOptional()
-  @IsDecimal()
-  defaultInternalCost?: string;
-
-  @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 }

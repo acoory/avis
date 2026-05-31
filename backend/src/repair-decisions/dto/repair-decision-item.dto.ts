@@ -5,6 +5,10 @@ export class RepairDecisionItemDto {
   @IsUUID()
   repairTypeId: string;
 
+  @IsOptional()
+  @IsUUID()
+  vehiclePartId?: string;
+
   @Type(() => Number)
   @IsInt()
   @Min(1)
