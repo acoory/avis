@@ -227,7 +227,12 @@ export class VehicleChecksService {
   }
 
   async remove(id: string, user: CurrentUserPayload) {
-    await this.findOne(id, user);
+    const vehicleCheck = await this.findOne(id, user);
+
+    if (vehicleCheck.status !== VehicleCheckStatus.DRAFT) {
+      throw new BadRequestException('Only draft vehicle checks can be deleted');
+    }
+
     await this.prisma.vehicleCheck.delete({ where: { id } });
     return { success: true };
   }

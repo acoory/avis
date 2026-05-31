@@ -95,6 +95,11 @@ export const businessService = {
     return data;
   },
 
+  async deleteVehicleCheck(id: string) {
+    const { data } = await api.delete<{ success: true }>(`/vehicle-checks/${id}`);
+    return data;
+  },
+
   async updatePartOrder(
     id: string,
     payload: {

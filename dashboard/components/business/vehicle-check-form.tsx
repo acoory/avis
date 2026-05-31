@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Pencil,
   Plus,
   Save,
   Search,
@@ -80,6 +81,9 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [preview, setPreview] = useState<RepairDecisionPreview | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isRecapOpen, setIsRecapOpen] = useState(false);
+  const [repairSheetLine, setRepairSheetLine] = useState<DraftRepairLine | null>(null);
+  const [repairSheetEditingId, setRepairSheetEditingId] = useState<string | null>(null);
+  const [repairSheetPreview, setRepairSheetPreview] = useState<RepairDecisionPreview | null>(null);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
@@ -130,23 +134,31 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     return repairType ? repairTypeCodesWithoutVehiclePart.has(repairType.code) : false;
   }
 
+  function toDecisionItem(line: DraftRepairLine): RepairDecisionInputItem | null {
+    if (!line.repairTypeId || line.quantity <= 0) {
+      return null;
+    }
+
+    if (!line.vehiclePartId && !isVehiclePartOptional(line.repairTypeId)) {
+      return null;
+    }
+
+    return {
+      repairTypeId: line.repairTypeId,
+      vehiclePartId: line.vehiclePartId || undefined,
+      quantity: line.quantity,
+      comment: line.comment || undefined,
+      partOrderRequired: line.partOrderRequired,
+    };
+  }
+
   const decisionItems = useMemo<RepairDecisionInputItem[]>(
-    () =>
-      lines
-        .filter(
-          (line) =>
-            line.repairTypeId &&
-            (line.vehiclePartId || isVehiclePartOptional(line.repairTypeId)) &&
-            line.quantity > 0,
-        )
-        .map((line) => ({
-          repairTypeId: line.repairTypeId,
-          vehiclePartId: line.vehiclePartId || undefined,
-          quantity: line.quantity,
-          comment: line.comment || undefined,
-          partOrderRequired: line.partOrderRequired,
-        })),
+    () => lines.map(toDecisionItem).filter((item): item is RepairDecisionInputItem => Boolean(item)),
     [lines, repairTypes],
+  );
+  const repairSheetDecisionItem = useMemo(
+    () => (repairSheetLine ? toDecisionItem(repairSheetLine) : null),
+    [repairSheetLine, repairTypes],
   );
 
   useEffect(() => {
@@ -166,6 +178,22 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
     return () => window.clearTimeout(timeout);
   }, [manufacturerId, decisionItems]);
+
+  useEffect(() => {
+    if (!manufacturerId || !repairSheetDecisionItem) {
+      setRepairSheetPreview(null);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      void businessService
+        .previewDecision({ manufacturerId, items: [repairSheetDecisionItem] })
+        .then((data) => setRepairSheetPreview(data))
+        .catch(() => setRepairSheetPreview(null));
+    }, 250);
+
+    return () => window.clearTimeout(timeout);
+  }, [manufacturerId, repairSheetDecisionItem]);
 
   useEffect(() => {
     if (!didMountRef.current) {
@@ -195,18 +223,80 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     : null;
   const activePreview = manufacturerId ? (decisionItems.length ? preview : emptyPreview) : null;
 
+  function createBlankRepairLine(): DraftRepairLine {
+    return {
+      id: crypto.randomUUID(),
+      repairTypeId: "",
+      vehiclePartId: "",
+      quantity: 1,
+      comment: "",
+      partOrderRequired: false,
+    };
+  }
+
+  function getVehiclePartIdForRepairType(repairTypeId: string, currentVehiclePartId: string) {
+    return repairTypeCodesWithoutVehiclePart.has(
+      repairTypes.find((item) => item.id === repairTypeId)?.code ?? "",
+    )
+      ? ""
+      : currentVehiclePartId;
+  }
+
+  function normalizeQuantityValue(rawValue: string) {
+    const digitsOnly = rawValue.replace(/\D/g, "");
+    return digitsOnly ? Math.max(1, Number(digitsOnly)) : 1;
+  }
+
   function addLine() {
-    setLines((current) => [
-      ...current,
-      {
-        id: crypto.randomUUID(),
-        repairTypeId: repairTypes[0]?.id ?? "",
-        vehiclePartId: "",
-        quantity: 1,
-        comment: "",
-        partOrderRequired: false,
-      },
-    ]);
+    setLines((current) => [...current, createBlankRepairLine()]);
+  }
+
+  function openRepairSheet(line?: DraftRepairLine) {
+    setRepairSheetLine(line ? { ...line } : createBlankRepairLine());
+    setRepairSheetEditingId(line?.id ?? null);
+  }
+
+  function closeRepairSheet() {
+    setRepairSheetLine(null);
+    setRepairSheetEditingId(null);
+  }
+
+  function patchRepairSheetLine(patch: Partial<DraftRepairLine>) {
+    setRepairSheetLine((current) => (current ? { ...current, ...patch } : current));
+  }
+
+  function changeRepairSheetType(repairTypeId: string) {
+    setRepairSheetLine((current) =>
+      current
+        ? {
+            ...current,
+            repairTypeId,
+            vehiclePartId: getVehiclePartIdForRepairType(repairTypeId, current.vehiclePartId),
+          }
+        : current,
+    );
+  }
+
+  function saveRepairSheetLine() {
+    if (!repairSheetLine?.repairTypeId) {
+      toast.error("Selectionne un type de reparation.");
+      return;
+    }
+
+    if (!isVehiclePartOptional(repairSheetLine.repairTypeId) && !repairSheetLine.vehiclePartId) {
+      toast.error("Selectionne un element pour cette reparation.");
+      return;
+    }
+
+    if (repairSheetEditingId) {
+      setLines((current) =>
+        current.map((line) => (line.id === repairSheetEditingId ? repairSheetLine : line)),
+      );
+    } else {
+      setLines((current) => [...current, repairSheetLine]);
+    }
+
+    closeRepairSheet();
   }
 
   function updateLine(id: string, patch: Partial<DraftRepairLine>) {
@@ -220,16 +310,10 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           return line;
         }
 
-        const nextVehiclePartId = repairTypeCodesWithoutVehiclePart.has(
-          repairTypes.find((item) => item.id === repairTypeId)?.code ?? "",
-        )
-          ? ""
-          : line.vehiclePartId;
-
         return {
           ...line,
           repairTypeId,
-          vehiclePartId: nextVehiclePartId,
+          vehiclePartId: getVehiclePartIdForRepairType(repairTypeId, line.vehiclePartId),
         };
       }),
     );
@@ -254,9 +338,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   function setQuantity(id: string, rawValue: string) {
-    const digitsOnly = rawValue.replace(/\D/g, "");
-    const nextQuantity = digitsOnly ? Math.max(1, Number(digitsOnly)) : 1;
-    updateLine(id, { quantity: nextQuantity });
+    updateLine(id, { quantity: normalizeQuantityValue(rawValue) });
   }
 
   function buildPayload() {
@@ -459,7 +541,11 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             <CardTitle>Reparations observees</CardTitle>
             <p className="mt-1 text-sm text-gray-500">{lines.length} ligne{lines.length > 1 ? "s" : ""} saisie{lines.length > 1 ? "s" : ""}</p>
           </div>
-          <Button className="shrink-0" type="button" variant="outline" onClick={addLine}>
+          <Button className="hidden shrink-0 md:inline-flex" disabled={!repairTypes.length} type="button" variant="outline" onClick={addLine}>
+            <Plus className="h-4 w-4" />
+            Ajouter
+          </Button>
+          <Button className="shrink-0 md:hidden" disabled={!repairTypes.length} type="button" variant="outline" onClick={() => openRepairSheet()}>
             <Plus className="h-4 w-4" />
             Ajouter
           </Button>
@@ -482,124 +568,70 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                   : item.vehiclePartCode === "UNKNOWN"),
             );
             const lineRequiresNoVehiclePart = isVehiclePartOptional(line.repairTypeId);
+            const repairTypeName = repairTypes.find((repairType) => repairType.id === line.repairTypeId)?.name ?? "-";
+            const vehiclePartName = lineRequiresNoVehiclePart
+              ? "Aucun element requis"
+              : vehicleParts.find((vehiclePart) => vehiclePart.id === line.vehiclePartId)?.name ?? "Element non selectionne";
 
             return (
               <div className="space-y-3 rounded-md border border-gray-200 bg-white p-3" key={line.id}>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium text-gray-950">Reparation #{index + 1}</p>
-                  <Button
-                    aria-label="Retirer la reparation"
-                    className="h-9 px-2 text-red-600 hover:bg-red-50"
-                    type="button"
-                    variant="ghost"
-                    onClick={() => removeLine(line.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="grid gap-3 lg:grid-cols-[1fr_1fr_140px]">
-                  <div className="space-y-2">
-                    <Label>Element</Label>
-                    {lineRequiresNoVehiclePart ? (
-                      <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-sm text-gray-500 md:py-2.5">
-                        Aucun element requis pour ce type.
-                      </div>
-                    ) : (
-                      <VehiclePartAutocomplete
-                        vehicleParts={vehicleParts}
-                        value={line.vehiclePartId}
-                        onChange={(vehiclePartId) => updateLine(line.id, { vehiclePartId })}
-                      />
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Type</Label>
-                    <select
-                      className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
-                      value={line.repairTypeId}
-                      onChange={(event) => changeRepairType(line.id, event.target.value)}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      aria-label="Modifier la reparation"
+                      className="h-9 px-2 md:hidden"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => openRepairSheet(line)}
                     >
-                      {repairTypes.map((repairType) => (
-                        <option key={repairType.id} value={repairType.id}>
-                          {repairType.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {repairTypes
-                        .filter((repairType) => repairType.isActive)
-                        .slice(0, 10)
-                        .map((repairType) => (
-                          <button
-                            className={[
-                              "rounded-md px-2 py-1 text-xs font-medium",
-                              repairType.id === line.repairTypeId
-                                ? "bg-teal-50 text-teal-800"
-                                : "bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-800",
-                            ].join(" ")}
-                            key={repairType.id}
-                            type="button"
-                            onClick={() => changeRepairType(line.id, repairType.id)}
-                          >
-                            {repairType.name}
-                          </button>
-                        ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Quantite</Label>
-                    <div className="grid grid-cols-[48px_1fr_48px] overflow-hidden rounded-md border border-gray-200 bg-white">
-                      <button
-                        className="h-12 border-r border-gray-200 text-lg font-semibold text-gray-700"
-                        type="button"
-                        onClick={() => decrementQuantity(line.id)}
-                      >
-                        -
-                      </button>
-                      <Input
-                        className="h-12 rounded-none border-0 px-1 text-center text-base font-semibold shadow-none focus:border-0"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        type="text"
-                        value={String(line.quantity)}
-                        onChange={(event) => setQuantity(line.id, event.target.value)}
-                      />
-                      <button
-                        className="h-12 border-l border-gray-200 text-lg font-semibold text-gray-700"
-                        type="button"
-                        onClick={() => incrementQuantity(line.id)}
-                      >
-                        +
-                      </button>
-                    </div>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      aria-label="Retirer la reparation"
+                      className="h-9 px-2 text-red-600 hover:bg-red-50"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => removeLine(line.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                    <Label>Commentaire</Label>
-                    <Input
-                      className="h-12 text-base md:h-10 md:text-sm"
-                      placeholder="Ex: rayure profonde"
-                      value={line.comment}
-                      onChange={(event) => updateLine(line.id, { comment: event.target.value })}
-                    />
+                <div className="space-y-2 md:hidden">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-gray-950">{repairTypeName} x{line.quantity}</p>
+                      <p className="mt-1 text-sm text-gray-500">{vehiclePartName}</p>
+                    </div>
+                    {previewLine ? <DecisionBadge status={previewLine.decisionStatus} /> : null}
+                  </div>
+                  {line.comment.trim() ? <p className="text-sm text-gray-600">{line.comment}</p> : null}
+                  {line.partOrderRequired ? <PartOrderDraftBadge /> : null}
                 </div>
 
-                <label className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-700">
-                  <input
-                    checked={line.partOrderRequired}
-                    className="h-4 w-4 accent-teal-700"
-                    type="checkbox"
-                    onChange={(event) => updateLine(line.id, { partOrderRequired: event.target.checked })}
+                <div className="hidden md:block">
+                  <RepairEditorFields
+                    line={line}
+                    repairTypes={repairTypes}
+                    vehicleParts={vehicleParts}
+                    isVehiclePartOptional={isVehiclePartOptional}
+                    onPatch={(patch) => updateLine(line.id, patch)}
+                    onRepairTypeChange={(repairTypeId) => changeRepairType(line.id, repairTypeId)}
+                    onQuantityChange={(rawValue) => setQuantity(line.id, rawValue)}
+                    onQuantityDelta={(delta) => {
+                      if (delta > 0) {
+                        incrementQuantity(line.id);
+                      } else {
+                        decrementQuantity(line.id);
+                      }
+                    }}
                   />
-                  <span>Pièce à commander</span>
-                </label>
+                </div>
 
                 {previewLine ? (
-                  <div className="flex flex-col gap-2 rounded-md bg-gray-50 p-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="hidden flex-col gap-2 rounded-md bg-gray-50 p-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between md:flex">
                     <div className="flex items-center gap-2">
                       <DecisionBadge status={previewLine.decisionStatus} />
                       <span>{previewLine.decisionMessage}</span>
@@ -669,6 +701,40 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           onValidate={openValidationRecap}
         />
       </div>
+
+      {activeStep === 1 && !repairSheetLine ? (
+        <Button
+          aria-label="Ajouter une reparation"
+          className="fixed bottom-24 right-4 z-40 h-12 w-12 rounded-full shadow-lg md:hidden"
+          disabled={!repairTypes.length}
+          size="icon"
+          type="button"
+          onClick={() => openRepairSheet()}
+        >
+          <Plus className="h-5 w-5" />
+        </Button>
+      ) : null}
+
+      {repairSheetLine ? (
+        <RepairBottomSheet
+          isEditing={Boolean(repairSheetEditingId)}
+          line={repairSheetLine}
+          preview={repairSheetPreview}
+          repairTypes={repairTypes}
+          vehicleParts={vehicleParts}
+          isVehiclePartOptional={isVehiclePartOptional}
+          onCancel={closeRepairSheet}
+          onConfirm={saveRepairSheetLine}
+          onPatch={patchRepairSheetLine}
+          onQuantityChange={(rawValue) => patchRepairSheetLine({ quantity: normalizeQuantityValue(rawValue) })}
+          onQuantityDelta={(delta) =>
+            patchRepairSheetLine({
+              quantity: Math.max(1, repairSheetLine.quantity + delta),
+            })
+          }
+          onRepairTypeChange={changeRepairSheetType}
+        />
+      ) : null}
 
       {isRecapOpen ? (
         <ValidationRecap
@@ -792,11 +858,243 @@ function StepActions({
   );
 }
 
+function RepairBottomSheet({
+  isEditing,
+  line,
+  preview,
+  repairTypes,
+  vehicleParts,
+  isVehiclePartOptional,
+  onCancel,
+  onConfirm,
+  onPatch,
+  onQuantityChange,
+  onQuantityDelta,
+  onRepairTypeChange,
+}: {
+  isEditing: boolean;
+  line: DraftRepairLine;
+  preview: RepairDecisionPreview | null;
+  repairTypes: RepairType[];
+  vehicleParts: VehiclePart[];
+  isVehiclePartOptional: (repairTypeId: string) => boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+  onPatch: (patch: Partial<DraftRepairLine>) => void;
+  onQuantityChange: (rawValue: string) => void;
+  onQuantityDelta: (delta: number) => void;
+  onRepairTypeChange: (repairTypeId: string) => void;
+}) {
+  const previewItem = preview?.items[0];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end bg-black/40 motion-safe:animate-[vehicle-check-sheet-overlay-in_160ms_ease-out] md:hidden">
+      <div className="max-h-[94vh] w-full overflow-hidden rounded-t-xl bg-white shadow-xl motion-safe:animate-[vehicle-check-sheet-in_220ms_cubic-bezier(0.22,1,0.36,1)]">
+        <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
+          <div>
+            <h2 className="text-base font-semibold text-gray-950">
+              {isEditing ? "Modifier la reparation" : "Nouvelle reparation"}
+            </h2>
+          </div>
+          <button
+            aria-label="Fermer la fiche reparation"
+            className="rounded-md p-2 text-gray-500 hover:bg-gray-100"
+            type="button"
+            onClick={onCancel}
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="max-h-[calc(94vh-112px)] overflow-x-hidden overflow-y-auto p-4 pt-3">
+          {previewItem ? (
+            <div className="mb-3 rounded-md border border-gray-200 bg-gray-50 p-3 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-950">Decision provisoire</p>
+                  <p className="mt-0.5 truncate text-gray-600">{previewItem.decisionMessage}</p>
+                </div>
+                <DecisionBadge status={previewItem.decisionStatus} />
+              </div>
+              <div className="mt-2 flex items-center justify-between text-gray-600">
+                <span>Economie reference</span>
+                <span className="font-semibold text-gray-950">
+                  {formatMoney(previewItem.totalInternalSavingAmount)}
+                </span>
+              </div>
+            </div>
+          ) : null}
+          <RepairEditorFields
+            layout="sheet"
+            line={line}
+            repairTypes={repairTypes}
+            vehicleParts={vehicleParts}
+            isVehiclePartOptional={isVehiclePartOptional}
+            onPatch={onPatch}
+            onQuantityChange={onQuantityChange}
+            onQuantityDelta={onQuantityDelta}
+            onRepairTypeChange={onRepairTypeChange}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 border-t border-gray-100 bg-white p-3">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Annuler
+          </Button>
+          <Button type="button" onClick={onConfirm}>
+            {isEditing ? "Enregistrer" : "Ajouter"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RepairEditorFields({
+  layout = "default",
+  line,
+  repairTypes,
+  vehicleParts,
+  isVehiclePartOptional,
+  onPatch,
+  onQuantityChange,
+  onQuantityDelta,
+  onRepairTypeChange,
+}: {
+  layout?: "default" | "sheet";
+  line: DraftRepairLine;
+  repairTypes: RepairType[];
+  vehicleParts: VehiclePart[];
+  isVehiclePartOptional: (repairTypeId: string) => boolean;
+  onPatch: (patch: Partial<DraftRepairLine>) => void;
+  onQuantityChange: (rawValue: string) => void;
+  onQuantityDelta: (delta: number) => void;
+  onRepairTypeChange: (repairTypeId: string) => void;
+}) {
+  const lineRequiresNoVehiclePart = isVehiclePartOptional(line.repairTypeId);
+  const gridClass =
+    layout === "sheet" ? "grid gap-3" : "grid gap-3 lg:grid-cols-[1fr_1fr_140px]";
+  const quickButtonsClass =
+    layout === "sheet"
+      ? "mt-2 flex w-full min-w-0 flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] [touch-action:pan-x] [&::-webkit-scrollbar]:hidden"
+      : "mt-2 flex flex-wrap gap-1.5";
+  const quickButtonClass = layout === "sheet" ? "shrink-0 whitespace-nowrap" : "";
+
+  return (
+    <div className="space-y-3">
+      <div className={gridClass}>
+        <div className="min-w-0 space-y-2">
+          <Label>Element</Label>
+          {lineRequiresNoVehiclePart ? (
+            <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-sm text-gray-500 md:py-2.5">
+              Aucun element requis pour ce type.
+            </div>
+          ) : (
+            <VehiclePartAutocomplete
+              compact={layout === "sheet"}
+              vehicleParts={vehicleParts}
+              value={line.vehiclePartId}
+              onChange={(vehiclePartId) => onPatch({ vehiclePartId })}
+            />
+          )}
+        </div>
+
+        <div className="min-w-0 space-y-2">
+          <Label>Type</Label>
+          <select
+            className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
+            value={line.repairTypeId}
+            onChange={(event) => onRepairTypeChange(event.target.value)}
+          >
+            <option value="">Selectionner un type</option>
+            {repairTypes.map((repairType) => (
+              <option key={repairType.id} value={repairType.id}>
+                {repairType.name}
+              </option>
+            ))}
+          </select>
+          <div className={quickButtonsClass}>
+            {repairTypes
+              .filter((repairType) => repairType.isActive)
+              .slice(0, 10)
+              .map((repairType) => (
+                <button
+                  className={[
+                    quickButtonClass,
+                    "rounded-md px-2 py-1 text-xs font-medium",
+                    repairType.id === line.repairTypeId
+                      ? "bg-teal-50 text-teal-800"
+                      : "bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-800",
+                  ].join(" ")}
+                  key={repairType.id}
+                  type="button"
+                  onClick={() => onRepairTypeChange(repairType.id)}
+                >
+                  {repairType.name}
+                </button>
+              ))}
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-2">
+          <Label>Quantite</Label>
+          <div className="grid grid-cols-[48px_1fr_48px] overflow-hidden rounded-md border border-gray-200 bg-white">
+            <button
+              className="h-12 border-r border-gray-200 text-lg font-semibold text-gray-700"
+              type="button"
+              onClick={() => onQuantityDelta(-1)}
+            >
+              -
+            </button>
+            <Input
+              className="h-12 rounded-none border-0 px-1 text-center text-base font-semibold shadow-none focus:border-0"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              type="text"
+              value={String(line.quantity)}
+              onChange={(event) => onQuantityChange(event.target.value)}
+            />
+            <button
+              className="h-12 border-l border-gray-200 text-lg font-semibold text-gray-700"
+              type="button"
+              onClick={() => onQuantityDelta(1)}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Commentaire</Label>
+        <Input
+          className="h-12 text-base md:h-10 md:text-sm"
+          placeholder="Ex: rayure profonde"
+          value={line.comment}
+          onChange={(event) => onPatch({ comment: event.target.value })}
+        />
+      </div>
+
+      <label className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-700">
+        <input
+          checked={line.partOrderRequired}
+          className="h-4 w-4 accent-teal-700"
+          type="checkbox"
+          onChange={(event) => onPatch({ partOrderRequired: event.target.checked })}
+        />
+        <span>Pièce à commander</span>
+      </label>
+    </div>
+  );
+}
+
 function VehiclePartAutocomplete({
+  compact = false,
   vehicleParts,
   value,
   onChange,
 }: {
+  compact?: boolean;
   vehicleParts: VehiclePart[];
   value: string;
   onChange: (vehiclePartId: string) => void;
@@ -895,10 +1193,19 @@ function VehiclePartAutocomplete({
       ) : null}
 
       {availableCategories.length ? (
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div
+          className={
+            compact
+              ? "mt-2 flex w-full min-w-0 flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] [touch-action:pan-x] [&::-webkit-scrollbar]:hidden"
+              : "mt-2 flex flex-wrap gap-1.5"
+          }
+        >
           {availableCategories.map((category) => (
             <button
-              className="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-teal-50 hover:text-teal-800"
+              className={[
+                compact ? "shrink-0 whitespace-nowrap" : "",
+                "rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-teal-50 hover:text-teal-800",
+              ].join(" ")}
               key={category}
               type="button"
               onClick={() => {

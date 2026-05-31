@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Pencil, Printer } from "lucide-react";
+import { CheckCircle2, Pencil, Printer, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -14,8 +15,11 @@ type VehicleCheckActionsProps = {
 };
 
 export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckActionsProps) {
+  const router = useRouter();
   const [isCompleting, setIsCompleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
+  const canDelete = vehicleCheck.status === "DRAFT";
 
   async function handleComplete() {
     setIsCompleting(true);
@@ -28,6 +32,25 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
       toast.error("Impossible de completer ce controle. Verifie les reparations interdites.");
     } finally {
       setIsCompleting(false);
+    }
+  }
+
+  async function handleDelete() {
+    const confirmed = window.confirm("Supprimer ce controle brouillon ?");
+    if (!confirmed) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await businessService.deleteVehicleCheck(vehicleCheck.id);
+      toast.success("Controle brouillon supprime avec succes.");
+      router.push("/dashboard/vehicle-checks");
+      router.refresh();
+    } catch {
+      toast.error("Impossible de supprimer ce controle.");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -50,6 +73,12 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
             Modifier
           </Link>
         </Button>
+        {canDelete ? (
+          <Button disabled={isDeleting} variant="outline" onClick={handleDelete}>
+            <Trash2 className="h-4 w-4" />
+            {isDeleting ? "Suppression..." : "Supprimer"}
+          </Button>
+        ) : null}
         <Button disabled={!canComplete || isCompleting} onClick={handleComplete}>
           <CheckCircle2 className="h-4 w-4" />
           {isCompleting ? "Completion..." : "Completer"}
