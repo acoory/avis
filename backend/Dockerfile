@@ -1,24 +1,19 @@
 FROM node:20
 
-# Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+RUN corepack enable
 
-# Install the application dependencies
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
 
-# Copy the rest of the application files
+RUN pnpm install --frozen-lockfile
+
 COPY . .
 
-RUN npx prisma generate
+RUN pnpm prisma:generate
 
-# Build the NestJS application
-RUN npm run build
+RUN pnpm build
 
-# Expose the application port
 EXPOSE 3001
 
-# Command to run the application
 CMD ["node", "dist/src/main"]
