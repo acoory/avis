@@ -39,7 +39,7 @@ export function LoginForm() {
     try {
       const response = await authService.login(values);
       setAuth(response);
-      toast.success("Connexion reussie.");
+      toast.success("Connexion reussie.", { duration: 1200 });
       router.replace("/dashboard");
     } catch {
       toast.error("Identifiants invalides ou compte inactif.");

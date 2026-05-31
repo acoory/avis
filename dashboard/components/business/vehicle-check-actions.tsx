@@ -56,8 +56,8 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
 
   return (
     <div className="flex flex-col gap-2 sm:items-end">
-      <div className="flex gap-2">
-        <Button asChild variant="outline">
+      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
+        <Button asChild className="w-full sm:w-auto" variant="outline">
           <Link
             href={`/dashboard/vehicle-checks/${vehicleCheck.id}/print?autoprint=1`}
             rel="noreferrer"
@@ -67,19 +67,19 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
             PDF
           </Link>
         </Button>
-        <Button asChild variant="outline">
+        <Button asChild className="w-full sm:w-auto" variant="outline">
           <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>
             <Pencil className="h-4 w-4" />
             Modifier
           </Link>
         </Button>
         {canDelete ? (
-          <Button disabled={isDeleting} variant="outline" onClick={handleDelete}>
+          <Button className="w-full sm:w-auto" disabled={isDeleting} variant="outline" onClick={handleDelete}>
             <Trash2 className="h-4 w-4" />
             {isDeleting ? "Suppression..." : "Supprimer"}
           </Button>
         ) : null}
-        <Button disabled={!canComplete || isCompleting} onClick={handleComplete}>
+        <Button className="w-full sm:w-auto" disabled={!canComplete || isCompleting} onClick={handleComplete}>
           <CheckCircle2 className="h-4 w-4" />
           {isCompleting ? "Completion..." : "Completer"}
         </Button>
