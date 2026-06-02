@@ -2,26 +2,16 @@
 
 import { AlertTriangle, Car, ClipboardCheck, Euro, PackageCheck, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { ExportButton } from "@/components/business/export-button";
 import { VehicleCheckTable } from "@/components/business/vehicle-check-table";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { useAuthStore } from "@/stores/auth.store";
-import { DashboardSummary, VehicleCheck } from "@/types/business";
+import { DashboardSummary } from "@/types/business";
 
 type CollaboratorSaving = {
   collaboratorId: string;
@@ -38,7 +28,6 @@ export default function DashboardPage() {
   const [dateFrom, setDateFrom] = useState(defaultPeriod.dateFrom);
   const [dateTo, setDateTo] = useState(defaultPeriod.dateTo);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [teamVehicleChecks, setTeamVehicleChecks] = useState<VehicleCheck[]>([]);
   const [byManufacturer, setByManufacturer] = useState<
     Array<{ manufacturerName: string; totalInternalSavingAmount: string; vehicleChecksCount: number }>
   >([]);
@@ -54,79 +43,14 @@ export default function DashboardPage() {
       businessService.dashboardSummary(params),
       businessService.savingsByManufacturer(params),
       businessService.savingsByCollaborator(params),
-      businessService.vehicleChecks(params),
     ]).then(
-      ([summaryData, manufacturerData, collaboratorData, vehicleChecksData]) => {
+      ([summaryData, manufacturerData, collaboratorData]) => {
         setSummary(summaryData);
         setByManufacturer(manufacturerData);
         setByCollaborator(collaboratorData);
-        setTeamVehicleChecks(vehicleChecksData);
       },
     );
   }, [dateFrom, dateTo]);
-
-  const partOrdersByCollaborator = useMemo(() => {
-    const grouped = new Map<
-      string,
-      {
-        collaboratorName: string;
-        collaboratorEmail: string;
-        itemsCount: number;
-        checksCount: number;
-        estimatedAmount: number;
-      }
-    >();
-
-    for (const check of teamVehicleChecks) {
-      const itemsToOrder = check.items?.filter((item) => item.partOrderStatus === "TO_ORDER") ?? [];
-      if (!itemsToOrder.length) {
-        continue;
-      }
-
-      const collaboratorName = check.collaborator
-        ? `${check.collaborator.firstName} ${check.collaborator.lastName}`
-        : "Collaborateur inconnu";
-      const collaboratorEmail = check.collaborator?.email ?? "";
-      const key = collaboratorEmail || collaboratorName;
-      const current = grouped.get(key) ?? {
-        collaboratorName,
-        collaboratorEmail,
-        itemsCount: 0,
-        checksCount: 0,
-        estimatedAmount: 0,
-      };
-
-      current.itemsCount += itemsToOrder.length;
-      current.checksCount += 1;
-      current.estimatedAmount += itemsToOrder.reduce(
-        (total, item) => total + Number(item.partOrderPrice ?? 0),
-        0,
-      );
-      grouped.set(key, current);
-    }
-
-    return [...grouped.values()].sort((first, second) => second.itemsCount - first.itemsCount);
-  }, [teamVehicleChecks]);
-
-  const collaboratorChartData = useMemo(
-    () =>
-      byCollaborator.map((row) => ({
-        name: row.collaboratorName,
-        controles: row.vehicleChecksCount,
-        economies: Number(row.totalInternalSavingAmount),
-      })),
-    [byCollaborator],
-  );
-
-  const partOrdersChartData = useMemo(
-    () =>
-      partOrdersByCollaborator.map((row) => ({
-        name: row.collaboratorName,
-        pieces: row.itemsCount,
-        controles: row.checksCount,
-      })),
-    [partOrdersByCollaborator],
-  );
 
   const pageTitle = isManager ? "Accueil manager" : "Buy Back";
   const pageDescription = isManager
@@ -159,7 +83,6 @@ export default function DashboardPage() {
             </button>
           </CardContent>
         </Card>
-        <ExportButton />
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <StatCard description="Tous statuts" icon={Car} title="Vehicules controles" value={`${summary?.vehicleChecksCount ?? 0}`} />
@@ -169,127 +92,20 @@ export default function DashboardPage() {
         <StatCard description="Pieces a commander" icon={PackageCheck} title="Commandes" value={`${summary?.partOrdersToPlaceCount ?? 0}`} />
       </div>
 
-      {isManager ? (
-        <div className="mt-6 grid gap-4 xl:grid-cols-[1fr_420px]">
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance par collaborateur</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="h-72">
-                {collaboratorChartData.length ? (
-                  <ResponsiveContainer height="100%" width="100%">
-                    <BarChart data={collaboratorChartData} margin={{ bottom: 8, left: 0, right: 8, top: 8 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} />
-                      <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${Number(value).toLocaleString("fr-FR")}€`} />
-                      <Tooltip
-                        formatter={(value, name) => [
-                          name === "economies" ? formatMoney(Number(value)) : value,
-                          name === "economies" ? "Economies" : "Controles",
-                        ]}
-                      />
-                      <Bar dataKey="economies" fill="#0f766e" name="Economies" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-gray-500">
-                    Aucune donnee collaborateur pour le moment.
-                  </div>
-                )}
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[680px] text-left text-sm">
-                  <thead className="border-b border-gray-100 text-xs uppercase text-gray-500">
-                    <tr>
-                      <th className="py-3 font-medium">Collaborateur</th>
-                      <th className="py-3 font-medium">Controles</th>
-                      <th className="py-3 font-medium">Economies</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {byCollaborator.map((row) => (
-                      <tr key={row.collaboratorId}>
-                        <td className="py-3">
-                          <p className="font-medium text-gray-950">{row.collaboratorName}</p>
-                          <p className="text-xs text-gray-500">{row.collaboratorEmail}</p>
-                        </td>
-                        <td className="py-3 text-gray-700">{row.vehicleChecksCount}</td>
-                        <td className="py-3 font-semibold text-teal-700">
-                          {formatMoney(row.totalInternalSavingAmount)}
-                        </td>
-                      </tr>
-                    ))}
-                    {!byCollaborator.length ? (
-                      <tr>
-                        <td className="py-6 text-center text-gray-500" colSpan={3}>
-                          Aucune donnee collaborateur pour le moment.
-                        </td>
-                      </tr>
-                    ) : null}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Commandes pieces par collaborateur</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="h-56">
-                {partOrdersChartData.length ? (
-                  <ResponsiveContainer height="100%" width="100%">
-                    <BarChart data={partOrdersChartData} margin={{ bottom: 8, left: 0, right: 8, top: 8 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} />
-                      <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
-                      <Tooltip
-                        formatter={(value, name) => [
-                          value,
-                          name === "pieces" ? "Pieces a commander" : "Controles concernes",
-                        ]}
-                      />
-                      <Bar dataKey="pieces" fill="#d97706" name="Pieces a commander" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-gray-500">
-                    Aucune commande piece a passer.
-                  </div>
-                )}
-              </div>
-              {partOrdersByCollaborator.map((row) => (
-                <div className="rounded-md border border-gray-100 p-3" key={row.collaboratorEmail || row.collaboratorName}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-gray-950">{row.collaboratorName}</p>
-                      <p className="text-xs text-gray-500">{row.checksCount} controle(s) concerne(s)</p>
-                    </div>
-                    <Badge variant="warning">{row.itemsCount} piece(s)</Badge>
-                  </div>
-                  <p className="mt-2 text-xs text-gray-500">
-                    Montant renseigne ou estime : {formatMoney(row.estimatedAmount)}
-                  </p>
-                </div>
-              ))}
-              {!partOrdersByCollaborator.length ? (
-                <p className="text-sm text-gray-500">Aucune commande piece a passer.</p>
-              ) : null}
-            </CardContent>
-          </Card>
-        </div>
-      ) : null}
-
-      <div className="mt-6 grid gap-4 xl:grid-cols-[1fr_360px]">
-        <div>
-          <h2 className="mb-3 text-sm font-semibold text-gray-950">
-            {isManager ? "Controles recents de l'equipe" : "Controles recents"}
-          </h2>
+      <div className="mt-6 min-w-0">
+        <div className="min-w-0">
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-sm font-semibold text-gray-950">
+              {isManager ? "Controles recents de l'equipe" : "Controles recents"}
+            </h2>
+            <ExportButton
+              dateRange={{ dateFrom: dateFrom || undefined, dateTo: dateTo || undefined }}
+              withCollaboratorFilter
+            />
+          </div>
           <VehicleCheckTable vehicleChecks={summary?.recentVehicleChecks ?? []} />
         </div>
-        <div className="space-y-4">
+        <div className="mt-4 grid min-w-0 gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Economies par constructeur</CardTitle>

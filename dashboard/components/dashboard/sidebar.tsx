@@ -39,7 +39,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       />
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72 shrink-0 border-r border-gray-200 bg-white transition-transform md:static md:z-auto md:block md:w-68 md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-72 shrink-0 overflow-y-auto border-r border-gray-200 bg-white transition-transform md:sticky md:inset-y-auto md:top-0 md:z-auto md:block md:h-screen md:w-68 md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >

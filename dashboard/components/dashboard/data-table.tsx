@@ -128,7 +128,7 @@ export function DataTable<T>({
   }
 
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardContent className="p-0">
         <div className="flex flex-col gap-3 border-b border-gray-100 p-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
@@ -203,7 +203,7 @@ export function DataTable<T>({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="min-w-0 overflow-x-auto">
           <table className="w-full text-left text-sm" style={{ minWidth }}>
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
               <tr>

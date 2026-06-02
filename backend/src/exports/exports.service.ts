@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/client';
 import ExcelJS from 'exceljs';
+import { Prisma, Role } from '../../prisma/generated/client.cjs';
+import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { formatLicensePlate } from '../common/utils/license-plate';
 import { PrismaService } from '../prisma/prisma.service';
+import { ExportVehicleChecksQueryDto } from './dto/export-vehicle-checks-query.dto';
 
 const preferredRepairTypeCodes = [
   'LUGGAGE_COVER',
@@ -19,13 +22,17 @@ const preferredRepairTypeCodes = [
 export class ExportsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async vehicleChecksWorkbook(): Promise<Buffer> {
+  async vehicleChecksWorkbook(
+    query: ExportVehicleChecksQueryDto = {},
+    user: CurrentUserPayload,
+  ): Promise<Buffer> {
     const [repairTypes, vehicleChecks] = await Promise.all([
       this.prisma.repairType.findMany({
         where: { isActive: true },
         orderBy: { name: 'asc' },
       }),
       this.prisma.vehicleCheck.findMany({
+        where: this.vehicleCheckWhere(query, user),
         include: {
           collaborator: {
             select: {
@@ -136,6 +143,53 @@ export class ExportsService {
 
     const xlsxBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(xlsxBuffer);
+  }
+
+  private vehicleCheckWhere(
+    query: ExportVehicleChecksQueryDto,
+    user: CurrentUserPayload,
+  ): Prisma.VehicleCheckWhereInput {
+    const where: Prisma.VehicleCheckWhereInput = {
+      ...this.scopeWhere(user),
+      ...(query.collaboratorId ? { collaboratorId: query.collaboratorId } : {}),
+    };
+
+    if (query.dateFrom || query.dateTo) {
+      where.checkDate = {
+        ...(query.dateFrom ? { gte: this.startOfDay(query.dateFrom) } : {}),
+        ...(query.dateTo ? { lte: this.endOfDay(query.dateTo) } : {}),
+      };
+    }
+
+    return where;
+  }
+
+  private scopeWhere(user: CurrentUserPayload): Prisma.VehicleCheckWhereInput {
+    if (user.role === Role.ADMIN) {
+      return {};
+    }
+
+    if (user.role === Role.MANAGER) {
+      return {
+        OR: [{ collaboratorId: user.sub }, { collaborator: { managerId: user.sub } }],
+      };
+    }
+
+    return {
+      collaboratorId: user.sub,
+    };
+  }
+
+  private startOfDay(value: string) {
+    const date = new Date(value);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  private endOfDay(value: string) {
+    const date = new Date(value);
+    date.setHours(23, 59, 59, 999);
+    return date;
   }
 
   private orderRepairTypes<T extends { code: string }>(repairTypes: T[]): T[] {

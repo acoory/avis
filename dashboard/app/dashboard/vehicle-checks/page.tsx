@@ -37,7 +37,7 @@ export default function VehicleChecksPage() {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <PageHeader title="Controles Buy Back" description="Liste des controles vehicules et decisions metier." />
         <div className="flex gap-2">
-          <ExportButton />
+          <ExportButton dateRange={dateRange} withCollaboratorFilter />
           <Button asChild>
             <Link href="/dashboard/vehicle-checks/new">
               <Plus className="h-4 w-4" />

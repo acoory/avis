@@ -192,6 +192,24 @@ export const businessService = {
   },
 };
 
-export function exportVehicleChecksUrl() {
-  return `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/exports/vehicle-checks.xlsx`;
+export function exportVehicleChecksUrl(params?: {
+  collaboratorId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}) {
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/exports/vehicle-checks.xlsx`);
+
+  if (params?.collaboratorId) {
+    url.searchParams.set("collaboratorId", params.collaboratorId);
+  }
+
+  if (params?.dateFrom) {
+    url.searchParams.set("dateFrom", params.dateFrom);
+  }
+
+  if (params?.dateTo) {
+    url.searchParams.set("dateTo", params.dateTo);
+  }
+
+  return url.toString();
 }

@@ -20,7 +20,7 @@ export function DashboardLayout({ children }: PropsWithChildren) {
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Header onMenuClick={() => setIsSidebarOpen(true)} />
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="min-w-0 flex-1 overflow-x-hidden p-4 md:p-6">{children}</main>
         </div>
       </div>
       ) : null}
