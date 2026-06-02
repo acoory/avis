@@ -45,6 +45,12 @@ enum PartOrderStatus {
   ORDERED
 }
 
+enum VehicleCheckItemOperationalStatus {
+  ACTIVE
+  IMPOSSIBLE
+  CANCELLED
+}
+
 model User {
   id               String    @id @default(uuid())
   email            String    @unique
@@ -62,6 +68,7 @@ model User {
   vehicleChecks VehicleCheck[] @relation("VehicleCheckCollaborator")
   manager       User?          @relation("ManagerCollaborators", fields: [managerId], references: [id], onDelete: SetNull)
   collaborators User[]         @relation("ManagerCollaborators")
+  vehicleCheckItemStatusHistories VehicleCheckItemStatusHistory[]
 
   @@index([role])
   @@index([isActive])
@@ -237,6 +244,8 @@ model VehicleCheckItem {
   decisionStatus            RepairDecisionStatus @default(ACCEPTED)
   decisionMessage           String?
   comment                   String?
+  operationalStatus         VehicleCheckItemOperationalStatus @default(ACTIVE)
+  operationalComment        String?
   partOrderRequired         Boolean              @default(false)
   partOrderStatus           PartOrderStatus      @default(NOT_REQUIRED)
   partOrderPrice            Decimal?             @db.Decimal(12, 2)
@@ -248,12 +257,31 @@ model VehicleCheckItem {
   vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
   repairType   RepairType   @relation(fields: [repairTypeId], references: [id], onDelete: Restrict)
   vehiclePart  VehiclePart  @relation(fields: [vehiclePartId], references: [id], onDelete: Restrict)
+  statusHistories VehicleCheckItemStatusHistory[]
 
   @@index([vehicleCheckId])
   @@index([repairTypeId])
   @@index([vehiclePartId])
   @@index([decisionStatus])
+  @@index([operationalStatus])
   @@index([partOrderStatus])
+}
+
+model VehicleCheckItemStatusHistory {
+  id                 String                           @id @default(uuid())
+  vehicleCheckItemId String
+  userId             String?
+  fromStatus         VehicleCheckItemOperationalStatus
+  toStatus           VehicleCheckItemOperationalStatus
+  comment            String?
+  createdAt          DateTime                         @default(now())
+
+  vehicleCheckItem VehicleCheckItem @relation(fields: [vehicleCheckItemId], references: [id], onDelete: Cascade)
+  user             User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([vehicleCheckItemId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model ExternalQuote {

@@ -57,3 +57,12 @@ export const PartOrderStatus = {
 } as const
 
 export type PartOrderStatus = (typeof PartOrderStatus)[keyof typeof PartOrderStatus]
+
+
+export const VehicleCheckItemOperationalStatus = {
+  ACTIVE: 'ACTIVE',
+  IMPOSSIBLE: 'IMPOSSIBLE',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type VehicleCheckItemOperationalStatus = (typeof VehicleCheckItemOperationalStatus)[keyof typeof VehicleCheckItemOperationalStatus]

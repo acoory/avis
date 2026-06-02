@@ -389,7 +389,11 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
         ? await businessService.completeVehicleCheck(savedVehicleCheck.id)
         : savedVehicleCheck;
 
-      toast.success(shouldComplete ? "Controle valide avec succes." : "Brouillon enregistre avec succes.");
+      toast.success(
+        shouldComplete
+          ? "Controle valide avec succes."
+          : "Brouillon enregistre avec succes.",
+      );
       router.replace(`/dashboard/vehicle-checks/${finalVehicleCheck.id}`);
     } catch {
       toast.error(

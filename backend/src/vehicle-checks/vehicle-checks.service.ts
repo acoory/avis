@@ -4,6 +4,7 @@ import {
   Prisma,
   RepairDecisionStatus,
   Role,
+  VehicleCheckItemOperationalStatus,
   VehicleCheckStatus,
 } from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
@@ -28,7 +29,23 @@ const vehicleCheckInclude = {
   manufacturer: true,
   vehicleModel: true,
   items: {
-    include: { repairType: true, vehiclePart: true },
+    include: {
+      repairType: true,
+      vehiclePart: true,
+      statusHistories: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' as const },
+      },
+    },
     orderBy: { createdAt: 'asc' as const },
   },
   externalQuotes: {
@@ -145,7 +162,7 @@ export class VehicleChecksService {
     }
 
     if (!dto.items) {
-      return this.prisma.vehicleCheck.update({
+      const updated = await this.prisma.vehicleCheck.update({
         where: { id },
         data: {
           agencyId: dto.agencyId,
@@ -159,6 +176,8 @@ export class VehicleChecksService {
         },
         include: vehicleCheckInclude,
       });
+
+      return updated;
     }
 
     const decision = dto.items.length
@@ -168,7 +187,7 @@ export class VehicleChecksService {
     return this.prisma.$transaction(async (tx) => {
       await tx.vehicleCheckItem.deleteMany({ where: { vehicleCheckId: id } });
 
-      return tx.vehicleCheck.update({
+      const updated = await tx.vehicleCheck.update({
         where: { id },
         data: {
           agencyId: dto.agencyId,
@@ -205,6 +224,8 @@ export class VehicleChecksService {
         },
         include: vehicleCheckInclude,
       });
+
+      return updated;
     });
   }
 
@@ -212,7 +233,9 @@ export class VehicleChecksService {
     const vehicleCheck = await this.findOne(id, user);
 
     const hasForbiddenItem = vehicleCheck.items.some(
-      (item) => item.decisionStatus === RepairDecisionStatus.FORBIDDEN,
+      (item) =>
+        item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
+        item.decisionStatus === RepairDecisionStatus.FORBIDDEN,
     );
 
     if (hasForbiddenItem) {

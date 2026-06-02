@@ -5,6 +5,7 @@ import {
   Prisma,
   RepairDecisionStatus,
   Role,
+  VehicleCheckItemOperationalStatus,
   VehicleCheckStatus,
 } from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
@@ -252,11 +253,16 @@ export class DashboardService {
 
   private vehicleCheckItemScope(user: CurrentUserPayload, query: DashboardQueryDto = {}): Prisma.VehicleCheckItemWhereInput {
     const vehicleCheckScope = this.vehicleCheckScope(user, query);
+    const baseWhere: Prisma.VehicleCheckItemWhereInput = {
+      operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+    };
+
     if (!Object.keys(vehicleCheckScope).length) {
-      return {};
+      return baseWhere;
     }
 
     return {
+      ...baseWhere,
       vehicleCheck: vehicleCheckScope,
     };
   }

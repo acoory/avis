@@ -11,6 +11,7 @@ import {
   RepairDecisionPreview,
   VehicleCheck,
   VehicleCheckItem,
+  VehicleCheckItemOperationalStatus,
   VehicleModel,
   VehiclePart,
 } from "@/types/business";
@@ -110,6 +111,17 @@ export const businessService = {
     },
   ) {
     const { data } = await api.patch<VehicleCheckItem>(`/vehicle-check-items/${id}/part-order`, payload);
+    return data;
+  },
+
+  async updateVehicleCheckItemOperationalStatus(
+    id: string,
+    payload: {
+      operationalStatus: VehicleCheckItemOperationalStatus;
+      operationalComment?: string;
+    },
+  ) {
+    const { data } = await api.patch<VehicleCheckItem>(`/vehicle-check-items/${id}/operational-status`, payload);
     return data;
   },
 

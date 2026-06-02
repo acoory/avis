@@ -314,6 +314,13 @@ export type EnumRepairDecisionStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel> | $Enums.RepairDecisionStatus
 }
 
+export type EnumVehicleCheckItemOperationalStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VehicleCheckItemOperationalStatus | Prisma.EnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel> | $Enums.VehicleCheckItemOperationalStatus
+}
+
 export type EnumPartOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
@@ -329,6 +336,16 @@ export type EnumRepairDecisionStatusWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
+}
+
+export type EnumVehicleCheckItemOperationalStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VehicleCheckItemOperationalStatus | Prisma.EnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVehicleCheckItemOperationalStatusWithAggregatesFilter<$PrismaModel> | $Enums.VehicleCheckItemOperationalStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
 }
 
 export type EnumPartOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -654,6 +671,13 @@ export type NestedEnumRepairDecisionStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel> | $Enums.RepairDecisionStatus
 }
 
+export type NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VehicleCheckItemOperationalStatus | Prisma.EnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel> | $Enums.VehicleCheckItemOperationalStatus
+}
+
 export type NestedEnumPartOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
@@ -669,6 +693,16 @@ export type NestedEnumRepairDecisionStatusWithAggregatesFilter<$PrismaModel = ne
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumRepairDecisionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumVehicleCheckItemOperationalStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VehicleCheckItemOperationalStatus | Prisma.EnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VehicleCheckItemOperationalStatus[] | Prisma.ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVehicleCheckItemOperationalStatusWithAggregatesFilter<$PrismaModel> | $Enums.VehicleCheckItemOperationalStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumPartOrderStatusWithAggregatesFilter<$PrismaModel = never> = {

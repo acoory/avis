@@ -90,6 +90,11 @@ export type VehicleCheck = Prisma.VehicleCheckModel
  */
 export type VehicleCheckItem = Prisma.VehicleCheckItemModel
 /**
+ * Model VehicleCheckItemStatusHistory
+ * 
+ */
+export type VehicleCheckItemStatusHistory = Prisma.VehicleCheckItemStatusHistoryModel
+/**
  * Model ExternalQuote
  * 
  */

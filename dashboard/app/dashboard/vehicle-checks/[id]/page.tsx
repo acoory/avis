@@ -28,6 +28,15 @@ export default function VehicleCheckDetailsPage() {
   }, [params.id]);
 
   function handlePartOrderUpdated(updatedItem: VehicleCheckItem) {
+    updateItem(updatedItem);
+  }
+
+  function handleOperationalStatusUpdated(updatedItem: VehicleCheckItem) {
+    updateItem(updatedItem);
+    void businessService.vehicleCheck(params.id).then(setVehicleCheck);
+  }
+
+  function updateItem(updatedItem: VehicleCheckItem) {
     setVehicleCheck((current) =>
       current
         ? {
@@ -85,7 +94,11 @@ export default function VehicleCheckDetailsPage() {
         </Card>
       </div>
       <div className="mt-6">
-        <RepairItemsTable vehicleCheck={vehicleCheck} onPartOrderUpdated={handlePartOrderUpdated} />
+        <RepairItemsTable
+          vehicleCheck={vehicleCheck}
+          onOperationalStatusUpdated={handleOperationalStatusUpdated}
+          onPartOrderUpdated={handlePartOrderUpdated}
+        />
       </div>
       <Card className="mt-6">
         <CardHeader>

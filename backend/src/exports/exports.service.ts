@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/client';
 import ExcelJS from 'exceljs';
-import { Prisma, Role } from '../../prisma/generated/client.cjs';
+import { Prisma, Role, VehicleCheckItemOperationalStatus } from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { formatLicensePlate } from '../common/utils/license-plate';
 import { PrismaService } from '../prisma/prisma.service';
@@ -100,8 +100,11 @@ export class ExportsService {
 
     for (const check of vehicleChecks) {
       const quantitiesByRepairCode = new Map<string, number>();
+      const activeItems = check.items.filter(
+        (item) => item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE,
+      );
 
-      for (const item of check.items) {
+      for (const item of activeItems) {
         const currentQuantity = quantitiesByRepairCode.get(item.repairType.code) ?? 0;
         quantitiesByRepairCode.set(item.repairType.code, currentQuantity + item.quantity);
       }

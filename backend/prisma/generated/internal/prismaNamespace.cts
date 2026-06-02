@@ -394,6 +394,7 @@ export const ModelName = {
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
   VehicleCheckItem: 'VehicleCheckItem',
+  VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
   ExternalQuote: 'ExternalQuote',
   ExternalQuoteItem: 'ExternalQuoteItem'
 } as const
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "vehicleCheckItem" | "externalQuote" | "externalQuoteItem"
+    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "vehicleCheckItem" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1155,6 +1156,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VehicleCheckItemStatusHistory: {
+      payload: Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>
+      fields: Prisma.VehicleCheckItemStatusHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VehicleCheckItemStatusHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VehicleCheckItemStatusHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.VehicleCheckItemStatusHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VehicleCheckItemStatusHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.VehicleCheckItemStatusHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.VehicleCheckItemStatusHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.VehicleCheckItemStatusHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VehicleCheckItemStatusHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.VehicleCheckItemStatusHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>
+        }
+        update: {
+          args: Prisma.VehicleCheckItemStatusHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.VehicleCheckItemStatusHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VehicleCheckItemStatusHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VehicleCheckItemStatusHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.VehicleCheckItemStatusHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemStatusHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.VehicleCheckItemStatusHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVehicleCheckItemStatusHistory>
+        }
+        groupBy: {
+          args: Prisma.VehicleCheckItemStatusHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckItemStatusHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VehicleCheckItemStatusHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckItemStatusHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
     ExternalQuote: {
       payload: Prisma.$ExternalQuotePayload<ExtArgs>
       fields: Prisma.ExternalQuoteFieldRefs
@@ -1497,6 +1572,8 @@ export const VehicleCheckItemScalarFieldEnum = {
   decisionStatus: 'decisionStatus',
   decisionMessage: 'decisionMessage',
   comment: 'comment',
+  operationalStatus: 'operationalStatus',
+  operationalComment: 'operationalComment',
   partOrderRequired: 'partOrderRequired',
   partOrderStatus: 'partOrderStatus',
   partOrderPrice: 'partOrderPrice',
@@ -1507,6 +1584,19 @@ export const VehicleCheckItemScalarFieldEnum = {
 } as const
 
 export type VehicleCheckItemScalarFieldEnum = (typeof VehicleCheckItemScalarFieldEnum)[keyof typeof VehicleCheckItemScalarFieldEnum]
+
+
+export const VehicleCheckItemStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckItemId: 'vehicleCheckItemId',
+  userId: 'userId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  comment: 'comment',
+  createdAt: 'createdAt'
+} as const
+
+export type VehicleCheckItemStatusHistoryScalarFieldEnum = (typeof VehicleCheckItemStatusHistoryScalarFieldEnum)[keyof typeof VehicleCheckItemStatusHistoryScalarFieldEnum]
 
 
 export const ExternalQuoteScalarFieldEnum = {
@@ -1689,6 +1779,20 @@ export type ListEnumRepairDecisionStatusFieldRefInput<$PrismaModel> = FieldRefIn
 
 
 /**
+ * Reference to a field of type 'VehicleCheckItemOperationalStatus'
+ */
+export type EnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleCheckItemOperationalStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'VehicleCheckItemOperationalStatus[]'
+ */
+export type ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleCheckItemOperationalStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'PartOrderStatus'
  */
 export type EnumPartOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartOrderStatus'>
@@ -1835,6 +1939,7 @@ export type GlobalOmitConfig = {
   manufacturerRepairRule?: Prisma.ManufacturerRepairRuleOmit
   vehicleCheck?: Prisma.VehicleCheckOmit
   vehicleCheckItem?: Prisma.VehicleCheckItemOmit
+  vehicleCheckItemStatusHistory?: Prisma.VehicleCheckItemStatusHistoryOmit
   externalQuote?: Prisma.ExternalQuoteOmit
   externalQuoteItem?: Prisma.ExternalQuoteItemOmit
 }

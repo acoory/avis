@@ -7,6 +7,7 @@ export type RepairDecisionStatus =
   | "MANDATORY"
   | "WARNING";
 export type PartOrderStatus = "NOT_REQUIRED" | "TO_ORDER" | "ORDERED";
+export type VehicleCheckItemOperationalStatus = "ACTIVE" | "IMPOSSIBLE" | "CANCELLED";
 export type ManufacturerRepairRuleStatus =
   | "ALLOWED"
   | "FORBIDDEN"
@@ -113,6 +114,21 @@ export type VehicleCheck = {
     partOrderPrice?: string | null;
     partOrderReference?: string | null;
     partOrderedAt?: string | null;
+    operationalStatus: VehicleCheckItemOperationalStatus;
+    operationalComment?: string | null;
+    statusHistories?: Array<{
+      id: string;
+      fromStatus: VehicleCheckItemOperationalStatus;
+      toStatus: VehicleCheckItemOperationalStatus;
+      comment?: string | null;
+      createdAt: string;
+      user?: {
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+      } | null;
+    }>;
     decisionStatus: RepairDecisionStatus;
     decisionMessage?: string | null;
     repairType: RepairType;

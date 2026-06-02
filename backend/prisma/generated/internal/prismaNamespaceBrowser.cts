@@ -61,6 +61,7 @@ export const ModelName = {
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
   VehicleCheckItem: 'VehicleCheckItem',
+  VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
   ExternalQuote: 'ExternalQuote',
   ExternalQuoteItem: 'ExternalQuoteItem'
 } as const
@@ -236,6 +237,8 @@ export const VehicleCheckItemScalarFieldEnum = {
   decisionStatus: 'decisionStatus',
   decisionMessage: 'decisionMessage',
   comment: 'comment',
+  operationalStatus: 'operationalStatus',
+  operationalComment: 'operationalComment',
   partOrderRequired: 'partOrderRequired',
   partOrderStatus: 'partOrderStatus',
   partOrderPrice: 'partOrderPrice',
@@ -246,6 +249,19 @@ export const VehicleCheckItemScalarFieldEnum = {
 } as const
 
 export type VehicleCheckItemScalarFieldEnum = (typeof VehicleCheckItemScalarFieldEnum)[keyof typeof VehicleCheckItemScalarFieldEnum]
+
+
+export const VehicleCheckItemStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckItemId: 'vehicleCheckItemId',
+  userId: 'userId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  comment: 'comment',
+  createdAt: 'createdAt'
+} as const
+
+export type VehicleCheckItemStatusHistoryScalarFieldEnum = (typeof VehicleCheckItemStatusHistoryScalarFieldEnum)[keyof typeof VehicleCheckItemStatusHistoryScalarFieldEnum]
 
 
 export const ExternalQuoteScalarFieldEnum = {
