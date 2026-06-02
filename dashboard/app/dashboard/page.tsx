@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Car, ClipboardCheck, Euro, PackageCheck, Users } from "lucide-react";
+import { AlertTriangle, Car, ClipboardCheck, Euro, Info, PackageCheck, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ExportButton } from "@/components/business/export-button";
 import { VehicleCheckTable } from "@/components/business/vehicle-check-table";
@@ -32,6 +32,7 @@ export default function DashboardPage() {
     Array<{ manufacturerName: string; totalInternalSavingAmount: string; vehicleChecksCount: number }>
   >([]);
   const [byCollaborator, setByCollaborator] = useState<CollaboratorSaving[]>([]);
+  const [isRecentChecksInfoOpen, setIsRecentChecksInfoOpen] = useState(false);
 
   useEffect(() => {
     const params = {
@@ -95,9 +96,30 @@ export default function DashboardPage() {
       <div className="mt-6 min-w-0">
         <div className="min-w-0">
           <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-sm font-semibold text-gray-950">
-              {isManager ? "Controles recents de l'equipe" : "Controles recents"}
-            </h2>
+            <div className="group relative flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-gray-950">
+                {isManager ? "Controles recents de l'equipe" : "Controles recents"}
+              </h2>
+              <button
+                aria-label="Informations sur les controles recents"
+                aria-expanded={isRecentChecksInfoOpen}
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-950"
+                type="button"
+                onClick={() => setIsRecentChecksInfoOpen((current) => !current)}
+              >
+                <Info className="h-4 w-4" />
+              </button>
+              <div
+                className={[
+                  "absolute left-0 top-9 z-20 w-[min(320px,calc(100vw-2rem))] rounded-md border border-gray-200 bg-white p-3 text-sm text-gray-600 shadow-lg md:group-hover:block",
+                  isRecentChecksInfoOpen ? "block" : "hidden",
+                ].join(" ")}
+              >
+                Cette liste affiche les derniers controles sur la periode selectionnee. Pour un manager, elle
+                inclut les controles de son equipe. L'export Excel reprend cette periode et peut etre filtre par
+                collaborateur.
+              </div>
+            </div>
             <ExportButton
               dateRange={{ dateFrom: dateFrom || undefined, dateTo: dateTo || undefined }}
               withCollaboratorFilter
