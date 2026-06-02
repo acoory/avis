@@ -30,6 +30,7 @@ type DataTableProps<T> = {
     label: string;
     getValue: (row: T) => string | Date | null | undefined;
     mode?: "client" | "server";
+    value?: { dateFrom?: string; dateTo?: string };
     onChange?: (range: { dateFrom?: string; dateTo?: string }) => void;
   };
 };
@@ -51,11 +52,13 @@ export function DataTable<T>({
   const [pageSize, setPageSize] = useState(10);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const selectedDateFrom = dateFilter?.value?.dateFrom ?? dateFrom;
+  const selectedDateTo = dateFilter?.value?.dateTo ?? dateTo;
 
   const filteredData = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
-    const fromTime = dateFrom ? startOfDay(dateFrom) : null;
-    const toTime = dateTo ? endOfDay(dateTo) : null;
+    const fromTime = selectedDateFrom ? startOfDay(selectedDateFrom) : null;
+    const toTime = selectedDateTo ? endOfDay(selectedDateTo) : null;
 
     return data.filter((row) => {
       const matchesSearch =
@@ -81,7 +84,7 @@ export function DataTable<T>({
 
       return (!fromTime || rowTime >= fromTime) && (!toTime || rowTime <= toTime);
     });
-  }, [columns, data, dateFilter, dateFrom, dateTo, search]);
+  }, [columns, data, dateFilter, selectedDateFrom, selectedDateTo, search]);
 
   const sortedData = useMemo(() => {
     const column = columns.find((item) => item.id === sortColumn);
@@ -150,14 +153,14 @@ export function DataTable<T>({
                   </label>
                   <Input
                     type="date"
-                    value={dateFrom}
+                    value={selectedDateFrom}
                     onChange={(event) => {
                       const nextDateFrom = event.target.value;
                       setDateFrom(nextDateFrom);
                       setPage(1);
                       dateFilter.onChange?.({
                         dateFrom: nextDateFrom || undefined,
-                        dateTo: dateTo || undefined,
+                        dateTo: selectedDateTo || undefined,
                       });
                     }}
                   />
@@ -168,13 +171,13 @@ export function DataTable<T>({
                   </label>
                   <Input
                     type="date"
-                    value={dateTo}
+                    value={selectedDateTo}
                     onChange={(event) => {
                       const nextDateTo = event.target.value;
                       setDateTo(nextDateTo);
                       setPage(1);
                       dateFilter.onChange?.({
-                        dateFrom: dateFrom || undefined,
+                        dateFrom: selectedDateFrom || undefined,
                         dateTo: nextDateTo || undefined,
                       });
                     }}

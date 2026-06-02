@@ -14,15 +14,18 @@ import { VehicleCheck } from "@/types/business";
 export default function VehicleChecksPage() {
   const [vehicleChecks, setVehicleChecks] = useState<VehicleCheck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<{ dateFrom?: string; dateTo?: string }>({});
 
   useEffect(() => {
     void loadVehicleChecks();
   }, []);
 
   async function loadVehicleChecks(range?: { dateFrom?: string; dateTo?: string }) {
+    const nextRange = range ?? dateRange;
+    setDateRange(nextRange);
     setIsLoading(true);
     try {
-      const data = await businessService.vehicleChecks(range);
+      const data = await businessService.vehicleChecks(nextRange);
       setVehicleChecks(data);
     } finally {
       setIsLoading(false);
@@ -46,7 +49,11 @@ export default function VehicleChecksPage() {
       {isLoading && vehicleChecks.length === 0 ? (
         <LoadingScreen fullScreen={false} />
       ) : (
-        <VehicleCheckTable vehicleChecks={vehicleChecks} onDateFilterChange={loadVehicleChecks} />
+        <VehicleCheckTable
+          dateRange={dateRange}
+          vehicleChecks={vehicleChecks}
+          onDateFilterChange={loadVehicleChecks}
+        />
       )}
     </>
   );

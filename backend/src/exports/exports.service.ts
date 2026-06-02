@@ -117,64 +117,22 @@ export class ExportsService {
 
     this.styleSummaryBody(worksheet, columns.length, fixedColumns.length, repairColumns.length);
 
-    const detailsWorksheet = workbook.addWorksheet('Details');
-    detailsWorksheet.columns = [
-      { header: 'Numero controle', key: 'checkNumber', width: 18 },
-      { header: 'Agence', key: 'agency', width: 24 },
-      { header: 'Modele', key: 'vehicleModel', width: 18 },
-      { header: 'Kilometrage', key: 'mileage', width: 14 },
-      { header: 'Franchise constructeur', key: 'constructorAllowanceAmount', width: 22 },
-      { header: 'Statut', key: 'status', width: 14 },
-      { header: 'Commentaire', key: 'decisionSummary', width: 52 },
+    const repairTypesWorksheet = workbook.addWorksheet('Type reparations');
+    repairTypesWorksheet.columns = [
+      { key: 'repairType', width: 34 },
+      { key: 'savingAmount', width: 20 },
     ];
-    this.styleSimpleHeader(detailsWorksheet);
-    for (const check of vehicleChecks) {
-      detailsWorksheet.addRow({
-        checkNumber: check.checkNumber,
-        agency: check.agency.name,
-        vehicleModel: check.vehicleModel?.name ?? '',
-        mileage: check.mileage ?? null,
-        constructorAllowanceAmount: this.number(check.constructorAllowanceAmount),
-        status: check.status,
-        decisionSummary: check.decisionSummary ?? check.notes ?? '',
+    repairTypesWorksheet.getCell('A1').value = 'Type réparations';
+    repairTypesWorksheet.getCell('A3').value = 'Type réparation effectuée';
+    repairTypesWorksheet.getCell('B3').value = 'Economie réalisée';
+
+    for (const repairType of orderedRepairTypes) {
+      repairTypesWorksheet.addRow({
+        repairType: repairType.name,
+        savingAmount: this.number(repairType.defaultInternalSavingAmount),
       });
     }
-    detailsWorksheet.getColumn('constructorAllowanceAmount').numFmt = '#,##0.00 €';
-
-    const linesWorksheet = workbook.addWorksheet('Lignes reparations');
-    linesWorksheet.columns = [
-      { header: 'Numero controle', key: 'checkNumber', width: 18 },
-      { header: 'Date du contrôle', key: 'checkDate', width: 16 },
-      { header: 'Constructeur', key: 'manufacturer', width: 18 },
-      { header: 'Immatriculation', key: 'licensePlate', width: 18 },
-      { header: 'Element', key: 'vehiclePart', width: 32 },
-      { header: 'Type de réparation', key: 'repairType', width: 24 },
-      { header: 'Quantite', key: 'quantity', width: 10 },
-      { header: 'Decision', key: 'decisionStatus', width: 16 },
-      { header: 'Message', key: 'decisionMessage', width: 52 },
-      { header: 'Commentaire', key: 'comment', width: 32 },
-      { header: 'Economie', key: 'totalInternalSavingAmount', width: 16 },
-    ];
-    this.styleSimpleHeader(linesWorksheet);
-    for (const check of vehicleChecks) {
-      for (const item of check.items) {
-        linesWorksheet.addRow({
-          checkNumber: check.checkNumber,
-          checkDate: check.checkDate,
-          manufacturer: check.manufacturer.name,
-          licensePlate: formatLicensePlate(check.licensePlate),
-          vehiclePart: item.vehiclePart.name,
-          repairType: item.repairType.name,
-          quantity: item.quantity,
-          decisionStatus: item.decisionStatus,
-          decisionMessage: item.decisionMessage ?? '',
-          comment: item.comment ?? '',
-          totalInternalSavingAmount: this.number(item.totalInternalSavingAmount),
-        });
-      }
-    }
-    linesWorksheet.getColumn('checkDate').numFmt = 'dd/mm/yyyy';
-    linesWorksheet.getColumn('totalInternalSavingAmount').numFmt = '#,##0.00 €';
+    this.styleRepairTypesWorksheet(repairTypesWorksheet);
 
     const xlsxBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(xlsxBuffer);
@@ -274,6 +232,44 @@ export class ExportsService {
       from: { row: 1, column: 1 },
       to: { row: 1, column: worksheet.columnCount },
     };
+  }
+
+  private styleRepairTypesWorksheet(worksheet: ExcelJS.Worksheet) {
+    worksheet.getRow(1).height = 26;
+    worksheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'FF111827' } };
+
+    const header = worksheet.getRow(3);
+    header.font = { bold: true, color: { argb: 'FF1F2937' } };
+    header.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD9D9D9' },
+    };
+    header.alignment = { vertical: 'middle', horizontal: 'center' };
+    header.height = 22;
+
+    worksheet.autoFilter = {
+      from: { row: 3, column: 1 },
+      to: { row: 3, column: 2 },
+    };
+    worksheet.getColumn('savingAmount').numFmt = '#,##0.00 €';
+
+    for (let rowNumber = 3; rowNumber <= Math.max(11, worksheet.rowCount); rowNumber += 1) {
+      const row = worksheet.getRow(rowNumber);
+      row.eachCell({ includeEmpty: true }, (cell, columnNumber) => {
+        if (columnNumber > 2) return;
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FF9CA3AF' } },
+          left: { style: 'thin', color: { argb: 'FF9CA3AF' } },
+          bottom: { style: 'thin', color: { argb: 'FF9CA3AF' } },
+          right: { style: 'thin', color: { argb: 'FF9CA3AF' } },
+        };
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: columnNumber === 2 ? 'right' : 'left',
+        };
+      });
+    }
   }
 
   private number(value: Decimal | null): number {

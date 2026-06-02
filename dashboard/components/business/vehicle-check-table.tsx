@@ -11,11 +11,12 @@ import { businessService } from "@/services/business.service";
 import { VehicleCheck, VehicleCheckItem } from "@/types/business";
 
 type VehicleCheckTableProps = {
+  dateRange?: { dateFrom?: string; dateTo?: string };
   vehicleChecks: VehicleCheck[];
   onDateFilterChange?: (range: { dateFrom?: string; dateTo?: string }) => void;
 };
 
-export function VehicleCheckTable({ vehicleChecks, onDateFilterChange }: VehicleCheckTableProps) {
+export function VehicleCheckTable({ dateRange, vehicleChecks, onDateFilterChange }: VehicleCheckTableProps) {
   return (
     <DataTable
       data={vehicleChecks}
@@ -24,6 +25,7 @@ export function VehicleCheckTable({ vehicleChecks, onDateFilterChange }: Vehicle
         label: "Date",
         getValue: (check) => check.checkDate,
         mode: onDateFilterChange ? "server" : "client",
+        value: dateRange,
         onChange: onDateFilterChange,
       }}
       emptyMessage="Aucun controle pour le moment."
