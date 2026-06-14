@@ -6,10 +6,15 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const frontendUrl = configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
+  const frontendUrls = (
+    configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000'
+  )
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean);
 
   app.enableCors({
-    origin: frontendUrl,
+    origin: frontendUrls,
     credentials: true,
   });
 
@@ -21,6 +26,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(configService.get<number>('PORT') ?? 3001);
+  await app.listen(configService.get<number>('PORT') ?? 3001, '0.0.0.0');
 }
 bootstrap();

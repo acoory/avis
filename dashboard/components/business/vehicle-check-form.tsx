@@ -19,6 +19,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DecisionBadge } from "@/components/business/decision-badge";
 import { LicensePlateScanner } from "@/components/business/license-plate-scanner";
+import { VehicleExteriorSelector } from "@/components/business/vehicle-exterior-selector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -58,6 +59,14 @@ const formSteps = [
 ];
 
 const repairTypeCodesWithoutVehiclePart = new Set(["SERVICING"]);
+
+function createDraftId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `draft-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps) {
   const router = useRouter();
@@ -173,6 +182,16 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     () => lines.map(toDecisionItem).filter((item): item is RepairDecisionInputItem => Boolean(item)),
     [lines, repairTypes],
   );
+  const selectedPartCounts = useMemo(
+    () =>
+      lines.reduce<Record<string, number>>((counts, line) => {
+        if (line.vehiclePartId) {
+          counts[line.vehiclePartId] = (counts[line.vehiclePartId] ?? 0) + 1;
+        }
+        return counts;
+      }, {}),
+    [lines],
+  );
   const repairSheetDecisionItem = useMemo(
     () => (repairSheetLine ? toDecisionItem(repairSheetLine) : null),
     [repairSheetLine, repairTypes],
@@ -242,7 +261,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
   function createBlankRepairLine(): DraftRepairLine {
     return {
-      id: crypto.randomUUID(),
+      id: createDraftId(),
       repairTypeId: "",
       vehiclePartId: "",
       quantity: 1,
@@ -271,6 +290,14 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   function openRepairSheet(line?: DraftRepairLine) {
     setRepairSheetLine(line ? { ...line } : createBlankRepairLine());
     setRepairSheetEditingId(line?.id ?? null);
+  }
+
+  function openRepairSheetForVehiclePart(vehiclePart: VehiclePart) {
+    setRepairSheetLine({
+      ...createBlankRepairLine(),
+      vehiclePartId: vehiclePart.id,
+    });
+    setRepairSheetEditingId(null);
   }
 
   function closeRepairSheet() {
@@ -644,6 +671,11 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           </Button>
         </CardHeader>
         <CardContent className="space-y-3 p-4 pt-0 md:p-6 md:pt-0">
+          <VehicleExteriorSelector
+            selectedPartCounts={selectedPartCounts}
+            vehicleParts={vehicleParts}
+            onSelect={openRepairSheetForVehiclePart}
+          />
           {!lines.length ? (
             <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-600">
               <p>Aucune reparation ajoutee pour le moment.</p>
@@ -1010,8 +1042,8 @@ function RepairBottomSheet({
   const previewItem = preview?.items[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-black/40 motion-safe:animate-[vehicle-check-sheet-overlay-in_160ms_ease-out] md:hidden">
-      <div className="max-h-[94vh] w-full overflow-hidden rounded-t-xl bg-white shadow-xl motion-safe:animate-[vehicle-check-sheet-in_220ms_cubic-bezier(0.22,1,0.36,1)]">
+    <div className="fixed inset-0 z-50 flex items-end bg-black/40 motion-safe:animate-[vehicle-check-sheet-overlay-in_160ms_ease-out] md:items-stretch md:justify-end">
+      <div className="max-h-[94vh] w-full overflow-hidden rounded-t-xl bg-white shadow-xl motion-safe:animate-[vehicle-check-sheet-in_220ms_cubic-bezier(0.22,1,0.36,1)] md:h-full md:max-h-none md:max-w-xl md:rounded-none">
         <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
           <div>
             <h2 className="text-base font-semibold text-gray-950">
@@ -1028,7 +1060,7 @@ function RepairBottomSheet({
           </button>
         </div>
 
-        <div className="max-h-[calc(94vh-112px)] overflow-x-hidden overflow-y-auto p-4 pt-3">
+        <div className="max-h-[calc(94vh-112px)] overflow-x-hidden overflow-y-auto p-4 pt-3 md:max-h-[calc(100dvh-112px)]">
           {previewItem ? (
             <div className="mb-3 rounded-md border border-gray-200 bg-gray-50 p-3 text-sm">
               <div className="flex items-center justify-between gap-3">
