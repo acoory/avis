@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft, Printer } from "lucide-react";
+import { ChevronLeft, Download, Printer } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { DecisionBadge, VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
+import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
 
@@ -18,6 +20,7 @@ export default function VehicleCheckPrintPage() {
   const searchParams = useSearchParams();
   const [vehicleCheck, setVehicleCheck] = useState<VehicleCheck | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
   const hasPrintedRef = useRef(false);
 
   useEffect(() => {
@@ -53,6 +56,22 @@ export default function VehicleCheckPrintPage() {
     return <PageHeader title="Controle introuvable" description="Impossible de charger cette synthese." />;
   }
 
+  async function handleDownload() {
+    if (!vehicleCheck) {
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      await downloadVehicleCheckPdf(vehicleCheck);
+      toast.success("PDF telecharge avec succes.");
+    } catch {
+      toast.error("Impossible de generer le PDF.");
+    } finally {
+      setIsDownloading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 print:bg-white">
       <div className="sticky top-0 z-20 border-b border-gray-200 bg-white/95 backdrop-blur print:hidden">
@@ -63,10 +82,16 @@ export default function VehicleCheckPrintPage() {
               Retour au controle
             </Link>
           </Button>
-          <Button size="sm" onClick={() => window.print()}>
-            <Printer className="h-4 w-4" />
-            Imprimer / PDF
-          </Button>
+          <div className="flex gap-2">
+            <Button disabled={isDownloading} size="sm" variant="outline" onClick={handleDownload}>
+              <Download className="h-4 w-4" />
+              {isDownloading ? "Generation..." : "Telecharger PDF"}
+            </Button>
+            <Button size="sm" onClick={() => window.print()}>
+              <Printer className="h-4 w-4" />
+              Imprimer
+            </Button>
+          </div>
         </div>
       </div>
 

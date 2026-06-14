@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Pencil, Printer, Trash2 } from "lucide-react";
+import { CheckCircle2, Download, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
 
@@ -18,6 +19,7 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
   const router = useRouter();
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
   const canDelete = vehicleCheck.status === "DRAFT";
 
@@ -54,18 +56,29 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
     }
   }
 
+  async function handleDownload() {
+    setIsDownloading(true);
+    try {
+      await downloadVehicleCheckPdf(vehicleCheck);
+      toast.success("PDF telecharge avec succes.");
+    } catch {
+      toast.error("Impossible de generer le PDF.");
+    } finally {
+      setIsDownloading(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 sm:items-end">
       <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
-        <Button asChild className="w-full sm:w-auto" variant="outline">
-          <Link
-            href={`/dashboard/vehicle-checks/${vehicleCheck.id}/print?autoprint=1`}
-            rel="noreferrer"
-            target="_blank"
-          >
-            <Printer className="h-4 w-4" />
-            PDF
-          </Link>
+        <Button
+          className="w-full sm:w-auto"
+          disabled={isDownloading}
+          variant="outline"
+          onClick={handleDownload}
+        >
+          <Download className="h-4 w-4" />
+          {isDownloading ? "Generation..." : "PDF"}
         </Button>
         <Button asChild className="w-full sm:w-auto" variant="outline">
           <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>

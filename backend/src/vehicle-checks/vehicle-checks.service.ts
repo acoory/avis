@@ -149,10 +149,6 @@ export class VehicleChecksService {
   async update(id: string, dto: UpdateVehicleCheckDto, user: CurrentUserPayload) {
     const existing = await this.findOne(id, user);
 
-    if (existing.status === VehicleCheckStatus.COMPLETED) {
-      throw new BadRequestException('Completed vehicle checks cannot be edited');
-    }
-
     const agencyId = dto.agencyId ?? existing.agencyId;
     const manufacturerId = dto.manufacturerId ?? existing.manufacturerId;
     const vehicleModelId = dto.vehicleModelId ?? existing.vehicleModelId ?? undefined;
@@ -183,6 +179,15 @@ export class VehicleChecksService {
     const decision = dto.items.length
       ? await this.repairDecisionService.preview(manufacturerId, dto.items)
       : await this.emptyDecisionForManufacturer(manufacturerId);
+
+    if (
+      existing.status === VehicleCheckStatus.COMPLETED &&
+      decision.items.some((item) => item.decisionStatus === RepairDecisionStatus.FORBIDDEN)
+    ) {
+      throw new BadRequestException(
+        'A completed vehicle check cannot contain forbidden repair items',
+      );
+    }
 
     return this.prisma.$transaction(async (tx) => {
       await tx.vehicleCheckItem.deleteMany({ where: { vehicleCheckId: id } });
@@ -315,7 +320,9 @@ export class VehicleChecksService {
     }
   }
 
-  private async emptyDecisionForManufacturer(manufacturerId: string) {
+  private async emptyDecisionForManufacturer(
+    manufacturerId: string,
+  ): Promise<Awaited<ReturnType<RepairDecisionService['preview']>>> {
     const manufacturer = await this.prisma.manufacturer.findUnique({
       where: { id: manufacturerId },
       include: { rule: true },
@@ -328,12 +335,17 @@ export class VehicleChecksService {
     const constructorAllowanceAmount = manufacturer.rule?.constructorAllowanceAmount ?? '0';
 
     return {
+      manufacturerId: manufacturer.id,
+      manufacturerName: manufacturer.name,
       totalInternalSavingAmount: '0.00',
       totalInternalCost: '0.00',
       constructorAllowanceAmount: this.money(constructorAllowanceAmount),
       allowanceDifferenceAmount: this.money(constructorAllowanceAmount),
       decisionSummary: 'Aucun degat constate.',
+      alerts: [],
       items: [],
+      missingMandatoryRepairTypes: [],
+      recommendedRepairTypes: [],
     };
   }
 

@@ -58,6 +58,7 @@ const repairTypeCodesWithoutVehiclePart = new Set(["SERVICING"]);
 
 export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps) {
   const router = useRouter();
+  const isCompletedEdit = initialVehicleCheck?.status === "COMPLETED";
   const formRef = useRef<HTMLFormElement | null>(null);
   const didMountRef = useRef(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
@@ -114,7 +115,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           ? initialVehicleCheck.items.map((item) => ({
               id: item.id,
               repairTypeId: item.repairType.id,
-              vehiclePartId: item.vehiclePart.id,
+              vehiclePartId: item.vehiclePart?.id ?? "",
               quantity: item.quantity,
               comment: item.comment ?? "",
               partOrderRequired: item.partOrderRequired,
@@ -392,7 +393,9 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       toast.success(
         shouldComplete
           ? "Controle valide avec succes."
-          : "Brouillon enregistre avec succes.",
+          : isCompletedEdit
+            ? "Controle modifie avec succes."
+            : "Brouillon enregistre avec succes.",
       );
       router.replace(`/dashboard/vehicle-checks/${finalVehicleCheck.id}`);
     } catch {
@@ -439,7 +442,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       <StepHeader activeStep={activeStep} onStepClick={setActiveStep} />
 
       {activeStep === 0 ? (
-      <Card>
+      <Card className="relative z-0">
         <CardHeader className="p-4 md:p-6">
           <CardTitle>Vehicule</CardTitle>
         </CardHeader>
@@ -468,10 +471,10 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             <Input className="h-12 text-base md:h-10 md:text-sm" value={city} onChange={(event) => setCity(event.target.value)} />
           </div>
 
-          <div className="space-y-2">
+          <div className="min-w-0 space-y-2">
             <Label>Date du controle</Label>
             <Input
-              className="h-12 text-base md:h-10 md:text-sm"
+              className="h-12 min-w-0 max-w-full text-base md:h-10 md:text-sm"
               type="date"
               value={checkDate}
               onChange={(event) => setCheckDate(event.target.value)}
@@ -689,6 +692,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           activeStep={activeStep}
           isLastStep={isLastStep}
           isSaving={isSaving}
+          isCompletedEdit={isCompletedEdit}
           onBack={goToPreviousStep}
           onNext={goToNextStep}
           onValidate={openValidationRecap}
@@ -700,6 +704,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           activeStep={activeStep}
           isLastStep={isLastStep}
           isSaving={isSaving}
+          isCompletedEdit={isCompletedEdit}
           onBack={goToPreviousStep}
           onNext={goToNextStep}
           onValidate={openValidationRecap}
@@ -766,7 +771,7 @@ function StepHeader({
   onStepClick: (step: number) => void;
 }) {
   return (
-    <Card className="sticky top-16 z-20 -mx-4 rounded-none border-x-0 bg-white md:static md:mx-0 md:rounded-lg md:border-x">
+    <Card className="sticky top-0 z-20 -mx-4 mb-2 rounded-none border-x-0 bg-white shadow-sm md:static md:mx-0 md:mb-0 md:rounded-lg md:border-x">
       <CardContent className="space-y-2 p-3 md:space-y-4 md:p-5">
         <div>
           <p className="text-xs font-medium uppercase text-gray-500">
@@ -816,6 +821,7 @@ function StepActions({
   activeStep,
   isLastStep,
   isSaving,
+  isCompletedEdit,
   onBack,
   onNext,
   onValidate,
@@ -823,6 +829,7 @@ function StepActions({
   activeStep: number;
   isLastStep: boolean;
   isSaving: boolean;
+  isCompletedEdit: boolean;
   onBack: () => void;
   onNext: () => void;
   onValidate: () => void;
@@ -843,20 +850,28 @@ function StepActions({
   }
 
   return (
-    <div className="grid grid-cols-[0.85fr_1fr_1fr] gap-2 md:flex md:justify-between">
+    <div
+      className={
+        isCompletedEdit
+          ? "grid grid-cols-2 gap-2 md:flex md:justify-between"
+          : "grid grid-cols-[0.85fr_1fr_1fr] gap-2 md:flex md:justify-between"
+      }
+    >
       <Button disabled={isSaving} type="button" variant="outline" onClick={onBack}>
         <ChevronLeft className="h-4 w-4" />
         Retour
       </Button>
       <div className="contents md:flex md:gap-2">
-        <Button disabled={isSaving} type="submit" variant="outline">
+        <Button disabled={isSaving} type="submit" variant={isCompletedEdit ? "default" : "outline"}>
           <Save className="h-4 w-4" />
-          {isSaving ? "Enregistrement..." : "Brouillon"}
+          {isSaving ? "Enregistrement..." : isCompletedEdit ? "Enregistrer" : "Brouillon"}
         </Button>
-        <Button disabled={isSaving} type="button" onClick={onValidate}>
-          <CheckCircle2 className="h-4 w-4" />
-          Valider
-        </Button>
+        {!isCompletedEdit ? (
+          <Button disabled={isSaving} type="button" onClick={onValidate}>
+            <CheckCircle2 className="h-4 w-4" />
+            Valider
+          </Button>
+        ) : null}
       </div>
     </div>
   );
