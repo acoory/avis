@@ -57,9 +57,19 @@ export function VehicleCheckTable({ dateRange, vehicleChecks, onDateFilterChange
         {
           id: "licensePlate",
           header: "Vehicule",
-          cell: (check) => formatLicensePlate(check.licensePlate),
+          cell: (check) =>
+            formatLicensePlate(
+              check.licensePlate,
+              check.licensePlateCountry,
+              check.licensePlateRaw,
+            ),
           sortValue: (check) => check.licensePlate,
-          searchValue: (check) => `${check.licensePlate} ${formatLicensePlate(check.licensePlate)}`,
+          searchValue: (check) =>
+            `${check.licensePlate} ${check.licensePlateRaw ?? ""} ${formatLicensePlate(
+              check.licensePlate,
+              check.licensePlateCountry,
+              check.licensePlateRaw,
+            )}`,
         },
         {
           id: "manufacturer",

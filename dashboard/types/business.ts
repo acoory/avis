@@ -87,6 +87,9 @@ export type VehicleCheck = {
   id: string;
   checkNumber: string;
   licensePlate: string;
+  licensePlateRaw?: string | null;
+  licensePlateCountry: string;
+  licensePlateRecognitionConfidence?: number | null;
   mileage?: number | null;
   checkDate: string;
   city: string;
@@ -197,6 +200,8 @@ export type CreateVehicleCheckPayload = {
   manufacturerId: string;
   vehicleModelId?: string;
   licensePlate: string;
+  licensePlateCountry?: string;
+  licensePlateRecognitionConfidence?: number;
   mileage?: number;
   checkDate?: string;
   city: string;

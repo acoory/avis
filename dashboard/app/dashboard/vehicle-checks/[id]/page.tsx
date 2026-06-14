@@ -69,7 +69,11 @@ export default function VehicleCheckDetailsPage() {
         <div>
           <PageHeader
             title={vehicleCheck.checkNumber}
-            description={`${formatLicensePlate(vehicleCheck.licensePlate)} | ${vehicleCheck.manufacturer?.name ?? "-"} | ${formatDate(vehicleCheck.checkDate)}`}
+            description={`${formatLicensePlate(
+              vehicleCheck.licensePlate,
+              vehicleCheck.licensePlateCountry,
+              vehicleCheck.licensePlateRaw,
+            )} | ${vehicleCheck.manufacturer?.name ?? "-"} | ${formatDate(vehicleCheck.checkDate)}`}
           />
           <VehicleCheckStatusBadge status={vehicleCheck.status} />
         </div>

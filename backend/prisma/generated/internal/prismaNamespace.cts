@@ -1540,6 +1540,9 @@ export const VehicleCheckScalarFieldEnum = {
   manufacturerId: 'manufacturerId',
   vehicleModelId: 'vehicleModelId',
   licensePlate: 'licensePlate',
+  licensePlateRaw: 'licensePlateRaw',
+  licensePlateCountry: 'licensePlateCountry',
+  licensePlateRecognitionConfidence: 'licensePlateRecognitionConfidence',
   mileage: 'mileage',
   checkDate: 'checkDate',
   city: 'city',
@@ -1751,6 +1754,20 @@ export type ListEnumManufacturerRepairRuleStatusFieldRefInput<$PrismaModel> = Fi
 
 
 /**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
  * Reference to a field of type 'VehicleCheckStatus'
  */
 export type EnumVehicleCheckStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleCheckStatus'>
@@ -1803,20 +1820,6 @@ export type EnumPartOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'PartOrderStatus[]'
  */
 export type ListEnumPartOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartOrderStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Float'
- */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**

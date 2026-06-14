@@ -33,7 +33,11 @@ export default function EditVehicleCheckPage() {
     <>
       <PageHeader
         title="Modifier le controle"
-        description={`${vehicleCheck.checkNumber} | ${formatLicensePlate(vehicleCheck.licensePlate)}`}
+        description={`${vehicleCheck.checkNumber} | ${formatLicensePlate(
+          vehicleCheck.licensePlate,
+          vehicleCheck.licensePlateCountry,
+          vehicleCheck.licensePlateRaw,
+        )}`}
       />
       <VehicleCheckForm initialVehicleCheck={vehicleCheck} />
     </>

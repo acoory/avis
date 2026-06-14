@@ -200,6 +200,9 @@ model VehicleCheck {
   manufacturerId             String
   vehicleModelId             String?
   licensePlate               String
+  licensePlateRaw            String?
+  licensePlateCountry        String             @default("FR")
+  licensePlateRecognitionConfidence Float?
   mileage                    Int?
   checkDate                  DateTime           @default(now())
   city                       String
@@ -229,6 +232,7 @@ model VehicleCheck {
   @@index([checkDate])
   @@index([status])
   @@index([licensePlate])
+  @@index([licensePlateCountry])
 }
 
 model VehicleCheckItem {

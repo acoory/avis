@@ -102,7 +102,11 @@ export default function VehicleCheckPrintPage() {
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Synthese controle vehicule</p>
               <h1 className="mt-1 text-xl font-semibold text-gray-950">{vehicleCheck.checkNumber}</h1>
               <p className="mt-1 text-sm text-gray-600">
-                {formatLicensePlate(vehicleCheck.licensePlate)} | {vehicleCheck.manufacturer?.name ?? "-"} |{" "}
+                {formatLicensePlate(
+                  vehicleCheck.licensePlate,
+                  vehicleCheck.licensePlateCountry,
+                  vehicleCheck.licensePlateRaw,
+                )} | {vehicleCheck.manufacturer?.name ?? "-"} |{" "}
                 {formatDate(vehicleCheck.checkDate)}
               </p>
             </div>

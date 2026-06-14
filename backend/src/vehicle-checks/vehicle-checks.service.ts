@@ -8,7 +8,11 @@ import {
   VehicleCheckStatus,
 } from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
-import { normalizeLicensePlate } from '../common/utils/license-plate';
+import {
+  normalizeLicensePlate,
+  normalizeLicensePlateCountry,
+  sanitizeLicensePlateRaw,
+} from '../common/utils/license-plate';
 import { PrismaService } from '../prisma/prisma.service';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
@@ -113,6 +117,9 @@ export class VehicleChecksService {
         manufacturerId: dto.manufacturerId,
         vehicleModelId: dto.vehicleModelId,
         licensePlate: normalizeLicensePlate(dto.licensePlate),
+        licensePlateRaw: sanitizeLicensePlateRaw(dto.licensePlate),
+        licensePlateCountry: normalizeLicensePlateCountry(dto.licensePlateCountry ?? 'FR'),
+        licensePlateRecognitionConfidence: dto.licensePlateRecognitionConfidence,
         mileage: dto.mileage,
         checkDate: dto.checkDate ? new Date(dto.checkDate) : new Date(),
         city: dto.city,
@@ -165,6 +172,11 @@ export class VehicleChecksService {
           manufacturerId: dto.manufacturerId,
           vehicleModelId: dto.vehicleModelId,
           licensePlate: dto.licensePlate ? normalizeLicensePlate(dto.licensePlate) : undefined,
+          licensePlateRaw: dto.licensePlate ? sanitizeLicensePlateRaw(dto.licensePlate) : undefined,
+          licensePlateCountry: dto.licensePlateCountry
+            ? normalizeLicensePlateCountry(dto.licensePlateCountry)
+            : undefined,
+          licensePlateRecognitionConfidence: dto.licensePlateRecognitionConfidence,
           mileage: dto.mileage,
           checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
           city: dto.city,
@@ -199,6 +211,11 @@ export class VehicleChecksService {
           manufacturerId: dto.manufacturerId,
           vehicleModelId: dto.vehicleModelId,
           licensePlate: dto.licensePlate ? normalizeLicensePlate(dto.licensePlate) : undefined,
+          licensePlateRaw: dto.licensePlate ? sanitizeLicensePlateRaw(dto.licensePlate) : undefined,
+          licensePlateCountry: dto.licensePlateCountry
+            ? normalizeLicensePlateCountry(dto.licensePlateCountry)
+            : undefined,
+          licensePlateRecognitionConfidence: dto.licensePlateRecognitionConfidence,
           mileage: dto.mileage,
           checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
           city: dto.city,

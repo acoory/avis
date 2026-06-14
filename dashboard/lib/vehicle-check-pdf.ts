@@ -87,7 +87,11 @@ export async function downloadVehicleCheckPdf(vehicleCheck: VehicleCheck) {
 
   document.setFont("helvetica", "normal");
   addWrappedText(
-    `${formatLicensePlate(vehicleCheck.licensePlate)} | ${vehicleCheck.manufacturer?.name ?? "-"} | ${formatDate(vehicleCheck.checkDate)}`,
+    `${formatLicensePlate(
+      vehicleCheck.licensePlate,
+      vehicleCheck.licensePlateCountry,
+      vehicleCheck.licensePlateRaw,
+    )} | ${vehicleCheck.manufacturer?.name ?? "-"} | ${formatDate(vehicleCheck.checkDate)}`,
     { color: [75, 85, 99] },
   );
 

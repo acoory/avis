@@ -2,6 +2,7 @@
 
 import {
   AlertTriangle,
+  Camera,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -17,11 +18,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DecisionBadge } from "@/components/business/decision-badge";
+import { LicensePlateScanner } from "@/components/business/license-plate-scanner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatLicensePlate, formatMoney, normalizeLicensePlate } from "@/lib/format";
+import { licensePlateCountries, sanitizeLicensePlateInput } from "@/lib/license-plate";
 import { businessService } from "@/services/business.service";
 import {
   Agency,
@@ -70,6 +73,10 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [manufacturerId, setManufacturerId] = useState("");
   const [vehicleModelId, setVehicleModelId] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
+  const [licensePlateCountry, setLicensePlateCountry] = useState("FR");
+  const [licensePlateRecognitionConfidence, setLicensePlateRecognitionConfidence] = useState<
+    number | undefined
+  >();
   const [mileage, setMileage] = useState("");
   const [checkDate, setCheckDate] = useState(
     initialVehicleCheck?.checkDate
@@ -85,6 +92,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [repairSheetLine, setRepairSheetLine] = useState<DraftRepairLine | null>(null);
   const [repairSheetEditingId, setRepairSheetEditingId] = useState<string | null>(null);
   const [repairSheetPreview, setRepairSheetPreview] = useState<RepairDecisionPreview | null>(null);
+  const [isLicensePlateScannerOpen, setIsLicensePlateScannerOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
@@ -101,7 +109,17 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       setAgencyId(initialVehicleCheck?.agency?.id ?? agenciesData[0]?.id ?? "");
       setManufacturerId(initialVehicleCheck?.manufacturer?.id ?? manufacturersData[0]?.id ?? "");
       setVehicleModelId(initialVehicleCheck?.vehicleModel?.id ?? "");
-      setLicensePlate(initialVehicleCheck?.licensePlate ?? "");
+      setLicensePlate(
+        initialVehicleCheck?.licensePlateRaw ??
+          formatLicensePlate(
+            initialVehicleCheck?.licensePlate,
+            initialVehicleCheck?.licensePlateCountry,
+          ),
+      );
+      setLicensePlateCountry(initialVehicleCheck?.licensePlateCountry ?? "FR");
+      setLicensePlateRecognitionConfidence(
+        initialVehicleCheck?.licensePlateRecognitionConfidence ?? undefined,
+      );
       setMileage(initialVehicleCheck?.mileage ? String(initialVehicleCheck.mileage) : "");
       setCheckDate(
         initialVehicleCheck?.checkDate
@@ -348,6 +366,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       manufacturerId,
       vehicleModelId: vehicleModelId || undefined,
       licensePlate,
+      licensePlateCountry,
+      licensePlateRecognitionConfidence,
       mileage: mileage ? Number(mileage) : undefined,
       checkDate,
       city,
@@ -517,14 +537,50 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
           <div className="space-y-2">
             <Label>Immatriculation</Label>
-            <Input
-              autoCapitalize="characters"
-              autoComplete="off"
-              className="h-12 text-base font-semibold uppercase tracking-wide md:h-10 md:text-sm"
-              value={licensePlate}
-              onChange={(event) => setLicensePlate(normalizeLicensePlate(event.target.value))}
-              placeholder="ER54678"
-            />
+            <div className="grid grid-cols-[7.5rem_minmax(0,1fr)_3rem] gap-2">
+              <select
+                aria-label="Pays de la plaque"
+                className="h-12 min-w-0 rounded-md border border-gray-200 bg-white px-2 text-sm text-gray-950 shadow-sm md:h-10"
+                value={licensePlateCountry}
+                onChange={(event) => {
+                  setLicensePlateCountry(event.target.value);
+                  setLicensePlateRecognitionConfidence(undefined);
+                }}
+              >
+                {licensePlateCountries.map((country) => (
+                  <option key={country.code} value={country.code}>
+                    {country.code === "UNKNOWN" ? "Autre" : country.code}
+                  </option>
+                ))}
+              </select>
+              <Input
+                autoCapitalize="characters"
+                autoComplete="off"
+                className="h-12 min-w-0 text-base font-semibold uppercase tracking-wide md:h-10 md:text-sm"
+                maxLength={20}
+                value={licensePlate}
+                onChange={(event) => {
+                  setLicensePlate(sanitizeLicensePlateInput(event.target.value));
+                  setLicensePlateRecognitionConfidence(undefined);
+                }}
+                placeholder="Plaque"
+              />
+              <Button
+                aria-label="Scanner la plaque"
+                className="h-12 w-12 md:h-10 md:w-10"
+                size="icon"
+                type="button"
+                variant="outline"
+                onClick={() => setIsLicensePlateScannerOpen(true)}
+              >
+                <Camera className="h-5 w-5" />
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500">
+              {licensePlateRecognitionConfidence !== undefined
+                ? `Detection OCR : ${Math.round(licensePlateRecognitionConfidence)} %, a verifier avant validation.`
+                : "Selectionne le pays ou choisis Autre pour une plaque non referencee."}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -745,11 +801,25 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
         />
       ) : null}
 
+      {isLicensePlateScannerOpen ? (
+        <LicensePlateScanner
+          country={licensePlateCountry}
+          onClose={() => setIsLicensePlateScannerOpen(false)}
+          onConfirm={(result) => {
+            setLicensePlate(sanitizeLicensePlateInput(result.value));
+            setLicensePlateCountry(result.country);
+            setLicensePlateRecognitionConfidence(result.confidence);
+            setIsLicensePlateScannerOpen(false);
+          }}
+        />
+      ) : null}
+
       {isRecapOpen ? (
         <ValidationRecap
           city={city}
           isSaving={isSaving}
           licensePlate={licensePlate}
+          licensePlateCountry={licensePlateCountry}
           manufacturerName={selectedManufacturer?.name ?? "-"}
           notes={notes}
           preview={activePreview}
@@ -1410,6 +1480,7 @@ function ValidationRecap({
   city,
   isSaving,
   licensePlate,
+  licensePlateCountry,
   manufacturerName,
   notes,
   preview,
@@ -1421,6 +1492,7 @@ function ValidationRecap({
   city: string;
   isSaving: boolean;
   licensePlate: string;
+  licensePlateCountry: string;
   manufacturerName: string;
   notes: string;
   preview: RepairDecisionPreview | null;
@@ -1454,7 +1526,14 @@ function ValidationRecap({
 
         <div className="space-y-4 p-4">
           <div className="grid gap-3 sm:grid-cols-2">
-            <RecapLine label="Immatriculation" value={formatLicensePlate(licensePlate)} />
+            <RecapLine
+              label="Immatriculation"
+              value={formatLicensePlate(
+                normalizeLicensePlate(licensePlate),
+                licensePlateCountry,
+                licensePlate,
+              )}
+            />
             <RecapLine label="Constructeur" value={manufacturerName} />
             <RecapLine label="Modele" value={vehicleModelName} />
             <RecapLine label="Agence" value={selectedAgencyName} />

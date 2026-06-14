@@ -11,19 +11,17 @@ export function formatDate(value: string | Date) {
 }
 
 export function normalizeLicensePlate(value: string) {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 7);
+  return normalizeInternationalLicensePlate(value);
 }
 
-export function formatLicensePlate(value: string | null | undefined) {
-  const normalized = normalizeLicensePlate(value ?? "");
-
-  if (normalized.length <= 2) {
-    return normalized;
-  }
-
-  if (normalized.length <= 5) {
-    return `${normalized.slice(0, 2)}-${normalized.slice(2)}`;
-  }
-
-  return `${normalized.slice(0, 2)}-${normalized.slice(2, 5)}-${normalized.slice(5)}`;
+export function formatLicensePlate(
+  value: string | null | undefined,
+  country = "FR",
+  rawValue?: string | null,
+) {
+  return formatInternationalLicensePlate(value, country, rawValue);
 }
+import {
+  formatLicensePlate as formatInternationalLicensePlate,
+  normalizeLicensePlate as normalizeInternationalLicensePlate,
+} from "@/lib/license-plate";

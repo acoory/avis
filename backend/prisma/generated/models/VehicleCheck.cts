@@ -27,6 +27,7 @@ export type AggregateVehicleCheck = {
 }
 
 export type VehicleCheckAvgAggregateOutputType = {
+  licensePlateRecognitionConfidence: number | null
   mileage: number | null
   totalInternalSavingAmount: runtime.Decimal | null
   totalInternalCost: runtime.Decimal | null
@@ -37,6 +38,7 @@ export type VehicleCheckAvgAggregateOutputType = {
 }
 
 export type VehicleCheckSumAggregateOutputType = {
+  licensePlateRecognitionConfidence: number | null
   mileage: number | null
   totalInternalSavingAmount: runtime.Decimal | null
   totalInternalCost: runtime.Decimal | null
@@ -54,6 +56,9 @@ export type VehicleCheckMinAggregateOutputType = {
   manufacturerId: string | null
   vehicleModelId: string | null
   licensePlate: string | null
+  licensePlateRaw: string | null
+  licensePlateCountry: string | null
+  licensePlateRecognitionConfidence: number | null
   mileage: number | null
   checkDate: Date | null
   city: string | null
@@ -78,6 +83,9 @@ export type VehicleCheckMaxAggregateOutputType = {
   manufacturerId: string | null
   vehicleModelId: string | null
   licensePlate: string | null
+  licensePlateRaw: string | null
+  licensePlateCountry: string | null
+  licensePlateRecognitionConfidence: number | null
   mileage: number | null
   checkDate: Date | null
   city: string | null
@@ -102,6 +110,9 @@ export type VehicleCheckCountAggregateOutputType = {
   manufacturerId: number
   vehicleModelId: number
   licensePlate: number
+  licensePlateRaw: number
+  licensePlateCountry: number
+  licensePlateRecognitionConfidence: number
   mileage: number
   checkDate: number
   city: number
@@ -121,6 +132,7 @@ export type VehicleCheckCountAggregateOutputType = {
 
 
 export type VehicleCheckAvgAggregateInputType = {
+  licensePlateRecognitionConfidence?: true
   mileage?: true
   totalInternalSavingAmount?: true
   totalInternalCost?: true
@@ -131,6 +143,7 @@ export type VehicleCheckAvgAggregateInputType = {
 }
 
 export type VehicleCheckSumAggregateInputType = {
+  licensePlateRecognitionConfidence?: true
   mileage?: true
   totalInternalSavingAmount?: true
   totalInternalCost?: true
@@ -148,6 +161,9 @@ export type VehicleCheckMinAggregateInputType = {
   manufacturerId?: true
   vehicleModelId?: true
   licensePlate?: true
+  licensePlateRaw?: true
+  licensePlateCountry?: true
+  licensePlateRecognitionConfidence?: true
   mileage?: true
   checkDate?: true
   city?: true
@@ -172,6 +188,9 @@ export type VehicleCheckMaxAggregateInputType = {
   manufacturerId?: true
   vehicleModelId?: true
   licensePlate?: true
+  licensePlateRaw?: true
+  licensePlateCountry?: true
+  licensePlateRecognitionConfidence?: true
   mileage?: true
   checkDate?: true
   city?: true
@@ -196,6 +215,9 @@ export type VehicleCheckCountAggregateInputType = {
   manufacturerId?: true
   vehicleModelId?: true
   licensePlate?: true
+  licensePlateRaw?: true
+  licensePlateCountry?: true
+  licensePlateRecognitionConfidence?: true
   mileage?: true
   checkDate?: true
   city?: true
@@ -307,6 +329,9 @@ export type VehicleCheckGroupByOutputType = {
   manufacturerId: string
   vehicleModelId: string | null
   licensePlate: string
+  licensePlateRaw: string | null
+  licensePlateCountry: string
+  licensePlateRecognitionConfidence: number | null
   mileage: number | null
   checkDate: Date
   city: string
@@ -354,6 +379,9 @@ export type VehicleCheckWhereInput = {
   manufacturerId?: Prisma.StringFilter<"VehicleCheck"> | string
   vehicleModelId?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   licensePlate?: Prisma.StringFilter<"VehicleCheck"> | string
+  licensePlateRaw?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
+  licensePlateCountry?: Prisma.StringFilter<"VehicleCheck"> | string
+  licensePlateRecognitionConfidence?: Prisma.FloatNullableFilter<"VehicleCheck"> | number | null
   mileage?: Prisma.IntNullableFilter<"VehicleCheck"> | number | null
   checkDate?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   city?: Prisma.StringFilter<"VehicleCheck"> | string
@@ -384,6 +412,9 @@ export type VehicleCheckOrderByWithRelationInput = {
   manufacturerId?: Prisma.SortOrder
   vehicleModelId?: Prisma.SortOrderInput | Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
+  licensePlateRaw?: Prisma.SortOrderInput | Prisma.SortOrder
+  licensePlateCountry?: Prisma.SortOrder
+  licensePlateRecognitionConfidence?: Prisma.SortOrderInput | Prisma.SortOrder
   mileage?: Prisma.SortOrderInput | Prisma.SortOrder
   checkDate?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -417,6 +448,9 @@ export type VehicleCheckWhereUniqueInput = Prisma.AtLeast<{
   manufacturerId?: Prisma.StringFilter<"VehicleCheck"> | string
   vehicleModelId?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   licensePlate?: Prisma.StringFilter<"VehicleCheck"> | string
+  licensePlateRaw?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
+  licensePlateCountry?: Prisma.StringFilter<"VehicleCheck"> | string
+  licensePlateRecognitionConfidence?: Prisma.FloatNullableFilter<"VehicleCheck"> | number | null
   mileage?: Prisma.IntNullableFilter<"VehicleCheck"> | number | null
   checkDate?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   city?: Prisma.StringFilter<"VehicleCheck"> | string
@@ -447,6 +481,9 @@ export type VehicleCheckOrderByWithAggregationInput = {
   manufacturerId?: Prisma.SortOrder
   vehicleModelId?: Prisma.SortOrderInput | Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
+  licensePlateRaw?: Prisma.SortOrderInput | Prisma.SortOrder
+  licensePlateCountry?: Prisma.SortOrder
+  licensePlateRecognitionConfidence?: Prisma.SortOrderInput | Prisma.SortOrder
   mileage?: Prisma.SortOrderInput | Prisma.SortOrder
   checkDate?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -479,6 +516,9 @@ export type VehicleCheckScalarWhereWithAggregatesInput = {
   manufacturerId?: Prisma.StringWithAggregatesFilter<"VehicleCheck"> | string
   vehicleModelId?: Prisma.StringNullableWithAggregatesFilter<"VehicleCheck"> | string | null
   licensePlate?: Prisma.StringWithAggregatesFilter<"VehicleCheck"> | string
+  licensePlateRaw?: Prisma.StringNullableWithAggregatesFilter<"VehicleCheck"> | string | null
+  licensePlateCountry?: Prisma.StringWithAggregatesFilter<"VehicleCheck"> | string
+  licensePlateRecognitionConfidence?: Prisma.FloatNullableWithAggregatesFilter<"VehicleCheck"> | number | null
   mileage?: Prisma.IntNullableWithAggregatesFilter<"VehicleCheck"> | number | null
   checkDate?: Prisma.DateTimeWithAggregatesFilter<"VehicleCheck"> | Date | string
   city?: Prisma.StringWithAggregatesFilter<"VehicleCheck"> | string
@@ -499,6 +539,9 @@ export type VehicleCheckCreateInput = {
   id?: string
   checkNumber: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -529,6 +572,9 @@ export type VehicleCheckUncheckedCreateInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -551,6 +597,9 @@ export type VehicleCheckUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -581,6 +630,9 @@ export type VehicleCheckUncheckedUpdateInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -607,6 +659,9 @@ export type VehicleCheckCreateManyInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -627,6 +682,9 @@ export type VehicleCheckUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -651,6 +709,9 @@ export type VehicleCheckUncheckedUpdateManyInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -685,6 +746,9 @@ export type VehicleCheckCountOrderByAggregateInput = {
   manufacturerId?: Prisma.SortOrder
   vehicleModelId?: Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
+  licensePlateRaw?: Prisma.SortOrder
+  licensePlateCountry?: Prisma.SortOrder
+  licensePlateRecognitionConfidence?: Prisma.SortOrder
   mileage?: Prisma.SortOrder
   checkDate?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -702,6 +766,7 @@ export type VehicleCheckCountOrderByAggregateInput = {
 }
 
 export type VehicleCheckAvgOrderByAggregateInput = {
+  licensePlateRecognitionConfidence?: Prisma.SortOrder
   mileage?: Prisma.SortOrder
   totalInternalSavingAmount?: Prisma.SortOrder
   totalInternalCost?: Prisma.SortOrder
@@ -719,6 +784,9 @@ export type VehicleCheckMaxOrderByAggregateInput = {
   manufacturerId?: Prisma.SortOrder
   vehicleModelId?: Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
+  licensePlateRaw?: Prisma.SortOrder
+  licensePlateCountry?: Prisma.SortOrder
+  licensePlateRecognitionConfidence?: Prisma.SortOrder
   mileage?: Prisma.SortOrder
   checkDate?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -743,6 +811,9 @@ export type VehicleCheckMinOrderByAggregateInput = {
   manufacturerId?: Prisma.SortOrder
   vehicleModelId?: Prisma.SortOrder
   licensePlate?: Prisma.SortOrder
+  licensePlateRaw?: Prisma.SortOrder
+  licensePlateCountry?: Prisma.SortOrder
+  licensePlateRecognitionConfidence?: Prisma.SortOrder
   mileage?: Prisma.SortOrder
   checkDate?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -760,6 +831,7 @@ export type VehicleCheckMinOrderByAggregateInput = {
 }
 
 export type VehicleCheckSumOrderByAggregateInput = {
+  licensePlateRecognitionConfidence?: Prisma.SortOrder
   mileage?: Prisma.SortOrder
   totalInternalSavingAmount?: Prisma.SortOrder
   totalInternalCost?: Prisma.SortOrder
@@ -942,6 +1014,14 @@ export type VehicleCheckUncheckedUpdateManyWithoutVehicleModelNestedInput = {
   deleteMany?: Prisma.VehicleCheckScalarWhereInput | Prisma.VehicleCheckScalarWhereInput[]
 }
 
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -986,6 +1066,9 @@ export type VehicleCheckCreateWithoutCollaboratorInput = {
   id?: string
   checkNumber: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1014,6 +1097,9 @@ export type VehicleCheckUncheckedCreateWithoutCollaboratorInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1069,6 +1155,9 @@ export type VehicleCheckScalarWhereInput = {
   manufacturerId?: Prisma.StringFilter<"VehicleCheck"> | string
   vehicleModelId?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   licensePlate?: Prisma.StringFilter<"VehicleCheck"> | string
+  licensePlateRaw?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
+  licensePlateCountry?: Prisma.StringFilter<"VehicleCheck"> | string
+  licensePlateRecognitionConfidence?: Prisma.FloatNullableFilter<"VehicleCheck"> | number | null
   mileage?: Prisma.IntNullableFilter<"VehicleCheck"> | number | null
   checkDate?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   city?: Prisma.StringFilter<"VehicleCheck"> | string
@@ -1089,6 +1178,9 @@ export type VehicleCheckCreateWithoutAgencyInput = {
   id?: string
   checkNumber: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1117,6 +1209,9 @@ export type VehicleCheckUncheckedCreateWithoutAgencyInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1165,6 +1260,9 @@ export type VehicleCheckCreateWithoutManufacturerInput = {
   id?: string
   checkNumber: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1193,6 +1291,9 @@ export type VehicleCheckUncheckedCreateWithoutManufacturerInput = {
   agencyId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1241,6 +1342,9 @@ export type VehicleCheckCreateWithoutVehicleModelInput = {
   id?: string
   checkNumber: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1269,6 +1373,9 @@ export type VehicleCheckUncheckedCreateWithoutVehicleModelInput = {
   agencyId: string
   manufacturerId: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1317,6 +1424,9 @@ export type VehicleCheckCreateWithoutItemsInput = {
   id?: string
   checkNumber: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1346,6 +1456,9 @@ export type VehicleCheckUncheckedCreateWithoutItemsInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1383,6 +1496,9 @@ export type VehicleCheckUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1412,6 +1528,9 @@ export type VehicleCheckUncheckedUpdateWithoutItemsInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1433,6 +1552,9 @@ export type VehicleCheckCreateWithoutExternalQuotesInput = {
   id?: string
   checkNumber: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1462,6 +1584,9 @@ export type VehicleCheckUncheckedCreateWithoutExternalQuotesInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1499,6 +1624,9 @@ export type VehicleCheckUpdateWithoutExternalQuotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1528,6 +1656,9 @@ export type VehicleCheckUncheckedUpdateWithoutExternalQuotesInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1552,6 +1683,9 @@ export type VehicleCheckCreateManyCollaboratorInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1572,6 +1706,9 @@ export type VehicleCheckUpdateWithoutCollaboratorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1600,6 +1737,9 @@ export type VehicleCheckUncheckedUpdateWithoutCollaboratorInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1625,6 +1765,9 @@ export type VehicleCheckUncheckedUpdateManyWithoutCollaboratorInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1648,6 +1791,9 @@ export type VehicleCheckCreateManyAgencyInput = {
   manufacturerId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1668,6 +1814,9 @@ export type VehicleCheckUpdateWithoutAgencyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1696,6 +1845,9 @@ export type VehicleCheckUncheckedUpdateWithoutAgencyInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1721,6 +1873,9 @@ export type VehicleCheckUncheckedUpdateManyWithoutAgencyInput = {
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1744,6 +1899,9 @@ export type VehicleCheckCreateManyManufacturerInput = {
   agencyId: string
   vehicleModelId?: string | null
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1764,6 +1922,9 @@ export type VehicleCheckUpdateWithoutManufacturerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1792,6 +1953,9 @@ export type VehicleCheckUncheckedUpdateWithoutManufacturerInput = {
   agencyId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1817,6 +1981,9 @@ export type VehicleCheckUncheckedUpdateManyWithoutManufacturerInput = {
   agencyId?: Prisma.StringFieldUpdateOperationsInput | string
   vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1840,6 +2007,9 @@ export type VehicleCheckCreateManyVehicleModelInput = {
   agencyId: string
   manufacturerId: string
   licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
   mileage?: number | null
   checkDate?: Date | string
   city: string
@@ -1860,6 +2030,9 @@ export type VehicleCheckUpdateWithoutVehicleModelInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1888,6 +2061,9 @@ export type VehicleCheckUncheckedUpdateWithoutVehicleModelInput = {
   agencyId?: Prisma.StringFieldUpdateOperationsInput | string
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1913,6 +2089,9 @@ export type VehicleCheckUncheckedUpdateManyWithoutVehicleModelInput = {
   agencyId?: Prisma.StringFieldUpdateOperationsInput | string
   manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
   licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1977,6 +2156,9 @@ export type VehicleCheckSelect<ExtArgs extends runtime.Types.Extensions.Internal
   manufacturerId?: boolean
   vehicleModelId?: boolean
   licensePlate?: boolean
+  licensePlateRaw?: boolean
+  licensePlateCountry?: boolean
+  licensePlateRecognitionConfidence?: boolean
   mileage?: boolean
   checkDate?: boolean
   city?: boolean
@@ -2008,6 +2190,9 @@ export type VehicleCheckSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   manufacturerId?: boolean
   vehicleModelId?: boolean
   licensePlate?: boolean
+  licensePlateRaw?: boolean
+  licensePlateCountry?: boolean
+  licensePlateRecognitionConfidence?: boolean
   mileage?: boolean
   checkDate?: boolean
   city?: boolean
@@ -2036,6 +2221,9 @@ export type VehicleCheckSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   manufacturerId?: boolean
   vehicleModelId?: boolean
   licensePlate?: boolean
+  licensePlateRaw?: boolean
+  licensePlateCountry?: boolean
+  licensePlateRecognitionConfidence?: boolean
   mileage?: boolean
   checkDate?: boolean
   city?: boolean
@@ -2064,6 +2252,9 @@ export type VehicleCheckSelectScalar = {
   manufacturerId?: boolean
   vehicleModelId?: boolean
   licensePlate?: boolean
+  licensePlateRaw?: boolean
+  licensePlateCountry?: boolean
+  licensePlateRecognitionConfidence?: boolean
   mileage?: boolean
   checkDate?: boolean
   city?: boolean
@@ -2080,7 +2271,7 @@ export type VehicleCheckSelectScalar = {
   updatedAt?: boolean
 }
 
-export type VehicleCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "checkNumber" | "collaboratorId" | "agencyId" | "manufacturerId" | "vehicleModelId" | "licensePlate" | "mileage" | "checkDate" | "city" | "status" | "totalInternalSavingAmount" | "totalInternalCost" | "totalExternalCost" | "totalDifferenceAmount" | "constructorAllowanceAmount" | "allowanceDifferenceAmount" | "decisionSummary" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheck"]>
+export type VehicleCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "checkNumber" | "collaboratorId" | "agencyId" | "manufacturerId" | "vehicleModelId" | "licensePlate" | "licensePlateRaw" | "licensePlateCountry" | "licensePlateRecognitionConfidence" | "mileage" | "checkDate" | "city" | "status" | "totalInternalSavingAmount" | "totalInternalCost" | "totalExternalCost" | "totalDifferenceAmount" | "constructorAllowanceAmount" | "allowanceDifferenceAmount" | "decisionSummary" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheck"]>
 export type VehicleCheckInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   agency?: boolean | Prisma.AgencyDefaultArgs<ExtArgs>
@@ -2121,6 +2312,9 @@ export type $VehicleCheckPayload<ExtArgs extends runtime.Types.Extensions.Intern
     manufacturerId: string
     vehicleModelId: string | null
     licensePlate: string
+    licensePlateRaw: string | null
+    licensePlateCountry: string
+    licensePlateRecognitionConfidence: number | null
     mileage: number | null
     checkDate: Date
     city: string
@@ -2571,6 +2765,9 @@ export interface VehicleCheckFieldRefs {
   readonly manufacturerId: Prisma.FieldRef<"VehicleCheck", 'String'>
   readonly vehicleModelId: Prisma.FieldRef<"VehicleCheck", 'String'>
   readonly licensePlate: Prisma.FieldRef<"VehicleCheck", 'String'>
+  readonly licensePlateRaw: Prisma.FieldRef<"VehicleCheck", 'String'>
+  readonly licensePlateCountry: Prisma.FieldRef<"VehicleCheck", 'String'>
+  readonly licensePlateRecognitionConfidence: Prisma.FieldRef<"VehicleCheck", 'Float'>
   readonly mileage: Prisma.FieldRef<"VehicleCheck", 'Int'>
   readonly checkDate: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
   readonly city: Prisma.FieldRef<"VehicleCheck", 'String'>

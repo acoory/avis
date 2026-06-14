@@ -114,7 +114,11 @@ export class ExportsService {
         checkDate: check.checkDate,
         city: check.city,
         manufacturer: check.manufacturer.name,
-        licensePlate: formatLicensePlate(check.licensePlate),
+        licensePlate: formatLicensePlate(
+          check.licensePlate,
+          check.licensePlateCountry,
+          check.licensePlateRaw,
+        ),
         totalInternalSavingAmount: this.number(check.totalInternalSavingAmount),
       };
 

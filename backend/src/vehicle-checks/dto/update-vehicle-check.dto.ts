@@ -3,9 +3,13 @@ import {
   IsArray,
   IsDateString,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
+  Max,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -26,7 +30,20 @@ export class UpdateVehicleCheckDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(20)
   licensePlate?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^(UNKNOWN|[A-Za-z]{2})$/)
+  licensePlateCountry?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  licensePlateRecognitionConfidence?: number;
 
   @IsOptional()
   @Type(() => Number)
