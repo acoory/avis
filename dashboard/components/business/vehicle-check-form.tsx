@@ -68,6 +68,30 @@ function createDraftId() {
   return `draft-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function suggestedRepairTypeId(vehiclePart: VehiclePart | undefined, repairTypes: RepairType[]) {
+  if (!vehiclePart) return "";
+
+  const exactRepairTypeCodes: Record<string, string> = {
+    CHARGING_CABLE: "CABLE",
+    LUGGAGE_COVER: "LUGGAGE_COVER",
+    WINDSHIELD: "WINDSHIELD_REPAIR",
+  };
+  const categoryRepairTypeCodes: Record<string, string> = {
+    BAGUETTE: "BODYWORK",
+    CARROSSERIE: "BODYWORK",
+    JANTE: "RIM",
+    OPTIQUE: "OPTIC",
+    PNEU: "TIRE",
+    RETROVISEUR: "BODYWORK",
+    SELLERIE: "UPHOLSTERY",
+  };
+  const repairTypeCode =
+    exactRepairTypeCodes[vehiclePart.code] ??
+    categoryRepairTypeCodes[vehiclePart.category ?? ""];
+
+  return repairTypes.find((repairType) => repairType.code === repairTypeCode)?.id ?? "";
+}
+
 export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps) {
   const router = useRouter();
   const isCompletedEdit = initialVehicleCheck?.status === "COMPLETED";
@@ -296,6 +320,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     setRepairSheetLine({
       ...createBlankRepairLine(),
       vehiclePartId: vehiclePart.id,
+      repairTypeId: suggestedRepairTypeId(vehiclePart, repairTypes),
     });
     setRepairSheetEditingId(null);
   }
@@ -316,6 +341,20 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             ...current,
             repairTypeId,
             vehiclePartId: getVehiclePartIdForRepairType(repairTypeId, current.vehiclePartId),
+          }
+        : current,
+    );
+  }
+
+  function changeRepairSheetVehiclePart(vehiclePartId: string) {
+    const vehiclePart = vehicleParts.find((part) => part.id === vehiclePartId);
+    setRepairSheetLine((current) =>
+      current
+        ? {
+            ...current,
+            vehiclePartId,
+            repairTypeId:
+              suggestedRepairTypeId(vehiclePart, repairTypes) || current.repairTypeId,
           }
         : current,
     );
@@ -360,6 +399,22 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           vehiclePartId: getVehiclePartIdForRepairType(repairTypeId, line.vehiclePartId),
         };
       }),
+    );
+  }
+
+  function changeVehiclePart(id: string, vehiclePartId: string) {
+    const vehiclePart = vehicleParts.find((part) => part.id === vehiclePartId);
+    setLines((current) =>
+      current.map((line) =>
+        line.id === id
+          ? {
+              ...line,
+              vehiclePartId,
+              repairTypeId:
+                suggestedRepairTypeId(vehiclePart, repairTypes) || line.repairTypeId,
+            }
+          : line,
+      ),
     );
   }
 
@@ -743,6 +798,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                     vehicleParts={vehicleParts}
                     isVehiclePartOptional={isVehiclePartOptional}
                     onPatch={(patch) => updateLine(line.id, patch)}
+                    onVehiclePartChange={(vehiclePartId) => changeVehiclePart(line.id, vehiclePartId)}
                     onRepairTypeChange={(repairTypeId) => changeRepairType(line.id, repairTypeId)}
                     onQuantityChange={(rawValue) => setQuantity(line.id, rawValue)}
                     onQuantityDelta={(delta) => {
@@ -856,6 +912,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           onCancel={closeRepairSheet}
           onConfirm={saveRepairSheetLine}
           onPatch={patchRepairSheetLine}
+          onVehiclePartChange={changeRepairSheetVehiclePart}
           onQuantityChange={(rawValue) => patchRepairSheetLine({ quantity: normalizeQuantityValue(rawValue) })}
           onQuantityDelta={(delta) =>
             patchRepairSheetLine({
@@ -1022,6 +1079,7 @@ function RepairBottomSheet({
   onCancel,
   onConfirm,
   onPatch,
+  onVehiclePartChange,
   onQuantityChange,
   onQuantityDelta,
   onRepairTypeChange,
@@ -1035,6 +1093,7 @@ function RepairBottomSheet({
   onCancel: () => void;
   onConfirm: () => void;
   onPatch: (patch: Partial<DraftRepairLine>) => void;
+  onVehiclePartChange: (vehiclePartId: string) => void;
   onQuantityChange: (rawValue: string) => void;
   onQuantityDelta: (delta: number) => void;
   onRepairTypeChange: (repairTypeId: string) => void;
@@ -1085,6 +1144,7 @@ function RepairBottomSheet({
             vehicleParts={vehicleParts}
             isVehiclePartOptional={isVehiclePartOptional}
             onPatch={onPatch}
+            onVehiclePartChange={onVehiclePartChange}
             onQuantityChange={onQuantityChange}
             onQuantityDelta={onQuantityDelta}
             onRepairTypeChange={onRepairTypeChange}
@@ -1111,6 +1171,7 @@ function RepairEditorFields({
   vehicleParts,
   isVehiclePartOptional,
   onPatch,
+  onVehiclePartChange,
   onQuantityChange,
   onQuantityDelta,
   onRepairTypeChange,
@@ -1121,6 +1182,7 @@ function RepairEditorFields({
   vehicleParts: VehiclePart[];
   isVehiclePartOptional: (repairTypeId: string) => boolean;
   onPatch: (patch: Partial<DraftRepairLine>) => void;
+  onVehiclePartChange: (vehiclePartId: string) => void;
   onQuantityChange: (rawValue: string) => void;
   onQuantityDelta: (delta: number) => void;
   onRepairTypeChange: (repairTypeId: string) => void;
@@ -1148,7 +1210,7 @@ function RepairEditorFields({
               compact={layout === "sheet"}
               vehicleParts={vehicleParts}
               value={line.vehiclePartId}
-              onChange={(vehiclePartId) => onPatch({ vehiclePartId })}
+              onChange={onVehiclePartChange}
             />
           )}
         </div>
@@ -1167,6 +1229,16 @@ function RepairEditorFields({
               </option>
             ))}
           </select>
+          {line.repairTypeId &&
+          line.repairTypeId ===
+            suggestedRepairTypeId(
+              vehicleParts.find((vehiclePart) => vehiclePart.id === line.vehiclePartId),
+              repairTypes,
+            ) ? (
+            <p className="text-xs font-medium text-teal-700">
+              Type suggere automatiquement, modifiable si besoin.
+            </p>
+          ) : null}
           <div className={quickButtonsClass}>
             {repairTypes
               .filter((repairType) => repairType.isActive)

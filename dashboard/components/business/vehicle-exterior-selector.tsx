@@ -1,11 +1,20 @@
 "use client";
 
-import { Car, CarFront, CircleDot, ListPlus, MousePointer2 } from "lucide-react";
+import {
+  Armchair,
+  Car,
+  CarFront,
+  CircleDot,
+  ListPlus,
+  MousePointer2,
+  PackageOpen,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { VehiclePart } from "@/types/business";
 
 type VehicleView = "FRONT" | "LEFT" | "RIGHT" | "REAR";
+type VehicleArea = "EXTERIOR" | "INTERIOR";
 
 type Zone = {
   code: string;
@@ -90,11 +99,21 @@ const wheelCodes = [
   "REAR_RIGHT_RIM",
 ];
 
+const interiorZones: Zone[] = [
+  { code: "PASSENGER_SEAT", label: "Siege passager", x: 220, y: 62, width: 126, height: 96 },
+  { code: "DRIVER_SEAT", label: "Siege conducteur", x: 220, y: 164, width: 126, height: 96 },
+  { code: "REAR_BENCH", label: "Banquette arriere", x: 366, y: 62, width: 110, height: 198 },
+  { code: "LUGGAGE_COVER", label: "Cache bagages", x: 490, y: 68, width: 102, height: 184 },
+];
+
+const accessoryCodes = ["KEY", "CHARGING_CABLE", "WHEEL_COVER"];
+
 export function VehicleExteriorSelector({
   selectedPartCounts,
   vehicleParts,
   onSelect,
 }: VehicleExteriorSelectorProps) {
+  const [activeArea, setActiveArea] = useState<VehicleArea>("EXTERIOR");
   const [activeView, setActiveView] = useState<VehicleView>("LEFT");
   const partsByCode = useMemo(
     () => new Map(vehicleParts.map((part) => [part.code, part])),
@@ -114,6 +133,13 @@ export function VehicleExteriorSelector({
         .filter((part): part is VehiclePart => Boolean(part)),
     [activeView, partsByCode],
   );
+  const interiorParts = useMemo(
+    () =>
+      interiorZones
+        .map((zone) => partsByCode.get(zone.code))
+        .filter((part): part is VehiclePart => Boolean(part)),
+    [partsByCode],
+  );
 
   function selectCode(code: string) {
     const part = partsByCode.get(code);
@@ -125,53 +151,90 @@ export function VehicleExteriorSelector({
       <div className="border-b border-gray-200 bg-white p-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-gray-950">Selection visuelle exterieure</p>
+            <p className="text-sm font-semibold text-gray-950">Selection visuelle</p>
             <p className="mt-0.5 text-xs text-gray-500">Touchez la zone endommagee.</p>
           </div>
-          <span className="rounded-md bg-teal-50 px-2 py-1 text-xs font-medium text-teal-800">
+        </div>
+        <div className="mt-3 grid grid-cols-2 rounded-md bg-gray-100 p-1">
+          <button
+            aria-pressed={activeArea === "EXTERIOR"}
+            className={[
+              "flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-colors",
+              activeArea === "EXTERIOR"
+                ? "bg-white text-teal-800 shadow-sm"
+                : "text-gray-600 hover:text-gray-950",
+            ].join(" ")}
+            type="button"
+            onClick={() => setActiveArea("EXTERIOR")}
+          >
+            <Car className="h-4 w-4" />
             Exterieur
-          </span>
+          </button>
+          <button
+            aria-pressed={activeArea === "INTERIOR"}
+            className={[
+              "flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-colors",
+              activeArea === "INTERIOR"
+                ? "bg-white text-teal-800 shadow-sm"
+                : "text-gray-600 hover:text-gray-950",
+            ].join(" ")}
+            type="button"
+            onClick={() => setActiveArea("INTERIOR")}
+          >
+            <Armchair className="h-4 w-4" />
+            Interieur
+          </button>
         </div>
-        <div className="mt-3 grid grid-cols-4 rounded-md bg-gray-100 p-1">
-          {views.map((view) => {
-            const Icon = view.icon;
-            const isActive = activeView === view.id;
-            return (
-              <button
-                aria-pressed={isActive}
-                className={[
-                  "flex min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:px-2",
-                  isActive
-                    ? "bg-white text-teal-800 shadow-sm"
-                    : "text-gray-600 hover:text-gray-950",
-                ].join(" ")}
-                key={view.id}
-                type="button"
-                onClick={() => setActiveView(view.id)}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span className="truncate">{view.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        {activeArea === "EXTERIOR" ? (
+          <div className="mt-2 grid grid-cols-4 rounded-md bg-gray-100 p-1">
+            {views.map((view) => {
+              const Icon = view.icon;
+              const isActive = activeView === view.id;
+              return (
+                <button
+                  aria-pressed={isActive}
+                  className={[
+                    "flex min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:px-2",
+                    isActive
+                      ? "bg-white text-teal-800 shadow-sm"
+                      : "text-gray-600 hover:text-gray-950",
+                  ].join(" ")}
+                  key={view.id}
+                  type="button"
+                  onClick={() => setActiveView(view.id)}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{view.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
 
       <div className="p-3 sm:p-4">
         <div className="mx-auto max-w-3xl overflow-hidden rounded-md border border-gray-200 bg-[linear-gradient(#ffffff,#f3f4f6)]">
           <svg
-            aria-label={`Vue ${views.find((view) => view.id === activeView)?.label} du vehicule`}
+            aria-label={
+              activeArea === "EXTERIOR"
+                ? `Vue ${views.find((view) => view.id === activeView)?.label} du vehicule`
+                : "Vue interieure du vehicule"
+            }
             className="block h-auto w-full"
             role="img"
             viewBox="0 0 640 320"
           >
             <image
               height="320"
-              href={imageByView[activeView]}
+              href={
+                activeArea === "EXTERIOR"
+                  ? imageByView[activeView]
+                  : "/vehicle-inspection/interior.png"
+              }
               preserveAspectRatio="xMidYMid meet"
               width="640"
             />
-            {activeZones.map((zone) => {
+            {(activeArea === "EXTERIOR" ? activeZones : interiorZones).map((zone) => {
               const part = partsByCode.get(zone.code);
               if (!part) return null;
               const hitArea = getHitArea(zone);
@@ -256,7 +319,7 @@ export function VehicleExteriorSelector({
             Elements de cette vue
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {activeParts.map((part) => (
+            {(activeArea === "EXTERIOR" ? activeParts : interiorParts).map((part) => (
               <button
                 className={[
                   "flex min-h-11 cursor-pointer items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-700",
@@ -279,7 +342,8 @@ export function VehicleExteriorSelector({
           </div>
         </div>
 
-        <div className="mt-3">
+        {activeArea === "EXTERIOR" ? (
+          <div className="mt-3">
           <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase text-gray-500">
             <CircleDot className="h-3.5 w-3.5" />
             Pneus et jantes
@@ -309,7 +373,44 @@ export function VehicleExteriorSelector({
               );
             })}
           </div>
-        </div>
+          </div>
+        ) : (
+          <div className="mt-3">
+            <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase text-gray-500">
+              <PackageOpen className="h-3.5 w-3.5" />
+              Accessoires
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {accessoryCodes.map((code) => {
+                const part = partsByCode.get(code);
+                if (!part) return null;
+                const selectedCount = selectedPartCounts[part.id] ?? 0;
+                return (
+                  <Button
+                    className={
+                      selectedCount
+                        ? "shrink-0 border-teal-300 bg-teal-50 text-teal-900"
+                        : "shrink-0"
+                    }
+                    key={part.id}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                    onClick={() => onSelect(part)}
+                  >
+                    <ListPlus className="h-3.5 w-3.5" />
+                    {part.name}
+                    {selectedCount ? (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-teal-700 px-1 text-[11px] font-semibold text-white">
+                        {selectedCount}
+                      </span>
+                    ) : null}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
