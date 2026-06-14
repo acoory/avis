@@ -7,6 +7,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck, VehicleCheckItem, VehicleCheckItemOperationalStatus } from "@/types/business";
@@ -154,7 +155,7 @@ export function RepairItemsTable({
       <DataTable
         data={vehicleCheck.items ?? []}
         emptyMessage="Aucune reparation sur ce controle."
-        minWidth={1180}
+        minWidth={1280}
         columns={[
           {
             id: "vehiclePart",
@@ -222,6 +223,37 @@ export function RepairItemsTable({
             cell: (item) => (item.comment?.trim() ? item.comment : "-"),
             sortValue: (item) => item.comment,
             searchValue: (item) => item.comment,
+          },
+          {
+            id: "photos",
+            header: "Photos",
+            cell: (item) =>
+              item.photos?.length ? (
+                <div className="flex items-center gap-1.5">
+                  {item.photos.slice(0, 2).map((photo) => (
+                    <a
+                      className="block h-9 w-9 overflow-hidden rounded-md border border-gray-200"
+                      href={photo.secureUrl}
+                      key={photo.publicId}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      <img
+                        alt="Degat"
+                        className="h-full w-full object-cover"
+                        src={cloudinaryThumbnailUrl(photo, 160)}
+                      />
+                    </a>
+                  ))}
+                  {item.photos.length > 2 ? (
+                    <span className="text-xs font-medium text-gray-500">+{item.photos.length - 2}</span>
+                  ) : null}
+                </div>
+              ) : (
+                "-"
+              ),
+            sortValue: (item) => item.photos?.length ?? 0,
+            searchValue: (item) => item.photos?.length ?? 0,
           },
           {
             id: "partOrder",
@@ -457,6 +489,29 @@ function RepairStatusSheet({
               <p className="mt-1 font-medium text-gray-950">{item.repairType.name}</p>
             </div>
           </div>
+
+          {item.photos?.length ? (
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-950">Photos du degat</h3>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {item.photos.map((photo) => (
+                  <a
+                    className="aspect-square overflow-hidden rounded-md border border-gray-200 bg-gray-100"
+                    href={photo.secureUrl}
+                    key={photo.publicId}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <img
+                      alt="Degat du vehicule"
+                      className="h-full w-full object-cover"
+                      src={cloudinaryThumbnailUrl(photo)}
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-4 space-y-2">
             <Label>Statut</Label>

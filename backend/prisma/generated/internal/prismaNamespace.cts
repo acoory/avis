@@ -394,6 +394,7 @@ export const ModelName = {
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
   VehicleCheckItem: 'VehicleCheckItem',
+  VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
   ExternalQuote: 'ExternalQuote',
   ExternalQuoteItem: 'ExternalQuoteItem'
@@ -412,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "vehicleCheckItem" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
+    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1156,6 +1157,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VehicleCheckItemPhoto: {
+      payload: Prisma.$VehicleCheckItemPhotoPayload<ExtArgs>
+      fields: Prisma.VehicleCheckItemPhotoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VehicleCheckItemPhotoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VehicleCheckItemPhotoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>
+        }
+        findFirst: {
+          args: Prisma.VehicleCheckItemPhotoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VehicleCheckItemPhotoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>
+        }
+        findMany: {
+          args: Prisma.VehicleCheckItemPhotoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>[]
+        }
+        create: {
+          args: Prisma.VehicleCheckItemPhotoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>
+        }
+        createMany: {
+          args: Prisma.VehicleCheckItemPhotoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VehicleCheckItemPhotoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>[]
+        }
+        delete: {
+          args: Prisma.VehicleCheckItemPhotoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>
+        }
+        update: {
+          args: Prisma.VehicleCheckItemPhotoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>
+        }
+        deleteMany: {
+          args: Prisma.VehicleCheckItemPhotoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VehicleCheckItemPhotoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VehicleCheckItemPhotoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>[]
+        }
+        upsert: {
+          args: Prisma.VehicleCheckItemPhotoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckItemPhotoPayload>
+        }
+        aggregate: {
+          args: Prisma.VehicleCheckItemPhotoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVehicleCheckItemPhoto>
+        }
+        groupBy: {
+          args: Prisma.VehicleCheckItemPhotoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckItemPhotoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VehicleCheckItemPhotoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckItemPhotoCountAggregateOutputType> | number
+        }
+      }
+    }
     VehicleCheckItemStatusHistory: {
       payload: Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>
       fields: Prisma.VehicleCheckItemStatusHistoryFieldRefs
@@ -1589,6 +1664,22 @@ export const VehicleCheckItemScalarFieldEnum = {
 export type VehicleCheckItemScalarFieldEnum = (typeof VehicleCheckItemScalarFieldEnum)[keyof typeof VehicleCheckItemScalarFieldEnum]
 
 
+export const VehicleCheckItemPhotoScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckItemId: 'vehicleCheckItemId',
+  publicId: 'publicId',
+  assetId: 'assetId',
+  secureUrl: 'secureUrl',
+  width: 'width',
+  height: 'height',
+  bytes: 'bytes',
+  format: 'format',
+  createdAt: 'createdAt'
+} as const
+
+export type VehicleCheckItemPhotoScalarFieldEnum = (typeof VehicleCheckItemPhotoScalarFieldEnum)[keyof typeof VehicleCheckItemPhotoScalarFieldEnum]
+
+
 export const VehicleCheckItemStatusHistoryScalarFieldEnum = {
   id: 'id',
   vehicleCheckItemId: 'vehicleCheckItemId',
@@ -1942,6 +2033,7 @@ export type GlobalOmitConfig = {
   manufacturerRepairRule?: Prisma.ManufacturerRepairRuleOmit
   vehicleCheck?: Prisma.VehicleCheckOmit
   vehicleCheckItem?: Prisma.VehicleCheckItemOmit
+  vehicleCheckItemPhoto?: Prisma.VehicleCheckItemPhotoOmit
   vehicleCheckItemStatusHistory?: Prisma.VehicleCheckItemStatusHistoryOmit
   externalQuote?: Prisma.ExternalQuoteOmit
   externalQuoteItem?: Prisma.ExternalQuoteItemOmit

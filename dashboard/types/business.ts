@@ -70,6 +70,17 @@ export type VehiclePart = {
   isActive: boolean;
 };
 
+export type DamagePhoto = {
+  id?: string;
+  publicId: string;
+  assetId?: string | null;
+  secureUrl: string;
+  width: number;
+  height: number;
+  bytes: number;
+  format: string;
+};
+
 export type ManufacturerRule = {
   id: string;
   manufacturerId: string;
@@ -132,6 +143,7 @@ export type VehicleCheck = {
         lastName: string;
       } | null;
     }>;
+    photos?: DamagePhoto[];
     decisionStatus: RepairDecisionStatus;
     decisionMessage?: string | null;
     repairType: RepairType;
@@ -145,6 +157,7 @@ export type RepairDecisionInputItem = {
   quantity: number;
   comment?: string;
   partOrderRequired?: boolean;
+  photos?: DamagePhoto[];
 };
 
 export type RepairDecisionPreview = {

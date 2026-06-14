@@ -262,6 +262,7 @@ model VehicleCheckItem {
   repairType   RepairType   @relation(fields: [repairTypeId], references: [id], onDelete: Restrict)
   vehiclePart  VehiclePart  @relation(fields: [vehiclePartId], references: [id], onDelete: Restrict)
   statusHistories VehicleCheckItemStatusHistory[]
+  photos          VehicleCheckItemPhoto[]
 
   @@index([vehicleCheckId])
   @@index([repairTypeId])
@@ -269,6 +270,24 @@ model VehicleCheckItem {
   @@index([decisionStatus])
   @@index([operationalStatus])
   @@index([partOrderStatus])
+}
+
+model VehicleCheckItemPhoto {
+  id                 String   @id @default(uuid())
+  vehicleCheckItemId String
+  publicId           String   @unique @map("cloudinaryPublicId")
+  assetId            String?  @map("cloudinaryAssetId")
+  secureUrl          String
+  width              Int
+  height             Int
+  bytes              Int
+  format             String
+  createdAt          DateTime @default(now())
+
+  vehicleCheckItem VehicleCheckItem @relation(fields: [vehicleCheckItemId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleCheckItemId])
+  @@index([createdAt])
 }
 
 model VehicleCheckItemStatusHistory {

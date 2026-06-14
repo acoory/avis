@@ -15,6 +15,7 @@ import { VehiclePartsModule } from './vehicle-parts/vehicle-parts.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ExportsModule } from './exports/exports.module';
 import { LicensePlatesModule } from './license-plates/license-plates.module';
+import { DamagePhotosModule } from './damage-photos/damage-photos.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { LicensePlatesModule } from './license-plates/license-plates.module';
     DashboardModule,
     ExportsModule,
     LicensePlatesModule,
+    DamagePhotosModule,
   ],
 })
 export class AppModule {}

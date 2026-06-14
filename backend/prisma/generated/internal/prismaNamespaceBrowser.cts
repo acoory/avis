@@ -61,6 +61,7 @@ export const ModelName = {
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
   VehicleCheckItem: 'VehicleCheckItem',
+  VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
   ExternalQuote: 'ExternalQuote',
   ExternalQuoteItem: 'ExternalQuoteItem'
@@ -252,6 +253,22 @@ export const VehicleCheckItemScalarFieldEnum = {
 } as const
 
 export type VehicleCheckItemScalarFieldEnum = (typeof VehicleCheckItemScalarFieldEnum)[keyof typeof VehicleCheckItemScalarFieldEnum]
+
+
+export const VehicleCheckItemPhotoScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckItemId: 'vehicleCheckItemId',
+  publicId: 'publicId',
+  assetId: 'assetId',
+  secureUrl: 'secureUrl',
+  width: 'width',
+  height: 'height',
+  bytes: 'bytes',
+  format: 'format',
+  createdAt: 'createdAt'
+} as const
+
+export type VehicleCheckItemPhotoScalarFieldEnum = (typeof VehicleCheckItemPhotoScalarFieldEnum)[keyof typeof VehicleCheckItemPhotoScalarFieldEnum]
 
 
 export const VehicleCheckItemStatusHistoryScalarFieldEnum = {

@@ -2,6 +2,7 @@ import { api } from "@/lib/api";
 import {
   Agency,
   DashboardSummary,
+  DamagePhoto,
   Manufacturer,
   ManufacturerRepairRule,
   ManufacturerRepairRuleStatus,
@@ -143,6 +144,60 @@ export const businessService = {
     }>("/license-plates/recognize", formData, {
       headers: { "Content-Type": "multipart/form-data" },
       timeout: 15000,
+    });
+    return data;
+  },
+
+  async damagePhotoUploadSignature() {
+    const { data } = await api.post<{
+      apiKey: string;
+      cloudName: string;
+      folder: string;
+      publicId: string;
+      timestamp: number;
+      signature: string;
+      uploadUrl: string;
+    }>("/damage-photos/upload-signature");
+    return data;
+  },
+
+  async uploadDamagePhoto(file: File) {
+    const signature = await this.damagePhotoUploadSignature();
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", signature.apiKey);
+    formData.append("folder", signature.folder);
+    formData.append("overwrite", "false");
+    formData.append("public_id", signature.publicId);
+    formData.append("signature", signature.signature);
+    formData.append("timestamp", String(signature.timestamp));
+
+    const response = await fetch(signature.uploadUrl, { method: "POST", body: formData });
+    if (!response.ok) throw new Error("Cloudinary upload failed");
+    const uploaded = (await response.json()) as {
+      asset_id?: string;
+      public_id: string;
+      secure_url: string;
+      width: number;
+      height: number;
+      bytes: number;
+      format: string;
+    };
+
+    return {
+      assetId: uploaded.asset_id,
+      publicId: uploaded.public_id,
+      secureUrl: uploaded.secure_url,
+      width: uploaded.width,
+      height: uploaded.height,
+      bytes: uploaded.bytes,
+      format: uploaded.format,
+    } satisfies DamagePhoto;
+  },
+
+  async deleteDamagePhoto(publicId: string) {
+    const { data } = await api.delete<{ success: boolean }>("/damage-photos", {
+      data: { publicId },
     });
     return data;
   },

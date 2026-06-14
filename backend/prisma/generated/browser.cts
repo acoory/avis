@@ -68,6 +68,11 @@ export type VehicleCheck = Prisma.VehicleCheckModel
  */
 export type VehicleCheckItem = Prisma.VehicleCheckItemModel
 /**
+ * Model VehicleCheckItemPhoto
+ * 
+ */
+export type VehicleCheckItemPhoto = Prisma.VehicleCheckItemPhotoModel
+/**
  * Model VehicleCheckItemStatusHistory
  * 
  */

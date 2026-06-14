@@ -15,6 +15,7 @@ import {
 } from '../common/utils/license-plate';
 import { PrismaService } from '../prisma/prisma.service';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
+import { CloudinaryService } from '../damage-photos/cloudinary.service';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
@@ -49,6 +50,9 @@ const vehicleCheckInclude = {
         },
         orderBy: { createdAt: 'desc' as const },
       },
+      photos: {
+        orderBy: { createdAt: 'asc' as const },
+      },
     },
     orderBy: { createdAt: 'asc' as const },
   },
@@ -64,6 +68,7 @@ export class VehicleChecksService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly repairDecisionService: RepairDecisionService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   findAll(query: ListVehicleChecksQueryDto = {}, user: CurrentUserPayload) {
@@ -131,7 +136,7 @@ export class VehicleChecksService {
         decisionSummary: decision.decisionSummary,
         notes: dto.notes,
         items: {
-          create: decision.items.map((item) => ({
+          create: decision.items.map((item, index) => ({
             repairTypeId: item.repairTypeId,
             vehiclePartId: item.vehiclePartId,
             quantity: item.quantity,
@@ -146,6 +151,17 @@ export class VehicleChecksService {
             partOrderStatus: item.partOrderRequired
               ? PartOrderStatus.TO_ORDER
               : PartOrderStatus.NOT_REQUIRED,
+            photos: {
+              create: (dto.items[index]?.photos ?? []).map((photo) => ({
+                publicId: photo.publicId,
+                assetId: photo.assetId,
+                secureUrl: photo.secureUrl,
+                width: photo.width,
+                height: photo.height,
+                bytes: photo.bytes,
+                format: photo.format,
+              })),
+            },
           })),
         },
       },
@@ -201,10 +217,20 @@ export class VehicleChecksService {
       );
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const existingPhotoPublicIds = existing.items.flatMap((item) =>
+      item.photos.map((photo) => photo.publicId),
+    );
+    const retainedPhotoPublicIds = new Set(
+      dto.items.flatMap((item) => (item.photos ?? []).map((photo) => photo.publicId)),
+    );
+    const removedPhotoPublicIds = existingPhotoPublicIds.filter(
+      (publicId) => !retainedPhotoPublicIds.has(publicId),
+    );
+
+    const updated = await this.prisma.$transaction(async (tx) => {
       await tx.vehicleCheckItem.deleteMany({ where: { vehicleCheckId: id } });
 
-      const updated = await tx.vehicleCheck.update({
+      return tx.vehicleCheck.update({
         where: { id },
         data: {
           agencyId: dto.agencyId,
@@ -226,7 +252,7 @@ export class VehicleChecksService {
           allowanceDifferenceAmount: decision.allowanceDifferenceAmount,
           decisionSummary: decision.decisionSummary,
           items: {
-            create: decision.items.map((item) => ({
+            create: decision.items.map((item, index) => ({
               repairTypeId: item.repairTypeId,
               vehiclePartId: item.vehiclePartId,
               quantity: item.quantity,
@@ -241,14 +267,30 @@ export class VehicleChecksService {
               partOrderStatus: item.partOrderRequired
                 ? PartOrderStatus.TO_ORDER
                 : PartOrderStatus.NOT_REQUIRED,
+              photos: {
+                create: (dto.items?.[index]?.photos ?? []).map((photo) => ({
+                  publicId: photo.publicId,
+                  assetId: photo.assetId,
+                  secureUrl: photo.secureUrl,
+                  width: photo.width,
+                  height: photo.height,
+                  bytes: photo.bytes,
+                  format: photo.format,
+                })),
+              },
             })),
           },
         },
         include: vehicleCheckInclude,
       });
 
-      return updated;
     });
+
+    await Promise.allSettled(
+      removedPhotoPublicIds.map((publicId) => this.cloudinaryService.destroy(publicId)),
+    );
+
+    return updated;
   }
 
   async complete(id: string, user: CurrentUserPayload) {
@@ -278,7 +320,13 @@ export class VehicleChecksService {
       throw new BadRequestException('Only draft vehicle checks can be deleted');
     }
 
+    const photoPublicIds = vehicleCheck.items.flatMap((item) =>
+      item.photos.map((photo) => photo.publicId),
+    );
     await this.prisma.vehicleCheck.delete({ where: { id } });
+    await Promise.allSettled(
+      photoPublicIds.map((publicId) => this.cloudinaryService.destroy(publicId)),
+    );
     return { success: true };
   }
 

@@ -7,6 +7,8 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  ImagePlus,
+  LoaderCircle,
   Pencil,
   Plus,
   Save,
@@ -24,11 +26,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cloudinaryThumbnailUrl, optimizeDamagePhoto } from "@/lib/damage-photo";
 import { formatLicensePlate, formatMoney, normalizeLicensePlate } from "@/lib/format";
 import { licensePlateCountries, sanitizeLicensePlateInput } from "@/lib/license-plate";
 import { businessService } from "@/services/business.service";
 import {
   Agency,
+  DamagePhoto,
   Manufacturer,
   RepairDecisionInputItem,
   RepairDecisionPreview,
@@ -45,6 +49,7 @@ type DraftRepairLine = {
   quantity: number;
   comment: string;
   partOrderRequired: boolean;
+  photos: DamagePhoto[];
 };
 
 type VehicleCheckFormProps = {
@@ -123,6 +128,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [isRecapOpen, setIsRecapOpen] = useState(false);
   const [repairSheetLine, setRepairSheetLine] = useState<DraftRepairLine | null>(null);
   const [repairSheetEditingId, setRepairSheetEditingId] = useState<string | null>(null);
+  const [repairSheetRemovedPhotos, setRepairSheetRemovedPhotos] = useState<DamagePhoto[]>([]);
   const [repairSheetPreview, setRepairSheetPreview] = useState<RepairDecisionPreview | null>(null);
   const [isLicensePlateScannerOpen, setIsLicensePlateScannerOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -168,6 +174,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
               quantity: item.quantity,
               comment: item.comment ?? "",
               partOrderRequired: item.partOrderRequired,
+              photos: item.photos ?? [],
             }))
           : [],
       );
@@ -199,6 +206,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       quantity: line.quantity,
       comment: line.comment || undefined,
       partOrderRequired: line.partOrderRequired,
+      photos: line.photos,
     };
   }
 
@@ -291,6 +299,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       quantity: 1,
       comment: "",
       partOrderRequired: false,
+      photos: [],
     };
   }
 
@@ -314,6 +323,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   function openRepairSheet(line?: DraftRepairLine) {
     setRepairSheetLine(line ? { ...line } : createBlankRepairLine());
     setRepairSheetEditingId(line?.id ?? null);
+    setRepairSheetRemovedPhotos([]);
   }
 
   function openRepairSheetForVehiclePart(vehiclePart: VehiclePart) {
@@ -323,15 +333,87 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       repairTypeId: suggestedRepairTypeId(vehiclePart, repairTypes),
     });
     setRepairSheetEditingId(null);
+    setRepairSheetRemovedPhotos([]);
   }
 
-  function closeRepairSheet() {
+  function closeRepairSheet(cleanupPhotos = true) {
+    if (cleanupPhotos) {
+      const originalPhotoIds = new Set(
+        lines
+          .find((line) => line.id === repairSheetEditingId)
+          ?.photos.map((photo) => photo.publicId) ?? [],
+      );
+      const discardedPhotos =
+        repairSheetLine?.photos.filter((photo) => !originalPhotoIds.has(photo.publicId)) ?? [];
+      const removedNewPhotos = repairSheetRemovedPhotos.filter(
+        (photo) => !originalPhotoIds.has(photo.publicId),
+      );
+      void removeUnpersistedPhotos([...discardedPhotos, ...removedNewPhotos]);
+    }
     setRepairSheetLine(null);
     setRepairSheetEditingId(null);
+    setRepairSheetRemovedPhotos([]);
   }
 
   function patchRepairSheetLine(patch: Partial<DraftRepairLine>) {
     setRepairSheetLine((current) => (current ? { ...current, ...patch } : current));
+  }
+
+  async function uploadDamagePhoto(file: File) {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Le fichier selectionne n'est pas une image.");
+    }
+
+    const optimized = await optimizeDamagePhoto(file);
+    return businessService.uploadDamagePhoto(optimized);
+  }
+
+  async function deleteUploadedPhoto(photo: DamagePhoto) {
+    try {
+      await businessService.deleteDamagePhoto(photo.publicId);
+    } catch {
+      toast.error("Impossible de supprimer cette photo de Cloudinary.");
+    }
+  }
+
+  async function removeUnpersistedPhotos(photos: DamagePhoto[]) {
+    await Promise.allSettled(photos.filter((photo) => !photo.id).map(deleteUploadedPhoto));
+  }
+
+  async function addPhotoToRepairLine(id: string, file: File) {
+    const photo = await uploadDamagePhoto(file);
+    setLines((current) =>
+      current.map((line) =>
+        line.id === id ? { ...line, photos: [...line.photos, photo].slice(0, 3) } : line,
+      ),
+    );
+  }
+
+  async function addPhotoToRepairSheet(file: File) {
+    const photo = await uploadDamagePhoto(file);
+    setRepairSheetLine((current) =>
+      current ? { ...current, photos: [...current.photos, photo].slice(0, 3) } : current,
+    );
+  }
+
+  async function removePhotoFromRepairLine(id: string, photo: DamagePhoto) {
+    if (!photo.id) await deleteUploadedPhoto(photo);
+    setLines((current) =>
+      current.map((line) =>
+        line.id === id
+          ? { ...line, photos: line.photos.filter((item) => item.publicId !== photo.publicId) }
+          : line,
+      ),
+    );
+  }
+
+  async function removePhotoFromRepairSheet(photo: DamagePhoto) {
+    setRepairSheetRemovedPhotos((current) => [...current, photo]);
+    setRepairSheetLine((current) =>
+      current
+        ? { ...current, photos: current.photos.filter((item) => item.publicId !== photo.publicId) }
+        : current,
+    );
   }
 
   function changeRepairSheetType(repairTypeId: string) {
@@ -379,7 +461,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       setLines((current) => [...current, repairSheetLine]);
     }
 
-    closeRepairSheet();
+    void removeUnpersistedPhotos(repairSheetRemovedPhotos);
+    closeRepairSheet(false);
   }
 
   function updateLine(id: string, patch: Partial<DraftRepairLine>) {
@@ -419,6 +502,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   function removeLine(id: string) {
+    const removedLine = lines.find((line) => line.id === id);
+    if (removedLine) void removeUnpersistedPhotos(removedLine.photos);
     setLines((current) => current.filter((line) => line.id !== id));
   }
 
@@ -798,6 +883,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                     vehicleParts={vehicleParts}
                     isVehiclePartOptional={isVehiclePartOptional}
                     onPatch={(patch) => updateLine(line.id, patch)}
+                    onAddPhoto={(file) => addPhotoToRepairLine(line.id, file)}
+                    onRemovePhoto={(photo) => removePhotoFromRepairLine(line.id, photo)}
                     onVehiclePartChange={(vehiclePartId) => changeVehiclePart(line.id, vehiclePartId)}
                     onRepairTypeChange={(repairTypeId) => changeRepairType(line.id, repairTypeId)}
                     onQuantityChange={(rawValue) => setQuantity(line.id, rawValue)}
@@ -912,6 +999,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           onCancel={closeRepairSheet}
           onConfirm={saveRepairSheetLine}
           onPatch={patchRepairSheetLine}
+          onAddPhoto={addPhotoToRepairSheet}
+          onRemovePhoto={removePhotoFromRepairSheet}
           onVehiclePartChange={changeRepairSheetVehiclePart}
           onQuantityChange={(rawValue) => patchRepairSheetLine({ quantity: normalizeQuantityValue(rawValue) })}
           onQuantityDelta={(delta) =>
@@ -1079,6 +1168,8 @@ function RepairBottomSheet({
   onCancel,
   onConfirm,
   onPatch,
+  onAddPhoto,
+  onRemovePhoto,
   onVehiclePartChange,
   onQuantityChange,
   onQuantityDelta,
@@ -1093,6 +1184,8 @@ function RepairBottomSheet({
   onCancel: () => void;
   onConfirm: () => void;
   onPatch: (patch: Partial<DraftRepairLine>) => void;
+  onAddPhoto: (file: File) => Promise<void>;
+  onRemovePhoto: (photo: DamagePhoto) => Promise<void>;
   onVehiclePartChange: (vehiclePartId: string) => void;
   onQuantityChange: (rawValue: string) => void;
   onQuantityDelta: (delta: number) => void;
@@ -1144,6 +1237,8 @@ function RepairBottomSheet({
             vehicleParts={vehicleParts}
             isVehiclePartOptional={isVehiclePartOptional}
             onPatch={onPatch}
+            onAddPhoto={onAddPhoto}
+            onRemovePhoto={onRemovePhoto}
             onVehiclePartChange={onVehiclePartChange}
             onQuantityChange={onQuantityChange}
             onQuantityDelta={onQuantityDelta}
@@ -1171,6 +1266,8 @@ function RepairEditorFields({
   vehicleParts,
   isVehiclePartOptional,
   onPatch,
+  onAddPhoto,
+  onRemovePhoto,
   onVehiclePartChange,
   onQuantityChange,
   onQuantityDelta,
@@ -1182,6 +1279,8 @@ function RepairEditorFields({
   vehicleParts: VehiclePart[];
   isVehiclePartOptional: (repairTypeId: string) => boolean;
   onPatch: (patch: Partial<DraftRepairLine>) => void;
+  onAddPhoto: (file: File) => Promise<void>;
+  onRemovePhoto: (photo: DamagePhoto) => Promise<void>;
   onVehiclePartChange: (vehiclePartId: string) => void;
   onQuantityChange: (rawValue: string) => void;
   onQuantityDelta: (delta: number) => void;
@@ -1301,6 +1400,12 @@ function RepairEditorFields({
         />
       </div>
 
+      <RepairPhotoField
+        photos={line.photos}
+        onAdd={onAddPhoto}
+        onRemove={onRemovePhoto}
+      />
+
       <label className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-700">
         <input
           checked={line.partOrderRequired}
@@ -1310,6 +1415,89 @@ function RepairEditorFields({
         />
         <span>Pièce à commander</span>
       </label>
+    </div>
+  );
+}
+
+function RepairPhotoField({
+  photos,
+  onAdd,
+  onRemove,
+}: {
+  photos: DamagePhoto[];
+  onAdd: (file: File) => Promise<void>;
+  onRemove: (photo: DamagePhoto) => Promise<void>;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  async function handleFile(file: File | undefined) {
+    if (!file || photos.length >= 3) return;
+    setIsUploading(true);
+    try {
+      await onAdd(file);
+    } catch {
+      toast.error("Impossible d'ajouter la photo. Verifie la configuration Cloudinary.");
+    } finally {
+      setIsUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <Label>Photos du degat</Label>
+        <span className="text-xs text-gray-500">{photos.length}/3 · Facultatif</span>
+      </div>
+      <input
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        ref={inputRef}
+        type="file"
+        onChange={(event) => void handleFile(event.target.files?.[0])}
+      />
+      <div className="grid grid-cols-3 gap-2">
+        {photos.map((photo) => (
+          <div
+            className="relative aspect-square overflow-hidden rounded-md border border-gray-200 bg-gray-100"
+            key={photo.publicId}
+          >
+            <img
+              alt="Degat du vehicule"
+              className="h-full w-full object-cover"
+              src={cloudinaryThumbnailUrl(photo)}
+            />
+            <button
+              aria-label="Supprimer la photo"
+              className="absolute right-1 top-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-black/70 text-white"
+              type="button"
+              onClick={() => void onRemove(photo)}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
+        {photos.length < 3 ? (
+          <button
+            className="flex aspect-square min-h-20 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 text-sm font-medium text-gray-600 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800"
+            disabled={isUploading}
+            type="button"
+            onClick={() => inputRef.current?.click()}
+          >
+            {isUploading ? (
+              <LoaderCircle className="h-5 w-5 animate-spin" />
+            ) : (
+              <ImagePlus className="h-5 w-5" />
+            )}
+            <span>{isUploading ? "Envoi..." : "Ajouter"}</span>
+          </button>
+        ) : null}
+      </div>
+      <p className="text-xs text-gray-500">
+        Image compressee automatiquement avant l'envoi.
+      </p>
     </div>
   );
 }

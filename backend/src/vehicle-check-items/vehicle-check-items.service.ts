@@ -127,6 +127,9 @@ export class VehicleCheckItemsService {
         },
         orderBy: { createdAt: 'desc' as const },
       },
+      photos: {
+        orderBy: { createdAt: 'asc' as const },
+      },
     };
   }
 

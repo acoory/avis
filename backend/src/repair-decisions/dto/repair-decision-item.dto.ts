@@ -1,5 +1,16 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { DamagePhotoDto } from '../../damage-photos/dto/damage-photo.dto';
 
 export class RepairDecisionItemDto {
   @IsUUID()
@@ -21,4 +32,11 @@ export class RepairDecisionItemDto {
   @IsOptional()
   @IsBoolean()
   partOrderRequired?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(3)
+  @ValidateNested({ each: true })
+  @Type(() => DamagePhotoDto)
+  photos?: DamagePhotoDto[];
 }
