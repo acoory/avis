@@ -51,10 +51,10 @@ type VehicleCheckFormProps = {
 };
 
 const formSteps = [
-  { title: "Vehicule", description: "Identification du vehicule et du constructeur." },
-  { title: "Reparations observees", description: "Dommages constates, quantites et commentaires." },
-  { title: "Synthèse décision", description: "Calculs et alertes generes par les regles constructeur." },
-  { title: "Observations", description: "Commentaire final et enregistrement." },
+  { title: "Vehicule", description: "Scanner ou saisir la plaque d'immatriculation." },
+  { title: "Informations", description: "Agence, date et identification du vehicule." },
+  { title: "Reparations", description: "Dommages constates, quantites et commentaires." },
+  { title: "Synthese", description: "Decision, observations et enregistrement." },
 ];
 
 const repairTypeCodesWithoutVehiclePart = new Set(["SERVICING"]);
@@ -77,7 +77,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [licensePlateRecognitionConfidence, setLicensePlateRecognitionConfidence] = useState<
     number | undefined
   >();
-  const [mileage, setMileage] = useState("");
   const [checkDate, setCheckDate] = useState(
     initialVehicleCheck?.checkDate
       ? new Date(initialVehicleCheck.checkDate).toISOString().slice(0, 10)
@@ -120,7 +119,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       setLicensePlateRecognitionConfidence(
         initialVehicleCheck?.licensePlateRecognitionConfidence ?? undefined,
       );
-      setMileage(initialVehicleCheck?.mileage ? String(initialVehicleCheck.mileage) : "");
       setCheckDate(
         initialVehicleCheck?.checkDate
           ? new Date(initialVehicleCheck.checkDate).toISOString().slice(0, 10)
@@ -368,7 +366,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       licensePlate,
       licensePlateCountry,
       licensePlateRecognitionConfidence,
-      mileage: mileage ? Number(mileage) : undefined,
       checkDate,
       city,
       notes: notes || undefined,
@@ -386,8 +383,13 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   function validateCurrentStep() {
-    if (activeStep === 0 && (!agencyId || !manufacturerId || !licensePlate || !city)) {
-      toast.error("Renseigne l'agence, le constructeur, l'immatriculation et la ville.");
+    if (activeStep === 0 && !licensePlate) {
+      toast.error("Scanne ou renseigne l'immatriculation.");
+      return false;
+    }
+
+    if (activeStep === 1 && (!agencyId || !manufacturerId || !city)) {
+      toast.error("Renseigne l'agence, le constructeur et la ville.");
       return false;
     }
 
@@ -455,149 +457,177 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     setActiveStep((current) => Math.max(current - 1, 0));
   }
 
+  function goToStep(step: number) {
+    if (step <= activeStep) {
+      setActiveStep(step);
+      return;
+    }
+
+    if (step === activeStep + 1) {
+      goToNextStep();
+    }
+  }
+
   const isLastStep = activeStep === formSteps.length - 1;
 
   return (
     <form className="scroll-mt-16 space-y-4 pb-24 md:space-y-6 md:pb-0" ref={formRef} onSubmit={handleSubmit}>
-      <StepHeader activeStep={activeStep} onStepClick={setActiveStep} />
+      <StepHeader activeStep={activeStep} onStepClick={goToStep} />
 
       {activeStep === 0 ? (
-      <Card className="relative z-0">
-        <CardHeader className="p-4 md:p-6">
-          <CardTitle>Vehicule</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 p-4 pt-0 md:grid-cols-2 md:p-6 md:pt-0 xl:grid-cols-3">
-          <div className="space-y-2">
-            <Label>Agence</Label>
-            <select
-              className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
-              value={agencyId}
-              onChange={(event) => {
-                setAgencyId(event.target.value);
-                const agency = agencies.find((item) => item.id === event.target.value);
-                if (agency) setCity(agency.city);
-              }}
+        <Card className="relative z-0">
+          <CardContent className="mx-auto max-w-xl space-y-5 p-4 md:p-8">
+            <Button
+              className="h-14 w-full text-base"
+              type="button"
+              onClick={() => setIsLicensePlateScannerOpen(true)}
             >
-              {agencies.map((agency) => (
-                <option key={agency.id} value={agency.id}>
-                  {agency.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              <Camera className="h-5 w-5" />
+              Scanner la plaque
+            </Button>
 
-          <div className="space-y-2">
-            <Label>Ville</Label>
-            <Input className="h-12 text-base md:h-10 md:text-sm" value={city} onChange={(event) => setCity(event.target.value)} />
-          </div>
-
-          <div className="min-w-0 space-y-2">
-            <Label>Date du controle</Label>
-            <Input
-              className="h-12 min-w-0 max-w-full text-base md:h-10 md:text-sm"
-              type="date"
-              value={checkDate}
-              onChange={(event) => setCheckDate(event.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Constructeur</Label>
-            <select
-              className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
-              value={manufacturerId}
-              onChange={(event) => {
-                setManufacturerId(event.target.value);
-                setVehicleModelId("");
-              }}
-            >
-              {manufacturers.map((manufacturer) => (
-                <option key={manufacturer.id} value={manufacturer.id}>
-                  {manufacturer.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Modele</Label>
-            <select
-              className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
-              value={vehicleModelId}
-              onChange={(event) => setVehicleModelId(event.target.value)}
-            >
-              <option value="">Non precise</option>
-              {vehicleModels.map((model) => (
-                <option key={model.id} value={model.id}>
-                  {model.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Immatriculation</Label>
-            <div className="grid grid-cols-[7.5rem_minmax(0,1fr)_3rem] gap-2">
-              <select
-                aria-label="Pays de la plaque"
-                className="h-12 min-w-0 rounded-md border border-gray-200 bg-white px-2 text-sm text-gray-950 shadow-sm md:h-10"
-                value={licensePlateCountry}
-                onChange={(event) => {
-                  setLicensePlateCountry(event.target.value);
-                  setLicensePlateRecognitionConfidence(undefined);
-                }}
-              >
-                {licensePlateCountries.map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.code === "UNKNOWN" ? "Autre" : country.code}
-                  </option>
-                ))}
-              </select>
-              <Input
-                autoCapitalize="characters"
-                autoComplete="off"
-                className="h-12 min-w-0 text-base font-semibold uppercase tracking-wide md:h-10 md:text-sm"
-                maxLength={20}
-                value={licensePlate}
-                onChange={(event) => {
-                  setLicensePlate(sanitizeLicensePlateInput(event.target.value));
-                  setLicensePlateRecognitionConfidence(undefined);
-                }}
-                placeholder="Plaque"
-              />
-              <Button
-                aria-label="Scanner la plaque"
-                className="h-12 w-12 md:h-10 md:w-10"
-                size="icon"
-                type="button"
-                variant="outline"
-                onClick={() => setIsLicensePlateScannerOpen(true)}
-              >
-                <Camera className="h-5 w-5" />
-              </Button>
+            <div className="flex items-center gap-3">
+              <span className="h-px flex-1 bg-gray-200" />
+              <span className="text-xs font-medium uppercase text-gray-400">ou saisir manuellement</span>
+              <span className="h-px flex-1 bg-gray-200" />
             </div>
-            <p className="text-xs text-gray-500">
-              {licensePlateRecognitionConfidence !== undefined
-                ? `Detection OCR : ${Math.round(licensePlateRecognitionConfidence)} %, a verifier avant validation.`
-                : "Selectionne le pays ou choisis Autre pour une plaque non referencee."}
-            </p>
-          </div>
 
-          <div className="space-y-2">
-            <Label>Kilometrage</Label>
-            <Input
-              className="h-12 text-base md:h-10 md:text-sm"
-              inputMode="numeric"
-              type="number"
-              value={mileage}
-              onChange={(event) => setMileage(event.target.value)}
-            />
-          </div>
-        </CardContent>
-      </Card>
+            <div className="space-y-2">
+              <Label>Immatriculation</Label>
+              <div className="grid grid-cols-[7.5rem_minmax(0,1fr)] gap-2">
+                <select
+                  aria-label="Pays de la plaque"
+                  className="h-12 min-w-0 rounded-md border border-gray-200 bg-white px-2 text-sm text-gray-950 shadow-sm"
+                  value={licensePlateCountry}
+                  onChange={(event) => {
+                    setLicensePlateCountry(event.target.value);
+                    setLicensePlateRecognitionConfidence(undefined);
+                  }}
+                >
+                  {licensePlateCountries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.code === "UNKNOWN" ? "Autre" : country.code}
+                    </option>
+                  ))}
+                </select>
+                <Input
+                  autoCapitalize="characters"
+                  autoComplete="off"
+                  className="h-12 min-w-0 text-base font-semibold uppercase tracking-wide"
+                  maxLength={20}
+                  value={licensePlate}
+                  onChange={(event) => {
+                    setLicensePlate(sanitizeLicensePlateInput(event.target.value));
+                    setLicensePlateRecognitionConfidence(undefined);
+                  }}
+                  placeholder="Plaque"
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                {licensePlateRecognitionConfidence !== undefined
+                  ? `Detection : ${Math.round(licensePlateRecognitionConfidence)} %, verifie la plaque avant de continuer.`
+                  : "Selectionne le pays ou choisis Autre pour une plaque non referencee."}
+              </p>
+            </div>
+
+            {licensePlate ? (
+              <div className="rounded-md border border-teal-200 bg-teal-50 p-4 text-center">
+                <p className="text-xs font-medium uppercase text-teal-700">Vehicule identifie</p>
+                <p className="mt-1 text-2xl font-semibold text-gray-950">
+                  {formatLicensePlate(
+                    normalizeLicensePlate(licensePlate),
+                    licensePlateCountry,
+                    licensePlate,
+                  )}
+                </p>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
       ) : null}
 
       {activeStep === 1 ? (
+        <Card className="relative z-0">
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle>Informations du controle</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 p-4 pt-0 md:grid-cols-2 md:p-6 md:pt-0 xl:grid-cols-3">
+            <div className="space-y-2">
+              <Label>Agence</Label>
+              <select
+                className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
+                value={agencyId}
+                onChange={(event) => {
+                  setAgencyId(event.target.value);
+                  const agency = agencies.find((item) => item.id === event.target.value);
+                  if (agency) setCity(agency.city);
+                }}
+              >
+                {agencies.map((agency) => (
+                  <option key={agency.id} value={agency.id}>
+                    {agency.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Ville</Label>
+              <Input
+                className="h-12 text-base md:h-10 md:text-sm"
+                value={city}
+                onChange={(event) => setCity(event.target.value)}
+              />
+            </div>
+
+            <div className="min-w-0 space-y-2">
+              <Label>Date du controle</Label>
+              <Input
+                className="h-12 min-w-0 max-w-full text-base md:h-10 md:text-sm"
+                type="date"
+                value={checkDate}
+                onChange={(event) => setCheckDate(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Constructeur</Label>
+              <select
+                className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
+                value={manufacturerId}
+                onChange={(event) => {
+                  setManufacturerId(event.target.value);
+                  setVehicleModelId("");
+                }}
+              >
+                {manufacturers.map((manufacturer) => (
+                  <option key={manufacturer.id} value={manufacturer.id}>
+                    {manufacturer.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Modele</Label>
+              <select
+                className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
+                value={vehicleModelId}
+                onChange={(event) => setVehicleModelId(event.target.value)}
+              >
+                <option value="">Non precise</option>
+                {vehicleModels.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {activeStep === 2 ? (
       <Card>
         <CardHeader className="flex-row items-center justify-between gap-3 p-4 md:p-6">
           <div>
@@ -711,39 +741,42 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       </Card>
       ) : null}
 
-      {activeStep === 2 ? (
-      <Card>
-        <CardHeader className="p-4 md:p-6">
-          <CardTitle>Synthèse décision</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 p-4 pt-0 md:p-6 md:pt-0">
-          <DecisionSummaryPanel
-            agencyName={selectedAgency?.name ?? "-"}
-            manufacturerName={selectedManufacturer?.name ?? "-"}
-            preview={activePreview}
-          />
-        </CardContent>
-      </Card>
-      ) : null}
-
       {activeStep === 3 ? (
-      <Card>
-        <CardContent className="space-y-3 p-4 md:p-5">
-          <Label>Observations</Label>
-          <textarea
-            className="min-h-28 w-full rounded-md border border-gray-200 px-3 py-2 text-base text-gray-950 shadow-sm md:text-sm"
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-          />
-        </CardContent>
-      </Card>
+        <div className="space-y-4">
+          <Card>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle>Synthese decision</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 p-4 pt-0 md:p-6 md:pt-0">
+              <DecisionSummaryPanel
+                agencyName={selectedAgency?.name ?? "-"}
+                manufacturerName={selectedManufacturer?.name ?? "-"}
+                preview={activePreview}
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="space-y-3 p-4 md:p-5">
+              <Label>Observations</Label>
+              <textarea
+                className="min-h-28 w-full rounded-md border border-gray-200 px-3 py-2 text-base text-gray-950 shadow-sm md:text-sm"
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+              />
+            </CardContent>
+          </Card>
+        </div>
       ) : null}
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 p-3 shadow-lg backdrop-blur md:hidden">
-        <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-gray-500">Economie reference</span>
-          <span className="font-semibold text-teal-700">{formatMoney(activePreview?.totalInternalSavingAmount)}</span>
-        </div>
+        {activeStep >= 2 ? (
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span className="text-gray-500">Economie reference</span>
+            <span className="font-semibold text-teal-700">
+              {formatMoney(activePreview?.totalInternalSavingAmount)}
+            </span>
+          </div>
+        ) : null}
         <StepActions
           activeStep={activeStep}
           isLastStep={isLastStep}
@@ -767,7 +800,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
         />
       </div>
 
-      {activeStep === 1 && !repairSheetLine ? (
+      {activeStep === 2 && !repairSheetLine ? (
         <Button
           aria-label="Ajouter une reparation"
           className="fixed bottom-24 right-4 z-40 h-12 w-12 rounded-full shadow-lg md:hidden"
@@ -841,7 +874,7 @@ function StepHeader({
   onStepClick: (step: number) => void;
 }) {
   return (
-    <Card className="sticky top-0 z-20 -mx-4 mb-2 rounded-none border-x-0 bg-white shadow-sm md:static md:mx-0 md:mb-0 md:rounded-lg md:border-x">
+    <Card className="sticky top-16 z-20 -mx-4 -mt-4 mb-2 rounded-none border-x-0 bg-white shadow-sm md:static md:mx-0 md:mt-0 md:mb-0 md:rounded-lg md:border-x">
       <CardContent className="space-y-2 p-3 md:space-y-4 md:p-5">
         <div>
           <p className="text-xs font-medium uppercase text-gray-500">
@@ -1511,7 +1544,7 @@ function ValidationRecap({
             </div>
             <h2 className="text-lg font-semibold text-gray-950">Recapitulatif avant validation</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Une fois valide, le controle ne sera plus modifiable.
+              Verifie les informations avant de valider le controle.
             </p>
           </div>
           <button

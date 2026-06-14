@@ -41,6 +41,7 @@ export function LicensePlateScanner({ country, onClose, onConfirm }: LicensePlat
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const cameraStartTimerRef = useRef<number | null>(null);
   const scanTimerRef = useRef<number | null>(null);
   const isScanningRef = useRef(false);
   const isMountedRef = useRef(true);
@@ -210,10 +211,19 @@ export function LicensePlateScanner({ country, onClose, onConfirm }: LicensePlat
       }
     }
 
-    void startCamera();
+    // React Strict Mode replays effects in development. Deferring the request
+    // prevents the discarded first pass from opening a second permission prompt.
+    cameraStartTimerRef.current = window.setTimeout(() => {
+      cameraStartTimerRef.current = null;
+      void startCamera();
+    }, 0);
 
     return () => {
       isMountedRef.current = false;
+      if (cameraStartTimerRef.current !== null) {
+        window.clearTimeout(cameraStartTimerRef.current);
+        cameraStartTimerRef.current = null;
+      }
       stopAutomaticScan();
       stopCamera();
     };
