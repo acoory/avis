@@ -1,0 +1,17 @@
+services:
+  fastalpr:
+    build:
+      context: ./fastalpr
+    restart: unless-stopped
+    environment:
+      FASTALPR_INTERNAL_TOKEN: ${FASTALPR_INTERNAL_TOKEN}
+      FASTALPR_DETECTOR_CONFIDENCE: ${FASTALPR_DETECTOR_CONFIDENCE:-0.45}
+      FASTALPR_DETECTOR_MODEL: ${FASTALPR_DETECTOR_MODEL:-yolo-v9-t-384-license-plate-end2end}
+      FASTALPR_OCR_MODEL: ${FASTALPR_OCR_MODEL:-cct-xs-v2-global-model}
+    volumes:
+      - fastalpr-models:/home/appuser/.cache
+    expose:
+      - "8000"
+
+volumes:
+  fastalpr-models:

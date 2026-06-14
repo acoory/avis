@@ -130,6 +130,23 @@ export const businessService = {
     return data;
   },
 
+  async recognizeLicensePlate(image: Blob) {
+    const formData = new FormData();
+    formData.append("image", image, "plate.jpg");
+    const { data } = await api.post<{
+      detected: boolean;
+      plate?: string;
+      confidence?: number;
+      region?: string | null;
+      regionConfidence?: number | null;
+      detectionConfidence?: number;
+    }>("/license-plates/recognize", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 15000,
+    });
+    return data;
+  },
+
   async agencies() {
     const { data } = await api.get<Agency[]>("/agencies");
     return data;
