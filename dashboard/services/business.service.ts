@@ -208,6 +208,34 @@ export const businessService = {
     return data;
   },
 
+  async createAgency(payload: {
+    code: string;
+    name: string;
+    city: string;
+    region: string;
+  }) {
+    const { data } = await api.post<Agency>("/agencies", payload);
+    return data;
+  },
+
+  async updateAgency(
+    id: string,
+    payload: {
+      code?: string;
+      name?: string;
+      city?: string;
+      region?: string;
+    },
+  ) {
+    const { data } = await api.patch<Agency>(`/agencies/${id}`, payload);
+    return data;
+  },
+
+  async deleteAgency(id: string) {
+    const { data } = await api.delete<{ success: true }>(`/agencies/${id}`);
+    return data;
+  },
+
   async manufacturers() {
     const { data } = await api.get<Manufacturer[]>("/manufacturers");
     return data;

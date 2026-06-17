@@ -77,8 +77,11 @@ model User {
 
 model Agency {
   id        String   @id @default(uuid())
+  code      String   @unique
   name      String
   city      String
+  region    String
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -86,6 +89,8 @@ model Agency {
 
   @@unique([name, city])
   @@index([city])
+  @@index([region])
+  @@index([isActive])
 }
 
 model Manufacturer {

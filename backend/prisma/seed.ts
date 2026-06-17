@@ -94,13 +94,31 @@ async function main() {
     },
   });
 
-  await prisma.agency.createMany({
-    data: [
-      { name: 'Agence Marseille', city: 'Marseille' },
-      { name: 'Agence Paris', city: 'Paris' },
-    ],
-    skipDuplicates: true,
-  });
+  const agencies = [
+    { code: 'PARIS_AGENCE_PARIS', name: 'Agence Paris', city: 'Paris', region: 'Île-de-France' },
+    { code: 'LYS_APT', name: 'Aéroport', city: 'Lyon', region: 'Centre-Est' },
+    { code: 'LYS_GARE', name: 'Gare Part-Dieu', city: 'Lyon', region: 'Centre-Est' },
+    { code: 'ORY_APT', name: 'Aéroport Orly', city: 'Paris', region: 'Île-de-France' },
+    { code: 'MRS_APT', name: 'Aéroport', city: 'Marseille', region: 'Sud' },
+    { code: 'NCE_APT', name: 'Aéroport', city: 'Nice', region: 'Sud-Est' },
+    { code: 'NCE_GARE', name: 'Gare', city: 'Nice', region: 'Sud-Est' },
+  ];
+
+  for (const agency of agencies) {
+    await prisma.agency.upsert({
+      where: { code: agency.code },
+      update: {
+        name: agency.name,
+        city: agency.city,
+        region: agency.region,
+        isActive: true,
+      },
+      create: {
+        ...agency,
+        isActive: true,
+      },
+    });
+  }
 
   const repairTypes = [
     {

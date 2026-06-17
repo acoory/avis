@@ -38,7 +38,6 @@ import {
   RepairDecisionPreview,
   RepairType,
   VehicleCheck,
-  VehicleModel,
   VehiclePart,
 } from "@/types/business";
 
@@ -64,6 +63,7 @@ const formSteps = [
 ];
 
 const repairTypeCodesWithoutVehiclePart = new Set(["SERVICING"]);
+const lastSelectedAgencyStorageKey = "vehicle-control:last-selected-agency-id";
 
 function createDraftId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -104,12 +104,11 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const didMountRef = useRef(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
-  const [vehicleModels, setVehicleModels] = useState<VehicleModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [vehicleParts, setVehicleParts] = useState<VehiclePart[]>([]);
   const [agencyId, setAgencyId] = useState("");
+  const [agencySearch, setAgencySearch] = useState("");
   const [manufacturerId, setManufacturerId] = useState("");
-  const [vehicleModelId, setVehicleModelId] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
   const [licensePlateCountry, setLicensePlateCountry] = useState("FR");
   const [licensePlateRecognitionConfidence, setLicensePlateRecognitionConfidence] = useState<
@@ -140,13 +139,16 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       businessService.repairTypes(),
       businessService.vehicleParts(),
     ]).then(([agenciesData, manufacturersData, repairTypesData, vehiclePartsData]) => {
+      const preferredAgencyId = initialVehicleCheck?.agency?.id ?? getLastSelectedAgencyId();
+      const preferredAgency = agenciesData.find((agency) => agency.id === preferredAgencyId);
+      const fallbackAgency = preferredAgency ?? agenciesData[0];
+
       setAgencies(agenciesData);
       setManufacturers(manufacturersData);
       setRepairTypes(repairTypesData);
       setVehicleParts(vehiclePartsData);
-      setAgencyId(initialVehicleCheck?.agency?.id ?? agenciesData[0]?.id ?? "");
+      setAgencyId(fallbackAgency?.id ?? "");
       setManufacturerId(initialVehicleCheck?.manufacturer?.id ?? manufacturersData[0]?.id ?? "");
-      setVehicleModelId(initialVehicleCheck?.vehicleModel?.id ?? "");
       setLicensePlate(
         initialVehicleCheck?.licensePlateRaw ??
           formatLicensePlate(
@@ -163,7 +165,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           ? new Date(initialVehicleCheck.checkDate).toISOString().slice(0, 10)
           : new Date().toISOString().slice(0, 10),
       );
-      setCity(initialVehicleCheck?.city ?? agenciesData[0]?.city ?? "");
+      setCity(initialVehicleCheck?.city ?? fallbackAgency?.city ?? "");
       setNotes(initialVehicleCheck?.notes ?? "");
       setLines(
         initialVehicleCheck?.items?.length
@@ -180,11 +182,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       );
     });
   }, [initialVehicleCheck]);
-
-  useEffect(() => {
-    if (!manufacturerId) return;
-    void businessService.vehicleModels(manufacturerId).then(setVehicleModels);
-  }, [manufacturerId]);
 
   function isVehiclePartOptional(repairTypeId: string) {
     const repairType = repairTypes.find((item) => item.id === repairTypeId);
@@ -273,6 +270,20 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }, [activeStep]);
 
   const selectedAgency = agencies.find((agency) => agency.id === agencyId);
+  const filteredAgencies = useMemo(() => {
+    const query = normalizeSearchText(agencySearch);
+    const matches = query
+      ? agencies.filter((agency) =>
+          normalizeSearchText(`${agency.city} ${agency.name} ${agency.code} ${agency.region}`).includes(query),
+        )
+      : agencies;
+
+    if (selectedAgency && !matches.some((agency) => agency.id === selectedAgency.id)) {
+      return [selectedAgency, ...matches];
+    }
+
+    return matches;
+  }, [agencies, agencySearch, selectedAgency]);
   const selectedManufacturer = manufacturers.find((manufacturer) => manufacturer.id === manufacturerId);
   const emptyPreview = manufacturerId
     ? {
@@ -506,7 +517,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     return {
       agencyId,
       manufacturerId,
-      vehicleModelId: vehicleModelId || undefined,
       licensePlate,
       licensePlateCountry,
       licensePlateRecognitionConfidence,
@@ -698,21 +708,35 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           <CardContent className="grid gap-4 p-4 pt-0 md:grid-cols-2 md:p-6 md:pt-0 xl:grid-cols-3">
             <div className="space-y-2">
               <Label>Agence</Label>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  className="h-12 pl-9 text-base md:h-10 md:text-sm"
+                  placeholder="Rechercher une ville ou une agence"
+                  value={agencySearch}
+                  onChange={(event) => setAgencySearch(event.target.value)}
+                />
+              </div>
               <select
                 className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
                 value={agencyId}
                 onChange={(event) => {
-                  setAgencyId(event.target.value);
-                  const agency = agencies.find((item) => item.id === event.target.value);
+                  const nextAgencyId = event.target.value;
+                  setAgencyId(nextAgencyId);
+                  setLastSelectedAgencyId(nextAgencyId);
+                  const agency = agencies.find((item) => item.id === nextAgencyId);
                   if (agency) setCity(agency.city);
                 }}
               >
-                {agencies.map((agency) => (
+                {filteredAgencies.map((agency) => (
                   <option key={agency.id} value={agency.id}>
-                    {agency.name}
+                    {formatAgencyOption(agency)}
                   </option>
                 ))}
               </select>
+              {!filteredAgencies.length ? (
+                <p className="text-xs text-gray-500">Aucune agence ne correspond a cette recherche.</p>
+              ) : null}
             </div>
 
             <div className="space-y-2">
@@ -739,30 +763,11 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
               <select
                 className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
                 value={manufacturerId}
-                onChange={(event) => {
-                  setManufacturerId(event.target.value);
-                  setVehicleModelId("");
-                }}
+                onChange={(event) => setManufacturerId(event.target.value)}
               >
                 {manufacturers.map((manufacturer) => (
                   <option key={manufacturer.id} value={manufacturer.id}>
                     {manufacturer.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Modele</Label>
-              <select
-                className="h-12 w-full rounded-md border border-gray-200 bg-white px-3 text-base text-gray-950 shadow-sm md:h-10 md:text-sm"
-                value={vehicleModelId}
-                onChange={(event) => setVehicleModelId(event.target.value)}
-              >
-                <option value="">Non precise</option>
-                {vehicleModels.map((model) => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
                   </option>
                 ))}
               </select>
@@ -893,7 +898,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             </CardHeader>
             <CardContent className="space-y-4 p-4 pt-0 md:p-6 md:pt-0">
               <DecisionSummaryPanel
-                agencyName={selectedAgency?.name ?? "-"}
+                agencyName={selectedAgency ? formatAgencyOption(selectedAgency) : "-"}
                 manufacturerName={selectedManufacturer?.name ?? "-"}
                 preview={activePreview}
               />
@@ -997,8 +1002,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           manufacturerName={selectedManufacturer?.name ?? "-"}
           notes={notes}
           preview={activePreview}
-          selectedAgencyName={selectedAgency?.name ?? "-"}
-          vehicleModelName={vehicleModels.find((model) => model.id === vehicleModelId)?.name ?? "Non precise"}
+          selectedAgencyName={selectedAgency ? formatAgencyOption(selectedAgency) : "-"}
           onCancel={() => setIsRecapOpen(false)}
           onConfirm={() => void saveVehicleCheck(true)}
         />
@@ -1758,7 +1762,6 @@ function ValidationRecap({
   notes,
   preview,
   selectedAgencyName,
-  vehicleModelName,
   onCancel,
   onConfirm,
 }: {
@@ -1770,7 +1773,6 @@ function ValidationRecap({
   notes: string;
   preview: RepairDecisionPreview | null;
   selectedAgencyName: string;
-  vehicleModelName: string;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
@@ -1808,7 +1810,6 @@ function ValidationRecap({
               )}
             />
             <RecapLine label="Constructeur" value={manufacturerName} />
-            <RecapLine label="Modele" value={vehicleModelName} />
             <RecapLine label="Agence" value={selectedAgencyName} />
             <RecapLine label="Ville" value={city} />
             <RecapLine label="Economie reference" value={formatMoney(preview?.totalInternalSavingAmount)} />
@@ -1892,4 +1893,24 @@ function normalizeSearchText(value: string) {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim();
+}
+
+function formatAgencyOption(agency: Agency) {
+  return `${agency.city} - ${agency.name}`;
+}
+
+function getLastSelectedAgencyId() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.localStorage.getItem(lastSelectedAgencyStorageKey);
+}
+
+function setLastSelectedAgencyId(agencyId: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(lastSelectedAgencyStorageKey, agencyId);
 }

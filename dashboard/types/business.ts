@@ -17,8 +17,11 @@ export type ManufacturerRepairRuleStatus =
 
 export type Agency = {
   id: string;
+  code: string;
   name: string;
   city: string;
+  region: string;
+  isActive: boolean;
 };
 
 export type Manufacturer = {

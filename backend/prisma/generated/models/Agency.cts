@@ -26,24 +26,33 @@ export type AggregateAgency = {
 
 export type AgencyMinAggregateOutputType = {
   id: string | null
+  code: string | null
   name: string | null
   city: string | null
+  region: string | null
+  isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type AgencyMaxAggregateOutputType = {
   id: string | null
+  code: string | null
   name: string | null
   city: string | null
+  region: string | null
+  isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type AgencyCountAggregateOutputType = {
   id: number
+  code: number
   name: number
   city: number
+  region: number
+  isActive: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -52,24 +61,33 @@ export type AgencyCountAggregateOutputType = {
 
 export type AgencyMinAggregateInputType = {
   id?: true
+  code?: true
   name?: true
   city?: true
+  region?: true
+  isActive?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type AgencyMaxAggregateInputType = {
   id?: true
+  code?: true
   name?: true
   city?: true
+  region?: true
+  isActive?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type AgencyCountAggregateInputType = {
   id?: true
+  code?: true
   name?: true
   city?: true
+  region?: true
+  isActive?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -149,8 +167,11 @@ export type AgencyGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type AgencyGroupByOutputType = {
   id: string
+  code: string
   name: string
   city: string
+  region: string
+  isActive: boolean
   createdAt: Date
   updatedAt: Date
   _count: AgencyCountAggregateOutputType | null
@@ -178,8 +199,11 @@ export type AgencyWhereInput = {
   OR?: Prisma.AgencyWhereInput[]
   NOT?: Prisma.AgencyWhereInput | Prisma.AgencyWhereInput[]
   id?: Prisma.StringFilter<"Agency"> | string
+  code?: Prisma.StringFilter<"Agency"> | string
   name?: Prisma.StringFilter<"Agency"> | string
   city?: Prisma.StringFilter<"Agency"> | string
+  region?: Prisma.StringFilter<"Agency"> | string
+  isActive?: Prisma.BoolFilter<"Agency"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   vehicleChecks?: Prisma.VehicleCheckListRelationFilter
@@ -187,8 +211,11 @@ export type AgencyWhereInput = {
 
 export type AgencyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   vehicleChecks?: Prisma.VehicleCheckOrderByRelationAggregateInput
@@ -196,21 +223,27 @@ export type AgencyOrderByWithRelationInput = {
 
 export type AgencyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  code?: string
   name_city?: Prisma.AgencyNameCityCompoundUniqueInput
   AND?: Prisma.AgencyWhereInput | Prisma.AgencyWhereInput[]
   OR?: Prisma.AgencyWhereInput[]
   NOT?: Prisma.AgencyWhereInput | Prisma.AgencyWhereInput[]
   name?: Prisma.StringFilter<"Agency"> | string
   city?: Prisma.StringFilter<"Agency"> | string
+  region?: Prisma.StringFilter<"Agency"> | string
+  isActive?: Prisma.BoolFilter<"Agency"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   vehicleChecks?: Prisma.VehicleCheckListRelationFilter
-}, "id" | "name_city">
+}, "id" | "code" | "name_city">
 
 export type AgencyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AgencyCountOrderByAggregateInput
@@ -223,16 +256,22 @@ export type AgencyScalarWhereWithAggregatesInput = {
   OR?: Prisma.AgencyScalarWhereWithAggregatesInput[]
   NOT?: Prisma.AgencyScalarWhereWithAggregatesInput | Prisma.AgencyScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Agency"> | string
+  code?: Prisma.StringWithAggregatesFilter<"Agency"> | string
   name?: Prisma.StringWithAggregatesFilter<"Agency"> | string
   city?: Prisma.StringWithAggregatesFilter<"Agency"> | string
+  region?: Prisma.StringWithAggregatesFilter<"Agency"> | string
+  isActive?: Prisma.BoolWithAggregatesFilter<"Agency"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Agency"> | Date | string
 }
 
 export type AgencyCreateInput = {
   id?: string
+  code: string
   name: string
   city: string
+  region: string
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutAgencyInput
@@ -240,8 +279,11 @@ export type AgencyCreateInput = {
 
 export type AgencyUncheckedCreateInput = {
   id?: string
+  code: string
   name: string
   city: string
+  region: string
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutAgencyInput
@@ -249,8 +291,11 @@ export type AgencyUncheckedCreateInput = {
 
 export type AgencyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutAgencyNestedInput
@@ -258,8 +303,11 @@ export type AgencyUpdateInput = {
 
 export type AgencyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutAgencyNestedInput
@@ -267,24 +315,33 @@ export type AgencyUncheckedUpdateInput = {
 
 export type AgencyCreateManyInput = {
   id?: string
+  code: string
   name: string
   city: string
+  region: string
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type AgencyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AgencyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -296,24 +353,33 @@ export type AgencyNameCityCompoundUniqueInput = {
 
 export type AgencyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type AgencyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type AgencyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -339,16 +405,22 @@ export type AgencyUpdateOneRequiredWithoutVehicleChecksNestedInput = {
 
 export type AgencyCreateWithoutVehicleChecksInput = {
   id?: string
+  code: string
   name: string
   city: string
+  region: string
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type AgencyUncheckedCreateWithoutVehicleChecksInput = {
   id?: string
+  code: string
   name: string
   city: string
+  region: string
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -371,16 +443,22 @@ export type AgencyUpdateToOneWithWhereWithoutVehicleChecksInput = {
 
 export type AgencyUpdateWithoutVehicleChecksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AgencyUncheckedUpdateWithoutVehicleChecksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -418,8 +496,11 @@ export type AgencyCountOutputTypeCountVehicleChecksArgs<ExtArgs extends runtime.
 
 export type AgencySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  code?: boolean
   name?: boolean
   city?: boolean
+  region?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   vehicleChecks?: boolean | Prisma.Agency$vehicleChecksArgs<ExtArgs>
@@ -428,29 +509,38 @@ export type AgencySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 
 export type AgencySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  code?: boolean
   name?: boolean
   city?: boolean
+  region?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["agency"]>
 
 export type AgencySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  code?: boolean
   name?: boolean
   city?: boolean
+  region?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["agency"]>
 
 export type AgencySelectScalar = {
   id?: boolean
+  code?: boolean
   name?: boolean
   city?: boolean
+  region?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgencyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "city" | "createdAt" | "updatedAt", ExtArgs["result"]["agency"]>
+export type AgencyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "city" | "region" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agency"]>
 export type AgencyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleChecks?: boolean | Prisma.Agency$vehicleChecksArgs<ExtArgs>
   _count?: boolean | Prisma.AgencyCountOutputTypeDefaultArgs<ExtArgs>
@@ -465,8 +555,11 @@ export type $AgencyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    code: string
     name: string
     city: string
+    region: string
+    isActive: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["agency"]>
@@ -894,8 +987,11 @@ export interface Prisma__AgencyClient<T, Null = never, ExtArgs extends runtime.T
  */
 export interface AgencyFieldRefs {
   readonly id: Prisma.FieldRef<"Agency", 'String'>
+  readonly code: Prisma.FieldRef<"Agency", 'String'>
   readonly name: Prisma.FieldRef<"Agency", 'String'>
   readonly city: Prisma.FieldRef<"Agency", 'String'>
+  readonly region: Prisma.FieldRef<"Agency", 'String'>
+  readonly isActive: Prisma.FieldRef<"Agency", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Agency", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Agency", 'DateTime'>
 }
