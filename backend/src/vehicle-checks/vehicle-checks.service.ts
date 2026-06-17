@@ -17,6 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
 import { CloudinaryService } from '../damage-photos/cloudinary.service';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
+import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
 
@@ -208,15 +209,6 @@ export class VehicleChecksService {
       ? await this.repairDecisionService.preview(manufacturerId, dto.items)
       : await this.emptyDecisionForManufacturer(manufacturerId);
 
-    if (
-      existing.status === VehicleCheckStatus.COMPLETED &&
-      decision.items.some((item) => item.decisionStatus === RepairDecisionStatus.FORBIDDEN)
-    ) {
-      throw new BadRequestException(
-        'A completed vehicle check cannot contain forbidden repair items',
-      );
-    }
-
     const existingPhotoPublicIds = existing.items.flatMap((item) =>
       item.photos.map((photo) => photo.publicId),
     );
@@ -251,6 +243,12 @@ export class VehicleChecksService {
           constructorAllowanceAmount: decision.constructorAllowanceAmount,
           allowanceDifferenceAmount: decision.allowanceDifferenceAmount,
           decisionSummary: decision.decisionSummary,
+          status:
+            existing.status === VehicleCheckStatus.DRAFT
+              ? undefined
+              : VehicleCheckStatus.TO_ANALYZE,
+          summaryFinalizedAt:
+            existing.status === VehicleCheckStatus.DRAFT ? undefined : null,
           items: {
             create: decision.items.map((item, index) => ({
               repairTypeId: item.repairTypeId,
@@ -296,20 +294,97 @@ export class VehicleChecksService {
   async complete(id: string, user: CurrentUserPayload) {
     const vehicleCheck = await this.findOne(id, user);
 
-    const hasForbiddenItem = vehicleCheck.items.some(
+    if (vehicleCheck.status !== VehicleCheckStatus.DRAFT) {
+      throw new BadRequestException('Only a draft vehicle check can be completed in the field');
+    }
+
+    return this.prisma.vehicleCheck.update({
+      where: { id },
+      data: {
+        status: VehicleCheckStatus.TO_ANALYZE,
+        fieldCompletedAt: new Date(),
+        summaryFinalizedAt: null,
+      },
+      include: vehicleCheckInclude,
+    });
+  }
+
+  async finalizeSummary(
+    id: string,
+    dto: FinalizeVehicleCheckSummaryDto,
+    user: CurrentUserPayload,
+  ) {
+    const vehicleCheck = await this.findOne(id, user);
+
+    if (
+      vehicleCheck.status !== VehicleCheckStatus.TO_ANALYZE &&
+      vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY
+    ) {
+      throw new BadRequestException(
+        'The field check must be completed before finalizing its summary',
+      );
+    }
+
+    const itemIds = new Set(vehicleCheck.items.map((item) => item.id));
+    const unknownItemId = dto.selectedItemIds.find((itemId) => !itemIds.has(itemId));
+    if (unknownItemId) {
+      throw new BadRequestException('One or more selected repairs do not belong to this check');
+    }
+
+    const selectedItemIds = new Set(dto.selectedItemIds);
+    const selectedItems = vehicleCheck.items.filter((item) =>
+      selectedItemIds.has(item.id),
+    );
+    const forbiddenItem = selectedItems.find(
       (item) =>
         item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
         item.decisionStatus === RepairDecisionStatus.FORBIDDEN,
     );
 
-    if (hasForbiddenItem) {
-      throw new BadRequestException('A vehicle check with forbidden repair items cannot be completed');
+    if (forbiddenItem) {
+      throw new BadRequestException(
+        'A forbidden repair cannot be included in the final summary',
+      );
     }
 
-    return this.prisma.vehicleCheck.update({
-      where: { id },
-      data: { status: VehicleCheckStatus.COMPLETED },
-      include: vehicleCheckInclude,
+    const activeSelectedItems = selectedItems.filter(
+      (item) => item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE,
+    );
+    const totalInternalSavingAmount = activeSelectedItems.reduce(
+      (total, item) => total.plus(item.totalInternalSavingAmount),
+      new Prisma.Decimal(0),
+    );
+    const totalInternalCost = activeSelectedItems.reduce(
+      (total, item) => total.plus(item.totalInternalCost),
+      new Prisma.Decimal(0),
+    );
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.vehicleCheckItem.updateMany({
+        where: { vehicleCheckId: id },
+        data: { selectedForSummary: false },
+      });
+
+      if (dto.selectedItemIds.length) {
+        await tx.vehicleCheckItem.updateMany({
+          where: {
+            vehicleCheckId: id,
+            id: { in: dto.selectedItemIds },
+          },
+          data: { selectedForSummary: true },
+        });
+      }
+
+      return tx.vehicleCheck.update({
+        where: { id },
+        data: {
+          status: VehicleCheckStatus.SUMMARY_READY,
+          summaryFinalizedAt: new Date(),
+          totalInternalSavingAmount,
+          totalInternalCost,
+        },
+        include: vehicleCheckInclude,
+      });
     });
   }
 

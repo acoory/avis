@@ -101,7 +101,9 @@ export class ExportsService {
     for (const check of vehicleChecks) {
       const quantitiesByRepairCode = new Map<string, number>();
       const activeItems = check.items.filter(
-        (item) => item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE,
+        (item) =>
+          item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
+          item.selectedForSummary,
       );
 
       for (const item of activeItems) {

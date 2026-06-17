@@ -23,11 +23,19 @@ export function DecisionBadge({ status }: { status: RepairDecisionStatus }) {
 
 const checkLabels: Record<VehicleCheckStatus, string> = {
   DRAFT: "Brouillon",
-  COMPLETED: "Complete",
+  TO_ANALYZE: "A analyser",
+  SUMMARY_READY: "Synthese prete",
   CANCELLED: "Annule",
 };
 
 export function VehicleCheckStatusBadge({ status }: { status: VehicleCheckStatus }) {
-  const variant = status === "COMPLETED" ? "success" : status === "CANCELLED" ? "destructive" : "warning";
+  const variant =
+    status === "SUMMARY_READY"
+      ? "success"
+      : status === "CANCELLED"
+        ? "destructive"
+        : status === "DRAFT"
+          ? "outline"
+          : "warning";
   return <Badge variant={variant}>{checkLabels[status]}</Badge>;
 }

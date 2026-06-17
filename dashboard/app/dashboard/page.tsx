@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Car, ClipboardCheck, Euro, Info, PackageCheck, Users } from "lucide-react";
+import { AlertTriangle, Car, ClipboardCheck, Euro, Info, ListChecks, PackageCheck, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ExportButton } from "@/components/business/export-button";
 import { VehicleCheckTable } from "@/components/business/vehicle-check-table";
@@ -85,9 +85,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
         <StatCard description="Tous statuts" icon={Car} title="Vehicules controles" value={`${summary?.vehicleChecksCount ?? 0}`} />
-        <StatCard description="Controles finalises" icon={ClipboardCheck} title="Completes" value={`${summary?.completedVehicleChecksCount ?? 0}`} />
+        <StatCard description="Decisions a prendre" icon={ListChecks} title="A analyser" value={`${summary?.vehicleChecksToAnalyzeCount ?? 0}`} />
+        <StatCard description="Syntheses imprimables" icon={ClipboardCheck} title="Syntheses pretes" value={`${summary?.completedVehicleChecksCount ?? 0}`} />
         <StatCard description="Gain estime" icon={Euro} title="Economies" value={formatMoney(summary?.totalInternalSavingAmount)} />
         <StatCard description="A traiter" icon={AlertTriangle} title="Alertes" value={`${summary?.alertItemsCount ?? 0}`} />
         <StatCard description="Pieces a commander" icon={PackageCheck} title="Commandes" value={`${summary?.partOrdersToPlaceCount ?? 0}`} />

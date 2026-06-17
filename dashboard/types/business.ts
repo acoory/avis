@@ -1,4 +1,4 @@
-export type VehicleCheckStatus = "DRAFT" | "COMPLETED" | "CANCELLED";
+export type VehicleCheckStatus = "DRAFT" | "TO_ANALYZE" | "SUMMARY_READY" | "CANCELLED";
 export type RepairDecisionStatus =
   | "ACCEPTED"
   | "TO_CHECK"
@@ -114,6 +114,8 @@ export type VehicleCheck = {
   allowanceDifferenceAmount: string;
   decisionSummary?: string | null;
   notes?: string | null;
+  fieldCompletedAt?: string | null;
+  summaryFinalizedAt?: string | null;
   collaborator?: {
     firstName: string;
     lastName: string;
@@ -133,6 +135,7 @@ export type VehicleCheck = {
     partOrderedAt?: string | null;
     operationalStatus: VehicleCheckItemOperationalStatus;
     operationalComment?: string | null;
+    selectedForSummary: boolean;
     statusHistories?: Array<{
       id: string;
       fromStatus: VehicleCheckItemOperationalStatus;
@@ -228,6 +231,7 @@ export type CreateVehicleCheckPayload = {
 export type DashboardSummary = {
   vehicleChecksCount: number;
   completedVehicleChecksCount: number;
+  vehicleChecksToAnalyzeCount: number;
   draftVehicleChecksCount: number;
   totalInternalSavingAmount: string;
   totalInternalCost: string;

@@ -26,7 +26,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cloudinaryThumbnailUrl, optimizeDamagePhoto } from "@/lib/damage-photo";
+import {
+  cloudinaryStorageUrl,
+  cloudinaryThumbnailUrl,
+  optimizeDamagePhoto,
+} from "@/lib/damage-photo";
 import { formatLicensePlate, formatMoney, normalizeLicensePlate } from "@/lib/format";
 import { licensePlateCountries, sanitizeLicensePlateInput } from "@/lib/license-plate";
 import { businessService } from "@/services/business.service";
@@ -99,7 +103,9 @@ function suggestedRepairTypeId(vehiclePart: VehiclePart | undefined, repairTypes
 
 export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps) {
   const router = useRouter();
-  const isCompletedEdit = initialVehicleCheck?.status === "COMPLETED";
+  const isCompletedEdit = Boolean(
+    initialVehicleCheck && initialVehicleCheck.status !== "DRAFT",
+  );
   const formRef = useRef<HTMLFormElement | null>(null);
   const didMountRef = useRef(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
@@ -203,7 +209,15 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       quantity: line.quantity,
       comment: line.comment || undefined,
       partOrderRequired: line.partOrderRequired,
-      photos: line.photos,
+      photos: line.photos.map((photo) => ({
+        publicId: photo.publicId,
+        assetId: photo.assetId,
+        secureUrl: cloudinaryStorageUrl(photo.secureUrl),
+        width: photo.width,
+        height: photo.height,
+        bytes: photo.bytes,
+        format: photo.format,
+      })),
     };
   }
 
@@ -568,7 +582,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
       toast.success(
         shouldComplete
-          ? "Controle valide avec succes."
+          ? "Controle terrain termine. Il est maintenant a analyser."
           : isCompletedEdit
             ? "Controle modifie avec succes."
             : "Brouillon enregistre avec succes.",
@@ -577,7 +591,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     } catch {
       toast.error(
         shouldComplete
-          ? "Impossible de valider ce controle. Verifie les reparations interdites."
+          ? "Impossible de terminer ce controle terrain."
           : "Impossible d'enregistrer le controle.",
       );
     } finally {
@@ -1117,7 +1131,7 @@ function StepActions({
         {!isCompletedEdit ? (
           <Button disabled={isSaving} type="button" onClick={onValidate}>
             <CheckCircle2 className="h-4 w-4" />
-            Valider
+            Terminer le controle
           </Button>
         ) : null}
       </div>
@@ -1784,7 +1798,7 @@ function ValidationRecap({
             <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-md bg-teal-50 text-teal-700">
               <FileText className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-950">Recapitulatif avant validation</h2>
+            <h2 className="text-lg font-semibold text-gray-950">Recapitulatif avant fin du controle terrain</h2>
             <p className="mt-1 text-sm text-gray-500">
               Verifie les informations avant de valider le controle.
             </p>
@@ -1870,7 +1884,7 @@ function ValidationRecap({
           </Button>
           <Button disabled={isSaving} type="button" onClick={onConfirm}>
             <CheckCircle2 className="h-4 w-4" />
-            {isSaving ? "Validation..." : "Confirmer la validation"}
+            {isSaving ? "Finalisation..." : "Confirmer la fin du controle"}
           </Button>
         </div>
       </div>

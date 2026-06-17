@@ -1,5 +1,4 @@
 import { api } from "@/lib/api";
-import { cloudinaryImageUrl } from "@/lib/damage-photo";
 import {
   Agency,
   DashboardSummary,
@@ -98,6 +97,13 @@ export const businessService = {
     return data;
   },
 
+  async finalizeVehicleCheckSummary(id: string, selectedItemIds: string[]) {
+    const { data } = await api.post<VehicleCheck>(`/vehicle-checks/${id}/finalize-summary`, {
+      selectedItemIds,
+    });
+    return data;
+  },
+
   async deleteVehicleCheck(id: string) {
     const { data } = await api.delete<{ success: true }>(`/vehicle-checks/${id}`);
     return data;
@@ -188,7 +194,7 @@ export const businessService = {
     return {
       assetId: uploaded.asset_id,
       publicId: uploaded.public_id,
-      secureUrl: cloudinaryImageUrl(uploaded.secure_url),
+      secureUrl: uploaded.secure_url,
       width: uploaded.width,
       height: uploaded.height,
       bytes: uploaded.bytes,

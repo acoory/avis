@@ -20,7 +20,8 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export const VehicleCheckStatus = {
   DRAFT: 'DRAFT',
-  COMPLETED: 'COMPLETED',
+  TO_ANALYZE: 'TO_ANALYZE',
+  SUMMARY_READY: 'SUMMARY_READY',
   CANCELLED: 'CANCELLED'
 } as const
 

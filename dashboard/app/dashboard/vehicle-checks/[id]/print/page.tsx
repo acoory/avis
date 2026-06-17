@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft, Download, Printer } from "lucide-react";
+import { ChevronLeft, Download } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -40,13 +40,17 @@ export default function VehicleCheckPrintPage() {
   }, [searchParams, vehicleCheck]);
 
   const partOrderSummary = useMemo(() => {
-    const items = vehicleCheck?.items ?? [];
+    const items = (vehicleCheck?.items ?? []).filter((item) => item.selectedForSummary);
     const required = items.filter((item) => item.partOrderRequired).length;
     const toOrder = items.filter((item) => item.partOrderStatus === "TO_ORDER").length;
     const ordered = items.filter((item) => item.partOrderStatus === "ORDERED").length;
 
     return { required, toOrder, ordered };
   }, [vehicleCheck?.items]);
+  const summaryItems = useMemo(
+    () => (vehicleCheck?.items ?? []).filter((item) => item.selectedForSummary),
+    [vehicleCheck?.items],
+  );
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -54,6 +58,15 @@ export default function VehicleCheckPrintPage() {
 
   if (!vehicleCheck) {
     return <PageHeader title="Controle introuvable" description="Impossible de charger cette synthese." />;
+  }
+
+  if (vehicleCheck.status !== "SUMMARY_READY") {
+    return (
+      <PageHeader
+        title="Synthese non disponible"
+        description="Selectionne d'abord les reparations a effectuer depuis le controle."
+      />
+    );
   }
 
   async function handleDownload() {
@@ -86,10 +99,6 @@ export default function VehicleCheckPrintPage() {
             <Button disabled={isDownloading} size="sm" variant="outline" onClick={handleDownload}>
               <Download className="h-4 w-4" />
               {isDownloading ? "Generation..." : "Telecharger PDF"}
-            </Button>
-            <Button size="sm" onClick={() => window.print()}>
-              <Printer className="h-4 w-4" />
-              Imprimer
             </Button>
           </div>
         </div>
@@ -156,15 +165,17 @@ export default function VehicleCheckPrintPage() {
         </section>
 
         <section className="mt-4">
-          <SectionTitle title="Synthese decision" />
+          <SectionTitle title="Travaux selectionnes" />
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
-            {vehicleCheck.decisionSummary?.trim() ? vehicleCheck.decisionSummary : "Aucun degat constate."}
+            {summaryItems.length
+              ? `${summaryItems.length} reparation(s) retenue(s) pour la demande de devis.`
+              : "Aucune reparation retenue."}
           </div>
         </section>
 
         <section className="mt-4">
-          <SectionTitle title="Reparations constatees" />
-          {vehicleCheck.items?.length ? (
+          <SectionTitle title="Reparations a chiffrer" />
+          {summaryItems.length ? (
             <div className="overflow-hidden rounded-lg border border-gray-200">
               <table className="w-full text-left text-sm">
                 <thead className="bg-gray-50 text-xs uppercase text-gray-500">
@@ -176,7 +187,7 @@ export default function VehicleCheckPrintPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {vehicleCheck.items.map((item) => (
+                  {summaryItems.map((item) => (
                     <tr className="align-top" key={item.id}>
                       <td className="px-4 py-4">
                         <p className="font-medium text-gray-950">{item.vehiclePart.name}</p>
@@ -205,7 +216,7 @@ export default function VehicleCheckPrintPage() {
             </div>
           ) : (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-              Aucun degat signale sur ce vehicule.
+              Aucune reparation selectionnee pour ce vehicule.
             </div>
           )}
         </section>

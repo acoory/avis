@@ -37,6 +37,14 @@ export function cloudinaryImageUrl(url: string) {
   return cloudinaryProxyUrl(url);
 }
 
+export function cloudinaryStorageUrl(url: string) {
+  if (url.startsWith("/cloudinary/")) {
+    return `https://res.cloudinary.com/${url.slice("/cloudinary/".length)}`;
+  }
+
+  return url;
+}
+
 function cloudinaryProxyUrl(url: string) {
   if (url.startsWith("/cloudinary/")) {
     return url;

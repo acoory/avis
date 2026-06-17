@@ -146,6 +146,7 @@ export class VehicleCheckItemsService {
         where: {
           vehicleCheckId,
           operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+          selectedForSummary: true,
         },
         _sum: {
           totalInternalSavingAmount: true,

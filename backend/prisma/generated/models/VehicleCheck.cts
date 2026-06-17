@@ -71,6 +71,8 @@ export type VehicleCheckMinAggregateOutputType = {
   allowanceDifferenceAmount: runtime.Decimal | null
   decisionSummary: string | null
   notes: string | null
+  fieldCompletedAt: Date | null
+  summaryFinalizedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -98,6 +100,8 @@ export type VehicleCheckMaxAggregateOutputType = {
   allowanceDifferenceAmount: runtime.Decimal | null
   decisionSummary: string | null
   notes: string | null
+  fieldCompletedAt: Date | null
+  summaryFinalizedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -125,6 +129,8 @@ export type VehicleCheckCountAggregateOutputType = {
   allowanceDifferenceAmount: number
   decisionSummary: number
   notes: number
+  fieldCompletedAt: number
+  summaryFinalizedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -176,6 +182,8 @@ export type VehicleCheckMinAggregateInputType = {
   allowanceDifferenceAmount?: true
   decisionSummary?: true
   notes?: true
+  fieldCompletedAt?: true
+  summaryFinalizedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -203,6 +211,8 @@ export type VehicleCheckMaxAggregateInputType = {
   allowanceDifferenceAmount?: true
   decisionSummary?: true
   notes?: true
+  fieldCompletedAt?: true
+  summaryFinalizedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -230,6 +240,8 @@ export type VehicleCheckCountAggregateInputType = {
   allowanceDifferenceAmount?: true
   decisionSummary?: true
   notes?: true
+  fieldCompletedAt?: true
+  summaryFinalizedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -344,6 +356,8 @@ export type VehicleCheckGroupByOutputType = {
   allowanceDifferenceAmount: runtime.Decimal
   decisionSummary: string | null
   notes: string | null
+  fieldCompletedAt: Date | null
+  summaryFinalizedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: VehicleCheckCountAggregateOutputType | null
@@ -394,6 +408,8 @@ export type VehicleCheckWhereInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFilter<"VehicleCheck"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   notes?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
+  fieldCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
+  summaryFinalizedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   collaborator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -427,6 +443,8 @@ export type VehicleCheckOrderByWithRelationInput = {
   allowanceDifferenceAmount?: Prisma.SortOrder
   decisionSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  fieldCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryFinalizedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   collaborator?: Prisma.UserOrderByWithRelationInput
@@ -463,6 +481,8 @@ export type VehicleCheckWhereUniqueInput = Prisma.AtLeast<{
   allowanceDifferenceAmount?: Prisma.DecimalFilter<"VehicleCheck"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   notes?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
+  fieldCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
+  summaryFinalizedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   collaborator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -496,6 +516,8 @@ export type VehicleCheckOrderByWithAggregationInput = {
   allowanceDifferenceAmount?: Prisma.SortOrder
   decisionSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  fieldCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryFinalizedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VehicleCheckCountOrderByAggregateInput
@@ -531,6 +553,8 @@ export type VehicleCheckScalarWhereWithAggregatesInput = {
   allowanceDifferenceAmount?: Prisma.DecimalWithAggregatesFilter<"VehicleCheck"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.StringNullableWithAggregatesFilter<"VehicleCheck"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"VehicleCheck"> | string | null
+  fieldCompletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"VehicleCheck"> | Date | string | null
+  summaryFinalizedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"VehicleCheck"> | Date | string
 }
@@ -554,6 +578,8 @@ export type VehicleCheckCreateInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -587,6 +613,8 @@ export type VehicleCheckUncheckedCreateInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -612,6 +640,8 @@ export type VehicleCheckUpdateInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -645,6 +675,8 @@ export type VehicleCheckUncheckedUpdateInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -674,6 +706,8 @@ export type VehicleCheckCreateManyInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -697,6 +731,8 @@ export type VehicleCheckUpdateManyMutationInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -724,6 +760,8 @@ export type VehicleCheckUncheckedUpdateManyInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -761,6 +799,8 @@ export type VehicleCheckCountOrderByAggregateInput = {
   allowanceDifferenceAmount?: Prisma.SortOrder
   decisionSummary?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  fieldCompletedAt?: Prisma.SortOrder
+  summaryFinalizedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -799,6 +839,8 @@ export type VehicleCheckMaxOrderByAggregateInput = {
   allowanceDifferenceAmount?: Prisma.SortOrder
   decisionSummary?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  fieldCompletedAt?: Prisma.SortOrder
+  summaryFinalizedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -826,6 +868,8 @@ export type VehicleCheckMinOrderByAggregateInput = {
   allowanceDifferenceAmount?: Prisma.SortOrder
   decisionSummary?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  fieldCompletedAt?: Prisma.SortOrder
+  summaryFinalizedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1081,6 +1125,8 @@ export type VehicleCheckCreateWithoutCollaboratorInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   agency: Prisma.AgencyCreateNestedOneWithoutVehicleChecksInput
@@ -1112,6 +1158,8 @@ export type VehicleCheckUncheckedCreateWithoutCollaboratorInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1170,6 +1218,8 @@ export type VehicleCheckScalarWhereInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFilter<"VehicleCheck"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   notes?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
+  fieldCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
+  summaryFinalizedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
 }
@@ -1193,6 +1243,8 @@ export type VehicleCheckCreateWithoutAgencyInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1224,6 +1276,8 @@ export type VehicleCheckUncheckedCreateWithoutAgencyInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1275,6 +1329,8 @@ export type VehicleCheckCreateWithoutManufacturerInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1306,6 +1362,8 @@ export type VehicleCheckUncheckedCreateWithoutManufacturerInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1357,6 +1415,8 @@ export type VehicleCheckCreateWithoutVehicleModelInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1388,6 +1448,8 @@ export type VehicleCheckUncheckedCreateWithoutVehicleModelInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1439,6 +1501,8 @@ export type VehicleCheckCreateWithoutItemsInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1471,6 +1535,8 @@ export type VehicleCheckUncheckedCreateWithoutItemsInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1511,6 +1577,8 @@ export type VehicleCheckUpdateWithoutItemsInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -1543,6 +1611,8 @@ export type VehicleCheckUncheckedUpdateWithoutItemsInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -1567,6 +1637,8 @@ export type VehicleCheckCreateWithoutExternalQuotesInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1599,6 +1671,8 @@ export type VehicleCheckUncheckedCreateWithoutExternalQuotesInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1639,6 +1713,8 @@ export type VehicleCheckUpdateWithoutExternalQuotesInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -1671,6 +1747,8 @@ export type VehicleCheckUncheckedUpdateWithoutExternalQuotesInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -1698,6 +1776,8 @@ export type VehicleCheckCreateManyCollaboratorInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1721,6 +1801,8 @@ export type VehicleCheckUpdateWithoutCollaboratorInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   agency?: Prisma.AgencyUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -1752,6 +1834,8 @@ export type VehicleCheckUncheckedUpdateWithoutCollaboratorInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -1780,6 +1864,8 @@ export type VehicleCheckUncheckedUpdateManyWithoutCollaboratorInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1806,6 +1892,8 @@ export type VehicleCheckCreateManyAgencyInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1829,6 +1917,8 @@ export type VehicleCheckUpdateWithoutAgencyInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -1860,6 +1950,8 @@ export type VehicleCheckUncheckedUpdateWithoutAgencyInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -1888,6 +1980,8 @@ export type VehicleCheckUncheckedUpdateManyWithoutAgencyInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1914,6 +2008,8 @@ export type VehicleCheckCreateManyManufacturerInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1937,6 +2033,8 @@ export type VehicleCheckUpdateWithoutManufacturerInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -1968,6 +2066,8 @@ export type VehicleCheckUncheckedUpdateWithoutManufacturerInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -1996,6 +2096,8 @@ export type VehicleCheckUncheckedUpdateManyWithoutManufacturerInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2022,6 +2124,8 @@ export type VehicleCheckCreateManyVehicleModelInput = {
   allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: string | null
   notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2045,6 +2149,8 @@ export type VehicleCheckUpdateWithoutVehicleModelInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2076,6 +2182,8 @@ export type VehicleCheckUncheckedUpdateWithoutVehicleModelInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2104,6 +2212,8 @@ export type VehicleCheckUncheckedUpdateManyWithoutVehicleModelInput = {
   allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2171,6 +2281,8 @@ export type VehicleCheckSelect<ExtArgs extends runtime.Types.Extensions.Internal
   allowanceDifferenceAmount?: boolean
   decisionSummary?: boolean
   notes?: boolean
+  fieldCompletedAt?: boolean
+  summaryFinalizedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2205,6 +2317,8 @@ export type VehicleCheckSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   allowanceDifferenceAmount?: boolean
   decisionSummary?: boolean
   notes?: boolean
+  fieldCompletedAt?: boolean
+  summaryFinalizedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2236,6 +2350,8 @@ export type VehicleCheckSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   allowanceDifferenceAmount?: boolean
   decisionSummary?: boolean
   notes?: boolean
+  fieldCompletedAt?: boolean
+  summaryFinalizedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2267,11 +2383,13 @@ export type VehicleCheckSelectScalar = {
   allowanceDifferenceAmount?: boolean
   decisionSummary?: boolean
   notes?: boolean
+  fieldCompletedAt?: boolean
+  summaryFinalizedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VehicleCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "checkNumber" | "collaboratorId" | "agencyId" | "manufacturerId" | "vehicleModelId" | "licensePlate" | "licensePlateRaw" | "licensePlateCountry" | "licensePlateRecognitionConfidence" | "mileage" | "checkDate" | "city" | "status" | "totalInternalSavingAmount" | "totalInternalCost" | "totalExternalCost" | "totalDifferenceAmount" | "constructorAllowanceAmount" | "allowanceDifferenceAmount" | "decisionSummary" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheck"]>
+export type VehicleCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "checkNumber" | "collaboratorId" | "agencyId" | "manufacturerId" | "vehicleModelId" | "licensePlate" | "licensePlateRaw" | "licensePlateCountry" | "licensePlateRecognitionConfidence" | "mileage" | "checkDate" | "city" | "status" | "totalInternalSavingAmount" | "totalInternalCost" | "totalExternalCost" | "totalDifferenceAmount" | "constructorAllowanceAmount" | "allowanceDifferenceAmount" | "decisionSummary" | "notes" | "fieldCompletedAt" | "summaryFinalizedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheck"]>
 export type VehicleCheckInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   agency?: boolean | Prisma.AgencyDefaultArgs<ExtArgs>
@@ -2327,6 +2445,8 @@ export type $VehicleCheckPayload<ExtArgs extends runtime.Types.Extensions.Intern
     allowanceDifferenceAmount: runtime.Decimal
     decisionSummary: string | null
     notes: string | null
+    fieldCompletedAt: Date | null
+    summaryFinalizedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["vehicleCheck"]>
@@ -2780,6 +2900,8 @@ export interface VehicleCheckFieldRefs {
   readonly allowanceDifferenceAmount: Prisma.FieldRef<"VehicleCheck", 'Decimal'>
   readonly decisionSummary: Prisma.FieldRef<"VehicleCheck", 'String'>
   readonly notes: Prisma.FieldRef<"VehicleCheck", 'String'>
+  readonly fieldCompletedAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
+  readonly summaryFinalizedAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
 }

@@ -1633,6 +1633,8 @@ export const VehicleCheckScalarFieldEnum = {
   allowanceDifferenceAmount: 'allowanceDifferenceAmount',
   decisionSummary: 'decisionSummary',
   notes: 'notes',
+  fieldCompletedAt: 'fieldCompletedAt',
+  summaryFinalizedAt: 'summaryFinalizedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1655,6 +1657,7 @@ export const VehicleCheckItemScalarFieldEnum = {
   comment: 'comment',
   operationalStatus: 'operationalStatus',
   operationalComment: 'operationalComment',
+  selectedForSummary: 'selectedForSummary',
   partOrderRequired: 'partOrderRequired',
   partOrderStatus: 'partOrderStatus',
   partOrderPrice: 'partOrderPrice',

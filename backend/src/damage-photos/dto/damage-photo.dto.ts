@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, IsUrl, MaxLength, Min } from 'class-validator';
 
 export class DamagePhotoDto {
@@ -11,6 +11,11 @@ export class DamagePhotoDto {
   @MaxLength(255)
   assetId?: string;
 
+  @Transform(({ value }) =>
+    typeof value === 'string' && value.startsWith('/cloudinary/')
+      ? `https://res.cloudinary.com/${value.slice('/cloudinary/'.length)}`
+      : value,
+  )
   @IsUrl({ require_protocol: true })
   secureUrl: string;
 

@@ -22,6 +22,7 @@ export class DashboardService {
     const [
       vehicleChecksCount,
       completedVehicleChecksCount,
+      vehicleChecksToAnalyzeCount,
       draftVehicleChecksCount,
       totals,
       alertItemsCount,
@@ -30,7 +31,10 @@ export class DashboardService {
     ] = await Promise.all([
       this.prisma.vehicleCheck.count({ where: vehicleCheckScope }),
       this.prisma.vehicleCheck.count({
-        where: { ...vehicleCheckScope, status: VehicleCheckStatus.COMPLETED },
+        where: { ...vehicleCheckScope, status: VehicleCheckStatus.SUMMARY_READY },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: { ...vehicleCheckScope, status: VehicleCheckStatus.TO_ANALYZE },
       }),
       this.prisma.vehicleCheck.count({
         where: { ...vehicleCheckScope, status: VehicleCheckStatus.DRAFT },
@@ -88,6 +92,7 @@ export class DashboardService {
     return {
       vehicleChecksCount,
       completedVehicleChecksCount,
+      vehicleChecksToAnalyzeCount,
       draftVehicleChecksCount,
       totalInternalSavingAmount: this.money(totals._sum.totalInternalSavingAmount),
       totalInternalCost: this.money(totals._sum.totalInternalCost),

@@ -16,7 +16,14 @@ const operationalStatusLabels = {
   CANCELLED: "Annulee",
 } as const;
 
-export async function downloadVehicleCheckPdf(vehicleCheck: VehicleCheck) {
+export async function createVehicleCheckPdfFile(vehicleCheck: VehicleCheck) {
+  if (vehicleCheck.status !== "SUMMARY_READY") {
+    throw new Error("The summary is not ready");
+  }
+
+  const summaryItems = (vehicleCheck.items ?? []).filter(
+    (item) => item.selectedForSummary,
+  );
   const { jsPDF } = await import("jspdf");
   const document = new jsPDF({ format: "a4", unit: "mm" });
   const pageWidth = document.internal.pageSize.getWidth();
@@ -130,14 +137,18 @@ export async function downloadVehicleCheckPdf(vehicleCheck: VehicleCheck) {
   );
   y += 12;
 
-  addSectionTitle("Synthese decision");
-  addWrappedText(vehicleCheck.decisionSummary?.trim() || "Aucun degat constate.");
+  addSectionTitle("Travaux selectionnes");
+  addWrappedText(
+    summaryItems.length
+      ? `${summaryItems.length} reparation(s) retenue(s) pour la demande de devis.`
+      : "Aucune reparation retenue.",
+  );
 
-  addSectionTitle("Reparations constatees");
-  if (!vehicleCheck.items?.length) {
-    addWrappedText("Aucun degat signale sur ce vehicule.", { color: [6, 95, 70] });
+  addSectionTitle("Reparations a chiffrer");
+  if (!summaryItems.length) {
+    addWrappedText("Aucune reparation selectionnee pour ce vehicule.", { color: [6, 95, 70] });
   } else {
-    vehicleCheck.items.forEach((item, index) => {
+    summaryItems.forEach((item, index) => {
       const detailLines = [
         item.decisionMessage?.trim() || null,
         item.comment?.trim() ? `Commentaire : ${item.comment}` : null,
@@ -189,5 +200,48 @@ export async function downloadVehicleCheckPdf(vehicleCheck: VehicleCheck) {
     );
   }
 
-  document.save(`${vehicleCheck.checkNumber}.pdf`);
+  return new File([document.output("blob")], `${vehicleCheck.checkNumber}.pdf`, {
+    type: "application/pdf",
+  });
+}
+
+export async function downloadVehicleCheckPdf(vehicleCheck: VehicleCheck) {
+  const file = await createVehicleCheckPdfFile(vehicleCheck);
+  downloadPdfFile(file);
+}
+
+export function downloadPdfFile(file: File) {
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = file.name;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export async function shareVehicleCheckPdfByEmail(vehicleCheck: VehicleCheck) {
+  const licensePlate = formatLicensePlate(
+    vehicleCheck.licensePlate,
+    vehicleCheck.licensePlateCountry,
+    vehicleCheck.licensePlateRaw,
+  );
+  const subject = `Véhicule control : ${licensePlate}`;
+  const body = `Bonjour,\n\nVeuillez trouver la synthèse du véhicule ${licensePlate} en pièce jointe.\n\nCordialement`;
+  const file = await createVehicleCheckPdfFile(vehicleCheck);
+  const shareData = { title: subject, text: body, files: [file] };
+
+  if (
+    typeof navigator.share === "function" &&
+    (typeof navigator.canShare !== "function" || navigator.canShare(shareData))
+  ) {
+    await navigator.share(shareData);
+    return { shared: true, downloaded: false };
+  }
+
+  downloadPdfFile(file);
+  window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+    `${body}\n\nLe PDF vient d'être téléchargé : ajoute-le à ton email avant l'envoi.`,
+  )}`;
+
+  return { shared: false, downloaded: true };
 }

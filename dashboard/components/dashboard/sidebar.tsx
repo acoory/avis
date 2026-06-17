@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Building2, Car, ClipboardList, Gauge, MapPin, Settings, Users, Wrench, X } from "lucide-react";
+import { Building2, ClipboardList, Gauge, MapPin, Settings, Users, Wrench, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
@@ -17,7 +17,7 @@ const navigation = [
   { label: "Types reparations", href: "/dashboard/repair-types", icon: Wrench, roles: ["ADMIN"] as Role[] },
   { label: "Constructeurs", href: "/dashboard/manufacturers", icon: Building2, roles: ["ADMIN"] as Role[] },
   // { label: "Rapports", href: "/dashboard/reports", icon: BarChart3 },
-  // { label: "Parametres", href: "/dashboard/settings", icon: Settings },
+  { label: "Parametres", href: "/dashboard/settings", icon: Settings },
 ];
 
 type SidebarProps = {

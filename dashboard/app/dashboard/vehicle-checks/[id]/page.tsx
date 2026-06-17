@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { VehicleCheckActions } from "@/components/business/vehicle-check-actions";
 import { VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { RepairItemsTable } from "@/components/business/vehicle-check-table";
+import { VehicleCheckSummarySelection } from "@/components/business/vehicle-check-summary-selection";
 import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
@@ -89,7 +90,7 @@ export default function VehicleCheckDetailsPage() {
             {vehicleCheck.vehicleModel?.name ? ` · ${vehicleCheck.vehicleModel.name}` : ""}
           </p>
         </div>
-        <VehicleCheckActions vehicleCheck={vehicleCheck} onCompleted={setVehicleCheck} />
+        <VehicleCheckActions vehicleCheck={vehicleCheck} onUpdated={setVehicleCheck} />
       </div>
 
       <Card>
@@ -127,6 +128,10 @@ export default function VehicleCheckDetailsPage() {
             ) : null}
           </CardContent>
         </Card>
+      ) : null}
+
+      {vehicleCheck.status === "TO_ANALYZE" || vehicleCheck.status === "SUMMARY_READY" ? (
+        <VehicleCheckSummarySelection vehicleCheck={vehicleCheck} onUpdated={setVehicleCheck} />
       ) : null}
 
       <section className="mt-6">

@@ -1,27 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Download, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle2, Download, Mail, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
 import { Button } from "@/components/ui/button";
-import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
+import {
+  downloadVehicleCheckPdf,
+  shareVehicleCheckPdfByEmail,
+} from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
 
 type VehicleCheckActionsProps = {
   vehicleCheck: VehicleCheck;
-  onCompleted: (vehicleCheck: VehicleCheck) => void;
+  onUpdated: (vehicleCheck: VehicleCheck) => void;
 };
 
-export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckActionsProps) {
+export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckActionsProps) {
   const router = useRouter();
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
+  const canShareSummary = vehicleCheck.status === "SUMMARY_READY";
   const canDelete = true;
 
   async function handleComplete() {
@@ -29,10 +34,10 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
 
     try {
       const completed = await businessService.completeVehicleCheck(vehicleCheck.id);
-      onCompleted(completed);
-      toast.success("Controle complete avec succes.");
+      onUpdated(completed);
+      toast.success("Controle terrain termine. Il est maintenant a analyser.");
     } catch {
-      toast.error("Impossible de completer ce controle. Verifie les reparations interdites.");
+      toast.error("Impossible de terminer ce controle terrain.");
     } finally {
       setIsCompleting(false);
     }
@@ -50,19 +55,53 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
     }
   }
 
+  async function handleEmail() {
+    setIsSharing(true);
+
+    try {
+      const result = await shareVehicleCheckPdfByEmail(vehicleCheck);
+      if (result.shared) {
+        toast.success("Synthese transmise a l'application de partage.");
+      } else {
+        toast.info("Le PDF a ete telecharge. Ajoute-le en piece jointe dans l'email.");
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      toast.error("Impossible de preparer l'email.");
+    } finally {
+      setIsSharing(false);
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col gap-2 sm:items-end">
         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
-          <Button
-            className="w-full sm:w-auto"
-            disabled={isDownloading}
-            variant="outline"
-            onClick={handleDownload}
-          >
-            <Download className="h-4 w-4" />
-            {isDownloading ? "Generation..." : "PDF"}
-          </Button>
+          {canShareSummary ? (
+            <Button
+              className="w-full sm:w-auto"
+              disabled={isDownloading}
+              variant="outline"
+              onClick={handleDownload}
+            >
+              <Download className="h-4 w-4" />
+              {isDownloading ? "Generation..." : "PDF"}
+            </Button>
+          ) : null}
+          {canShareSummary ? (
+            <Button
+              className="w-full sm:w-auto"
+              disabled={isSharing}
+              type="button"
+              variant="outline"
+              onClick={handleEmail}
+            >
+              <Mail className="h-4 w-4" />
+              {isSharing ? "Preparation..." : "Envoyer par mail"}
+            </Button>
+          ) : null}
           <Button asChild className="w-full sm:w-auto" variant="outline">
             <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>
               <Pencil className="h-4 w-4" />
@@ -80,10 +119,12 @@ export function VehicleCheckActions({ vehicleCheck, onCompleted }: VehicleCheckA
               Supprimer
             </Button>
           ) : null}
-          <Button className="w-full sm:w-auto" disabled={!canComplete || isCompleting} onClick={handleComplete}>
-            <CheckCircle2 className="h-4 w-4" />
-            {isCompleting ? "Completion..." : "Completer"}
-          </Button>
+          {canComplete ? (
+            <Button className="w-full sm:w-auto" disabled={isCompleting} onClick={handleComplete}>
+              <CheckCircle2 className="h-4 w-4" />
+              {isCompleting ? "Finalisation..." : "Terminer le controle"}
+            </Button>
+          ) : null}
         </div>
       </div>
       <VehicleCheckDeleteDialog

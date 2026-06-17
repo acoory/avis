@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PreviewRepairDecisionDto } from '../repair-decisions/dto/preview-repair-decision.dto';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
+import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
 import { VehicleChecksService } from './vehicle-checks.service';
@@ -45,6 +46,15 @@ export class VehicleChecksController {
   @Post(':id/complete')
   complete(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
     return this.vehicleChecksService.complete(id, user);
+  }
+
+  @Post(':id/finalize-summary')
+  finalizeSummary(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: FinalizeVehicleCheckSummaryDto,
+  ) {
+    return this.vehicleChecksService.finalizeSummary(id, dto, user);
   }
 
   @Post('preview-decision')

@@ -18,7 +18,8 @@ enum Role {
 
 enum VehicleCheckStatus {
   DRAFT
-  COMPLETED
+  TO_ANALYZE
+  SUMMARY_READY
   CANCELLED
 }
 
@@ -198,30 +199,32 @@ model ManufacturerRepairRule {
 }
 
 model VehicleCheck {
-  id                         String             @id @default(uuid())
-  checkNumber                String             @unique
-  collaboratorId             String
-  agencyId                   String
-  manufacturerId             String
-  vehicleModelId             String?
-  licensePlate               String
-  licensePlateRaw            String?
-  licensePlateCountry        String             @default("FR")
+  id                                String             @id @default(uuid())
+  checkNumber                       String             @unique
+  collaboratorId                    String
+  agencyId                          String
+  manufacturerId                    String
+  vehicleModelId                    String?
+  licensePlate                      String
+  licensePlateRaw                   String?
+  licensePlateCountry               String             @default("FR")
   licensePlateRecognitionConfidence Float?
-  mileage                    Int?
-  checkDate                  DateTime           @default(now())
-  city                       String
-  status                     VehicleCheckStatus @default(DRAFT)
-  totalInternalSavingAmount  Decimal            @default(0) @db.Decimal(12, 2)
-  totalInternalCost          Decimal            @default(0) @db.Decimal(12, 2)
-  totalExternalCost          Decimal            @default(0) @db.Decimal(12, 2)
-  totalDifferenceAmount      Decimal            @default(0) @db.Decimal(12, 2)
-  constructorAllowanceAmount Decimal            @default(0) @db.Decimal(12, 2)
-  allowanceDifferenceAmount  Decimal            @default(0) @db.Decimal(12, 2)
-  decisionSummary            String?
-  notes                      String?
-  createdAt                  DateTime           @default(now())
-  updatedAt                  DateTime           @updatedAt
+  mileage                           Int?
+  checkDate                         DateTime           @default(now())
+  city                              String
+  status                            VehicleCheckStatus @default(DRAFT)
+  totalInternalSavingAmount         Decimal            @default(0) @db.Decimal(12, 2)
+  totalInternalCost                 Decimal            @default(0) @db.Decimal(12, 2)
+  totalExternalCost                 Decimal            @default(0) @db.Decimal(12, 2)
+  totalDifferenceAmount             Decimal            @default(0) @db.Decimal(12, 2)
+  constructorAllowanceAmount        Decimal            @default(0) @db.Decimal(12, 2)
+  allowanceDifferenceAmount         Decimal            @default(0) @db.Decimal(12, 2)
+  decisionSummary                   String?
+  notes                             String?
+  fieldCompletedAt                  DateTime?
+  summaryFinalizedAt                DateTime?
+  createdAt                         DateTime           @default(now())
+  updatedAt                         DateTime           @updatedAt
 
   collaborator   User               @relation("VehicleCheckCollaborator", fields: [collaboratorId], references: [id], onDelete: Restrict)
   agency         Agency             @relation(fields: [agencyId], references: [id], onDelete: Restrict)
@@ -241,31 +244,32 @@ model VehicleCheck {
 }
 
 model VehicleCheckItem {
-  id                        String               @id @default(uuid())
+  id                        String                            @id @default(uuid())
   vehicleCheckId            String
   repairTypeId              String
   vehiclePartId             String
-  quantity                  Int                  @default(1)
-  unitInternalSavingAmount  Decimal              @default(0) @db.Decimal(12, 2)
-  totalInternalSavingAmount Decimal              @default(0) @db.Decimal(12, 2)
-  unitInternalCost          Decimal              @default(0) @db.Decimal(12, 2)
-  totalInternalCost         Decimal              @default(0) @db.Decimal(12, 2)
-  decisionStatus            RepairDecisionStatus @default(ACCEPTED)
+  quantity                  Int                               @default(1)
+  unitInternalSavingAmount  Decimal                           @default(0) @db.Decimal(12, 2)
+  totalInternalSavingAmount Decimal                           @default(0) @db.Decimal(12, 2)
+  unitInternalCost          Decimal                           @default(0) @db.Decimal(12, 2)
+  totalInternalCost         Decimal                           @default(0) @db.Decimal(12, 2)
+  decisionStatus            RepairDecisionStatus              @default(ACCEPTED)
   decisionMessage           String?
   comment                   String?
   operationalStatus         VehicleCheckItemOperationalStatus @default(ACTIVE)
   operationalComment        String?
-  partOrderRequired         Boolean              @default(false)
-  partOrderStatus           PartOrderStatus      @default(NOT_REQUIRED)
-  partOrderPrice            Decimal?             @db.Decimal(12, 2)
+  selectedForSummary        Boolean                           @default(true)
+  partOrderRequired         Boolean                           @default(false)
+  partOrderStatus           PartOrderStatus                   @default(NOT_REQUIRED)
+  partOrderPrice            Decimal?                          @db.Decimal(12, 2)
   partOrderReference        String?
   partOrderedAt             DateTime?
-  createdAt                 DateTime             @default(now())
-  updatedAt                 DateTime             @updatedAt
+  createdAt                 DateTime                          @default(now())
+  updatedAt                 DateTime                          @updatedAt
 
-  vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
-  repairType   RepairType   @relation(fields: [repairTypeId], references: [id], onDelete: Restrict)
-  vehiclePart  VehiclePart  @relation(fields: [vehiclePartId], references: [id], onDelete: Restrict)
+  vehicleCheck    VehicleCheck                    @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  repairType      RepairType                      @relation(fields: [repairTypeId], references: [id], onDelete: Restrict)
+  vehiclePart     VehiclePart                     @relation(fields: [vehiclePartId], references: [id], onDelete: Restrict)
   statusHistories VehicleCheckItemStatusHistory[]
   photos          VehicleCheckItemPhoto[]
 
@@ -296,13 +300,13 @@ model VehicleCheckItemPhoto {
 }
 
 model VehicleCheckItemStatusHistory {
-  id                 String                           @id @default(uuid())
+  id                 String                            @id @default(uuid())
   vehicleCheckItemId String
   userId             String?
   fromStatus         VehicleCheckItemOperationalStatus
   toStatus           VehicleCheckItemOperationalStatus
   comment            String?
-  createdAt          DateTime                         @default(now())
+  createdAt          DateTime                          @default(now())
 
   vehicleCheckItem VehicleCheckItem @relation(fields: [vehicleCheckItemId], references: [id], onDelete: Cascade)
   user             User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
