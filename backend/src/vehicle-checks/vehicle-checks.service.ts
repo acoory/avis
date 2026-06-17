@@ -316,10 +316,6 @@ export class VehicleChecksService {
   async remove(id: string, user: CurrentUserPayload) {
     const vehicleCheck = await this.findOne(id, user);
 
-    if (vehicleCheck.status !== VehicleCheckStatus.DRAFT) {
-      throw new BadRequestException('Only draft vehicle checks can be deleted');
-    }
-
     const photoPublicIds = vehicleCheck.items.flatMap((item) =>
       item.photos.map((photo) => photo.publicId),
     );

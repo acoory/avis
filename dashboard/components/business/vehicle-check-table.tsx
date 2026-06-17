@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { Eye, Pencil, X } from "lucide-react";
+import { Eye, Pencil, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DecisionBadge, VehicleCheckStatusBadge } from "@/components/business/decision-badge";
+import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
 import { DataTable } from "@/components/dashboard/data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cloudinaryThumbnailUrl } from "@/lib/damage-photo";
+import { cloudinaryOriginalUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck, VehicleCheckItem, VehicleCheckItemOperationalStatus } from "@/types/business";
@@ -16,111 +17,156 @@ type VehicleCheckTableProps = {
   dateRange?: { dateFrom?: string; dateTo?: string };
   vehicleChecks: VehicleCheck[];
   onDateFilterChange?: (range: { dateFrom?: string; dateTo?: string }) => void;
+  onDeleted?: (vehicleCheck: VehicleCheck) => void;
 };
 
-export function VehicleCheckTable({ dateRange, vehicleChecks, onDateFilterChange }: VehicleCheckTableProps) {
+export function VehicleCheckTable({
+  dateRange,
+  vehicleChecks,
+  onDateFilterChange,
+  onDeleted,
+}: VehicleCheckTableProps) {
+  const [vehicleCheckToDelete, setVehicleCheckToDelete] = useState<VehicleCheck | null>(null);
+
   return (
-    <DataTable
-      data={vehicleChecks}
-      initialSort={{ column: "checkDate", direction: "desc" }}
-      dateFilter={{
-        label: "Date",
-        getValue: (check) => check.checkDate,
-        mode: onDateFilterChange ? "server" : "client",
-        value: dateRange,
-        onChange: onDateFilterChange,
-      }}
-      emptyMessage="Aucun controle pour le moment."
-      minWidth={1040}
-      columns={[
-        {
-          id: "checkNumber",
-          header: "Numero",
-          className: "px-4 py-3 font-medium text-gray-950",
-          cell: (check) => (
-            <Link
-              className="font-semibold text-teal-700 underline-offset-4 hover:underline"
-              href={`/dashboard/vehicle-checks/${check.id}`}
-            >
-              {check.checkNumber}
-            </Link>
-          ),
-          sortValue: (check) => check.checkNumber,
-          searchValue: (check) => check.checkNumber,
-        },
-        {
-          id: "checkDate",
-          header: "Date",
-          cell: (check) => formatDate(check.checkDate),
-          sortValue: (check) => new Date(check.checkDate),
-          searchValue: (check) => formatDate(check.checkDate),
-        },
-        {
-          id: "licensePlate",
-          header: "Vehicule",
-          cell: (check) =>
-            formatLicensePlate(
-              check.licensePlate,
-              check.licensePlateCountry,
-              check.licensePlateRaw,
-            ),
-          sortValue: (check) => check.licensePlate,
-          searchValue: (check) =>
-            `${check.licensePlate} ${check.licensePlateRaw ?? ""} ${formatLicensePlate(
-              check.licensePlate,
-              check.licensePlateCountry,
-              check.licensePlateRaw,
-            )}`,
-        },
-        {
-          id: "manufacturer",
-          header: "Constructeur",
-          cell: (check) => check.manufacturer?.name ?? "-",
-          sortValue: (check) => check.manufacturer?.name,
-          searchValue: (check) => check.manufacturer?.name,
-        },
-        {
-          id: "city",
-          header: "Ville",
-          cell: (check) => check.city,
-          sortValue: (check) => check.city,
-          searchValue: (check) => check.city,
-        },
-        {
-          id: "totalInternalSavingAmount",
-          header: "Economie reference",
-          cell: (check) => formatMoney(check.totalInternalSavingAmount),
-          sortValue: (check) => Number(check.totalInternalSavingAmount),
-          searchValue: (check) => check.totalInternalSavingAmount,
-        },
-        {
-          id: "status",
-          header: "Statut",
-          cell: (check) => <VehicleCheckStatusBadge status={check.status} />,
-          sortValue: (check) => check.status,
-          searchValue: (check) => check.status,
-        },
-        {
-          id: "partOrders",
-          header: "Commandes",
-          cell: (check) => <PartOrderSummaryBadge vehicleCheck={check} />,
-          sortValue: (check) => partOrderSummary(check).toOrder,
-          searchValue: (check) => partOrderSummaryText(check),
-        },
-        {
-          id: "view",
-          header: "Voir",
-          cell: (check) => (
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/dashboard/vehicle-checks/${check.id}`}>
-                <Eye className="h-4 w-4" />
-                Detail
+    <>
+      <DataTable
+        data={vehicleChecks}
+        initialSort={{ column: "checkDate", direction: "desc" }}
+        dateFilter={{
+          label: "Date",
+          getValue: (check) => check.checkDate,
+          mode: onDateFilterChange ? "server" : "client",
+          value: dateRange,
+          onChange: onDateFilterChange,
+        }}
+        emptyMessage="Aucun controle pour le moment."
+        minWidth={1080}
+        columns={[
+          {
+            id: "checkNumber",
+            header: "Numero",
+            className: "px-4 py-3 font-medium text-gray-950",
+            cell: (check) => (
+              <Link
+                className="font-semibold text-teal-700 underline-offset-4 hover:underline"
+                href={`/dashboard/vehicle-checks/${check.id}`}
+              >
+                {check.checkNumber}
               </Link>
-            </Button>
-          ),
-        },
-      ]}
-    />
+            ),
+            sortValue: (check) => check.checkNumber,
+            searchValue: (check) => check.checkNumber,
+          },
+          {
+            id: "checkDate",
+            header: "Date",
+            cell: (check) => formatDate(check.checkDate),
+            sortValue: (check) => new Date(check.checkDate),
+            searchValue: (check) => formatDate(check.checkDate),
+          },
+          {
+            id: "licensePlate",
+            header: "Vehicule",
+            cell: (check) =>
+              formatLicensePlate(
+                check.licensePlate,
+                check.licensePlateCountry,
+                check.licensePlateRaw,
+              ),
+            sortValue: (check) => check.licensePlate,
+            searchValue: (check) =>
+              `${check.licensePlate} ${check.licensePlateRaw ?? ""} ${formatLicensePlate(
+                check.licensePlate,
+                check.licensePlateCountry,
+                check.licensePlateRaw,
+              )}`,
+          },
+          {
+            id: "manufacturer",
+            header: "Constructeur",
+            cell: (check) => check.manufacturer?.name ?? "-",
+            sortValue: (check) => check.manufacturer?.name,
+            searchValue: (check) => check.manufacturer?.name,
+          },
+          {
+            id: "city",
+            header: "Ville",
+            cell: (check) => check.city,
+            sortValue: (check) => check.city,
+            searchValue: (check) => check.city,
+          },
+          {
+            id: "totalInternalSavingAmount",
+            header: "Economie reference",
+            cell: (check) => formatMoney(check.totalInternalSavingAmount),
+            sortValue: (check) => Number(check.totalInternalSavingAmount),
+            searchValue: (check) => check.totalInternalSavingAmount,
+          },
+          {
+            id: "status",
+            header: "Statut",
+            cell: (check) => <VehicleCheckStatusBadge status={check.status} />,
+            sortValue: (check) => check.status,
+            searchValue: (check) => check.status,
+          },
+          {
+            id: "partOrders",
+            header: "Commandes",
+            cell: (check) => <PartOrderSummaryBadge vehicleCheck={check} />,
+            sortValue: (check) => partOrderSummary(check).toOrder,
+            searchValue: (check) => partOrderSummaryText(check),
+          },
+          {
+            id: "actions",
+            header: "Actions",
+            cell: (check) => (
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  asChild
+                  className="h-9 w-9 border-teal-200 px-0 text-teal-700 hover:bg-teal-50 hover:text-teal-800"
+                  size="sm"
+                  title="Detail"
+                  variant="outline"
+                >
+                  <Link
+                    aria-label={`Voir le controle ${check.checkNumber}`}
+                    href={`/dashboard/vehicle-checks/${check.id}`}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button
+                  aria-label={`Supprimer le vehicule ${formatLicensePlate(
+                    check.licensePlate,
+                    check.licensePlateCountry,
+                    check.licensePlateRaw,
+                  )}`}
+                  className="h-9 w-9 border-red-200 px-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                  size="sm"
+                  title="Supprimer"
+                  type="button"
+                  variant="outline"
+                  onClick={() => setVehicleCheckToDelete(check)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ),
+          },
+        ]}
+      />
+      <VehicleCheckDeleteDialog
+        open={Boolean(vehicleCheckToDelete)}
+        vehicleCheck={vehicleCheckToDelete}
+        onOpenChange={(open) => {
+          if (!open) {
+            setVehicleCheckToDelete(null);
+          }
+        }}
+        onDeleted={onDeleted}
+      />
+    </>
   );
 }
 
@@ -233,7 +279,7 @@ export function RepairItemsTable({
                   {item.photos.slice(0, 2).map((photo) => (
                     <a
                       className="block h-9 w-9 overflow-hidden rounded-md border border-gray-200"
-                      href={photo.secureUrl}
+                      href={cloudinaryOriginalUrl(photo)}
                       key={photo.publicId}
                       rel="noreferrer"
                       target="_blank"
@@ -497,7 +543,7 @@ function RepairStatusSheet({
                 {item.photos.map((photo) => (
                   <a
                     className="aspect-square overflow-hidden rounded-md border border-gray-200 bg-gray-100"
-                    href={photo.secureUrl}
+                    href={cloudinaryOriginalUrl(photo)}
                     key={photo.publicId}
                     rel="noreferrer"
                     target="_blank"

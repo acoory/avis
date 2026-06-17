@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { cloudinaryImageUrl } from "@/lib/damage-photo";
 import {
   Agency,
   DashboardSummary,
@@ -187,7 +188,7 @@ export const businessService = {
     return {
       assetId: uploaded.asset_id,
       publicId: uploaded.public_id,
-      secureUrl: uploaded.secure_url,
+      secureUrl: cloudinaryImageUrl(uploaded.secure_url),
       width: uploaded.width,
       height: uploaded.height,
       bytes: uploaded.bytes,

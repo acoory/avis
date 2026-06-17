@@ -311,11 +311,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       : currentVehiclePartId;
   }
 
-  function normalizeQuantityValue(rawValue: string) {
-    const digitsOnly = rawValue.replace(/\D/g, "");
-    return digitsOnly ? Math.max(1, Number(digitsOnly)) : 1;
-  }
-
   function addLine() {
     setLines((current) => [...current, createBlankRepairLine()]);
   }
@@ -505,24 +500,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     const removedLine = lines.find((line) => line.id === id);
     if (removedLine) void removeUnpersistedPhotos(removedLine.photos);
     setLines((current) => current.filter((line) => line.id !== id));
-  }
-
-  function incrementQuantity(id: string) {
-    setLines((current) =>
-      current.map((line) => (line.id === id ? { ...line, quantity: line.quantity + 1 } : line)),
-    );
-  }
-
-  function decrementQuantity(id: string) {
-    setLines((current) =>
-      current.map((line) =>
-        line.id === id ? { ...line, quantity: Math.max(1, line.quantity - 1) } : line,
-      ),
-    );
-  }
-
-  function setQuantity(id: string, rawValue: string) {
-    updateLine(id, { quantity: normalizeQuantityValue(rawValue) });
   }
 
   function buildPayload() {
@@ -867,7 +844,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                 <div className="space-y-2 md:hidden">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-medium text-gray-950">{repairTypeName} x{line.quantity}</p>
+                      <p className="font-medium text-gray-950">{repairTypeName}</p>
                       <p className="mt-1 text-sm text-gray-500">{vehiclePartName}</p>
                     </div>
                     {previewLine ? <DecisionBadge status={previewLine.decisionStatus} /> : null}
@@ -887,14 +864,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                     onRemovePhoto={(photo) => removePhotoFromRepairLine(line.id, photo)}
                     onVehiclePartChange={(vehiclePartId) => changeVehiclePart(line.id, vehiclePartId)}
                     onRepairTypeChange={(repairTypeId) => changeRepairType(line.id, repairTypeId)}
-                    onQuantityChange={(rawValue) => setQuantity(line.id, rawValue)}
-                    onQuantityDelta={(delta) => {
-                      if (delta > 0) {
-                        incrementQuantity(line.id);
-                      } else {
-                        decrementQuantity(line.id);
-                      }
-                    }}
                   />
                 </div>
 
@@ -1002,12 +971,6 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           onAddPhoto={addPhotoToRepairSheet}
           onRemovePhoto={removePhotoFromRepairSheet}
           onVehiclePartChange={changeRepairSheetVehiclePart}
-          onQuantityChange={(rawValue) => patchRepairSheetLine({ quantity: normalizeQuantityValue(rawValue) })}
-          onQuantityDelta={(delta) =>
-            patchRepairSheetLine({
-              quantity: Math.max(1, repairSheetLine.quantity + delta),
-            })
-          }
           onRepairTypeChange={changeRepairSheetType}
         />
       ) : null}
@@ -1171,8 +1134,6 @@ function RepairBottomSheet({
   onAddPhoto,
   onRemovePhoto,
   onVehiclePartChange,
-  onQuantityChange,
-  onQuantityDelta,
   onRepairTypeChange,
 }: {
   isEditing: boolean;
@@ -1187,8 +1148,6 @@ function RepairBottomSheet({
   onAddPhoto: (file: File) => Promise<void>;
   onRemovePhoto: (photo: DamagePhoto) => Promise<void>;
   onVehiclePartChange: (vehiclePartId: string) => void;
-  onQuantityChange: (rawValue: string) => void;
-  onQuantityDelta: (delta: number) => void;
   onRepairTypeChange: (repairTypeId: string) => void;
 }) {
   const previewItem = preview?.items[0];
@@ -1240,8 +1199,6 @@ function RepairBottomSheet({
             onAddPhoto={onAddPhoto}
             onRemovePhoto={onRemovePhoto}
             onVehiclePartChange={onVehiclePartChange}
-            onQuantityChange={onQuantityChange}
-            onQuantityDelta={onQuantityDelta}
             onRepairTypeChange={onRepairTypeChange}
           />
         </div>
@@ -1269,8 +1226,6 @@ function RepairEditorFields({
   onAddPhoto,
   onRemovePhoto,
   onVehiclePartChange,
-  onQuantityChange,
-  onQuantityDelta,
   onRepairTypeChange,
 }: {
   layout?: "default" | "sheet";
@@ -1282,13 +1237,11 @@ function RepairEditorFields({
   onAddPhoto: (file: File) => Promise<void>;
   onRemovePhoto: (photo: DamagePhoto) => Promise<void>;
   onVehiclePartChange: (vehiclePartId: string) => void;
-  onQuantityChange: (rawValue: string) => void;
-  onQuantityDelta: (delta: number) => void;
   onRepairTypeChange: (repairTypeId: string) => void;
 }) {
   const lineRequiresNoVehiclePart = isVehiclePartOptional(line.repairTypeId);
   const gridClass =
-    layout === "sheet" ? "grid gap-3" : "grid gap-3 lg:grid-cols-[1fr_1fr_140px]";
+    layout === "sheet" ? "grid gap-3" : "grid gap-3 lg:grid-cols-2";
   const quickButtonsClass =
     layout === "sheet"
       ? "mt-2 flex w-full min-w-0 flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] [touch-action:pan-x] [&::-webkit-scrollbar]:hidden"
@@ -1361,33 +1314,6 @@ function RepairEditorFields({
           </div>
         </div>
 
-        <div className="min-w-0 space-y-2">
-          <Label>Quantite</Label>
-          <div className="grid grid-cols-[48px_1fr_48px] overflow-hidden rounded-md border border-gray-200 bg-white">
-            <button
-              className="h-12 border-r border-gray-200 text-lg font-semibold text-gray-700"
-              type="button"
-              onClick={() => onQuantityDelta(-1)}
-            >
-              -
-            </button>
-            <Input
-              className="h-12 rounded-none border-0 px-1 text-center text-base font-semibold shadow-none focus:border-0"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              type="text"
-              value={String(line.quantity)}
-              onChange={(event) => onQuantityChange(event.target.value)}
-            />
-            <button
-              className="h-12 border-l border-gray-200 text-lg font-semibold text-gray-700"
-              type="button"
-              onClick={() => onQuantityDelta(1)}
-            >
-              +
-            </button>
-          </div>
-        </div>
       </div>
 
       <div className="space-y-2">
@@ -1401,6 +1327,7 @@ function RepairEditorFields({
       </div>
 
       <RepairPhotoField
+        compact={layout === "sheet"}
         photos={line.photos}
         onAdd={onAddPhoto}
         onRemove={onRemovePhoto}
@@ -1420,10 +1347,12 @@ function RepairEditorFields({
 }
 
 function RepairPhotoField({
+  compact = false,
   photos,
   onAdd,
   onRemove,
 }: {
+  compact?: boolean;
   photos: DamagePhoto[];
   onAdd: (file: File) => Promise<void>;
   onRemove: (photo: DamagePhoto) => Promise<void>;
@@ -1445,9 +1374,9 @@ function RepairPhotoField({
   }
 
   return (
-    <div className="space-y-2">
+    <div className={compact ? "space-y-1.5" : "space-y-2"}>
       <div className="flex items-center justify-between gap-3">
-        <Label>Photos du degat</Label>
+        <Label>{compact ? "Photos" : "Photos du degat"}</Label>
         <span className="text-xs text-gray-500">{photos.length}/3 · Facultatif</span>
       </div>
       <input
@@ -1458,10 +1387,19 @@ function RepairPhotoField({
         type="file"
         onChange={(event) => void handleFile(event.target.files?.[0])}
       />
-      <div className="grid grid-cols-3 gap-2">
+      <div
+        className={
+          compact
+            ? "flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            : "grid grid-cols-3 gap-2"
+        }
+      >
         {photos.map((photo) => (
           <div
-            className="relative aspect-square overflow-hidden rounded-md border border-gray-200 bg-gray-100"
+            className={[
+              "relative aspect-square overflow-hidden rounded-md border border-gray-200 bg-gray-100",
+              compact ? "h-16 w-16 shrink-0" : "",
+            ].join(" ")}
             key={photo.publicId}
           >
             <img
@@ -1471,7 +1409,10 @@ function RepairPhotoField({
             />
             <button
               aria-label="Supprimer la photo"
-              className="absolute right-1 top-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-black/70 text-white"
+              className={[
+                "absolute right-1 top-1 flex cursor-pointer items-center justify-center rounded-full bg-black/70 text-white",
+                compact ? "h-7 w-7" : "h-8 w-8",
+              ].join(" ")}
               type="button"
               onClick={() => void onRemove(photo)}
             >
@@ -1481,7 +1422,12 @@ function RepairPhotoField({
         ))}
         {photos.length < 3 ? (
           <button
-            className="flex aspect-square min-h-20 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 text-sm font-medium text-gray-600 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800"
+            className={[
+              "flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 font-medium text-gray-600 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800",
+              compact
+                ? "h-16 w-16 shrink-0 gap-1 text-xs"
+                : "aspect-square min-h-20 gap-2 text-sm",
+            ].join(" ")}
             disabled={isUploading}
             type="button"
             onClick={() => inputRef.current?.click()}
@@ -1489,15 +1435,17 @@ function RepairPhotoField({
             {isUploading ? (
               <LoaderCircle className="h-5 w-5 animate-spin" />
             ) : (
-              <ImagePlus className="h-5 w-5" />
+              <ImagePlus className={compact ? "h-4 w-4" : "h-5 w-5"} />
             )}
-            <span>{isUploading ? "Envoi..." : "Ajouter"}</span>
+            <span>{isUploading ? "Envoi..." : compact ? "Photo" : "Ajouter"}</span>
           </button>
         ) : null}
       </div>
-      <p className="text-xs text-gray-500">
-        Image compressee automatiquement avant l'envoi.
-      </p>
+      {!compact ? (
+        <p className="text-xs text-gray-500">
+          Image compressee automatiquement avant l'envoi.
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -1750,7 +1698,7 @@ function DecisionSummaryPanel({
                   <div>
                     <p className="text-sm text-gray-500">{item.vehiclePartName}</p>
                     <p className="font-medium text-gray-950">
-                      {item.repairTypeName} x{item.quantity}
+                      {item.repairTypeName}
                     </p>
                     <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
                     {item.partOrderRequired ? <PartOrderDraftBadge /> : null}
@@ -1880,7 +1828,7 @@ function ValidationRecap({
                       <div>
                         <p className="text-sm text-gray-500">{item.vehiclePartName}</p>
                         <p className="font-medium text-gray-950">
-                          {item.repairTypeName} x{item.quantity}
+                          {item.repairTypeName}
                         </p>
                         <p className="mt-1 text-sm text-gray-600">{item.decisionMessage}</p>
                         {item.partOrderRequired ? <PartOrderDraftBadge /> : null}

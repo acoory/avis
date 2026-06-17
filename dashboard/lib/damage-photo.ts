@@ -24,7 +24,38 @@ export async function optimizeDamagePhoto(file: File) {
 }
 
 export function cloudinaryThumbnailUrl(photo: DamagePhoto, width = 320) {
-  return photo.secureUrl.replace("/upload/", `/upload/f_auto,q_auto,c_limit,w_${width}/`);
+  return cloudinaryProxyUrl(
+    photo.secureUrl.replace("/upload/", `/upload/f_auto,q_auto,c_limit,w_${width}/`),
+  );
+}
+
+export function cloudinaryOriginalUrl(photo: DamagePhoto) {
+  return cloudinaryProxyUrl(photo.secureUrl);
+}
+
+export function cloudinaryImageUrl(url: string) {
+  return cloudinaryProxyUrl(url);
+}
+
+function cloudinaryProxyUrl(url: string) {
+  if (url.startsWith("/cloudinary/")) {
+    return url;
+  }
+
+  const parsedUrl = parseUrl(url);
+  if (!parsedUrl || parsedUrl.hostname !== "res.cloudinary.com") {
+    return url;
+  }
+
+  return `/cloudinary${parsedUrl.pathname}${parsedUrl.search}`;
+}
+
+function parseUrl(url: string) {
+  try {
+    return new URL(url);
+  } catch {
+    return null;
+  }
 }
 
 function loadImage(file: File) {
