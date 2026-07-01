@@ -17,6 +17,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
 import { CloudinaryService } from '../damage-photos/cloudinary.service';
+import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
@@ -66,6 +67,8 @@ const vehicleCheckInclude = {
   publicShare: {
     select: {
       createdAt: true,
+      externalRepairContact: true,
+      externalRepairContactId: true,
       takenInChargeAt: true,
       vehicleRecoveredAt: true,
       vehicleRecoveredBy: {
@@ -145,8 +148,9 @@ export class VehicleChecksService {
     return vehicleCheck;
   }
 
-  async createPublicShare(id: string, user: CurrentUserPayload) {
+  async createPublicShare(id: string, user: CurrentUserPayload, dto: CreatePublicShareDto = {}) {
     const vehicleCheck = await this.findOne(id, user);
+    const externalRepairContactId = await this.ensureExternalRepairContact(dto.externalRepairContactId);
 
     if (vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY) {
       throw new BadRequestException('The vehicle check summary must be ready before sharing');
@@ -164,15 +168,28 @@ export class VehicleChecksService {
             data: { isEnabled: true },
           });
 
-      return this.publicShareResponse(share);
+      const updatedShare = externalRepairContactId
+        ? await this.prisma.vehicleCheckPublicShare.update({
+            where: { id: share.id },
+            data: { externalRepairContactId },
+            include: { externalRepairContact: true },
+          })
+        : await this.prisma.vehicleCheckPublicShare.findUniqueOrThrow({
+            where: { id: share.id },
+            include: { externalRepairContact: true },
+          });
+
+      return this.publicShareResponse(updatedShare);
     }
 
     const share = await this.prisma.vehicleCheckPublicShare.create({
       data: {
         createdById: user.sub,
+        externalRepairContactId,
         token: await this.generatePublicShareToken(),
         vehicleCheckId: id,
       },
+      include: { externalRepairContact: true },
     });
 
     return this.publicShareResponse(share);
@@ -182,6 +199,7 @@ export class VehicleChecksService {
     const share = await this.prisma.vehicleCheckPublicShare.findUnique({
       where: { token },
       include: {
+        externalRepairContact: true,
         vehicleCheck: {
           include: publicVehicleCheckInclude,
         },
@@ -194,6 +212,8 @@ export class VehicleChecksService {
 
     return {
       createdAt: share.createdAt,
+      externalRepairContact: share.externalRepairContact,
+      externalRepairContactId: share.externalRepairContactId,
       takenInChargeAt: share.takenInChargeAt,
       vehicleRecoveredAt: share.vehicleRecoveredAt,
       token: share.token,
@@ -678,14 +698,44 @@ export class VehicleChecksService {
     throw new BadRequestException('Unable to generate public share token');
   }
 
+  private async ensureExternalRepairContact(externalRepairContactId?: string) {
+    if (!externalRepairContactId) {
+      return undefined;
+    }
+
+    const contact = await this.prisma.externalRepairContact.findFirst({
+      where: {
+        id: externalRepairContactId,
+        isActive: true,
+      },
+      select: { id: true },
+    });
+
+    if (!contact) {
+      throw new BadRequestException('External repair contact not found');
+    }
+
+    return contact.id;
+  }
+
   private publicShareResponse(share: {
     token: string;
     createdAt: Date;
+    externalRepairContact?: {
+      companyName: string | null;
+      email: string;
+      id: string;
+      name: string;
+      phone: string | null;
+    } | null;
+    externalRepairContactId?: string | null;
     takenInChargeAt?: Date | null;
     vehicleRecoveredAt?: Date | null;
   }) {
     return {
       createdAt: share.createdAt,
+      externalRepairContact: share.externalRepairContact ?? null,
+      externalRepairContactId: share.externalRepairContactId ?? share.externalRepairContact?.id ?? null,
       takenInChargeAt: share.takenInChargeAt ?? null,
       vehicleRecoveredAt: share.vehicleRecoveredAt ?? null,
       token: share.token,

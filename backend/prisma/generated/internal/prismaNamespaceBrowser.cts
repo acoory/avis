@@ -254,6 +254,7 @@ export type ExternalRepairContactScalarFieldEnum = (typeof ExternalRepairContact
 export const VehicleCheckPublicShareScalarFieldEnum = {
   id: 'id',
   vehicleCheckId: 'vehicleCheckId',
+  externalRepairContactId: 'externalRepairContactId',
   token: 'token',
   isEnabled: 'isEnabled',
   takenInChargeAt: 'takenInChargeAt',

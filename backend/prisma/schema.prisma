@@ -260,6 +260,7 @@ model ExternalRepairContact {
   updatedAt   DateTime @updatedAt
 
   createdBy User? @relation("ExternalRepairContactCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  publicShares VehicleCheckPublicShare[]
 
   @@index([isActive])
   @@index([createdById])
@@ -269,6 +270,7 @@ model ExternalRepairContact {
 model VehicleCheckPublicShare {
   id             String   @id @default(uuid())
   vehicleCheckId String   @unique
+  externalRepairContactId String?
   token          String   @unique
   isEnabled      Boolean  @default(true)
   takenInChargeAt DateTime?
@@ -279,11 +281,13 @@ model VehicleCheckPublicShare {
   updatedAt      DateTime @updatedAt
 
   vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  externalRepairContact ExternalRepairContact? @relation(fields: [externalRepairContactId], references: [id], onDelete: SetNull)
   createdBy    User?        @relation("VehicleCheckPublicShareCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   vehicleRecoveredBy User?  @relation("VehicleCheckPublicShareRecoveredBy", fields: [vehicleRecoveredById], references: [id], onDelete: SetNull)
 
   @@index([token])
   @@index([isEnabled])
+  @@index([externalRepairContactId])
   @@index([takenInChargeAt])
   @@index([vehicleRecoveredAt])
   @@index([vehicleRecoveredById])

@@ -4,6 +4,7 @@ import type { CurrentUserPayload } from '../common/decorators/current-user.decor
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PreviewRepairDecisionDto } from '../repair-decisions/dto/preview-repair-decision.dto';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
+import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
@@ -58,8 +59,12 @@ export class VehicleChecksController {
   }
 
   @Post(':id/public-share')
-  createPublicShare(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
-    return this.vehicleChecksService.createPublicShare(id, user);
+  createPublicShare(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: CreatePublicShareDto,
+  ) {
+    return this.vehicleChecksService.createPublicShare(id, user, dto);
   }
 
   @Post(':id/public-share/recovered')

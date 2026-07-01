@@ -96,6 +96,7 @@ export class DashboardService {
         take: 6,
         orderBy: { updatedAt: 'desc' },
         include: {
+          externalRepairContact: true,
           vehicleCheck: {
             include: {
               agency: true,
@@ -137,6 +138,7 @@ export class DashboardService {
             share.vehicleRecoveredAt
               ? {
                   eventAt: share.vehicleRecoveredAt,
+                  externalRepairContact: share.externalRepairContact,
                   id: `${share.id}-recovered`,
                   type: 'VEHICLE_RECOVERED',
                   vehicleCheck,
@@ -145,6 +147,7 @@ export class DashboardService {
             share.takenInChargeAt
               ? {
                   eventAt: share.takenInChargeAt,
+                  externalRepairContact: share.externalRepairContact,
                   id: `${share.id}-taken-in-charge`,
                   type: 'TAKEN_IN_CHARGE',
                   vehicleCheck,
