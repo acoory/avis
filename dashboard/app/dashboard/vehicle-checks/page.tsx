@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CheckCircle2, ClipboardList, Euro, ListChecks, PackageCheck, Plus, RotateCcw, Wrench, type LucideIcon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { ExportButton } from "@/components/business/export-button";
 import { VehicleCheckTable } from "@/components/business/vehicle-check-table";
 import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
 
@@ -15,6 +16,7 @@ export default function VehicleChecksPage() {
   const [vehicleChecks, setVehicleChecks] = useState<VehicleCheck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState<{ dateFrom?: string; dateTo?: string }>({});
+  const stats = useMemo(() => vehicleCheckStats(vehicleChecks), [vehicleChecks]);
 
   useEffect(() => {
     void loadVehicleChecks();
@@ -38,9 +40,7 @@ export default function VehicleChecksPage() {
   }
 
   function handleVehicleCheckUpdated(updatedVehicleCheck: VehicleCheck) {
-    setVehicleChecks((current) =>
-      current.map((check) => (check.id === updatedVehicleCheck.id ? updatedVehicleCheck : check)),
-    );
+    setVehicleChecks((current) => current.map((check) => (check.id === updatedVehicleCheck.id ? updatedVehicleCheck : check)));
   }
 
   return (
@@ -57,6 +57,7 @@ export default function VehicleChecksPage() {
           </Button>
         </div>
       </div>
+      {vehicleChecks.length ? <VehicleChecksStats stats={stats} /> : null}
       {isLoading && vehicleChecks.length === 0 ? (
         <LoadingScreen fullScreen={false} />
       ) : (
@@ -70,4 +71,155 @@ export default function VehicleChecksPage() {
       )}
     </>
   );
+}
+
+type VehicleCheckStats = {
+  completedCount: number;
+  recoveredCount: number;
+  takenInChargeCount: number;
+  toAnalyzeCount: number;
+  totalCount: number;
+  totalSavingAmount: number;
+  toOrderCount: number;
+};
+
+function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
+  const cards = [
+    // {
+    //   description: "Sur la periode",
+    //   icon: ClipboardList,
+    //   title: "Controles",
+    //   tone: "blue",
+    //   value: formatInteger(stats.totalCount),
+    // },
+    {
+      description: "Decisions a traiter",
+      icon: ListChecks,
+      title: "A analyser",
+      tone: "amber",
+      value: formatInteger(stats.toAnalyzeCount),
+    },
+    // {
+    //   description: "Syntheses finalisees",
+    //   icon: CheckCircle2,
+    //   title: "Completes",
+    //   tone: "teal",
+    //   value: formatInteger(stats.completedCount),
+    // },
+    {
+      description: "Chez prestataire",
+      icon: Wrench,
+      title: "Pris en charge",
+      tone: "emerald",
+      value: formatInteger(stats.takenInChargeCount),
+    },
+    {
+      description: "Retour confirme",
+      icon: RotateCcw,
+      title: "Recuperes",
+      tone: "blue",
+      value: formatInteger(stats.recoveredCount),
+    },
+    {
+      description: "Pieces a commander",
+      icon: PackageCheck,
+      title: "Commandes",
+      tone: "amber",
+      value: formatInteger(stats.toOrderCount),
+    },
+    // {
+    //   description: "Gain reference",
+    //   icon: Euro,
+    //   title: "Economies",
+    //   tone: "emerald",
+    //   value: formatCompactMoney(stats.totalSavingAmount),
+    // },
+  ] satisfies Array<{
+    description: string;
+    icon: LucideIcon;
+    title: string;
+    tone: StatTone;
+    value: string;
+  }>;
+
+  return (
+    <section className="mb-5 flex snap-x gap-3 overflow-x-auto pb-2 pr-4 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pb-0 sm:pr-0 lg:grid-cols-4 2xl:grid-cols-7">
+      {cards.map((card) => (
+        <StatCard description={card.description} icon={card.icon} key={card.title} title={card.title} tone={card.tone} value={card.value} />
+      ))}
+    </section>
+  );
+}
+
+type StatTone = "amber" | "blue" | "emerald" | "teal";
+
+const statToneStyles: Record<StatTone, string> = {
+  amber: "bg-amber-50 text-amber-600 ring-amber-100",
+  blue: "bg-blue-50 text-blue-600 ring-blue-100",
+  emerald: "bg-emerald-50 text-emerald-600 ring-emerald-100",
+  teal: "bg-teal-50 text-teal-600 ring-teal-100",
+};
+
+function StatCard({ description, icon: Icon, title, tone, value }: { description: string; icon: LucideIcon; title: string; tone: StatTone; value: string }) {
+  return (
+    <Card className="w-[72vw] max-w-[260px] shrink-0 snap-start rounded-[16px] border-[#e9e9e9] bg-white sm:w-auto sm:max-w-none sm:shrink">
+      <CardContent className="p-4">
+        <div className="flex min-h-[84px] items-start gap-3">
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ${statToneStyles[tone]}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase leading-tight text-slate-500">{title}</p>
+            <p className="mt-1 text-2xl font-bold tracking-wide text-slate-950">{value}</p>
+            <p className="mt-1 text-[11px] font-semibold leading-tight text-slate-500">{description}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function vehicleCheckStats(vehicleChecks: VehicleCheck[]): VehicleCheckStats {
+  return vehicleChecks.reduce<VehicleCheckStats>(
+    (stats, check) => {
+      const activeItems = check.items?.filter((item) => item.operationalStatus === "ACTIVE") ?? [];
+
+      stats.totalCount += 1;
+      stats.totalSavingAmount += numberValue(check.totalInternalSavingAmount);
+      if (check.status === "SUMMARY_READY") stats.completedCount += 1;
+      if (check.status === "TO_ANALYZE") stats.toAnalyzeCount += 1;
+      if (check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt) stats.takenInChargeCount += 1;
+      if (check.publicShare?.vehicleRecoveredAt) stats.recoveredCount += 1;
+      stats.toOrderCount += activeItems.filter((item) => item.partOrderStatus === "TO_ORDER").length;
+
+      return stats;
+    },
+    {
+      completedCount: 0,
+      recoveredCount: 0,
+      takenInChargeCount: 0,
+      toAnalyzeCount: 0,
+      totalCount: 0,
+      totalSavingAmount: 0,
+      toOrderCount: 0,
+    },
+  );
+}
+
+function numberValue(value: string | number | null | undefined) {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatInteger(value: number) {
+  return new Intl.NumberFormat("fr-FR").format(value);
+}
+
+function formatCompactMoney(value: number) {
+  return new Intl.NumberFormat("fr-FR", {
+    currency: "EUR",
+    maximumFractionDigits: 0,
+    notation: Math.abs(value) >= 100000 ? "compact" : "standard",
+    style: "currency",
+  }).format(value);
 }
