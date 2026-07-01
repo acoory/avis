@@ -126,6 +126,8 @@ export type VehicleCheck = {
   vehicleModel?: VehicleModel | null;
   publicShare?: {
     createdAt: string;
+    externalRepairContact?: ExternalRepairContact | null;
+    externalRepairContactId?: string | null;
     takenInChargeAt?: string | null;
     vehicleRecoveredAt?: string | null;
     vehicleRecoveredBy?: {
@@ -239,6 +241,8 @@ export type ExternalRepairContact = {
 
 export type VehicleCheckPublicShare = {
   createdAt: string;
+  externalRepairContact?: ExternalRepairContact | null;
+  externalRepairContactId?: string | null;
   takenInChargeAt?: string | null;
   vehicleRecoveredAt?: string | null;
   token: string;
@@ -246,6 +250,8 @@ export type VehicleCheckPublicShare = {
 
 export type PublicVehicleCheckShare = {
   createdAt: string;
+  externalRepairContact?: ExternalRepairContact | null;
+  externalRepairContactId?: string | null;
   takenInChargeAt?: string | null;
   vehicleRecoveredAt?: string | null;
   token: string;
@@ -281,6 +287,7 @@ export type DashboardSummary = {
   partOrdersToPlaceCount?: number;
   repairRequestNotifications?: Array<{
     eventAt: string;
+    externalRepairContact?: ExternalRepairContact | null;
     id: string;
     type: "TAKEN_IN_CHARGE" | "VEHICLE_RECOVERED";
     vehicleCheck: Pick<

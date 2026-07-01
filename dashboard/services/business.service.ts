@@ -100,8 +100,8 @@ export const businessService = {
     return data;
   },
 
-  async createVehicleCheckPublicShare(id: string) {
-    const { data } = await api.post<VehicleCheckPublicShare>(`/vehicle-checks/${id}/public-share`, {});
+  async createVehicleCheckPublicShare(id: string, payload?: { externalRepairContactId?: string }) {
+    const { data } = await api.post<VehicleCheckPublicShare>(`/vehicle-checks/${id}/public-share`, payload ?? {});
     return data;
   },
 

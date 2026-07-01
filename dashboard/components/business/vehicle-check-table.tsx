@@ -495,6 +495,11 @@ function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }
       <div className="space-y-1">
         <Badge className="bg-blue-50 text-blue-700">Recupere</Badge>
         <p className="text-xs font-medium text-gray-500">{formatShortDateTime(share.vehicleRecoveredAt)}</p>
+        {share.externalRepairContact ? (
+          <p className="max-w-40 truncate text-xs font-medium text-gray-500" title={externalRepairContactLabel(share.externalRepairContact)}>
+            {externalRepairContactLabel(share.externalRepairContact)}
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -504,6 +509,11 @@ function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }
       <div className="space-y-1">
         <Badge variant="success">Pris en charge</Badge>
         <p className="text-xs font-medium text-gray-500">{formatShortDateTime(share.takenInChargeAt)}</p>
+        {share.externalRepairContact ? (
+          <p className="max-w-40 truncate text-xs font-medium text-gray-500" title={externalRepairContactLabel(share.externalRepairContact)}>
+            par {externalRepairContactLabel(share.externalRepairContact)}
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -903,4 +913,9 @@ function formatShortDateTime(value: string) {
     month: "2-digit",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function externalRepairContactLabel(contact: NonNullable<VehicleCheck["publicShare"]>["externalRepairContact"]) {
+  if (!contact) return "";
+  return contact.companyName?.trim() || contact.name;
 }

@@ -89,6 +89,11 @@ function NotificationLink({ notification }: { notification: RepairRequestNotific
         <span className="mt-0.5 block truncate text-xs font-medium text-slate-500">
           {isRecovered ? "Vehicule recupere" : "Demande prise en charge"}
         </span>
+        {notification.externalRepairContact ? (
+          <span className="mt-0.5 block truncate text-xs font-medium text-slate-500">
+            {isRecovered ? "chez" : "par"} {externalRepairContactLabel(notification.externalRepairContact)}
+          </span>
+        ) : null}
         <span className={cn("mt-1 block text-xs font-semibold", isRecovered ? "text-blue-700" : "text-emerald-700")}>
           {formatShortDateTime(notification.eventAt)}
         </span>
@@ -105,4 +110,8 @@ function formatShortDateTime(value: string) {
     month: "2-digit",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function externalRepairContactLabel(contact: NonNullable<RepairRequestNotification["externalRepairContact"]>) {
+  return contact.companyName?.trim() || contact.name;
 }

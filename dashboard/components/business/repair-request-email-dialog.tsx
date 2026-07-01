@@ -65,7 +65,9 @@ export function RepairRequestEmailDialog({
         email,
         name,
       });
-      const share = await businessService.createVehicleCheckPublicShare(vehicleCheck.id);
+      const share = await businessService.createVehicleCheckPublicShare(vehicleCheck.id, {
+        externalRepairContactId: contact.id,
+      });
       const url = new URL(`/public/repairs/${share.token}`, window.location.origin).toString();
       setPublicUrl(url);
       openOutlookCompose(contact.email, mailSubject(vehicleCheck), mailBody(vehicleCheck, url, selectedItemsCount));

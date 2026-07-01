@@ -90,6 +90,7 @@ export default function PublicRepairRequestPage() {
       <div className="mx-auto max-w-4xl space-y-3">
         <PublicPageHeader
           isTakingCharge={isTakingCharge}
+          externalRepairContact={share.externalRepairContact}
           takenInChargeAt={share.takenInChargeAt}
           vehicleRecoveredAt={share.vehicleRecoveredAt}
           onTakeCharge={() => setIsConfirmingTakeCharge(true)}
@@ -140,10 +141,12 @@ export default function PublicRepairRequestPage() {
 
 function PublicPageHeader({
   isTakingCharge,
+  externalRepairContact,
   onTakeCharge,
   takenInChargeAt,
   vehicleRecoveredAt,
 }: {
+  externalRepairContact?: PublicVehicleCheckShare["externalRepairContact"];
   isTakingCharge: boolean;
   onTakeCharge: () => void;
   takenInChargeAt?: string | null;
@@ -163,12 +166,19 @@ function PublicPageHeader({
       {vehicleRecoveredAt ? (
         <div className="flex shrink-0 items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700">
           <CheckCircle2 className="h-4 w-4" />
-          <span>Vehicule recupere le {formatShortDateTime(vehicleRecoveredAt)}</span>
+          <span>
+            Vehicule recupere
+            {externalRepairContact ? ` chez ${externalRepairContactLabel(externalRepairContact)}` : ""} le{" "}
+            {formatShortDateTime(vehicleRecoveredAt)}
+          </span>
         </div>
       ) : takenInChargeAt ? (
         <div className="flex shrink-0 items-center gap-2 rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700">
           <CheckCircle2 className="h-4 w-4" />
-          <span>Pris en charge le {formatShortDateTime(takenInChargeAt)}</span>
+          <span>
+            Pris en charge{externalRepairContact ? ` par ${externalRepairContactLabel(externalRepairContact)}` : ""} le{" "}
+            {formatShortDateTime(takenInChargeAt)}
+          </span>
         </div>
       ) : (
         <button
@@ -424,4 +434,8 @@ function formatShortDateTime(value: string) {
     month: "2-digit",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function externalRepairContactLabel(contact: NonNullable<PublicVehicleCheckShare["externalRepairContact"]>) {
+  return contact.companyName?.trim() || contact.name;
 }
