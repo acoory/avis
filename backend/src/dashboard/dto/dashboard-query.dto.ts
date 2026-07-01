@@ -1,4 +1,4 @@
-import { IsISO8601, IsOptional } from 'class-validator';
+import { IsISO8601, IsOptional, IsString } from 'class-validator';
 
 export class DashboardQueryDto {
   @IsOptional()
@@ -8,4 +8,8 @@ export class DashboardQueryDto {
   @IsOptional()
   @IsISO8601()
   dateTo?: string;
+
+  @IsOptional()
+  @IsString()
+  collaboratorId?: string;
 }

@@ -57,6 +57,16 @@ export class VehicleChecksController {
     return this.vehicleChecksService.finalizeSummary(id, dto, user);
   }
 
+  @Post(':id/public-share')
+  createPublicShare(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.vehicleChecksService.createPublicShare(id, user);
+  }
+
+  @Post(':id/public-share/recovered')
+  markVehicleRecovered(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.vehicleChecksService.markVehicleRecovered(id, user);
+  }
+
   @Post('preview-decision')
   previewDecision(@Body() dto: PreviewRepairDecisionDto) {
     return this.repairDecisionService.preview(dto.manufacturerId, dto.items);

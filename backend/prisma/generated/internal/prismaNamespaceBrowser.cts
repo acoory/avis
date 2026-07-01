@@ -60,6 +60,8 @@ export const ModelName = {
   ManufacturerRule: 'ManufacturerRule',
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
+  ExternalRepairContact: 'ExternalRepairContact',
+  VehicleCheckPublicShare: 'VehicleCheckPublicShare',
   VehicleCheckItem: 'VehicleCheckItem',
   VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
@@ -231,6 +233,38 @@ export const VehicleCheckScalarFieldEnum = {
 } as const
 
 export type VehicleCheckScalarFieldEnum = (typeof VehicleCheckScalarFieldEnum)[keyof typeof VehicleCheckScalarFieldEnum]
+
+
+export const ExternalRepairContactScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  companyName: 'companyName',
+  email: 'email',
+  phone: 'phone',
+  notes: 'notes',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExternalRepairContactScalarFieldEnum = (typeof ExternalRepairContactScalarFieldEnum)[keyof typeof ExternalRepairContactScalarFieldEnum]
+
+
+export const VehicleCheckPublicShareScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckId: 'vehicleCheckId',
+  token: 'token',
+  isEnabled: 'isEnabled',
+  takenInChargeAt: 'takenInChargeAt',
+  vehicleRecoveredAt: 'vehicleRecoveredAt',
+  vehicleRecoveredById: 'vehicleRecoveredById',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehicleCheckPublicShareScalarFieldEnum = (typeof VehicleCheckPublicShareScalarFieldEnum)[keyof typeof VehicleCheckPublicShareScalarFieldEnum]
 
 
 export const VehicleCheckItemScalarFieldEnum = {

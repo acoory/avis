@@ -5,12 +5,11 @@ import { CheckCircle2, Download, Mail, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
+import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  downloadVehicleCheckPdf,
-  shareVehicleCheckPdfByEmail,
-} from "@/lib/vehicle-check-pdf";
+import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
 
@@ -23,10 +22,14 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
   const router = useRouter();
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [recoveredDialogOpen, setRecoveredDialogOpen] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
   const canShareSummary = vehicleCheck.status === "SUMMARY_READY";
+  const canMarkRecovered = Boolean(
+    vehicleCheck.publicShare?.takenInChargeAt && !vehicleCheck.publicShare.vehicleRecoveredAt,
+  );
   const canDelete = true;
 
   async function handleComplete() {
@@ -55,26 +58,6 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
     }
   }
 
-  async function handleEmail() {
-    setIsSharing(true);
-
-    try {
-      const result = await shareVehicleCheckPdfByEmail(vehicleCheck);
-      if (result.shared) {
-        toast.success("Synthese transmise a l'application de partage.");
-      } else {
-        toast.info("Le PDF a ete telecharge. Ajoute-le en piece jointe dans l'email.");
-      }
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        return;
-      }
-      toast.error("Impossible de preparer l'email.");
-    } finally {
-      setIsSharing(false);
-    }
-  }
-
   return (
     <>
       <div className="flex flex-col gap-2 sm:items-end">
@@ -93,13 +76,23 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
           {canShareSummary ? (
             <Button
               className="w-full sm:w-auto"
-              disabled={isSharing}
               type="button"
               variant="outline"
-              onClick={handleEmail}
+              onClick={() => setEmailDialogOpen(true)}
             >
               <Mail className="h-4 w-4" />
-              {isSharing ? "Preparation..." : "Envoyer par mail"}
+              Envoyer par mail
+            </Button>
+          ) : null}
+          {canMarkRecovered ? (
+            <Button
+              className="w-full sm:w-auto"
+              type="button"
+              variant="outline"
+              onClick={() => setRecoveredDialogOpen(true)}
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              Marquer recupere
             </Button>
           ) : null}
           <Button asChild className="w-full sm:w-auto" variant="outline">
@@ -136,6 +129,19 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
           router.refresh();
         }}
       />
+      <VehicleRecoveredDialog
+        open={recoveredDialogOpen}
+        vehicleCheck={vehicleCheck}
+        onOpenChange={setRecoveredDialogOpen}
+        onRecovered={onUpdated}
+      />
+      {canShareSummary ? (
+        <RepairRequestEmailDialog
+          open={emailDialogOpen}
+          vehicleCheck={vehicleCheck}
+          onOpenChange={setEmailDialogOpen}
+        />
+      ) : null}
     </>
   );
 }

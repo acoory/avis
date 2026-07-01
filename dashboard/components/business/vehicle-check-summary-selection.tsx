@@ -12,13 +12,11 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cloudinaryOriginalUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
-import {
-  downloadVehicleCheckPdf,
-  shareVehicleCheckPdfByEmail,
-} from "@/lib/vehicle-check-pdf";
+import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
 
@@ -39,6 +37,7 @@ export function VehicleCheckSummarySelection({
   const [isPostValidationOpen, setIsPostValidationOpen] = useState(false);
   const [finalizedVehicleCheck, setFinalizedVehicleCheck] = useState<VehicleCheck | null>(null);
   const [isPreparingDocument, setIsPreparingDocument] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [photoGallery, setPhotoGallery] = useState<{
     photos: NonNullable<NonNullable<VehicleCheck["items"]>[number]["photos"]>;
     index: number;
@@ -130,26 +129,6 @@ export function VehicleCheckSummarySelection({
       setIsPostValidationOpen(false);
     } catch {
       toast.error("Impossible de generer le PDF.");
-    } finally {
-      setIsPreparingDocument(false);
-    }
-  }
-
-  async function emailFinalizedPdf() {
-    if (!finalizedVehicleCheck) return;
-    setIsPreparingDocument(true);
-    try {
-      const result = await shareVehicleCheckPdfByEmail(finalizedVehicleCheck);
-      toast.success(
-        result.shared
-          ? "Synthese transmise a l'application de partage."
-          : "Email prepare. Ajoute le PDF telecharge en piece jointe.",
-      );
-      setIsPostValidationOpen(false);
-    } catch (error) {
-      if (!(error instanceof DOMException && error.name === "AbortError")) {
-        toast.error("Impossible de preparer l'email.");
-      }
     } finally {
       setIsPreparingDocument(false);
     }
@@ -371,7 +350,10 @@ export function VehicleCheckSummarySelection({
               <Button
                 disabled={isPreparingDocument}
                 type="button"
-                onClick={emailFinalizedPdf}
+                onClick={() => {
+                  setIsPostValidationOpen(false);
+                  setEmailDialogOpen(true);
+                }}
               >
                 <Mail className="h-4 w-4" />
                 Envoyer par mail
@@ -388,6 +370,13 @@ export function VehicleCheckSummarySelection({
             </Button>
           </div>
         </div>
+      ) : null}
+      {finalizedVehicleCheck ? (
+        <RepairRequestEmailDialog
+          open={emailDialogOpen}
+          vehicleCheck={finalizedVehicleCheck}
+          onOpenChange={setEmailDialogOpen}
+        />
       ) : null}
     </Card>
   );

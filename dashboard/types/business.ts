@@ -124,6 +124,19 @@ export type VehicleCheck = {
   agency?: Agency;
   manufacturer?: Manufacturer;
   vehicleModel?: VehicleModel | null;
+  publicShare?: {
+    createdAt: string;
+    takenInChargeAt?: string | null;
+    vehicleRecoveredAt?: string | null;
+    vehicleRecoveredBy?: {
+      email: string;
+      firstName: string;
+      id: string;
+      lastName: string;
+    } | null;
+    vehicleRecoveredById?: string | null;
+    token: string;
+  } | null;
   items?: Array<{
     id: string;
     quantity: number;
@@ -214,6 +227,33 @@ export type RepairDecisionPreview = {
 
 export type VehicleCheckItem = NonNullable<VehicleCheck["items"]>[number];
 
+export type ExternalRepairContact = {
+  id: string;
+  name: string;
+  companyName?: string | null;
+  email: string;
+  phone?: string | null;
+  notes?: string | null;
+  isActive: boolean;
+};
+
+export type VehicleCheckPublicShare = {
+  createdAt: string;
+  takenInChargeAt?: string | null;
+  vehicleRecoveredAt?: string | null;
+  token: string;
+};
+
+export type PublicVehicleCheckShare = {
+  createdAt: string;
+  takenInChargeAt?: string | null;
+  vehicleRecoveredAt?: string | null;
+  token: string;
+  vehicleCheck: Omit<VehicleCheck, "collaborator" | "externalQuotes" | "items"> & {
+    items: VehicleCheckItem[];
+  };
+};
+
 export type CreateVehicleCheckPayload = {
   agencyId: string;
   manufacturerId: string;
@@ -239,5 +279,177 @@ export type DashboardSummary = {
   totalDifferenceAmount: string;
   alertItemsCount: number;
   partOrdersToPlaceCount?: number;
+  repairRequestNotifications?: Array<{
+    eventAt: string;
+    id: string;
+    type: "TAKEN_IN_CHARGE" | "VEHICLE_RECOVERED";
+    vehicleCheck: Pick<
+      VehicleCheck,
+      | "id"
+      | "checkNumber"
+      | "licensePlate"
+      | "licensePlateCountry"
+      | "licensePlateRaw"
+      | "checkDate"
+      | "city"
+      | "agency"
+      | "manufacturer"
+      | "vehicleModel"
+    >;
+  }>;
   recentVehicleChecks: VehicleCheck[];
 };
+
+export type DashboardTimelinePoint = {
+  alertItemsCount: number;
+  completedVehicleChecksCount: number;
+  date: string;
+  draftVehicleChecksCount: number;
+  partOrdersToPlaceCount: number;
+  totalDifferenceAmount: string;
+  totalInternalCost: string;
+  totalInternalSavingAmount: string;
+  vehicleChecksCount: number;
+  vehicleChecksToAnalyzeCount: number;
+};
+
+export type GtmotiveEstimate = {
+  estimateId: number;
+  code?: string;
+  securityProfileId?: number;
+  source?: "created" | "fallback";
+};
+
+export type GtmotiveVehicle = {
+  make: string | null;
+  model: string | null;
+  version: string | null;
+  registrationNumber: string | null;
+  vin: string | null;
+  makeCode: string | null;
+  modelId: string | null;
+  navigationModelCode: string | null;
+  equipment: string | null;
+  label: string | null;
+};
+
+export type GtmotiveVehicleIdentification = {
+  estimateId: number;
+  securityProfileId?: number;
+  vehicle: GtmotiveVehicle;
+  ready: boolean;
+  warnings: string[];
+};
+
+export type GtmotivePart = {
+  id: string;
+  label: string;
+  partNumber?: string;
+  canReplace: boolean;
+  operations: Array<{
+    id: number;
+    label: string;
+    available: boolean;
+  }>;
+};
+
+export type GtmotivePartsResponse = {
+  groups: Array<{
+    id: string;
+    label: string;
+    selected: boolean;
+  }>;
+  parts: GtmotivePart[];
+};
+
+export type GtmotiveNavigationBoard = {
+  id: number | null;
+  description: string | null;
+  svgUrl: string | null;
+  images: Array<{
+    width: number | null;
+    url: string | null;
+  }>;
+  functionalGroups: Array<{
+    id: string;
+    description: string;
+  }>;
+  fallback: boolean;
+  message: string | null;
+};
+
+export type GtmotiveGraphicZone = {
+  groupId: string;
+  available: boolean;
+  message?: string;
+  parts?: Array<{
+    partCode?: string;
+    description?: string;
+    imgId?: string;
+  }>;
+  imgs?: Array<{
+    id?: number | null;
+    url?: string | null;
+    svgImage?: string;
+    positionX?: number;
+    positionY?: number;
+    rotation?: number;
+    scale?: number;
+    order?: number;
+    gradient?: unknown;
+    state?: unknown;
+    situation?: unknown;
+    parts?: unknown[];
+  }>;
+  metadata?: {
+    navigationModelCode?: string;
+    modelId?: string;
+    equipments?: string[];
+    manufacturingValues?: string[];
+  };
+};
+
+export type GtmotiveOperationResult = {
+  operationId: number;
+  actionId: number;
+  operation: string;
+  part: {
+    id: string;
+    label: string;
+  };
+  reference: string | null;
+  oemReference: string | null;
+  oemPrice: number | null;
+  partPrice: number | null;
+  labourTime: number | null;
+  labourRate: number | null;
+  labourRateLabel: string | null;
+  labourAmount: number | null;
+  ingredientsAmount: number | null;
+  total: number | null;
+  precalculation: string | null;
+  job: string | null;
+  technicity: string | null;
+  currency: "EUR";
+  replacedOperation?: {
+    operationId: number;
+    actionId: number;
+    operation: string;
+    part: {
+      id: string;
+      label: string;
+    };
+  } | null;
+  children: Array<{
+    operationId: number;
+    actionId: number;
+    operation: string;
+    reference: string | null;
+    partPrice: number | null;
+    labourTime: number | null;
+    labourAmount: number | null;
+    total: number | null;
+  }>;
+};
+
+export type GtmotiveReplaceResult = GtmotiveOperationResult;

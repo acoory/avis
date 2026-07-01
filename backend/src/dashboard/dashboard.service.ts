@@ -28,6 +28,7 @@ export class DashboardService {
       alertItemsCount,
       partOrdersToPlaceCount,
       recentVehicleChecks,
+      repairRequestNotifications,
     ] = await Promise.all([
       this.prisma.vehicleCheck.count({ where: vehicleCheckScope }),
       this.prisma.vehicleCheck.count({
@@ -87,6 +88,23 @@ export class DashboardService {
           },
         },
       }),
+      this.prisma.vehicleCheckPublicShare.findMany({
+        where: {
+          OR: [{ takenInChargeAt: { not: null } }, { vehicleRecoveredAt: { not: null } }],
+          vehicleCheck: vehicleCheckScope,
+        },
+        take: 6,
+        orderBy: { updatedAt: 'desc' },
+        include: {
+          vehicleCheck: {
+            include: {
+              agency: true,
+              manufacturer: true,
+              vehicleModel: true,
+            },
+          },
+        },
+      }),
     ]);
 
     return {
@@ -100,6 +118,42 @@ export class DashboardService {
       totalDifferenceAmount: this.money(totals._sum.totalDifferenceAmount),
       alertItemsCount,
       partOrdersToPlaceCount,
+      repairRequestNotifications: repairRequestNotifications
+        .flatMap((share) => {
+          const vehicleCheck = {
+            id: share.vehicleCheck.id,
+            checkNumber: share.vehicleCheck.checkNumber,
+            licensePlate: share.vehicleCheck.licensePlate,
+            licensePlateRaw: share.vehicleCheck.licensePlateRaw,
+            licensePlateCountry: share.vehicleCheck.licensePlateCountry,
+            checkDate: share.vehicleCheck.checkDate,
+            city: share.vehicleCheck.city,
+            manufacturer: share.vehicleCheck.manufacturer,
+            vehicleModel: share.vehicleCheck.vehicleModel,
+            agency: share.vehicleCheck.agency,
+          };
+
+          return [
+            share.vehicleRecoveredAt
+              ? {
+                  eventAt: share.vehicleRecoveredAt,
+                  id: `${share.id}-recovered`,
+                  type: 'VEHICLE_RECOVERED',
+                  vehicleCheck,
+                }
+              : null,
+            share.takenInChargeAt
+              ? {
+                  eventAt: share.takenInChargeAt,
+                  id: `${share.id}-taken-in-charge`,
+                  type: 'TAKEN_IN_CHARGE',
+                  vehicleCheck,
+                }
+              : null,
+          ].filter(Boolean);
+        })
+        .sort((a, b) => b!.eventAt.getTime() - a!.eventAt.getTime())
+        .slice(0, 6),
       recentVehicleChecks: recentVehicleChecks.map((check) => ({
         id: check.id,
         checkNumber: check.checkNumber,
@@ -232,20 +286,138 @@ export class DashboardService {
     });
   }
 
+  async timeline(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+    const period = this.timelinePeriod(query);
+    const where = this.vehicleCheckScope(user, {
+      ...query,
+      dateFrom: period.dateFrom,
+      dateTo: period.dateTo,
+    });
+    const buckets = new Map<string, DashboardTimelineBucket>();
+
+    for (const date of this.eachDate(period.from, period.to)) {
+      const key = this.dateKey(date);
+      buckets.set(key, {
+        alertItemsCount: 0,
+        completedVehicleChecksCount: 0,
+        date: key,
+        draftVehicleChecksCount: 0,
+        partOrdersToPlaceCount: 0,
+        totalDifferenceAmount: '0.00',
+        totalInternalCost: '0.00',
+        totalInternalSavingAmount: '0.00',
+        vehicleChecksCount: 0,
+        vehicleChecksToAnalyzeCount: 0,
+      });
+    }
+
+    const checks = await this.prisma.vehicleCheck.findMany({
+      where,
+      select: {
+        checkDate: true,
+        status: true,
+        totalDifferenceAmount: true,
+        totalInternalCost: true,
+        totalInternalSavingAmount: true,
+        items: {
+          where: {
+            operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+          },
+          select: {
+            decisionStatus: true,
+            partOrderStatus: true,
+          },
+        },
+      },
+      orderBy: { checkDate: 'asc' },
+    });
+
+    const numericBuckets = new Map<
+      string,
+      {
+        totalDifferenceAmount: Decimal;
+        totalInternalCost: Decimal;
+        totalInternalSavingAmount: Decimal;
+      }
+    >();
+
+    checks.forEach((check) => {
+      const key = this.dateKey(check.checkDate);
+      const bucket = buckets.get(key);
+
+      if (!bucket) {
+        return;
+      }
+
+      const totals = numericBuckets.get(key) ?? {
+        totalDifferenceAmount: new Decimal(0),
+        totalInternalCost: new Decimal(0),
+        totalInternalSavingAmount: new Decimal(0),
+      };
+
+      bucket.vehicleChecksCount += 1;
+      if (check.status === VehicleCheckStatus.SUMMARY_READY) bucket.completedVehicleChecksCount += 1;
+      if (check.status === VehicleCheckStatus.TO_ANALYZE) bucket.vehicleChecksToAnalyzeCount += 1;
+      if (check.status === VehicleCheckStatus.DRAFT) bucket.draftVehicleChecksCount += 1;
+
+      const alertStatuses: RepairDecisionStatus[] = [
+        RepairDecisionStatus.FORBIDDEN,
+        RepairDecisionStatus.TO_CHECK,
+        RepairDecisionStatus.WARNING,
+      ];
+
+      check.items.forEach((item) => {
+        if (alertStatuses.includes(item.decisionStatus)) {
+          bucket.alertItemsCount += 1;
+        }
+
+        if (item.partOrderStatus === PartOrderStatus.TO_ORDER) {
+          bucket.partOrdersToPlaceCount += 1;
+        }
+      });
+
+      totals.totalDifferenceAmount = totals.totalDifferenceAmount.add(check.totalDifferenceAmount);
+      totals.totalInternalCost = totals.totalInternalCost.add(check.totalInternalCost);
+      totals.totalInternalSavingAmount = totals.totalInternalSavingAmount.add(check.totalInternalSavingAmount);
+      numericBuckets.set(key, totals);
+    });
+
+    numericBuckets.forEach((totals, key) => {
+      const bucket = buckets.get(key);
+
+      if (!bucket) {
+        return;
+      }
+
+      bucket.totalDifferenceAmount = this.money(totals.totalDifferenceAmount);
+      bucket.totalInternalCost = this.money(totals.totalInternalCost);
+      bucket.totalInternalSavingAmount = this.money(totals.totalInternalSavingAmount);
+    });
+
+    return Array.from(buckets.values());
+  }
+
   private money(value?: Decimal | null): string {
     return (value ?? new Decimal(0)).toFixed(2);
   }
 
   private vehicleCheckScope(user: CurrentUserPayload, query: DashboardQueryDto = {}): Prisma.VehicleCheckWhereInput {
     const periodWhere = this.periodWhere(query);
+    const collaboratorWhere = query.collaboratorId
+      ? { collaboratorId: query.collaboratorId }
+      : {};
 
     if (user.role === Role.ADMIN) {
-      return periodWhere;
+      return {
+        ...periodWhere,
+        ...collaboratorWhere,
+      };
     }
 
     if (user.role === Role.MANAGER) {
       return {
         ...periodWhere,
+        ...collaboratorWhere,
         OR: [{ collaboratorId: user.sub }, { collaborator: { managerId: user.sub } }],
       };
     }
@@ -286,14 +458,86 @@ export class DashboardService {
   }
 
   private startOfDay(value: string) {
-    const date = new Date(value);
+    const date = this.inputDate(value);
     date.setHours(0, 0, 0, 0);
     return date;
   }
 
   private endOfDay(value: string) {
-    const date = new Date(value);
+    const date = this.inputDate(value);
     date.setHours(23, 59, 59, 999);
     return date;
   }
+
+  private inputDate(value: string) {
+    const [year, month, day] = value.split('-').map(Number);
+
+    if (year && month && day) {
+      return new Date(year, month - 1, day);
+    }
+
+    return new Date(value);
+  }
+
+  private timelinePeriod(query: DashboardQueryDto) {
+    const todayKey = this.dateKey(new Date());
+    const to = query.dateTo ? this.endOfDay(query.dateTo) : this.endOfDay(todayKey);
+    const from = query.dateFrom ? this.startOfDay(query.dateFrom) : this.startOfDay(this.dateKey(this.addDays(to, -30)));
+
+    if (from <= to) {
+      return {
+        dateFrom: this.dateKey(from),
+        dateTo: this.dateKey(to),
+        from,
+        to,
+      };
+    }
+
+    return {
+      dateFrom: this.dateKey(to),
+      dateTo: this.dateKey(from),
+      from: this.startOfDay(this.dateKey(to)),
+      to: this.endOfDay(this.dateKey(from)),
+    };
+  }
+
+  private eachDate(from: Date, to: Date) {
+    const dates: Date[] = [];
+    const current = this.startOfDay(this.dateKey(from));
+    const end = this.startOfDay(this.dateKey(to));
+
+    while (current <= end) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
+  }
+
+  private addDays(date: Date, days: number) {
+    const next = new Date(date);
+    next.setDate(next.getDate() + days);
+    return next;
+  }
+
+  private dateKey(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
 }
+
+type DashboardTimelineBucket = {
+  alertItemsCount: number;
+  completedVehicleChecksCount: number;
+  date: string;
+  draftVehicleChecksCount: number;
+  partOrdersToPlaceCount: number;
+  totalDifferenceAmount: string;
+  totalInternalCost: string;
+  totalInternalSavingAmount: string;
+  vehicleChecksCount: number;
+  vehicleChecksToAnalyzeCount: number;
+};

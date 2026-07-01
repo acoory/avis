@@ -16,6 +16,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ExportsModule } from './exports/exports.module';
 import { LicensePlatesModule } from './license-plates/license-plates.module';
 import { DamagePhotosModule } from './damage-photos/damage-photos.module';
+import { GtmotiveModule } from './gtmotive/gtmotive.module';
+import { ExternalRepairContactsModule } from './external-repair-contacts/external-repair-contacts.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { DamagePhotosModule } from './damage-photos/damage-photos.module';
     ExportsModule,
     LicensePlatesModule,
     DamagePhotosModule,
+    GtmotiveModule,
+    ExternalRepairContactsModule,
   ],
 })
 export class AppModule {}

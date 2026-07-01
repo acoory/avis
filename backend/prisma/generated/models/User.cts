@@ -242,6 +242,9 @@ export type UserWhereInput = {
   manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   collaborators?: Prisma.UserListRelationFilter
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryListRelationFilter
+  externalRepairContacts?: Prisma.ExternalRepairContactListRelationFilter
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -261,6 +264,9 @@ export type UserOrderByWithRelationInput = {
   manager?: Prisma.UserOrderByWithRelationInput
   collaborators?: Prisma.UserOrderByRelationAggregateInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryOrderByRelationAggregateInput
+  externalRepairContacts?: Prisma.ExternalRepairContactOrderByRelationAggregateInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareOrderByRelationAggregateInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -283,6 +289,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   collaborators?: Prisma.UserListRelationFilter
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryListRelationFilter
+  externalRepairContacts?: Prisma.ExternalRepairContactListRelationFilter
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -337,6 +346,9 @@ export type UserCreateInput = {
   manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
   collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -355,6 +367,9 @@ export type UserUncheckedCreateInput = {
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
   collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserUpdateInput = {
@@ -373,6 +388,9 @@ export type UserUpdateInput = {
   manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
   collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -391,6 +409,9 @@ export type UserUncheckedUpdateInput = {
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
   collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -598,6 +619,54 @@ export type UserUpdateOneRequiredWithoutVehicleChecksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleChecksInput, Prisma.UserUpdateWithoutVehicleChecksInput>, Prisma.UserUncheckedUpdateWithoutVehicleChecksInput>
 }
 
+export type UserCreateNestedOneWithoutExternalRepairContactsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutExternalRepairContactsInput, Prisma.UserUncheckedCreateWithoutExternalRepairContactsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutExternalRepairContactsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutExternalRepairContactsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutExternalRepairContactsInput, Prisma.UserUncheckedCreateWithoutExternalRepairContactsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutExternalRepairContactsInput
+  upsert?: Prisma.UserUpsertWithoutExternalRepairContactsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutExternalRepairContactsInput, Prisma.UserUpdateWithoutExternalRepairContactsInput>, Prisma.UserUncheckedUpdateWithoutExternalRepairContactsInput>
+}
+
+export type UserCreateNestedOneWithoutVehicleCheckPublicSharesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckPublicSharesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckPublicSharesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutVehicleRecoveredPublicSharesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleRecoveredPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleRecoveredPublicSharesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutVehicleCheckPublicSharesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckPublicSharesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckPublicSharesInput
+  upsert?: Prisma.UserUpsertWithoutVehicleCheckPublicSharesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleCheckPublicSharesInput, Prisma.UserUpdateWithoutVehicleCheckPublicSharesInput>, Prisma.UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput>
+}
+
+export type UserUpdateOneWithoutVehicleRecoveredPublicSharesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleRecoveredPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleRecoveredPublicSharesInput
+  upsert?: Prisma.UserUpsertWithoutVehicleRecoveredPublicSharesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleRecoveredPublicSharesInput, Prisma.UserUpdateWithoutVehicleRecoveredPublicSharesInput>, Prisma.UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput>
+}
+
 export type UserCreateNestedOneWithoutVehicleCheckItemStatusHistoriesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckItemStatusHistoriesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckItemStatusHistoriesInput
@@ -629,6 +698,9 @@ export type UserCreateWithoutCollaboratorsInput = {
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
   manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserUncheckedCreateWithoutCollaboratorsInput = {
@@ -646,6 +718,9 @@ export type UserUncheckedCreateWithoutCollaboratorsInput = {
   managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserCreateOrConnectWithoutCollaboratorsInput = {
@@ -668,6 +743,9 @@ export type UserCreateWithoutManagerInput = {
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
   collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserUncheckedCreateWithoutManagerInput = {
@@ -685,6 +763,9 @@ export type UserUncheckedCreateWithoutManagerInput = {
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
   collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserCreateOrConnectWithoutManagerInput = {
@@ -723,6 +804,9 @@ export type UserUpdateWithoutCollaboratorsInput = {
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
   manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCollaboratorsInput = {
@@ -740,6 +824,9 @@ export type UserUncheckedUpdateWithoutCollaboratorsInput = {
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutManagerInput = {
@@ -791,6 +878,9 @@ export type UserCreateWithoutVehicleChecksInput = {
   manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
   collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserUncheckedCreateWithoutVehicleChecksInput = {
@@ -808,6 +898,9 @@ export type UserUncheckedCreateWithoutVehicleChecksInput = {
   managerId?: string | null
   collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserCreateOrConnectWithoutVehicleChecksInput = {
@@ -841,6 +934,9 @@ export type UserUpdateWithoutVehicleChecksInput = {
   manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
   collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleChecksInput = {
@@ -858,6 +954,297 @@ export type UserUncheckedUpdateWithoutVehicleChecksInput = {
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+}
+
+export type UserCreateWithoutExternalRepairContactsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
+  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+}
+
+export type UserUncheckedCreateWithoutExternalRepairContactsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  managerId?: string | null
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+}
+
+export type UserCreateOrConnectWithoutExternalRepairContactsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutExternalRepairContactsInput, Prisma.UserUncheckedCreateWithoutExternalRepairContactsInput>
+}
+
+export type UserUpsertWithoutExternalRepairContactsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutExternalRepairContactsInput, Prisma.UserUncheckedUpdateWithoutExternalRepairContactsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutExternalRepairContactsInput, Prisma.UserUncheckedCreateWithoutExternalRepairContactsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutExternalRepairContactsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutExternalRepairContactsInput, Prisma.UserUncheckedUpdateWithoutExternalRepairContactsInput>
+}
+
+export type UserUpdateWithoutExternalRepairContactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
+  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutExternalRepairContactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+}
+
+export type UserCreateWithoutVehicleCheckPublicSharesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
+  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+}
+
+export type UserUncheckedCreateWithoutVehicleCheckPublicSharesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  managerId?: string | null
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+}
+
+export type UserCreateOrConnectWithoutVehicleCheckPublicSharesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckPublicSharesInput>
+}
+
+export type UserCreateWithoutVehicleRecoveredPublicSharesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
+  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  managerId?: string | null
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserCreateOrConnectWithoutVehicleRecoveredPublicSharesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleRecoveredPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput>
+}
+
+export type UserUpsertWithoutVehicleCheckPublicSharesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVehicleCheckPublicSharesInput, Prisma.UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckPublicSharesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVehicleCheckPublicSharesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVehicleCheckPublicSharesInput, Prisma.UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput>
+}
+
+export type UserUpdateWithoutVehicleCheckPublicSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
+  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+}
+
+export type UserUpsertWithoutVehicleRecoveredPublicSharesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVehicleRecoveredPublicSharesInput, Prisma.UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleRecoveredPublicSharesInput, Prisma.UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVehicleRecoveredPublicSharesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVehicleRecoveredPublicSharesInput, Prisma.UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput>
+}
+
+export type UserUpdateWithoutVehicleRecoveredPublicSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
+  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -875,6 +1262,9 @@ export type UserCreateWithoutVehicleCheckItemStatusHistoriesInput = {
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
   manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
   collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -892,6 +1282,9 @@ export type UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput = {
   managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
   collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -925,6 +1318,9 @@ export type UserUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
   manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
   collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -942,6 +1338,9 @@ export type UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
   collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserCreateManyManagerInput = {
@@ -973,6 +1372,9 @@ export type UserUpdateWithoutManagerInput = {
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
   collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagerInput = {
@@ -990,6 +1392,9 @@ export type UserUncheckedUpdateWithoutManagerInput = {
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
   collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutManagerInput = {
@@ -1015,12 +1420,18 @@ export type UserCountOutputType = {
   vehicleChecks: number
   collaborators: number
   vehicleCheckItemStatusHistories: number
+  externalRepairContacts: number
+  vehicleCheckPublicShares: number
+  vehicleRecoveredPublicShares: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleChecks?: boolean | UserCountOutputTypeCountVehicleChecksArgs
   collaborators?: boolean | UserCountOutputTypeCountCollaboratorsArgs
   vehicleCheckItemStatusHistories?: boolean | UserCountOutputTypeCountVehicleCheckItemStatusHistoriesArgs
+  externalRepairContacts?: boolean | UserCountOutputTypeCountExternalRepairContactsArgs
+  vehicleCheckPublicShares?: boolean | UserCountOutputTypeCountVehicleCheckPublicSharesArgs
+  vehicleRecoveredPublicShares?: boolean | UserCountOutputTypeCountVehicleRecoveredPublicSharesArgs
 }
 
 /**
@@ -1054,6 +1465,27 @@ export type UserCountOutputTypeCountVehicleCheckItemStatusHistoriesArgs<ExtArgs 
   where?: Prisma.VehicleCheckItemStatusHistoryWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountExternalRepairContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ExternalRepairContactWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVehicleCheckPublicSharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckPublicShareWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVehicleRecoveredPublicSharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckPublicShareWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1072,6 +1504,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   manager?: boolean | Prisma.User$managerArgs<ExtArgs>
   collaborators?: boolean | Prisma.User$collaboratorsArgs<ExtArgs>
   vehicleCheckItemStatusHistories?: boolean | Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs>
+  externalRepairContacts?: boolean | Prisma.User$externalRepairContactsArgs<ExtArgs>
+  vehicleCheckPublicShares?: boolean | Prisma.User$vehicleCheckPublicSharesArgs<ExtArgs>
+  vehicleRecoveredPublicShares?: boolean | Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1128,6 +1563,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   manager?: boolean | Prisma.User$managerArgs<ExtArgs>
   collaborators?: boolean | Prisma.User$collaboratorsArgs<ExtArgs>
   vehicleCheckItemStatusHistories?: boolean | Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs>
+  externalRepairContacts?: boolean | Prisma.User$externalRepairContactsArgs<ExtArgs>
+  vehicleCheckPublicShares?: boolean | Prisma.User$vehicleCheckPublicSharesArgs<ExtArgs>
+  vehicleRecoveredPublicShares?: boolean | Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1144,6 +1582,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     manager: Prisma.$UserPayload<ExtArgs> | null
     collaborators: Prisma.$UserPayload<ExtArgs>[]
     vehicleCheckItemStatusHistories: Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>[]
+    externalRepairContacts: Prisma.$ExternalRepairContactPayload<ExtArgs>[]
+    vehicleCheckPublicShares: Prisma.$VehicleCheckPublicSharePayload<ExtArgs>[]
+    vehicleRecoveredPublicShares: Prisma.$VehicleCheckPublicSharePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1556,6 +1997,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   manager<T extends Prisma.User$managerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$managerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   collaborators<T extends Prisma.User$collaboratorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$collaboratorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vehicleCheckItemStatusHistories<T extends Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  externalRepairContacts<T extends Prisma.User$externalRepairContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$externalRepairContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExternalRepairContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleCheckPublicShares<T extends Prisma.User$vehicleCheckPublicSharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleCheckPublicSharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPublicSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleRecoveredPublicShares<T extends Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPublicSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2086,6 +2530,78 @@ export type User$vehicleCheckItemStatusHistoriesArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.VehicleCheckItemStatusHistoryScalarFieldEnum | Prisma.VehicleCheckItemStatusHistoryScalarFieldEnum[]
+}
+
+/**
+ * User.externalRepairContacts
+ */
+export type User$externalRepairContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ExternalRepairContact
+   */
+  select?: Prisma.ExternalRepairContactSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ExternalRepairContact
+   */
+  omit?: Prisma.ExternalRepairContactOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExternalRepairContactInclude<ExtArgs> | null
+  where?: Prisma.ExternalRepairContactWhereInput
+  orderBy?: Prisma.ExternalRepairContactOrderByWithRelationInput | Prisma.ExternalRepairContactOrderByWithRelationInput[]
+  cursor?: Prisma.ExternalRepairContactWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ExternalRepairContactScalarFieldEnum | Prisma.ExternalRepairContactScalarFieldEnum[]
+}
+
+/**
+ * User.vehicleCheckPublicShares
+ */
+export type User$vehicleCheckPublicSharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckPublicShare
+   */
+  select?: Prisma.VehicleCheckPublicShareSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckPublicShare
+   */
+  omit?: Prisma.VehicleCheckPublicShareOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckPublicShareInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckPublicShareWhereInput
+  orderBy?: Prisma.VehicleCheckPublicShareOrderByWithRelationInput | Prisma.VehicleCheckPublicShareOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckPublicShareWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckPublicShareScalarFieldEnum | Prisma.VehicleCheckPublicShareScalarFieldEnum[]
+}
+
+/**
+ * User.vehicleRecoveredPublicShares
+ */
+export type User$vehicleRecoveredPublicSharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckPublicShare
+   */
+  select?: Prisma.VehicleCheckPublicShareSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckPublicShare
+   */
+  omit?: Prisma.VehicleCheckPublicShareOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckPublicShareInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckPublicShareWhereInput
+  orderBy?: Prisma.VehicleCheckPublicShareOrderByWithRelationInput | Prisma.VehicleCheckPublicShareOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckPublicShareWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckPublicShareScalarFieldEnum | Prisma.VehicleCheckPublicShareScalarFieldEnum[]
 }
 
 /**

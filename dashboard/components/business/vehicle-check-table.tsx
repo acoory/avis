@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { Eye, Pencil, Trash2, X } from "lucide-react";
+import { CheckCircle2, Eye, Pencil, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DecisionBadge, VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
+import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-dialog";
 import { DataTable } from "@/components/dashboard/data-table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +20,7 @@ type VehicleCheckTableProps = {
   vehicleChecks: VehicleCheck[];
   onDateFilterChange?: (range: { dateFrom?: string; dateTo?: string }) => void;
   onDeleted?: (vehicleCheck: VehicleCheck) => void;
+  onUpdated?: (vehicleCheck: VehicleCheck) => void;
 };
 
 export function VehicleCheckTable({
@@ -25,8 +28,10 @@ export function VehicleCheckTable({
   vehicleChecks,
   onDateFilterChange,
   onDeleted,
+  onUpdated,
 }: VehicleCheckTableProps) {
   const [vehicleCheckToDelete, setVehicleCheckToDelete] = useState<VehicleCheck | null>(null);
+  const [vehicleCheckToRecover, setVehicleCheckToRecover] = useState<VehicleCheck | null>(null);
 
   return (
     <>
@@ -41,53 +46,58 @@ export function VehicleCheckTable({
           onChange: onDateFilterChange,
         }}
         emptyMessage="Aucun controle pour le moment."
-        minWidth={1080}
+        minWidth={880}
+        mobileCard={(check) => (
+          <VehicleCheckMobileCard
+            check={check}
+            onDelete={() => setVehicleCheckToDelete(check)}
+            onRecover={() => setVehicleCheckToRecover(check)}
+          />
+        )}
         columns={[
           {
             id: "checkNumber",
-            header: "Numero",
+            header: "Controle",
             className: "px-4 py-3 font-medium text-gray-950",
             cell: (check) => (
-              <Link
-                className="font-semibold text-teal-700 underline-offset-4 hover:underline"
-                href={`/dashboard/vehicle-checks/${check.id}`}
-              >
-                {check.checkNumber}
-              </Link>
+              <div className="min-w-0">
+                <Link
+                  className="font-semibold text-teal-700 underline-offset-4 hover:underline"
+                  href={`/dashboard/vehicle-checks/${check.id}`}
+                >
+                  {check.checkNumber}
+                </Link>
+                <p className="mt-1 text-xs font-medium text-gray-500">{formatDate(check.checkDate)}</p>
+              </div>
             ),
             sortValue: (check) => check.checkNumber,
-            searchValue: (check) => check.checkNumber,
-          },
-          {
-            id: "checkDate",
-            header: "Date",
-            cell: (check) => formatDate(check.checkDate),
-            sortValue: (check) => new Date(check.checkDate),
-            searchValue: (check) => formatDate(check.checkDate),
+            searchValue: (check) => `${check.checkNumber} ${formatDate(check.checkDate)}`,
           },
           {
             id: "licensePlate",
             header: "Vehicule",
-            cell: (check) =>
-              formatLicensePlate(
-                check.licensePlate,
-                check.licensePlateCountry,
-                check.licensePlateRaw,
-              ),
+            className: "px-4 py-3 text-gray-900",
+            cell: (check) => (
+              <div className="min-w-0">
+                <p className="font-semibold">
+                  {formatLicensePlate(
+                    check.licensePlate,
+                    check.licensePlateCountry,
+                    check.licensePlateRaw,
+                  )}
+                </p>
+                <p className="mt-1 truncate text-xs font-medium text-gray-500">
+                  {check.manufacturer?.name ?? "-"}{check.vehicleModel?.name ? ` · ${check.vehicleModel.name}` : ""}
+                </p>
+              </div>
+            ),
             sortValue: (check) => check.licensePlate,
             searchValue: (check) =>
-              `${check.licensePlate} ${check.licensePlateRaw ?? ""} ${formatLicensePlate(
+              `${check.licensePlate} ${check.licensePlateRaw ?? ""} ${check.manufacturer?.name ?? ""} ${check.vehicleModel?.name ?? ""} ${formatLicensePlate(
                 check.licensePlate,
                 check.licensePlateCountry,
                 check.licensePlateRaw,
               )}`,
-          },
-          {
-            id: "manufacturer",
-            header: "Constructeur",
-            cell: (check) => check.manufacturer?.name ?? "-",
-            sortValue: (check) => check.manufacturer?.name,
-            searchValue: (check) => check.manufacturer?.name,
           },
           {
             id: "city",
@@ -98,8 +108,13 @@ export function VehicleCheckTable({
           },
           {
             id: "totalInternalSavingAmount",
-            header: "Economie reference",
-            cell: (check) => formatMoney(check.totalInternalSavingAmount),
+            header: "Economie",
+            cell: (check) => (
+              <div>
+                <p className="font-semibold text-gray-900">{formatMoney(check.totalInternalSavingAmount)}</p>
+                <p className="mt-1 text-xs font-medium text-gray-500">reference</p>
+              </div>
+            ),
             sortValue: (check) => Number(check.totalInternalSavingAmount),
             searchValue: (check) => check.totalInternalSavingAmount,
           },
@@ -118,10 +133,43 @@ export function VehicleCheckTable({
             searchValue: (check) => partOrderSummaryText(check),
           },
           {
+            id: "publicShare",
+            header: "Prestataire",
+            cell: (check) => <PublicShareStatusBadge vehicleCheck={check} />,
+            sortValue: (check) =>
+              check.publicShare?.vehicleRecoveredAt ? 3 : check.publicShare?.takenInChargeAt ? 2 : check.publicShare ? 1 : 0,
+            searchValue: (check) =>
+              check.publicShare?.vehicleRecoveredAt
+                ? "Recupere"
+                : check.publicShare?.takenInChargeAt
+                  ? "Pris en charge"
+                  : check.publicShare
+                    ? "Envoye"
+                    : "Non envoye",
+          },
+          {
             id: "actions",
             header: "Actions",
+            className: "px-4 py-3",
             cell: (check) => (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-nowrap gap-1.5">
+                {check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt ? (
+                  <Button
+                    aria-label={`Marquer le vehicule ${formatLicensePlate(
+                      check.licensePlate,
+                      check.licensePlateCountry,
+                      check.licensePlateRaw,
+                    )} comme recupere`}
+                    className="h-9 w-9 border-blue-200 px-0 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+                    size="sm"
+                    title="Marquer recupere"
+                    type="button"
+                    variant="outline"
+                    onClick={() => setVehicleCheckToRecover(check)}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                  </Button>
+                ) : null}
                 <Button
                   asChild
                   className="h-9 w-9 border-teal-200 px-0 text-teal-700 hover:bg-teal-50 hover:text-teal-800"
@@ -166,7 +214,96 @@ export function VehicleCheckTable({
         }}
         onDeleted={onDeleted}
       />
+      <VehicleRecoveredDialog
+        open={Boolean(vehicleCheckToRecover)}
+        vehicleCheck={vehicleCheckToRecover}
+        onOpenChange={(open) => {
+          if (!open) {
+            setVehicleCheckToRecover(null);
+          }
+        }}
+        onRecovered={(updated) => {
+          setVehicleCheckToRecover(null);
+          onUpdated?.(updated);
+        }}
+      />
     </>
+  );
+}
+
+function VehicleCheckMobileCard({
+  check,
+  onDelete,
+  onRecover,
+}: {
+  check: VehicleCheck;
+  onDelete: () => void;
+  onRecover: () => void;
+}) {
+  const canRecover = Boolean(check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt);
+  const vehicleLabel = formatLicensePlate(
+    check.licensePlate,
+    check.licensePlateCountry,
+    check.licensePlateRaw,
+  );
+
+  return (
+    <article className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <Link
+            className="block truncate text-base font-bold text-teal-700 underline-offset-4 hover:underline"
+            href={`/dashboard/vehicle-checks/${check.id}`}
+          >
+            {vehicleLabel}
+          </Link>
+          <p className="mt-1 text-xs font-semibold text-gray-500">{check.checkNumber}</p>
+        </div>
+        <VehicleCheckStatusBadge status={check.status} />
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+        <MobileDetail label="Date" value={formatDate(check.checkDate)} />
+        <MobileDetail label="Ville" value={check.city || "-"} />
+        <MobileDetail label="Constructeur" value={check.manufacturer?.name ?? "-"} />
+        <div>
+          <p className="text-[10px] font-bold uppercase text-gray-500">Prestataire</p>
+          <div className="mt-1">
+            <PublicShareStatusBadge vehicleCheck={check} />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
+        {canRecover ? (
+          <Button className="h-9 flex-1 border-blue-200 text-blue-700 hover:bg-blue-50" size="sm" type="button" variant="outline" onClick={onRecover}>
+            <CheckCircle2 className="h-4 w-4" />
+            Recuperer
+          </Button>
+        ) : null}
+        <Button asChild className="h-9 flex-1 border-teal-200 text-teal-700 hover:bg-teal-50" size="sm" variant="outline">
+          <Link href={`/dashboard/vehicle-checks/${check.id}`}>
+            <Eye className="h-4 w-4" />
+            Detail
+          </Link>
+        </Button>
+        <Button className="h-9 flex-1 border-red-200 text-red-600 hover:bg-red-50" size="sm" type="button" variant="outline" onClick={onDelete}>
+          <Trash2 className="h-4 w-4" />
+          Supprimer
+        </Button>
+      </div>
+    </article>
+  );
+}
+
+function MobileDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[10px] font-bold uppercase text-gray-500">{label}</p>
+      <p className="mt-1 truncate font-semibold text-gray-900" title={value}>
+        {value}
+      </p>
+    </div>
   );
 }
 
@@ -344,6 +481,34 @@ function PartOrderSummaryBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck })
       Commandées
     </span>
   );
+}
+
+function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
+  const share = vehicleCheck.publicShare;
+
+  if (!share) {
+    return <Badge variant="outline">Non envoye</Badge>;
+  }
+
+  if (share.vehicleRecoveredAt) {
+    return (
+      <div className="space-y-1">
+        <Badge className="bg-blue-50 text-blue-700">Recupere</Badge>
+        <p className="text-xs font-medium text-gray-500">{formatShortDateTime(share.vehicleRecoveredAt)}</p>
+      </div>
+    );
+  }
+
+  if (share.takenInChargeAt) {
+    return (
+      <div className="space-y-1">
+        <Badge variant="success">Pris en charge</Badge>
+        <p className="text-xs font-medium text-gray-500">{formatShortDateTime(share.takenInChargeAt)}</p>
+      </div>
+    );
+  }
+
+  return <Badge variant="warning">Envoye</Badge>;
 }
 
 function partOrderSummary(vehicleCheck: VehicleCheck) {
@@ -728,4 +893,14 @@ function PartOrderCell({
       </Button>
     </div>
   );
+}
+
+function formatShortDateTime(value: string) {
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(value));
 }

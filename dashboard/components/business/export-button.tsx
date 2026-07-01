@@ -10,15 +10,23 @@ import { UserListItem } from "@/types/users";
 
 type ExportButtonProps = {
   dateRange?: { dateFrom?: string; dateTo?: string };
+  selectedCollaboratorId?: string;
+  onCollaboratorChange?: (collaboratorId: string) => void;
   withCollaboratorFilter?: boolean;
 };
 
-export function ExportButton({ dateRange, withCollaboratorFilter = false }: ExportButtonProps) {
+export function ExportButton({
+  dateRange,
+  onCollaboratorChange,
+  selectedCollaboratorId,
+  withCollaboratorFilter = false,
+}: ExportButtonProps) {
   const accessToken = useAuthStore((state) => state.accessToken);
   const user = useAuthStore((state) => state.user);
-  const [selectedCollaboratorId, setSelectedCollaboratorId] = useState("");
+  const [internalCollaboratorId, setInternalCollaboratorId] = useState("");
   const [users, setUsers] = useState<UserListItem[]>([]);
   const canSelectCollaborator = withCollaboratorFilter && user?.role !== "COLLABORATOR";
+  const collaboratorId = selectedCollaboratorId ?? internalCollaboratorId;
 
   useEffect(() => {
     if (!canSelectCollaborator) {
@@ -43,7 +51,7 @@ export function ExportButton({ dateRange, withCollaboratorFilter = false }: Expo
   async function handleExport() {
     const response = await fetch(
       exportVehicleChecksUrl({
-        collaboratorId: selectedCollaboratorId || undefined,
+        collaboratorId: collaboratorId || undefined,
         dateFrom: dateRange?.dateFrom,
         dateTo: dateRange?.dateTo,
       }),
@@ -61,12 +69,15 @@ export function ExportButton({ dateRange, withCollaboratorFilter = false }: Expo
   }
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+    <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
       {canSelectCollaborator ? (
         <select
-          className="h-10 rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 shadow-sm"
-          value={selectedCollaboratorId}
-          onChange={(event) => setSelectedCollaboratorId(event.target.value)}
+          className="h-9 min-w-0 rounded-md border border-gray-200 bg-white px-2 text-xs font-medium text-gray-900 shadow-sm sm:w-56 sm:text-sm"
+          value={collaboratorId}
+          onChange={(event) => {
+            setInternalCollaboratorId(event.target.value);
+            onCollaboratorChange?.(event.target.value);
+          }}
         >
           <option value="">Tous les collaborateurs</option>
           {collaboratorOptions.map((collaborator) => (
@@ -76,9 +87,9 @@ export function ExportButton({ dateRange, withCollaboratorFilter = false }: Expo
           ))}
         </select>
       ) : null}
-      <Button onClick={handleExport} variant="outline">
-        <Download className="h-4 w-4" />
-        Export Excel
+      <Button className={canSelectCollaborator ? "h-9 min-w-0 px-2 text-xs sm:px-3 sm:text-sm" : "col-span-2 h-9 px-2 text-xs sm:text-sm"} onClick={handleExport} variant="outline">
+        <Download className="h-3.5 w-3.5" />
+        <span className="truncate">Export Excel</span>
       </Button>
     </div>
   );

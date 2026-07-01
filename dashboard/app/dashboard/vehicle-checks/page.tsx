@@ -37,6 +37,12 @@ export default function VehicleChecksPage() {
     void loadVehicleChecks(dateRange);
   }
 
+  function handleVehicleCheckUpdated(updatedVehicleCheck: VehicleCheck) {
+    setVehicleChecks((current) =>
+      current.map((check) => (check.id === updatedVehicleCheck.id ? updatedVehicleCheck : check)),
+    );
+  }
+
   return (
     <>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -59,6 +65,7 @@ export default function VehicleChecksPage() {
           vehicleChecks={vehicleChecks}
           onDeleted={handleVehicleCheckDeleted}
           onDateFilterChange={loadVehicleChecks}
+          onUpdated={handleVehicleCheckUpdated}
         />
       )}
     </>

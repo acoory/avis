@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { randomBytes } from 'crypto';
 import {
   PartOrderStatus,
   Prisma,
@@ -62,6 +63,43 @@ const vehicleCheckInclude = {
       items: { include: { repairType: true } },
     },
   },
+  publicShare: {
+    select: {
+      createdAt: true,
+      takenInChargeAt: true,
+      vehicleRecoveredAt: true,
+      vehicleRecoveredBy: {
+        select: {
+          email: true,
+          firstName: true,
+          id: true,
+          lastName: true,
+        },
+      },
+      vehicleRecoveredById: true,
+      token: true,
+    },
+  },
+};
+
+const publicVehicleCheckInclude = {
+  agency: true,
+  manufacturer: true,
+  vehicleModel: true,
+  items: {
+    where: {
+      selectedForSummary: true,
+      operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+    },
+    include: {
+      repairType: true,
+      vehiclePart: true,
+      photos: {
+        orderBy: { createdAt: 'asc' as const },
+      },
+    },
+    orderBy: { createdAt: 'asc' as const },
+  },
 };
 
 @Injectable()
@@ -105,6 +143,112 @@ export class VehicleChecksService {
     }
 
     return vehicleCheck;
+  }
+
+  async createPublicShare(id: string, user: CurrentUserPayload) {
+    const vehicleCheck = await this.findOne(id, user);
+
+    if (vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY) {
+      throw new BadRequestException('The vehicle check summary must be ready before sharing');
+    }
+
+    const existingShare = await this.prisma.vehicleCheckPublicShare.findUnique({
+      where: { vehicleCheckId: id },
+    });
+
+    if (existingShare) {
+      const share = existingShare.isEnabled
+        ? existingShare
+        : await this.prisma.vehicleCheckPublicShare.update({
+            where: { id: existingShare.id },
+            data: { isEnabled: true },
+          });
+
+      return this.publicShareResponse(share);
+    }
+
+    const share = await this.prisma.vehicleCheckPublicShare.create({
+      data: {
+        createdById: user.sub,
+        token: await this.generatePublicShareToken(),
+        vehicleCheckId: id,
+      },
+    });
+
+    return this.publicShareResponse(share);
+  }
+
+  async findPublicShare(token: string) {
+    const share = await this.prisma.vehicleCheckPublicShare.findUnique({
+      where: { token },
+      include: {
+        vehicleCheck: {
+          include: publicVehicleCheckInclude,
+        },
+      },
+    });
+
+    if (!share?.isEnabled || share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY) {
+      throw new NotFoundException('Public repair request not found');
+    }
+
+    return {
+      createdAt: share.createdAt,
+      takenInChargeAt: share.takenInChargeAt,
+      vehicleRecoveredAt: share.vehicleRecoveredAt,
+      token: share.token,
+      vehicleCheck: share.vehicleCheck,
+    };
+  }
+
+  async takeChargePublicShare(token: string) {
+    const share = await this.prisma.vehicleCheckPublicShare.findUnique({
+      where: { token },
+      include: {
+        vehicleCheck: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    });
+
+    if (!share?.isEnabled || share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY) {
+      throw new NotFoundException('Public repair request not found');
+    }
+
+    if (!share.takenInChargeAt) {
+      await this.prisma.vehicleCheckPublicShare.update({
+        where: { id: share.id },
+        data: { takenInChargeAt: new Date() },
+      });
+    }
+
+    return this.findPublicShare(token);
+  }
+
+  async markVehicleRecovered(id: string, user: CurrentUserPayload) {
+    const vehicleCheck = await this.findOne(id, user);
+
+    if (!vehicleCheck.publicShare) {
+      throw new BadRequestException('The repair request must be shared before marking the vehicle as recovered');
+    }
+
+    if (!vehicleCheck.publicShare.takenInChargeAt) {
+      throw new BadRequestException('The repair request must be taken in charge before marking the vehicle as recovered');
+    }
+
+    if (!vehicleCheck.publicShare.vehicleRecoveredAt) {
+      await this.prisma.vehicleCheckPublicShare.update({
+        where: { vehicleCheckId: id },
+        data: {
+          vehicleRecoveredAt: new Date(),
+          vehicleRecoveredById: user.sub,
+        },
+      });
+    }
+
+    return this.findOne(id, user);
   }
 
   async create(collaboratorId: string, dto: CreateVehicleCheckDto) {
@@ -516,5 +660,35 @@ export class VehicleChecksService {
     });
 
     return `${prefix}-${String(count + 1).padStart(4, '0')}`;
+  }
+
+  private async generatePublicShareToken() {
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const token = randomBytes(24).toString('base64url');
+      const existingShare = await this.prisma.vehicleCheckPublicShare.findUnique({
+        where: { token },
+        select: { id: true },
+      });
+
+      if (!existingShare) {
+        return token;
+      }
+    }
+
+    throw new BadRequestException('Unable to generate public share token');
+  }
+
+  private publicShareResponse(share: {
+    token: string;
+    createdAt: Date;
+    takenInChargeAt?: Date | null;
+    vehicleRecoveredAt?: Date | null;
+  }) {
+    return {
+      createdAt: share.createdAt,
+      takenInChargeAt: share.takenInChargeAt ?? null,
+      vehicleRecoveredAt: share.vehicleRecoveredAt ?? null,
+      token: share.token,
+    };
   }
 }

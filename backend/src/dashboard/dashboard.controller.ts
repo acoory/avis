@@ -29,4 +29,9 @@ export class DashboardController {
   repairTypeFrequency(@CurrentUser() user: CurrentUserPayload, @Query() query: DashboardQueryDto) {
     return this.dashboardService.repairTypeFrequency(user, query);
   }
+
+  @Get('timeline')
+  timeline(@CurrentUser() user: CurrentUserPayload, @Query() query: DashboardQueryDto) {
+    return this.dashboardService.timeline(user, query);
+  }
 }

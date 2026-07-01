@@ -393,6 +393,8 @@ export const ModelName = {
   ManufacturerRule: 'ManufacturerRule',
   ManufacturerRepairRule: 'ManufacturerRepairRule',
   VehicleCheck: 'VehicleCheck',
+  ExternalRepairContact: 'ExternalRepairContact',
+  VehicleCheckPublicShare: 'VehicleCheckPublicShare',
   VehicleCheckItem: 'VehicleCheckItem',
   VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
@@ -413,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
+    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "externalRepairContact" | "vehicleCheckPublicShare" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1083,6 +1085,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ExternalRepairContact: {
+      payload: Prisma.$ExternalRepairContactPayload<ExtArgs>
+      fields: Prisma.ExternalRepairContactFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExternalRepairContactFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExternalRepairContactFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>
+        }
+        findFirst: {
+          args: Prisma.ExternalRepairContactFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExternalRepairContactFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>
+        }
+        findMany: {
+          args: Prisma.ExternalRepairContactFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>[]
+        }
+        create: {
+          args: Prisma.ExternalRepairContactCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>
+        }
+        createMany: {
+          args: Prisma.ExternalRepairContactCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExternalRepairContactCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>[]
+        }
+        delete: {
+          args: Prisma.ExternalRepairContactDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>
+        }
+        update: {
+          args: Prisma.ExternalRepairContactUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>
+        }
+        deleteMany: {
+          args: Prisma.ExternalRepairContactDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExternalRepairContactUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExternalRepairContactUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>[]
+        }
+        upsert: {
+          args: Prisma.ExternalRepairContactUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalRepairContactPayload>
+        }
+        aggregate: {
+          args: Prisma.ExternalRepairContactAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExternalRepairContact>
+        }
+        groupBy: {
+          args: Prisma.ExternalRepairContactGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExternalRepairContactGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExternalRepairContactCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExternalRepairContactCountAggregateOutputType> | number
+        }
+      }
+    }
+    VehicleCheckPublicShare: {
+      payload: Prisma.$VehicleCheckPublicSharePayload<ExtArgs>
+      fields: Prisma.VehicleCheckPublicShareFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VehicleCheckPublicShareFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VehicleCheckPublicShareFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>
+        }
+        findFirst: {
+          args: Prisma.VehicleCheckPublicShareFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VehicleCheckPublicShareFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>
+        }
+        findMany: {
+          args: Prisma.VehicleCheckPublicShareFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>[]
+        }
+        create: {
+          args: Prisma.VehicleCheckPublicShareCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>
+        }
+        createMany: {
+          args: Prisma.VehicleCheckPublicShareCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VehicleCheckPublicShareCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>[]
+        }
+        delete: {
+          args: Prisma.VehicleCheckPublicShareDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>
+        }
+        update: {
+          args: Prisma.VehicleCheckPublicShareUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>
+        }
+        deleteMany: {
+          args: Prisma.VehicleCheckPublicShareDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VehicleCheckPublicShareUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VehicleCheckPublicShareUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>[]
+        }
+        upsert: {
+          args: Prisma.VehicleCheckPublicShareUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckPublicSharePayload>
+        }
+        aggregate: {
+          args: Prisma.VehicleCheckPublicShareAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVehicleCheckPublicShare>
+        }
+        groupBy: {
+          args: Prisma.VehicleCheckPublicShareGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckPublicShareGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VehicleCheckPublicShareCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckPublicShareCountAggregateOutputType> | number
+        }
+      }
+    }
     VehicleCheckItem: {
       payload: Prisma.$VehicleCheckItemPayload<ExtArgs>
       fields: Prisma.VehicleCheckItemFieldRefs
@@ -1642,6 +1792,38 @@ export const VehicleCheckScalarFieldEnum = {
 export type VehicleCheckScalarFieldEnum = (typeof VehicleCheckScalarFieldEnum)[keyof typeof VehicleCheckScalarFieldEnum]
 
 
+export const ExternalRepairContactScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  companyName: 'companyName',
+  email: 'email',
+  phone: 'phone',
+  notes: 'notes',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExternalRepairContactScalarFieldEnum = (typeof ExternalRepairContactScalarFieldEnum)[keyof typeof ExternalRepairContactScalarFieldEnum]
+
+
+export const VehicleCheckPublicShareScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckId: 'vehicleCheckId',
+  token: 'token',
+  isEnabled: 'isEnabled',
+  takenInChargeAt: 'takenInChargeAt',
+  vehicleRecoveredAt: 'vehicleRecoveredAt',
+  vehicleRecoveredById: 'vehicleRecoveredById',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehicleCheckPublicShareScalarFieldEnum = (typeof VehicleCheckPublicShareScalarFieldEnum)[keyof typeof VehicleCheckPublicShareScalarFieldEnum]
+
+
 export const VehicleCheckItemScalarFieldEnum = {
   id: 'id',
   vehicleCheckId: 'vehicleCheckId',
@@ -2038,6 +2220,8 @@ export type GlobalOmitConfig = {
   manufacturerRule?: Prisma.ManufacturerRuleOmit
   manufacturerRepairRule?: Prisma.ManufacturerRepairRuleOmit
   vehicleCheck?: Prisma.VehicleCheckOmit
+  externalRepairContact?: Prisma.ExternalRepairContactOmit
+  vehicleCheckPublicShare?: Prisma.VehicleCheckPublicShareOmit
   vehicleCheckItem?: Prisma.VehicleCheckItemOmit
   vehicleCheckItemPhoto?: Prisma.VehicleCheckItemPhotoOmit
   vehicleCheckItemStatusHistory?: Prisma.VehicleCheckItemStatusHistoryOmit

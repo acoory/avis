@@ -21,6 +21,7 @@ type DataTableProps<T> = {
   columns: DataTableColumn<T>[];
   data: T[];
   emptyMessage?: string;
+  mobileCard?: (row: T) => ReactNode;
   minWidth?: number;
   initialSort?: {
     column: string;
@@ -41,6 +42,7 @@ export function DataTable<T>({
   columns,
   data,
   emptyMessage = "Aucune donnee.",
+  mobileCard,
   minWidth = 760,
   initialSort,
   dateFilter,
@@ -203,7 +205,20 @@ export function DataTable<T>({
           </div>
         </div>
 
-        <div className="min-w-0 overflow-x-auto">
+        {mobileCard ? (
+          <div className="divide-y divide-gray-100 md:hidden">
+            {visibleRows.map((row, rowIndex) => (
+              <div className="p-3" key={rowIndex}>
+                {mobileCard(row)}
+              </div>
+            ))}
+            {!visibleRows.length ? (
+              <div className="px-4 py-8 text-center text-sm text-gray-500">{emptyMessage}</div>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className={mobileCard ? "hidden min-w-0 overflow-x-auto md:block" : "min-w-0 overflow-x-auto"}>
           <table className="w-full text-left text-sm" style={{ minWidth }}>
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
               <tr>

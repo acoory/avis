@@ -2,7 +2,16 @@ import { api } from "@/lib/api";
 import {
   Agency,
   DashboardSummary,
+  DashboardTimelinePoint,
   DamagePhoto,
+  ExternalRepairContact,
+  GtmotiveEstimate,
+  GtmotiveGraphicZone,
+  GtmotiveNavigationBoard,
+  GtmotiveOperationResult,
+  GtmotivePart,
+  GtmotivePartsResponse,
+  GtmotiveVehicleIdentification,
   Manufacturer,
   ManufacturerRepairRule,
   ManufacturerRepairRuleStatus,
@@ -13,11 +22,14 @@ import {
   VehicleCheck,
   VehicleCheckItem,
   VehicleCheckItemOperationalStatus,
+  VehicleCheckPublicShare,
   VehicleModel,
   VehiclePart,
+  PublicVehicleCheckShare,
 } from "@/types/business";
 
 type PeriodParams = {
+  collaboratorId?: string;
   dateFrom?: string;
   dateTo?: string;
 };
@@ -70,6 +82,161 @@ export const businessService = {
       }>
     >("/dashboard/repair-type-frequency", { params });
     return data;
+  },
+
+  async externalRepairContacts() {
+    const { data } = await api.get<ExternalRepairContact[]>("/external-repair-contacts");
+    return data;
+  },
+
+  async findOrCreateExternalRepairContact(payload: {
+    companyName?: string;
+    email: string;
+    name: string;
+    notes?: string;
+    phone?: string;
+  }) {
+    const { data } = await api.post<ExternalRepairContact>("/external-repair-contacts/find-or-create", payload);
+    return data;
+  },
+
+  async createVehicleCheckPublicShare(id: string) {
+    const { data } = await api.post<VehicleCheckPublicShare>(`/vehicle-checks/${id}/public-share`, {});
+    return data;
+  },
+
+  async markVehicleRecovered(id: string) {
+    const { data } = await api.post<VehicleCheck>(`/vehicle-checks/${id}/public-share/recovered`, {});
+    return data;
+  },
+
+  async publicVehicleCheckShare(token: string) {
+    const { data } = await api.get<PublicVehicleCheckShare>(`/public/vehicle-checks/${token}`);
+    return data;
+  },
+
+  async takeChargePublicVehicleCheckShare(token: string) {
+    const { data } = await api.post<PublicVehicleCheckShare>(`/public/vehicle-checks/${token}/take-charge`, {});
+    return data;
+  },
+
+  async dashboardTimeline(params?: PeriodParams) {
+    const { data } = await api.get<DashboardTimelinePoint[]>("/dashboard/timeline", { params });
+    return data;
+  },
+
+  async createGtmotiveEstimate() {
+    const { data } = await api.post<GtmotiveEstimate>("/api/gtmotive/estimate", {});
+    return data;
+  },
+
+  async identifyGtmotiveVehicle(payload: {
+    estimateId: number;
+    securityProfileId?: number;
+    registrationNumber?: string;
+    vin?: string;
+  }) {
+    const { data } = await api.post<GtmotiveVehicleIdentification>("/api/gtmotive/identify-vehicle", payload);
+    return data;
+  },
+
+  async gtmotiveNavigationBoard(
+    estimateId: number,
+    params: {
+      securityProfileId?: number;
+      makeCode?: string | null;
+      modelId?: string | null;
+      navigationModelCode?: string | null;
+      equipment?: string | null;
+    },
+  ) {
+    const { data } = await api.get<GtmotiveNavigationBoard>(`/api/gtmotive/estimates/${estimateId}/navigation-board`, {
+      params,
+    });
+    return data;
+  },
+
+  async gtmotiveNavigationBoardSvg(svgUrl: string) {
+    const { data } = await api.get<string>(svgUrl, { responseType: "text" });
+    return data;
+  },
+
+  async gtmotiveNavigationBoardImage(imageUrl: string) {
+    const { data } = await api.get<Blob>(imageUrl, { responseType: "blob" });
+    return data;
+  },
+
+  async selectGtmotiveGroup(estimateId: number, payload: { groupId: string; securityProfileId?: number }) {
+    const { data } = await api.post<{
+      estimateId: number;
+      selectedGroup: { id: string; label: string };
+    }>(`/api/gtmotive/estimates/${estimateId}/select-group`, payload);
+    return data;
+  },
+
+  async gtmotiveParts(estimateId: number, securityProfileId?: number, groupId?: string) {
+    const { data } = await api.get<GtmotivePartsResponse>(`/api/gtmotive/estimates/${estimateId}/parts`, {
+      params: { securityProfileId, groupId },
+    });
+    return data;
+  },
+
+  async gtmotiveGraphicZone(
+    estimateId: number,
+    groupId: string,
+    params: {
+      securityProfileId?: number;
+      makeCode?: string | null;
+      modelId?: string | null;
+      navigationModelCode?: string | null;
+      equipment?: string | null;
+    },
+  ) {
+    const { data } = await api.get<GtmotiveGraphicZone>(`/api/gtmotive/estimates/${estimateId}/graphic-zone/${groupId}`, {
+      params,
+    });
+    return data;
+  },
+
+  async addGtmotivePartOperation(
+    estimateId: number,
+    part: GtmotivePart,
+    payload: {
+      relatedPartType?: number;
+      securityProfileId?: number;
+      taskType: number;
+    },
+  ) {
+    const { data } = await api.post<GtmotiveOperationResult>(`/api/gtmotive/estimates/${estimateId}/operations`, {
+      partCode: part.id,
+      partDescription: part.label,
+      ...payload,
+    });
+    return data;
+  },
+
+  async switchGtmotivePartOperation(
+    estimateId: number,
+    part: GtmotivePart,
+    payload: {
+      relatedPartType?: number;
+      securityProfileId?: number;
+      taskType: number;
+    },
+  ) {
+    const { data } = await api.post<GtmotiveOperationResult>(`/api/gtmotive/estimates/${estimateId}/operations/switch`, {
+      partCode: part.id,
+      partDescription: part.label,
+      ...payload,
+    });
+    return data;
+  },
+
+  async replaceGtmotivePart(estimateId: number, part: GtmotivePart, securityProfileId?: number) {
+    return this.addGtmotivePartOperation(estimateId, part, {
+      securityProfileId,
+      taskType: 1,
+    });
   },
 
   async vehicleChecks(params?: PeriodParams) {

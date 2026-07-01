@@ -1,0 +1,56 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# builds / generated
+backend/dist/
+dashboard/.next/
+dashboard/tsconfig.tsbuildinfo
+backend/**/*.tsbuildinfo
+dist/
+build/
+graphify-out/
+
+# prisma generated / migrations
+backend/prisma/generated/
+backend/prisma/migrations/
+
+# lockfiles
+backend/pnpm-lock.yaml
+dashboard/pnpm-lock.yaml
+package-lock.json
+bun.lockb
+yarn.lock
+
+# env / secrets
+.env
+.env.*
+*.env
+
+# logs / cache
+*.log
+.DS_Store
+.cache/
+coverage/
+
+# public static assets
+dashboard/public/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.svg
+*.ico
+
+# docker / non-code optionnel
+docker-compose.fastalpr.yml
+
+README.md
+**/README.md
+AGENTS.md
+**/AGENTS.md
+CLAUDE.md
+**/CLAUDE.md
+docs/
+**/docs/
+*.md

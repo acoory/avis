@@ -70,6 +70,9 @@ model User {
   manager       User?          @relation("ManagerCollaborators", fields: [managerId], references: [id], onDelete: SetNull)
   collaborators User[]         @relation("ManagerCollaborators")
   vehicleCheckItemStatusHistories VehicleCheckItemStatusHistory[]
+  externalRepairContacts ExternalRepairContact[] @relation("ExternalRepairContactCreatedBy")
+  vehicleCheckPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareCreatedBy")
+  vehicleRecoveredPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareRecoveredBy")
 
   @@index([role])
   @@index([isActive])
@@ -232,6 +235,7 @@ model VehicleCheck {
   vehicleModel   VehicleModel?      @relation(fields: [vehicleModelId], references: [id], onDelete: SetNull)
   items          VehicleCheckItem[]
   externalQuotes ExternalQuote[]
+  publicShare    VehicleCheckPublicShare?
 
   @@index([collaboratorId])
   @@index([agencyId])
@@ -241,6 +245,49 @@ model VehicleCheck {
   @@index([status])
   @@index([licensePlate])
   @@index([licensePlateCountry])
+}
+
+model ExternalRepairContact {
+  id          String   @id @default(uuid())
+  name        String
+  companyName String?
+  email       String   @unique
+  phone       String?
+  notes       String?
+  isActive    Boolean  @default(true)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User? @relation("ExternalRepairContactCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([isActive])
+  @@index([createdById])
+  @@index([companyName])
+}
+
+model VehicleCheckPublicShare {
+  id             String   @id @default(uuid())
+  vehicleCheckId String   @unique
+  token          String   @unique
+  isEnabled      Boolean  @default(true)
+  takenInChargeAt DateTime?
+  vehicleRecoveredAt DateTime?
+  vehicleRecoveredById String?
+  createdById    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  createdBy    User?        @relation("VehicleCheckPublicShareCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  vehicleRecoveredBy User?  @relation("VehicleCheckPublicShareRecoveredBy", fields: [vehicleRecoveredById], references: [id], onDelete: SetNull)
+
+  @@index([token])
+  @@index([isEnabled])
+  @@index([takenInChargeAt])
+  @@index([vehicleRecoveredAt])
+  @@index([vehicleRecoveredById])
+  @@index([createdById])
 }
 
 model VehicleCheckItem {
