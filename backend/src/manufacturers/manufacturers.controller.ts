@@ -22,7 +22,7 @@ export class ManufacturersController {
     return this.manufacturersService.findOne(id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.MANAGER)
   @Post()
   create(@Body() dto: CreateManufacturerDto) {
     return this.manufacturersService.create(dto);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/dashboard/data-table";
@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import {
@@ -28,9 +29,12 @@ const editableStatuses: Array<{ value: ManufacturerRepairRuleStatus; label: stri
 
 export default function ManufacturersPage() {
   const user = useAuthStore((state) => state.user);
+  const canCreateManufacturer = user?.role === "ADMIN" || user?.role === "MANAGER";
   const canEditRules = user?.role === "ADMIN";
   const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
+  const [newManufacturerName, setNewManufacturerName] = useState("");
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
   const [savingCell, setSavingCell] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,6 +45,27 @@ export default function ManufacturersPage() {
       },
     );
   }, []);
+
+  async function createManufacturer() {
+    const name = newManufacturerName.trim();
+
+    if (!name) {
+      toast.error("Le nom du constructeur est obligatoire.");
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const savedManufacturer = await businessService.createManufacturer({ name });
+      setManufacturers((current) => sortManufacturers([...current, toManufacturerListItem(savedManufacturer)]));
+      setNewManufacturerName("");
+      toast.success("Constructeur cree.");
+    } catch {
+      toast.error("Impossible de creer ce constructeur. Il existe peut-etre deja.");
+    } finally {
+      setIsCreating(false);
+    }
+  }
 
   async function updateMatrixRule(
     manufacturer: Manufacturer,
@@ -87,6 +112,31 @@ export default function ManufacturersPage() {
   return (
     <>
       <PageHeader title="Constructeurs" description="Matrice Buy Back par constructeur." />
+      {canCreateManufacturer ? (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Nouveau constructeur</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <Input
+                placeholder="Nom du constructeur"
+                value={newManufacturerName}
+                onChange={(event) => setNewManufacturerName(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    void createManufacturer();
+                  }
+                }}
+              />
+              <Button disabled={isCreating} onClick={() => void createManufacturer()}>
+                <Plus className="h-4 w-4" />
+                Ajouter
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
       <DataTable
         data={manufacturers}
         emptyMessage="Aucun constructeur pour le moment."
@@ -252,4 +302,23 @@ function upsertRepairRule(rules: ManufacturerRepairRule[], savedRule: Manufactur
 
 function matrixCellKey(manufacturerId: string, repairTypeId: string) {
   return `${manufacturerId}:${repairTypeId}`;
+}
+
+function toManufacturerListItem(manufacturer: Manufacturer): Manufacturer {
+  return {
+    ...manufacturer,
+    rule: manufacturer.rule ?? null,
+    repairRules: manufacturer.repairRules ?? [],
+    _count: manufacturer._count ?? {
+      models: 0,
+      repairRules: 0,
+      checks: 0,
+    },
+  };
+}
+
+function sortManufacturers(manufacturers: Manufacturer[]) {
+  return [...manufacturers].sort((first, second) =>
+    first.name.localeCompare(second.name, "fr", { sensitivity: "base" }),
+  );
 }

@@ -414,6 +414,11 @@ export const businessService = {
     return data;
   },
 
+  async createManufacturer(payload: { name: string }) {
+    const { data } = await api.post<Manufacturer>("/manufacturers", payload);
+    return data;
+  },
+
   async vehicleModels(manufacturerId?: string) {
     const { data } = await api.get<VehicleModel[]>("/vehicle-models", { params: { manufacturerId } });
     return data;
