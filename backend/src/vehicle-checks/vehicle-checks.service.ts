@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
 import {
@@ -156,12 +160,20 @@ export class VehicleChecksService {
     return vehicleCheck;
   }
 
-  async createPublicShare(id: string, user: CurrentUserPayload, dto: CreatePublicShareDto = {}) {
+  async createPublicShare(
+    id: string,
+    user: CurrentUserPayload,
+    dto: CreatePublicShareDto = {},
+  ) {
     const vehicleCheck = await this.findOne(id, user);
-    const externalRepairContactId = await this.ensureExternalRepairContact(dto.externalRepairContactId);
+    const externalRepairContactId = await this.ensureExternalRepairContact(
+      dto.externalRepairContactId,
+    );
 
     if (vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY) {
-      throw new BadRequestException('The vehicle check summary must be ready before sharing');
+      throw new BadRequestException(
+        'The vehicle check summary must be ready before sharing',
+      );
     }
 
     const existingShare = await this.prisma.vehicleCheckPublicShare.findUnique({
@@ -203,15 +215,27 @@ export class VehicleChecksService {
     return this.publicShareResponse(share);
   }
 
-  async sendRepairRequestEmail(id: string, user: CurrentUserPayload, dto: SendRepairRequestEmailDto) {
+  async sendRepairRequestEmail(
+    id: string,
+    user: CurrentUserPayload,
+    dto: SendRepairRequestEmailDto,
+  ) {
     const recipients = await this.resolveRepairRequestRecipients(dto, user);
     const primaryContact = recipients[0];
-    const share = await this.createPublicShare(id, user, { externalRepairContactId: primaryContact.id });
+    const share = await this.createPublicShare(id, user, {
+      externalRepairContactId: primaryContact.id,
+    });
     const vehicleCheck = await this.findOne(id, user);
-    const selectedItemsCount = (vehicleCheck.items ?? []).filter((item) => item.selectedForSummary).length;
+    const selectedItemsCount = (vehicleCheck.items ?? []).filter(
+      (item) => item.selectedForSummary,
+    ).length;
     const publicUrl = this.publicRepairRequestUrl(share.token);
     const subject = this.repairRequestSubject(vehicleCheck);
-    const text = this.repairRequestText(vehicleCheck, publicUrl, selectedItemsCount);
+    const text = this.repairRequestText(
+      vehicleCheck,
+      publicUrl,
+      selectedItemsCount,
+    );
 
     await this.mailService.sendMail({
       html: this.repairRequestHtml(vehicleCheck, publicUrl, selectedItemsCount),
@@ -250,7 +274,10 @@ export class VehicleChecksService {
       },
     });
 
-    if (!share?.isEnabled || share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY) {
+    if (
+      !share?.isEnabled ||
+      share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY
+    ) {
       throw new NotFoundException('Public repair request not found');
     }
 
@@ -277,7 +304,10 @@ export class VehicleChecksService {
       },
     });
 
-    if (!share?.isEnabled || share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY) {
+    if (
+      !share?.isEnabled ||
+      share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY
+    ) {
       throw new NotFoundException('Public repair request not found');
     }
 
@@ -295,14 +325,17 @@ export class VehicleChecksService {
     const vehicleCheck = await this.findOne(id, user);
 
     if (!vehicleCheck.publicShare) {
-      throw new BadRequestException('The repair request must be shared before marking the vehicle as recovered');
+      throw new BadRequestException(
+        'The repair request must be shared before marking the vehicle as recovered',
+      );
     }
 
     if (!vehicleCheck.publicShare.vehicleRecoveredAt) {
       await this.prisma.vehicleCheckPublicShare.update({
         where: { vehicleCheckId: id },
         data: {
-          takenInChargeAt: vehicleCheck.publicShare.takenInChargeAt ?? new Date(),
+          takenInChargeAt:
+            vehicleCheck.publicShare.takenInChargeAt ?? new Date(),
           vehicleRecoveredAt: new Date(),
           vehicleRecoveredById: user.sub,
         },
@@ -313,7 +346,11 @@ export class VehicleChecksService {
   }
 
   async create(collaboratorId: string, dto: CreateVehicleCheckDto) {
-    await this.ensureReferences(dto.agencyId, dto.manufacturerId, dto.vehicleModelId);
+    await this.ensureReferences(
+      dto.agencyId,
+      dto.manufacturerId,
+      dto.vehicleModelId,
+    );
     await this.ensureVehicleParts(dto.items.map((item) => item.vehiclePartId));
     const decision = dto.items.length
       ? await this.repairDecisionService.preview(dto.manufacturerId, dto.items)
@@ -329,8 +366,11 @@ export class VehicleChecksService {
         vehicleModelId: dto.vehicleModelId,
         licensePlate: normalizeLicensePlate(dto.licensePlate),
         licensePlateRaw: sanitizeLicensePlateRaw(dto.licensePlate),
-        licensePlateCountry: normalizeLicensePlateCountry(dto.licensePlateCountry ?? 'FR'),
-        licensePlateRecognitionConfidence: dto.licensePlateRecognitionConfidence,
+        licensePlateCountry: normalizeLicensePlateCountry(
+          dto.licensePlateCountry ?? 'FR',
+        ),
+        licensePlateRecognitionConfidence:
+          dto.licensePlateRecognitionConfidence,
         mileage: dto.mileage,
         checkDate: dto.checkDate ? new Date(dto.checkDate) : new Date(),
         city: dto.city,
@@ -375,15 +415,22 @@ export class VehicleChecksService {
     });
   }
 
-  async update(id: string, dto: UpdateVehicleCheckDto, user: CurrentUserPayload) {
+  async update(
+    id: string,
+    dto: UpdateVehicleCheckDto,
+    user: CurrentUserPayload,
+  ) {
     const existing = await this.findOne(id, user);
 
     const agencyId = dto.agencyId ?? existing.agencyId;
     const manufacturerId = dto.manufacturerId ?? existing.manufacturerId;
-    const vehicleModelId = dto.vehicleModelId ?? existing.vehicleModelId ?? undefined;
+    const vehicleModelId =
+      dto.vehicleModelId ?? existing.vehicleModelId ?? undefined;
     await this.ensureReferences(agencyId, manufacturerId, vehicleModelId);
     if (dto.items) {
-      await this.ensureVehicleParts(dto.items.map((item) => item.vehiclePartId));
+      await this.ensureVehicleParts(
+        dto.items.map((item) => item.vehiclePartId),
+      );
     }
 
     if (!dto.items) {
@@ -393,12 +440,17 @@ export class VehicleChecksService {
           agencyId: dto.agencyId,
           manufacturerId: dto.manufacturerId,
           vehicleModelId: dto.vehicleModelId,
-          licensePlate: dto.licensePlate ? normalizeLicensePlate(dto.licensePlate) : undefined,
-          licensePlateRaw: dto.licensePlate ? sanitizeLicensePlateRaw(dto.licensePlate) : undefined,
+          licensePlate: dto.licensePlate
+            ? normalizeLicensePlate(dto.licensePlate)
+            : undefined,
+          licensePlateRaw: dto.licensePlate
+            ? sanitizeLicensePlateRaw(dto.licensePlate)
+            : undefined,
           licensePlateCountry: dto.licensePlateCountry
             ? normalizeLicensePlateCountry(dto.licensePlateCountry)
             : undefined,
-          licensePlateRecognitionConfidence: dto.licensePlateRecognitionConfidence,
+          licensePlateRecognitionConfidence:
+            dto.licensePlateRecognitionConfidence,
           mileage: dto.mileage,
           checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
           city: dto.city,
@@ -418,7 +470,9 @@ export class VehicleChecksService {
       item.photos.map((photo) => photo.publicId),
     );
     const retainedPhotoPublicIds = new Set(
-      dto.items.flatMap((item) => (item.photos ?? []).map((photo) => photo.publicId)),
+      dto.items.flatMap((item) =>
+        (item.photos ?? []).map((photo) => photo.publicId),
+      ),
     );
     const removedPhotoPublicIds = existingPhotoPublicIds.filter(
       (publicId) => !retainedPhotoPublicIds.has(publicId),
@@ -433,12 +487,17 @@ export class VehicleChecksService {
           agencyId: dto.agencyId,
           manufacturerId: dto.manufacturerId,
           vehicleModelId: dto.vehicleModelId,
-          licensePlate: dto.licensePlate ? normalizeLicensePlate(dto.licensePlate) : undefined,
-          licensePlateRaw: dto.licensePlate ? sanitizeLicensePlateRaw(dto.licensePlate) : undefined,
+          licensePlate: dto.licensePlate
+            ? normalizeLicensePlate(dto.licensePlate)
+            : undefined,
+          licensePlateRaw: dto.licensePlate
+            ? sanitizeLicensePlateRaw(dto.licensePlate)
+            : undefined,
           licensePlateCountry: dto.licensePlateCountry
             ? normalizeLicensePlateCountry(dto.licensePlateCountry)
             : undefined,
-          licensePlateRecognitionConfidence: dto.licensePlateRecognitionConfidence,
+          licensePlateRecognitionConfidence:
+            dto.licensePlateRecognitionConfidence,
           mileage: dto.mileage,
           checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
           city: dto.city,
@@ -486,11 +545,12 @@ export class VehicleChecksService {
         },
         include: vehicleCheckInclude,
       });
-
     });
 
     await Promise.allSettled(
-      removedPhotoPublicIds.map((publicId) => this.cloudinaryService.destroy(publicId)),
+      removedPhotoPublicIds.map((publicId) =>
+        this.cloudinaryService.destroy(publicId),
+      ),
     );
 
     return updated;
@@ -500,7 +560,9 @@ export class VehicleChecksService {
     const vehicleCheck = await this.findOne(id, user);
 
     if (vehicleCheck.status !== VehicleCheckStatus.DRAFT) {
-      throw new BadRequestException('Only a draft vehicle check can be completed in the field');
+      throw new BadRequestException(
+        'Only a draft vehicle check can be completed in the field',
+      );
     }
 
     return this.prisma.vehicleCheck.update({
@@ -531,9 +593,13 @@ export class VehicleChecksService {
     }
 
     const itemIds = new Set(vehicleCheck.items.map((item) => item.id));
-    const unknownItemId = dto.selectedItemIds.find((itemId) => !itemIds.has(itemId));
+    const unknownItemId = dto.selectedItemIds.find(
+      (itemId) => !itemIds.has(itemId),
+    );
     if (unknownItemId) {
-      throw new BadRequestException('One or more selected repairs do not belong to this check');
+      throw new BadRequestException(
+        'One or more selected repairs do not belong to this check',
+      );
     }
 
     const selectedItemIds = new Set(dto.selectedItemIds);
@@ -553,7 +619,8 @@ export class VehicleChecksService {
     }
 
     const activeSelectedItems = selectedItems.filter(
-      (item) => item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE,
+      (item) =>
+        item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE,
     );
     const totalInternalSavingAmount = activeSelectedItems.reduce(
       (total, item) => total.plus(item.totalInternalSavingAmount),
@@ -601,7 +668,9 @@ export class VehicleChecksService {
     );
     await this.prisma.vehicleCheck.delete({ where: { id } });
     await Promise.allSettled(
-      photoPublicIds.map((publicId) => this.cloudinaryService.destroy(publicId)),
+      photoPublicIds.map((publicId) =>
+        this.cloudinaryService.destroy(publicId),
+      ),
     );
     return { success: true };
   }
@@ -613,7 +682,10 @@ export class VehicleChecksService {
 
     if (user.role === Role.MANAGER) {
       return {
-        OR: [{ collaboratorId: user.sub }, { collaborator: { managerId: user.sub } }],
+        OR: [
+          { collaboratorId: user.sub },
+          { collaborator: { managerId: user.sub } },
+        ],
       };
     }
 
@@ -622,10 +694,20 @@ export class VehicleChecksService {
     };
   }
 
-  private async ensureReferences(agencyId: string, manufacturerId: string, vehicleModelId?: string) {
+  private async ensureReferences(
+    agencyId: string,
+    manufacturerId: string,
+    vehicleModelId?: string,
+  ) {
     const [agency, manufacturer, vehicleModel] = await Promise.all([
-      this.prisma.agency.findUnique({ where: { id: agencyId }, select: { id: true } }),
-      this.prisma.manufacturer.findUnique({ where: { id: manufacturerId }, select: { id: true } }),
+      this.prisma.agency.findUnique({
+        where: { id: agencyId },
+        select: { id: true },
+      }),
+      this.prisma.manufacturer.findUnique({
+        where: { id: manufacturerId },
+        select: { id: true },
+      }),
       vehicleModelId
         ? this.prisma.vehicleModel.findUnique({
             where: { id: vehicleModelId },
@@ -636,15 +718,22 @@ export class VehicleChecksService {
 
     if (!agency) throw new NotFoundException('Agency not found');
     if (!manufacturer) throw new NotFoundException('Manufacturer not found');
-    if (vehicleModelId && !vehicleModel) throw new NotFoundException('Vehicle model not found');
+    if (vehicleModelId && !vehicleModel)
+      throw new NotFoundException('Vehicle model not found');
     if (vehicleModel && vehicleModel.manufacturerId !== manufacturerId) {
-      throw new BadRequestException('Vehicle model does not belong to selected manufacturer');
+      throw new BadRequestException(
+        'Vehicle model does not belong to selected manufacturer',
+      );
     }
   }
 
   private async ensureVehicleParts(vehiclePartIds: Array<string | undefined>) {
     const uniqueVehiclePartIds = [
-      ...new Set(vehiclePartIds.filter((vehiclePartId): vehiclePartId is string => Boolean(vehiclePartId))),
+      ...new Set(
+        vehiclePartIds.filter((vehiclePartId): vehiclePartId is string =>
+          Boolean(vehiclePartId),
+        ),
+      ),
     ];
 
     if (!uniqueVehiclePartIds.length) {
@@ -673,7 +762,8 @@ export class VehicleChecksService {
       throw new NotFoundException('Manufacturer not found');
     }
 
-    const constructorAllowanceAmount = manufacturer.rule?.constructorAllowanceAmount ?? '0';
+    const constructorAllowanceAmount =
+      manufacturer.rule?.constructorAllowanceAmount ?? '0';
 
     return {
       manufacturerId: manufacturer.id,
@@ -726,10 +816,11 @@ export class VehicleChecksService {
   private async generatePublicShareToken() {
     for (let attempt = 0; attempt < 5; attempt += 1) {
       const token = randomBytes(24).toString('base64url');
-      const existingShare = await this.prisma.vehicleCheckPublicShare.findUnique({
-        where: { token },
-        select: { id: true },
-      });
+      const existingShare =
+        await this.prisma.vehicleCheckPublicShare.findUnique({
+          where: { token },
+          select: { id: true },
+        });
 
       if (!existingShare) {
         return token;
@@ -759,8 +850,15 @@ export class VehicleChecksService {
     return contact.id;
   }
 
-  private async resolveRepairRequestRecipients(dto: SendRepairRequestEmailDto, user: CurrentUserPayload) {
-    const company = await this.contactsService.findOrCreateCompany(dto.companyId, dto.companyName, user);
+  private async resolveRepairRequestRecipients(
+    dto: SendRepairRequestEmailDto,
+    user: CurrentUserPayload,
+  ) {
+    const company = await this.contactsService.findOrCreateCompany(
+      dto.companyId,
+      dto.companyName,
+      user,
+    );
     const recipients: Array<{ email: string; id: string }> = [];
     const seenEmails = new Set<string>();
 
@@ -819,7 +917,10 @@ export class VehicleChecksService {
     return {
       createdAt: share.createdAt,
       externalRepairContact: share.externalRepairContact ?? null,
-      externalRepairContactId: share.externalRepairContactId ?? share.externalRepairContact?.id ?? null,
+      externalRepairContactId:
+        share.externalRepairContactId ??
+        share.externalRepairContact?.id ??
+        null,
       takenInChargeAt: share.takenInChargeAt ?? null,
       vehicleRecoveredAt: share.vehicleRecoveredAt ?? null,
       token: share.token,
@@ -868,7 +969,9 @@ export class VehicleChecksService {
       vehicleCheck.licensePlateCountry,
       vehicleCheck.licensePlateRaw,
     );
-    const checkDate = new Intl.DateTimeFormat('fr-FR').format(vehicleCheck.checkDate);
+    const checkDate = new Intl.DateTimeFormat('fr-FR').format(
+      vehicleCheck.checkDate,
+    );
     const contactName = this.repairRequestContactName(vehicleCheck);
     const contactEmail = this.repairRequestContactEmail(vehicleCheck);
     const contactEmailLabel = contactEmail ? ` (${contactEmail})` : '';
@@ -913,13 +1016,21 @@ export class VehicleChecksService {
       vehicleCheck.licensePlateCountry,
       vehicleCheck.licensePlateRaw,
     );
-    const checkDate = new Intl.DateTimeFormat('fr-FR').format(vehicleCheck.checkDate);
-    const contactName = this.escapeHtml(this.repairRequestContactName(vehicleCheck));
-    const contactEmail = this.escapeHtml(this.repairRequestContactEmail(vehicleCheck) ?? '');
+    const checkDate = new Intl.DateTimeFormat('fr-FR').format(
+      vehicleCheck.checkDate,
+    );
+    const contactName = this.escapeHtml(
+      this.repairRequestContactName(vehicleCheck),
+    );
+    const contactEmail = this.escapeHtml(
+      this.repairRequestContactEmail(vehicleCheck) ?? '',
+    );
     const contactEmailLabel = contactEmail
       ? ` <span style="display:inline-block;margin:0 2px;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-weight:700;white-space:nowrap">${contactEmail}</span>`
       : '';
-    const vehicleLabel = this.escapeHtml(this.repairRequestVehicleLabel(vehicleCheck));
+    const vehicleLabel = this.escapeHtml(
+      this.repairRequestVehicleLabel(vehicleCheck),
+    );
     const safePublicUrl = this.escapeHtml(publicUrl);
 
     return [
@@ -931,9 +1042,15 @@ export class VehicleChecksService {
       `<p style="margin:0 0 18px;font-size:15px;color:#334155">${contactName} souhaite obtenir un devis pour les réparations sélectionnées.</p>`,
       '<table style="border-collapse:separate;border-spacing:0;width:100%;margin:0 0 20px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">',
       this.repairRequestInfoRow('Véhicule', vehicleLabel),
-      this.repairRequestInfoRow('Immatriculation', this.escapeHtml(licensePlate)),
+      this.repairRequestInfoRow(
+        'Immatriculation',
+        this.escapeHtml(licensePlate),
+      ),
       this.repairRequestInfoRow('Date du contrôle', this.escapeHtml(checkDate)),
-      this.repairRequestInfoRow('Réparations sélectionnées', String(selectedItemsCount)),
+      this.repairRequestInfoRow(
+        'Réparations sélectionnées',
+        String(selectedItemsCount),
+      ),
       '</table>',
       '<p style="margin:0 0 16px;font-size:15px;color:#334155">Le dossier contient le détail à chiffrer, les commentaires et les photos des dommages.</p>',
       `<p style="margin:0 0 16px"><a href="${safePublicUrl}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:11px 16px;border-radius:7px;font-weight:700">Consulter le dossier</a></p>`,
@@ -961,12 +1078,17 @@ export class VehicleChecksService {
       lastName: string;
     } | null;
   }) {
-    const collaboratorName = [vehicleCheck.collaborator?.firstName, vehicleCheck.collaborator?.lastName]
+    const collaboratorName = [
+      vehicleCheck.collaborator?.firstName,
+      vehicleCheck.collaborator?.lastName,
+    ]
       .filter(Boolean)
       .join(' ')
       .trim();
 
-    return collaboratorName || vehicleCheck.collaborator?.email || 'Notre équipe';
+    return (
+      collaboratorName || vehicleCheck.collaborator?.email || 'Notre équipe'
+    );
   }
 
   private repairRequestContactEmail(vehicleCheck: {
@@ -983,7 +1105,11 @@ export class VehicleChecksService {
     manufacturer?: { name: string } | null;
     vehicleModel?: { name: string } | null;
   }) {
-    return [vehicleCheck.manufacturer?.name, vehicleCheck.vehicleModel?.name].filter(Boolean).join(' ') || '-';
+    return (
+      [vehicleCheck.manufacturer?.name, vehicleCheck.vehicleModel?.name]
+        .filter(Boolean)
+        .join(' ') || '-'
+    );
   }
 
   private escapeHtml(value: string) {
