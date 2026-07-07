@@ -7,5 +7,6 @@ import { ExternalRepairContactsService } from './external-repair-contacts.servic
   imports: [PrismaModule],
   controllers: [ExternalRepairContactsController],
   providers: [ExternalRepairContactsService],
+  exports: [ExternalRepairContactsService],
 })
 export class ExternalRepairContactsModule {}

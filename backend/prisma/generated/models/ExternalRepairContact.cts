@@ -28,6 +28,7 @@ export type ExternalRepairContactMinAggregateOutputType = {
   id: string | null
   name: string | null
   companyName: string | null
+  companyId: string | null
   email: string | null
   phone: string | null
   notes: string | null
@@ -41,6 +42,7 @@ export type ExternalRepairContactMaxAggregateOutputType = {
   id: string | null
   name: string | null
   companyName: string | null
+  companyId: string | null
   email: string | null
   phone: string | null
   notes: string | null
@@ -54,6 +56,7 @@ export type ExternalRepairContactCountAggregateOutputType = {
   id: number
   name: number
   companyName: number
+  companyId: number
   email: number
   phone: number
   notes: number
@@ -69,6 +72,7 @@ export type ExternalRepairContactMinAggregateInputType = {
   id?: true
   name?: true
   companyName?: true
+  companyId?: true
   email?: true
   phone?: true
   notes?: true
@@ -82,6 +86,7 @@ export type ExternalRepairContactMaxAggregateInputType = {
   id?: true
   name?: true
   companyName?: true
+  companyId?: true
   email?: true
   phone?: true
   notes?: true
@@ -95,6 +100,7 @@ export type ExternalRepairContactCountAggregateInputType = {
   id?: true
   name?: true
   companyName?: true
+  companyId?: true
   email?: true
   phone?: true
   notes?: true
@@ -181,6 +187,7 @@ export type ExternalRepairContactGroupByOutputType = {
   id: string
   name: string
   companyName: string | null
+  companyId: string | null
   email: string
   phone: string | null
   notes: string | null
@@ -215,6 +222,7 @@ export type ExternalRepairContactWhereInput = {
   id?: Prisma.StringFilter<"ExternalRepairContact"> | string
   name?: Prisma.StringFilter<"ExternalRepairContact"> | string
   companyName?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
+  companyId?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   email?: Prisma.StringFilter<"ExternalRepairContact"> | string
   phone?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   notes?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
@@ -223,6 +231,7 @@ export type ExternalRepairContactWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ExternalRepairContact"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ExternalRepairContact"> | Date | string
   createdBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  company?: Prisma.XOR<Prisma.ExternalRepairCompanyNullableScalarRelationFilter, Prisma.ExternalRepairCompanyWhereInput> | null
   publicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
 }
 
@@ -230,6 +239,7 @@ export type ExternalRepairContactOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrderInput | Prisma.SortOrder
+  companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -238,6 +248,7 @@ export type ExternalRepairContactOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdBy?: Prisma.UserOrderByWithRelationInput
+  company?: Prisma.ExternalRepairCompanyOrderByWithRelationInput
   publicShares?: Prisma.VehicleCheckPublicShareOrderByRelationAggregateInput
 }
 
@@ -249,6 +260,7 @@ export type ExternalRepairContactWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ExternalRepairContactWhereInput | Prisma.ExternalRepairContactWhereInput[]
   name?: Prisma.StringFilter<"ExternalRepairContact"> | string
   companyName?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
+  companyId?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   phone?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   notes?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   isActive?: Prisma.BoolFilter<"ExternalRepairContact"> | boolean
@@ -256,6 +268,7 @@ export type ExternalRepairContactWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"ExternalRepairContact"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ExternalRepairContact"> | Date | string
   createdBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  company?: Prisma.XOR<Prisma.ExternalRepairCompanyNullableScalarRelationFilter, Prisma.ExternalRepairCompanyWhereInput> | null
   publicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
 }, "id" | "email">
 
@@ -263,6 +276,7 @@ export type ExternalRepairContactOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrderInput | Prisma.SortOrder
+  companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -282,6 +296,7 @@ export type ExternalRepairContactScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ExternalRepairContact"> | string
   name?: Prisma.StringWithAggregatesFilter<"ExternalRepairContact"> | string
   companyName?: Prisma.StringNullableWithAggregatesFilter<"ExternalRepairContact"> | string | null
+  companyId?: Prisma.StringNullableWithAggregatesFilter<"ExternalRepairContact"> | string | null
   email?: Prisma.StringWithAggregatesFilter<"ExternalRepairContact"> | string
   phone?: Prisma.StringNullableWithAggregatesFilter<"ExternalRepairContact"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"ExternalRepairContact"> | string | null
@@ -302,6 +317,7 @@ export type ExternalRepairContactCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.UserCreateNestedOneWithoutExternalRepairContactsInput
+  company?: Prisma.ExternalRepairCompanyCreateNestedOneWithoutContactsInput
   publicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutExternalRepairContactInput
 }
 
@@ -309,6 +325,7 @@ export type ExternalRepairContactUncheckedCreateInput = {
   id?: string
   name: string
   companyName?: string | null
+  companyId?: string | null
   email: string
   phone?: string | null
   notes?: string | null
@@ -330,6 +347,7 @@ export type ExternalRepairContactUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.UserUpdateOneWithoutExternalRepairContactsNestedInput
+  company?: Prisma.ExternalRepairCompanyUpdateOneWithoutContactsNestedInput
   publicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutExternalRepairContactNestedInput
 }
 
@@ -337,6 +355,7 @@ export type ExternalRepairContactUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -351,6 +370,7 @@ export type ExternalRepairContactCreateManyInput = {
   id?: string
   name: string
   companyName?: string | null
+  companyId?: string | null
   email: string
   phone?: string | null
   notes?: string | null
@@ -376,6 +396,7 @@ export type ExternalRepairContactUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -399,6 +420,7 @@ export type ExternalRepairContactCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -412,6 +434,7 @@ export type ExternalRepairContactMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -425,6 +448,7 @@ export type ExternalRepairContactMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -481,6 +505,48 @@ export type ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput 
   deleteMany?: Prisma.ExternalRepairContactScalarWhereInput | Prisma.ExternalRepairContactScalarWhereInput[]
 }
 
+export type ExternalRepairContactCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.ExternalRepairContactCreateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput> | Prisma.ExternalRepairContactCreateWithoutCompanyInput[] | Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput | Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.ExternalRepairContactCreateManyCompanyInputEnvelope
+  connect?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+}
+
+export type ExternalRepairContactUncheckedCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.ExternalRepairContactCreateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput> | Prisma.ExternalRepairContactCreateWithoutCompanyInput[] | Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput | Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.ExternalRepairContactCreateManyCompanyInputEnvelope
+  connect?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+}
+
+export type ExternalRepairContactUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.ExternalRepairContactCreateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput> | Prisma.ExternalRepairContactCreateWithoutCompanyInput[] | Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput | Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.ExternalRepairContactUpsertWithWhereUniqueWithoutCompanyInput | Prisma.ExternalRepairContactUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.ExternalRepairContactCreateManyCompanyInputEnvelope
+  set?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  disconnect?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  delete?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  connect?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  update?: Prisma.ExternalRepairContactUpdateWithWhereUniqueWithoutCompanyInput | Prisma.ExternalRepairContactUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.ExternalRepairContactUpdateManyWithWhereWithoutCompanyInput | Prisma.ExternalRepairContactUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.ExternalRepairContactScalarWhereInput | Prisma.ExternalRepairContactScalarWhereInput[]
+}
+
+export type ExternalRepairContactUncheckedUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.ExternalRepairContactCreateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput> | Prisma.ExternalRepairContactCreateWithoutCompanyInput[] | Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput | Prisma.ExternalRepairContactCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.ExternalRepairContactUpsertWithWhereUniqueWithoutCompanyInput | Prisma.ExternalRepairContactUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.ExternalRepairContactCreateManyCompanyInputEnvelope
+  set?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  disconnect?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  delete?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  connect?: Prisma.ExternalRepairContactWhereUniqueInput | Prisma.ExternalRepairContactWhereUniqueInput[]
+  update?: Prisma.ExternalRepairContactUpdateWithWhereUniqueWithoutCompanyInput | Prisma.ExternalRepairContactUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.ExternalRepairContactUpdateManyWithWhereWithoutCompanyInput | Prisma.ExternalRepairContactUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.ExternalRepairContactScalarWhereInput | Prisma.ExternalRepairContactScalarWhereInput[]
+}
+
 export type ExternalRepairContactCreateNestedOneWithoutPublicSharesInput = {
   create?: Prisma.XOR<Prisma.ExternalRepairContactCreateWithoutPublicSharesInput, Prisma.ExternalRepairContactUncheckedCreateWithoutPublicSharesInput>
   connectOrCreate?: Prisma.ExternalRepairContactCreateOrConnectWithoutPublicSharesInput
@@ -507,6 +573,7 @@ export type ExternalRepairContactCreateWithoutCreatedByInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  company?: Prisma.ExternalRepairCompanyCreateNestedOneWithoutContactsInput
   publicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutExternalRepairContactInput
 }
 
@@ -514,6 +581,7 @@ export type ExternalRepairContactUncheckedCreateWithoutCreatedByInput = {
   id?: string
   name: string
   companyName?: string | null
+  companyId?: string | null
   email: string
   phone?: string | null
   notes?: string | null
@@ -556,6 +624,7 @@ export type ExternalRepairContactScalarWhereInput = {
   id?: Prisma.StringFilter<"ExternalRepairContact"> | string
   name?: Prisma.StringFilter<"ExternalRepairContact"> | string
   companyName?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
+  companyId?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   email?: Prisma.StringFilter<"ExternalRepairContact"> | string
   phone?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   notes?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
@@ -563,6 +632,60 @@ export type ExternalRepairContactScalarWhereInput = {
   createdById?: Prisma.StringNullableFilter<"ExternalRepairContact"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ExternalRepairContact"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ExternalRepairContact"> | Date | string
+}
+
+export type ExternalRepairContactCreateWithoutCompanyInput = {
+  id?: string
+  name: string
+  companyName?: string | null
+  email: string
+  phone?: string | null
+  notes?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutExternalRepairContactsInput
+  publicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutExternalRepairContactInput
+}
+
+export type ExternalRepairContactUncheckedCreateWithoutCompanyInput = {
+  id?: string
+  name: string
+  companyName?: string | null
+  email: string
+  phone?: string | null
+  notes?: string | null
+  isActive?: boolean
+  createdById?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutExternalRepairContactInput
+}
+
+export type ExternalRepairContactCreateOrConnectWithoutCompanyInput = {
+  where: Prisma.ExternalRepairContactWhereUniqueInput
+  create: Prisma.XOR<Prisma.ExternalRepairContactCreateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput>
+}
+
+export type ExternalRepairContactCreateManyCompanyInputEnvelope = {
+  data: Prisma.ExternalRepairContactCreateManyCompanyInput | Prisma.ExternalRepairContactCreateManyCompanyInput[]
+  skipDuplicates?: boolean
+}
+
+export type ExternalRepairContactUpsertWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.ExternalRepairContactWhereUniqueInput
+  update: Prisma.XOR<Prisma.ExternalRepairContactUpdateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedUpdateWithoutCompanyInput>
+  create: Prisma.XOR<Prisma.ExternalRepairContactCreateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedCreateWithoutCompanyInput>
+}
+
+export type ExternalRepairContactUpdateWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.ExternalRepairContactWhereUniqueInput
+  data: Prisma.XOR<Prisma.ExternalRepairContactUpdateWithoutCompanyInput, Prisma.ExternalRepairContactUncheckedUpdateWithoutCompanyInput>
+}
+
+export type ExternalRepairContactUpdateManyWithWhereWithoutCompanyInput = {
+  where: Prisma.ExternalRepairContactScalarWhereInput
+  data: Prisma.XOR<Prisma.ExternalRepairContactUpdateManyMutationInput, Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCompanyInput>
 }
 
 export type ExternalRepairContactCreateWithoutPublicSharesInput = {
@@ -576,12 +699,14 @@ export type ExternalRepairContactCreateWithoutPublicSharesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.UserCreateNestedOneWithoutExternalRepairContactsInput
+  company?: Prisma.ExternalRepairCompanyCreateNestedOneWithoutContactsInput
 }
 
 export type ExternalRepairContactUncheckedCreateWithoutPublicSharesInput = {
   id?: string
   name: string
   companyName?: string | null
+  companyId?: string | null
   email: string
   phone?: string | null
   notes?: string | null
@@ -618,12 +743,14 @@ export type ExternalRepairContactUpdateWithoutPublicSharesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.UserUpdateOneWithoutExternalRepairContactsNestedInput
+  company?: Prisma.ExternalRepairCompanyUpdateOneWithoutContactsNestedInput
 }
 
 export type ExternalRepairContactUncheckedUpdateWithoutPublicSharesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -637,6 +764,7 @@ export type ExternalRepairContactCreateManyCreatedByInput = {
   id?: string
   name: string
   companyName?: string | null
+  companyId?: string | null
   email: string
   phone?: string | null
   notes?: string | null
@@ -655,6 +783,7 @@ export type ExternalRepairContactUpdateWithoutCreatedByInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.ExternalRepairCompanyUpdateOneWithoutContactsNestedInput
   publicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutExternalRepairContactNestedInput
 }
 
@@ -662,6 +791,7 @@ export type ExternalRepairContactUncheckedUpdateWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -675,10 +805,65 @@ export type ExternalRepairContactUncheckedUpdateManyWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ExternalRepairContactCreateManyCompanyInput = {
+  id?: string
+  name: string
+  companyName?: string | null
+  email: string
+  phone?: string | null
+  notes?: string | null
+  isActive?: boolean
+  createdById?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ExternalRepairContactUpdateWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutExternalRepairContactsNestedInput
+  publicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutExternalRepairContactNestedInput
+}
+
+export type ExternalRepairContactUncheckedUpdateWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutExternalRepairContactNestedInput
+}
+
+export type ExternalRepairContactUncheckedUpdateManyWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -718,6 +903,7 @@ export type ExternalRepairContactSelect<ExtArgs extends runtime.Types.Extensions
   id?: boolean
   name?: boolean
   companyName?: boolean
+  companyId?: boolean
   email?: boolean
   phone?: boolean
   notes?: boolean
@@ -726,6 +912,7 @@ export type ExternalRepairContactSelect<ExtArgs extends runtime.Types.Extensions
   createdAt?: boolean
   updatedAt?: boolean
   createdBy?: boolean | Prisma.ExternalRepairContact$createdByArgs<ExtArgs>
+  company?: boolean | Prisma.ExternalRepairContact$companyArgs<ExtArgs>
   publicShares?: boolean | Prisma.ExternalRepairContact$publicSharesArgs<ExtArgs>
   _count?: boolean | Prisma.ExternalRepairContactCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["externalRepairContact"]>
@@ -734,6 +921,7 @@ export type ExternalRepairContactSelectCreateManyAndReturn<ExtArgs extends runti
   id?: boolean
   name?: boolean
   companyName?: boolean
+  companyId?: boolean
   email?: boolean
   phone?: boolean
   notes?: boolean
@@ -742,12 +930,14 @@ export type ExternalRepairContactSelectCreateManyAndReturn<ExtArgs extends runti
   createdAt?: boolean
   updatedAt?: boolean
   createdBy?: boolean | Prisma.ExternalRepairContact$createdByArgs<ExtArgs>
+  company?: boolean | Prisma.ExternalRepairContact$companyArgs<ExtArgs>
 }, ExtArgs["result"]["externalRepairContact"]>
 
 export type ExternalRepairContactSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   companyName?: boolean
+  companyId?: boolean
   email?: boolean
   phone?: boolean
   notes?: boolean
@@ -756,12 +946,14 @@ export type ExternalRepairContactSelectUpdateManyAndReturn<ExtArgs extends runti
   createdAt?: boolean
   updatedAt?: boolean
   createdBy?: boolean | Prisma.ExternalRepairContact$createdByArgs<ExtArgs>
+  company?: boolean | Prisma.ExternalRepairContact$companyArgs<ExtArgs>
 }, ExtArgs["result"]["externalRepairContact"]>
 
 export type ExternalRepairContactSelectScalar = {
   id?: boolean
   name?: boolean
   companyName?: boolean
+  companyId?: boolean
   email?: boolean
   phone?: boolean
   notes?: boolean
@@ -771,29 +963,34 @@ export type ExternalRepairContactSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ExternalRepairContactOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "companyName" | "email" | "phone" | "notes" | "isActive" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["externalRepairContact"]>
+export type ExternalRepairContactOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "companyName" | "companyId" | "email" | "phone" | "notes" | "isActive" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["externalRepairContact"]>
 export type ExternalRepairContactInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdBy?: boolean | Prisma.ExternalRepairContact$createdByArgs<ExtArgs>
+  company?: boolean | Prisma.ExternalRepairContact$companyArgs<ExtArgs>
   publicShares?: boolean | Prisma.ExternalRepairContact$publicSharesArgs<ExtArgs>
   _count?: boolean | Prisma.ExternalRepairContactCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ExternalRepairContactIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdBy?: boolean | Prisma.ExternalRepairContact$createdByArgs<ExtArgs>
+  company?: boolean | Prisma.ExternalRepairContact$companyArgs<ExtArgs>
 }
 export type ExternalRepairContactIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdBy?: boolean | Prisma.ExternalRepairContact$createdByArgs<ExtArgs>
+  company?: boolean | Prisma.ExternalRepairContact$companyArgs<ExtArgs>
 }
 
 export type $ExternalRepairContactPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ExternalRepairContact"
   objects: {
     createdBy: Prisma.$UserPayload<ExtArgs> | null
+    company: Prisma.$ExternalRepairCompanyPayload<ExtArgs> | null
     publicShares: Prisma.$VehicleCheckPublicSharePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
     companyName: string | null
+    companyId: string | null
     email: string
     phone: string | null
     notes: string | null
@@ -1196,6 +1393,7 @@ readonly fields: ExternalRepairContactFieldRefs;
 export interface Prisma__ExternalRepairContactClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   createdBy<T extends Prisma.ExternalRepairContact$createdByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ExternalRepairContact$createdByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  company<T extends Prisma.ExternalRepairContact$companyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ExternalRepairContact$companyArgs<ExtArgs>>): Prisma.Prisma__ExternalRepairCompanyClient<runtime.Types.Result.GetResult<Prisma.$ExternalRepairCompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   publicShares<T extends Prisma.ExternalRepairContact$publicSharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ExternalRepairContact$publicSharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPublicSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1229,6 +1427,7 @@ export interface ExternalRepairContactFieldRefs {
   readonly id: Prisma.FieldRef<"ExternalRepairContact", 'String'>
   readonly name: Prisma.FieldRef<"ExternalRepairContact", 'String'>
   readonly companyName: Prisma.FieldRef<"ExternalRepairContact", 'String'>
+  readonly companyId: Prisma.FieldRef<"ExternalRepairContact", 'String'>
   readonly email: Prisma.FieldRef<"ExternalRepairContact", 'String'>
   readonly phone: Prisma.FieldRef<"ExternalRepairContact", 'String'>
   readonly notes: Prisma.FieldRef<"ExternalRepairContact", 'String'>
@@ -1653,6 +1852,25 @@ export type ExternalRepairContact$createdByArgs<ExtArgs extends runtime.Types.Ex
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * ExternalRepairContact.company
+ */
+export type ExternalRepairContact$companyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ExternalRepairCompany
+   */
+  select?: Prisma.ExternalRepairCompanySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ExternalRepairCompany
+   */
+  omit?: Prisma.ExternalRepairCompanyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExternalRepairCompanyInclude<ExtArgs> | null
+  where?: Prisma.ExternalRepairCompanyWhereInput
 }
 
 /**

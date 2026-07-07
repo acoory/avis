@@ -5,7 +5,6 @@ import { CheckCircle2, Download, Mail, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
 import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-dialog";
 import { Button } from "@/components/ui/button";
@@ -15,21 +14,19 @@ import { VehicleCheck } from "@/types/business";
 
 type VehicleCheckActionsProps = {
   vehicleCheck: VehicleCheck;
+  onSendRepairRequest: () => void;
   onUpdated: (vehicleCheck: VehicleCheck) => void;
 };
 
-export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckActionsProps) {
+export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdated }: VehicleCheckActionsProps) {
   const router = useRouter();
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [recoveredDialogOpen, setRecoveredDialogOpen] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
   const canShareSummary = vehicleCheck.status === "SUMMARY_READY";
-  const canMarkRecovered = Boolean(
-    vehicleCheck.publicShare?.takenInChargeAt && !vehicleCheck.publicShare.vehicleRecoveredAt,
-  );
+  const canMarkRecovered = Boolean(vehicleCheck.publicShare && !vehicleCheck.publicShare.vehicleRecoveredAt);
   const canDelete = true;
 
   async function handleComplete() {
@@ -61,11 +58,12 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
   return (
     <>
       <div className="flex flex-col gap-2 sm:items-end">
-        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:max-w-xl sm:flex-wrap sm:justify-end">
           {canShareSummary ? (
             <Button
               className="w-full sm:w-auto"
               disabled={isDownloading}
+              size="sm"
               variant="outline"
               onClick={handleDownload}
             >
@@ -76,17 +74,19 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
           {canShareSummary ? (
             <Button
               className="w-full sm:w-auto"
+              size="sm"
               type="button"
               variant="outline"
-              onClick={() => setEmailDialogOpen(true)}
+              onClick={onSendRepairRequest}
             >
               <Mail className="h-4 w-4" />
-              Envoyer par mail
+              Envoyer par email
             </Button>
           ) : null}
           {canMarkRecovered ? (
             <Button
               className="w-full sm:w-auto"
+              size="sm"
               type="button"
               variant="outline"
               onClick={() => setRecoveredDialogOpen(true)}
@@ -95,7 +95,7 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
               Marquer recupere
             </Button>
           ) : null}
-          <Button asChild className="w-full sm:w-auto" variant="outline">
+          <Button asChild className="w-full sm:w-auto" size="sm" variant="outline">
             <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>
               <Pencil className="h-4 w-4" />
               Modifier
@@ -103,7 +103,8 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
           </Button>
           {canDelete ? (
             <Button
-              className="w-full sm:w-auto"
+              className="w-full border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 sm:w-auto"
+              size="sm"
               type="button"
               variant="outline"
               onClick={() => setDeleteDialogOpen(true)}
@@ -113,7 +114,7 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
             </Button>
           ) : null}
           {canComplete ? (
-            <Button className="w-full sm:w-auto" disabled={isCompleting} onClick={handleComplete}>
+            <Button className="w-full sm:w-auto" disabled={isCompleting} size="sm" onClick={handleComplete}>
               <CheckCircle2 className="h-4 w-4" />
               {isCompleting ? "Finalisation..." : "Terminer le controle"}
             </Button>
@@ -135,13 +136,6 @@ export function VehicleCheckActions({ vehicleCheck, onUpdated }: VehicleCheckAct
         onOpenChange={setRecoveredDialogOpen}
         onRecovered={onUpdated}
       />
-      {canShareSummary ? (
-        <RepairRequestEmailDialog
-          open={emailDialogOpen}
-          vehicleCheck={vehicleCheck}
-          onOpenChange={setEmailDialogOpen}
-        />
-      ) : null}
     </>
   );
 }

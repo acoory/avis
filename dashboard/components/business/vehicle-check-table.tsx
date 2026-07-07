@@ -137,15 +137,13 @@ export function VehicleCheckTable({
             header: "Prestataire",
             cell: (check) => <PublicShareStatusBadge vehicleCheck={check} />,
             sortValue: (check) =>
-              check.publicShare?.vehicleRecoveredAt ? 3 : check.publicShare?.takenInChargeAt ? 2 : check.publicShare ? 1 : 0,
+              check.publicShare?.vehicleRecoveredAt ? 3 : check.publicShare ? 2 : 0,
             searchValue: (check) =>
               check.publicShare?.vehicleRecoveredAt
                 ? "Recupere"
-                : check.publicShare?.takenInChargeAt
-                  ? "Pris en charge"
-                  : check.publicShare
-                    ? "Envoye"
-                    : "Non envoye",
+                : check.publicShare
+                  ? "Chez le prestataire"
+                  : "Non envoye",
           },
           {
             id: "actions",
@@ -153,7 +151,7 @@ export function VehicleCheckTable({
             className: "px-4 py-3",
             cell: (check) => (
               <div className="flex flex-nowrap gap-1.5">
-                {check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt ? (
+                {check.publicShare && !check.publicShare.vehicleRecoveredAt ? (
                   <Button
                     aria-label={`Marquer le vehicule ${formatLicensePlate(
                       check.licensePlate,
@@ -240,7 +238,7 @@ function VehicleCheckMobileCard({
   onDelete: () => void;
   onRecover: () => void;
 }) {
-  const canRecover = Boolean(check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt);
+  const canRecover = Boolean(check.publicShare && !check.publicShare.vehicleRecoveredAt);
   const vehicleLabel = formatLicensePlate(
     check.licensePlate,
     check.licensePlateCountry,
@@ -504,21 +502,19 @@ function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }
     );
   }
 
-  if (share.takenInChargeAt) {
-    return (
-      <div className="space-y-1">
-        <Badge variant="success">Pris en charge</Badge>
+  return (
+    <div className="space-y-1">
+      <Badge variant="success">Chez prestataire</Badge>
+      {share.takenInChargeAt ? (
         <p className="text-xs font-medium text-gray-500">{formatShortDateTime(share.takenInChargeAt)}</p>
-        {share.externalRepairContact ? (
-          <p className="max-w-40 truncate text-xs font-medium text-gray-500" title={externalRepairContactLabel(share.externalRepairContact)}>
-            par {externalRepairContactLabel(share.externalRepairContact)}
-          </p>
-        ) : null}
-      </div>
-    );
-  }
-
-  return <Badge variant="warning">Envoye</Badge>;
+      ) : null}
+      {share.externalRepairContact ? (
+        <p className="max-w-40 truncate text-xs font-medium text-gray-500" title={externalRepairContactLabel(share.externalRepairContact)}>
+          {externalRepairContactLabel(share.externalRepairContact)}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 function partOrderSummary(vehicleCheck: VehicleCheck) {

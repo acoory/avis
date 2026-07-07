@@ -85,6 +85,11 @@ export type ManufacturerRepairRule = Prisma.ManufacturerRepairRuleModel
  */
 export type VehicleCheck = Prisma.VehicleCheckModel
 /**
+ * Model ExternalRepairCompany
+ * 
+ */
+export type ExternalRepairCompany = Prisma.ExternalRepairCompanyModel
+/**
  * Model ExternalRepairContact
  * 
  */

@@ -10,6 +10,11 @@ import { ExternalRepairContactsService } from './external-repair-contacts.servic
 export class ExternalRepairContactsController {
   constructor(private readonly contactsService: ExternalRepairContactsService) {}
 
+  @Get('companies')
+  findCompanies() {
+    return this.contactsService.findCompanies();
+  }
+
   @Get()
   findAll() {
     return this.contactsService.findAll();

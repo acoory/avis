@@ -5,6 +5,7 @@ import {
   DashboardTimelinePoint,
   DamagePhoto,
   ExternalRepairContact,
+  ExternalRepairCompany,
   GtmotiveEstimate,
   GtmotiveGraphicZone,
   GtmotiveNavigationBoard,
@@ -89,6 +90,11 @@ export const businessService = {
     return data;
   },
 
+  async externalRepairCompanies() {
+    const { data } = await api.get<ExternalRepairCompany[]>("/external-repair-contacts/companies");
+    return data;
+  },
+
   async findOrCreateExternalRepairContact(payload: {
     companyName?: string;
     email: string;
@@ -102,6 +108,28 @@ export const businessService = {
 
   async createVehicleCheckPublicShare(id: string, payload?: { externalRepairContactId?: string }) {
     const { data } = await api.post<VehicleCheckPublicShare>(`/vehicle-checks/${id}/public-share`, payload ?? {});
+    return data;
+  },
+
+  async sendVehicleCheckRepairRequestEmail(
+    id: string,
+    payload: {
+      companyName?: string;
+      companyId?: string;
+      recipients: Array<{
+        email?: string;
+        id?: string;
+        name?: string;
+      }>;
+    },
+  ) {
+    const { data } = await api.post<
+      VehicleCheckPublicShare & {
+        emailSentAt: string;
+        recipientEmail: string;
+        recipientEmails: string[];
+      }
+    >(`/vehicle-checks/${id}/repair-request-email`, payload);
     return data;
   },
 

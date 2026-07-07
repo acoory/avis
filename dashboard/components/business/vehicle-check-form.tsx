@@ -1706,7 +1706,6 @@ function DecisionSummaryPanel({
       <div className="rounded-md border border-gray-200">
         <div className="border-b border-gray-100 px-3 py-2">
           <p className="text-sm font-medium text-gray-950">Decisions par reparation</p>
-          <p className="mt-1 text-xs text-gray-500">{preview.decisionSummary}</p>
         </div>
         <div className="divide-y divide-gray-100">
           {preview.items.length ? (

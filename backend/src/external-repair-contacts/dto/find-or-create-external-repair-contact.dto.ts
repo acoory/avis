@@ -7,6 +7,10 @@ export class FindOrCreateExternalRepairContactDto {
 
   @IsOptional()
   @IsString()
+  companyId?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(120)
   companyName?: string;
 

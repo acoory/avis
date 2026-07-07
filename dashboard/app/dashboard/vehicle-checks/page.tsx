@@ -109,7 +109,7 @@ function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
     {
       description: "Chez prestataire",
       icon: Wrench,
-      title: "Pris en charge",
+      title: "Prestataire",
       tone: "emerald",
       value: formatInteger(stats.takenInChargeCount),
     },
@@ -188,7 +188,7 @@ function vehicleCheckStats(vehicleChecks: VehicleCheck[]): VehicleCheckStats {
       stats.totalSavingAmount += numberValue(check.totalInternalSavingAmount);
       if (check.status === "SUMMARY_READY") stats.completedCount += 1;
       if (check.status === "TO_ANALYZE") stats.toAnalyzeCount += 1;
-      if (check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt) stats.takenInChargeCount += 1;
+      if (check.publicShare && !check.publicShare.vehicleRecoveredAt) stats.takenInChargeCount += 1;
       if (check.publicShare?.vehicleRecoveredAt) stats.recoveredCount += 1;
       stats.toOrderCount += activeItems.filter((item) => item.partOrderStatus === "TO_ORDER").length;
 

@@ -232,11 +232,21 @@ export type VehicleCheckItem = NonNullable<VehicleCheck["items"]>[number];
 export type ExternalRepairContact = {
   id: string;
   name: string;
+  company?: ExternalRepairCompany | null;
+  companyId?: string | null;
   companyName?: string | null;
   email: string;
   phone?: string | null;
   notes?: string | null;
   isActive: boolean;
+};
+
+export type ExternalRepairCompany = {
+  id: string;
+  name: string;
+  notes?: string | null;
+  isActive: boolean;
+  contacts?: ExternalRepairContact[];
 };
 
 export type VehicleCheckPublicShare = {

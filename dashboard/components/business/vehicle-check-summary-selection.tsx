@@ -2,6 +2,7 @@
 
 import {
   CheckSquare2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -14,7 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cloudinaryOriginalUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
@@ -30,6 +31,9 @@ export function VehicleCheckSummarySelection({
   onUpdated,
 }: VehicleCheckSummarySelectionProps) {
   const items = vehicleCheck.items ?? [];
+  const isSummaryPending = vehicleCheck.status === "TO_ANALYZE" && !vehicleCheck.summaryFinalizedAt;
+  const isSummaryReady = vehicleCheck.status === "SUMMARY_READY" || Boolean(vehicleCheck.summaryFinalizedAt);
+  const [isExpanded, setIsExpanded] = useState(isSummaryPending);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(
     () => new Set(items.filter((item) => item.selectedForSummary).map((item) => item.id)),
   );
@@ -48,6 +52,10 @@ export function VehicleCheckSummarySelection({
       new Set(items.filter((item) => item.selectedForSummary).map((item) => item.id)),
     );
   }, [vehicleCheck.id, vehicleCheck.summaryFinalizedAt, items]);
+
+  useEffect(() => {
+    setIsExpanded(isSummaryPending);
+  }, [vehicleCheck.id, isSummaryPending]);
 
   useEffect(() => {
     if (!photoGallery) {
@@ -135,114 +143,170 @@ export function VehicleCheckSummarySelection({
   }
 
   return (
-    <Card className="mt-5 border-teal-200">
-      <CardHeader>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <CheckSquare2 className="h-5 w-5 text-teal-700" />
-              Reparations a inclure dans la synthese
-            </CardTitle>
-            <p className="mt-1 text-sm text-gray-500">
-              Coche uniquement les dommages que tu souhaites réellement faire reparer.
+    <Card className="mt-5 overflow-hidden border-gray-200 shadow-none" id="summary-selection">
+      <CardHeader className="p-0">
+        <button
+          aria-expanded={isExpanded}
+          className="flex w-full flex-col gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 sm:flex-row sm:items-center sm:justify-between"
+          type="button"
+          onClick={() => setIsExpanded((current) => !current)}
+        >
+          <div className="flex min-w-0 items-center gap-3">
+            <span
+              className={[
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
+                isSummaryPending ? "bg-amber-50 text-amber-700" : "bg-teal-50 text-teal-700",
+              ].join(" ")}
+            >
+              <CheckSquare2 className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-base font-semibold text-gray-950">Synthese</p>
+              <p className="mt-0.5 text-sm leading-5 text-gray-500">
+                {isSummaryPending
+                  ? "Verifie les reparations preselectionnees, puis valide."
+                  : "Les reparations retenues peuvent encore etre ajustees."}
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
+            <span
+              className={[
+                "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium",
+                isSummaryPending
+                  ? "border-amber-200 bg-amber-50 text-amber-800"
+                  : isSummaryReady
+                    ? "border-teal-200 bg-teal-50 text-teal-800"
+                    : "border-gray-200 bg-gray-50 text-gray-700",
+              ].join(" ")}
+            >
+              {isSummaryPending ? "A realiser" : isSummaryReady ? "Prete" : "En attente"}
+            </span>
+            <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700">
+              {selectedItemIds.size}/{items.length} selectionnee{selectedItemIds.size > 1 ? "s" : ""}
+            </span>
+            <ChevronDown
+              className={[
+                "h-4 w-4 text-gray-400 transition-transform",
+                isExpanded ? "rotate-180" : "",
+              ].join(" ")}
+            />
+          </div>
+        </button>
+      </CardHeader>
+      {isExpanded ? (
+        <CardContent className="space-y-0 border-t border-gray-200 p-0">
+          <div className="border-b border-gray-200 px-4 py-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-950">
+              <span
+                className={[
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-md",
+                  isSummaryPending ? "bg-amber-50 text-amber-700" : "bg-teal-50 text-teal-700",
+                ].join(" ")}
+              >
+                <CheckSquare2 className="h-3.5 w-3.5" />
+              </span>
+              {isSummaryPending ? "Synthese a realiser" : "Reparations a inclure"}
+            </div>
+            <p className="mt-1 text-sm leading-5 text-gray-500">
+              {isSummaryPending
+                ? "Verifie les reparations preselectionnees, puis valide la synthese."
+                : "Selectionne les dommages qui doivent apparaitre dans le PDF."}
             </p>
           </div>
-          <p className="text-sm font-medium text-teal-700">
-            {selectedItemIds.size} sur {items.length} selectionnee{selectedItemIds.size > 1 ? "s" : ""}
-          </p>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {items.length ? (
-          <div className="grid gap-3 lg:grid-cols-2">
-            {items.map((item) => {
-              const checked = selectedItemIds.has(item.id);
+          {items.length ? (
+            <div className="divide-y divide-gray-200">
+              {items.map((item) => {
+                const checked = selectedItemIds.has(item.id);
 
-              return (
-                <label
-                  className={[
-                    "flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors",
-                    checked
-                      ? "border-teal-300 bg-teal-50"
-                      : "border-gray-200 bg-white hover:bg-gray-50",
-                  ].join(" ")}
-                  key={item.id}
-                >
-                  <input
-                    checked={checked}
-                    className="mt-1 h-4 w-4 accent-teal-700"
-                    type="checkbox"
-                    onChange={() => toggleItem(item.id)}
-                  />
-                  {item.photos?.length ? (
-                    <span className="flex shrink-0 gap-1">
-                      {item.photos.map((photo, photoIndex) => (
-                        <button
-                          aria-label="Voir la photo en grand"
-                          className="group relative h-14 w-14 overflow-hidden rounded-md border border-gray-200"
-                          key={photo.publicId}
-                          type="button"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            setPhotoGallery({
-                              photos: item.photos ?? [],
-                              index: photoIndex,
-                            });
-                          }}
-                        >
-                          <img
-                            alt="Degat"
-                            className="h-full w-full object-cover"
-                            src={cloudinaryThumbnailUrl(photo, 160)}
-                          />
-                          <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-white transition-colors group-hover:bg-black/35">
-                            <Maximize2 className="h-4 w-4 opacity-0 group-hover:opacity-100" />
-                          </span>
-                        </button>
-                      ))}
-                    </span>
-                  ) : null}
-                  <span className="min-w-0">
-                    <span className="block font-medium text-gray-950">{item.vehiclePart.name}</span>
-                    <span className="block text-sm text-gray-600">
-                      {item.repairType.name} · Quantite {item.quantity}
-                    </span>
-                    {item.comment?.trim() ? (
-                      <span className="mt-1 block text-xs text-gray-500">{item.comment}</span>
-                    ) : null}
-                    {item.decisionStatus === "FORBIDDEN" ? (
-                      <span className="mt-1 block text-xs font-medium text-red-700">
-                        Reparation interdite : elle doit etre decochee pour finaliser.
+                return (
+                  <label
+                    className={[
+                      "flex cursor-pointer gap-3 px-4 py-3 transition-colors",
+                      checked
+                        ? "bg-teal-50/70"
+                        : "bg-white hover:bg-gray-50",
+                    ].join(" ")}
+                    key={item.id}
+                  >
+                    <input
+                      checked={checked}
+                      className="mt-1 h-4 w-4 shrink-0 accent-teal-700"
+                      type="checkbox"
+                      onChange={() => toggleItem(item.id)}
+                    />
+                    {item.photos?.length ? (
+                      <span className="flex shrink-0 gap-1">
+                        {item.photos.map((photo, photoIndex) => (
+                          <button
+                            aria-label="Voir la photo en grand"
+                            className="group relative h-12 w-12 overflow-hidden rounded-md border border-gray-200"
+                            key={photo.publicId}
+                            type="button"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              setPhotoGallery({
+                                photos: item.photos ?? [],
+                                index: photoIndex,
+                              });
+                            }}
+                          >
+                            <img
+                              alt="Degat"
+                              className="h-full w-full object-cover"
+                              src={cloudinaryThumbnailUrl(photo, 160)}
+                            />
+                            <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-white transition-colors group-hover:bg-black/35">
+                              <Maximize2 className="h-4 w-4 opacity-0 group-hover:opacity-100" />
+                            </span>
+                          </button>
+                        ))}
                       </span>
                     ) : null}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-            Aucun dommage n&apos;a ete reference. Tu peux tout de meme finaliser une synthese vide.
-          </p>
-        )}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-gray-950">{item.vehiclePart.name}</span>
+                      <span className="block text-sm text-gray-500">
+                        {item.repairType.name} · Quantite {item.quantity}
+                      </span>
+                      {item.comment?.trim() ? (
+                        <span className="mt-1 block text-xs text-gray-500">{item.comment}</span>
+                      ) : null}
+                      {item.decisionStatus === "FORBIDDEN" ? (
+                        <span className="mt-1 block text-xs font-medium text-red-700">
+                          Reparation interdite : elle doit etre decochee pour finaliser.
+                        </span>
+                      ) : null}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="m-4 rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+              Aucun dommage n&apos;a ete reference. Tu peux tout de meme finaliser une synthese vide.
+            </p>
+          )}
 
-        <div className="flex flex-col gap-2 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-gray-500">
-            Les dommages decoches restent conserves dans le controle mais ne figureront pas dans le PDF.
-          </p>
-          <Button
-            disabled={isSaving || selectedForbiddenCount > 0}
-            type="button"
-            onClick={saveSelection}
-          >
-            {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CheckSquare2 className="h-4 w-4" />}
-            {vehicleCheck.status === "SUMMARY_READY"
-              ? "Enregistrer la selection"
-              : "Valider la synthese"}
-          </Button>
-        </div>
-      </CardContent>
+          <div className="flex flex-col gap-3 border-t border-gray-200 bg-gray-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm leading-5 text-gray-500">
+              Les dommages decoches restent dans le controle, hors PDF.
+            </p>
+            <Button
+              className="w-full sm:w-auto"
+              disabled={isSaving || selectedForbiddenCount > 0}
+              size="sm"
+              type="button"
+              onClick={saveSelection}
+            >
+              {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CheckSquare2 className="h-4 w-4" />}
+              {vehicleCheck.status === "SUMMARY_READY"
+                ? "Enregistrer la selection"
+                : "Valider la synthese"}
+            </Button>
+          </div>
+        </CardContent>
+      ) : null}
       {photoGallery?.photos.length ? (
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4"
@@ -356,7 +420,7 @@ export function VehicleCheckSummarySelection({
                 }}
               >
                 <Mail className="h-4 w-4" />
-                Envoyer par mail
+                Envoyer par email
               </Button>
             </div>
             <Button

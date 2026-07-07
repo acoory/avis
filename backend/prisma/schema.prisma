@@ -70,6 +70,7 @@ model User {
   manager       User?          @relation("ManagerCollaborators", fields: [managerId], references: [id], onDelete: SetNull)
   collaborators User[]         @relation("ManagerCollaborators")
   vehicleCheckItemStatusHistories VehicleCheckItemStatusHistory[]
+  externalRepairCompanies ExternalRepairCompany[] @relation("ExternalRepairCompanyCreatedBy")
   externalRepairContacts ExternalRepairContact[] @relation("ExternalRepairContactCreatedBy")
   vehicleCheckPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareCreatedBy")
   vehicleRecoveredPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareRecoveredBy")
@@ -247,10 +248,28 @@ model VehicleCheck {
   @@index([licensePlateCountry])
 }
 
+model ExternalRepairCompany {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  notes       String?
+  isActive    Boolean  @default(true)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User? @relation("ExternalRepairCompanyCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  contacts  ExternalRepairContact[]
+
+  @@index([isActive])
+  @@index([createdById])
+  @@index([name])
+}
+
 model ExternalRepairContact {
   id          String   @id @default(uuid())
   name        String
   companyName String?
+  companyId   String?
   email       String   @unique
   phone       String?
   notes       String?
@@ -260,10 +279,12 @@ model ExternalRepairContact {
   updatedAt   DateTime @updatedAt
 
   createdBy User? @relation("ExternalRepairContactCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  company   ExternalRepairCompany? @relation(fields: [companyId], references: [id], onDelete: SetNull)
   publicShares VehicleCheckPublicShare[]
 
   @@index([isActive])
   @@index([createdById])
+  @@index([companyId])
   @@index([companyName])
 }
 
