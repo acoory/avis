@@ -870,6 +870,8 @@ export class VehicleChecksService {
     );
     const checkDate = new Intl.DateTimeFormat('fr-FR').format(vehicleCheck.checkDate);
     const contactName = this.repairRequestContactName(vehicleCheck);
+    const contactEmail = this.repairRequestContactEmail(vehicleCheck);
+    const contactEmailLabel = contactEmail ? ` (${contactEmail})` : '';
 
     return [
       'Bonjour,',
@@ -885,7 +887,7 @@ export class VehicleChecksService {
       'Dossier à consulter :',
       publicUrl,
       '',
-      "Merci de transmettre votre devis en réponse à cet email ou selon les modalités de l'établissement.",
+      `Merci de transmettre votre devis en réponse à l'email de la personne qui gère le véhicule${contactEmailLabel} ou selon les modalités de l'établissement.`,
     ].join('\n');
   }
 
@@ -913,6 +915,10 @@ export class VehicleChecksService {
     );
     const checkDate = new Intl.DateTimeFormat('fr-FR').format(vehicleCheck.checkDate);
     const contactName = this.escapeHtml(this.repairRequestContactName(vehicleCheck));
+    const contactEmail = this.escapeHtml(this.repairRequestContactEmail(vehicleCheck) ?? '');
+    const contactEmailLabel = contactEmail
+      ? ` <span style="display:inline-block;margin:0 2px;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-weight:700;white-space:nowrap">${contactEmail}</span>`
+      : '';
     const vehicleLabel = this.escapeHtml(this.repairRequestVehicleLabel(vehicleCheck));
     const safePublicUrl = this.escapeHtml(publicUrl);
 
@@ -932,7 +938,7 @@ export class VehicleChecksService {
       '<p style="margin:0 0 16px;font-size:15px;color:#334155">Le dossier contient le détail à chiffrer, les commentaires et les photos des dommages.</p>',
       `<p style="margin:0 0 16px"><a href="${safePublicUrl}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:11px 16px;border-radius:7px;font-weight:700">Consulter le dossier</a></p>`,
       `<p style="margin:0 0 18px;font-size:12px;color:#64748b">Si le bouton ne fonctionne pas, copiez ce lien :<br><a href="${safePublicUrl}" style="color:#0f766e;word-break:break-all">${safePublicUrl}</a></p>`,
-      "<p style=\"margin:0;font-size:15px;color:#334155\">Merci de transmettre votre devis en réponse à cet email ou selon les modalités de l'établissement.</p>",
+      `<p style="margin:0;font-size:15px;color:#334155">Merci de transmettre votre devis en réponse à l'email de la personne qui gère le véhicule${contactEmailLabel} ou selon les modalités de l'établissement.</p>`,
       '</div>',
       '</div>',
       '</div>',
@@ -961,6 +967,16 @@ export class VehicleChecksService {
       .trim();
 
     return collaboratorName || vehicleCheck.collaborator?.email || 'Notre équipe';
+  }
+
+  private repairRequestContactEmail(vehicleCheck: {
+    collaborator?: {
+      email: string;
+      firstName: string;
+      lastName: string;
+    } | null;
+  }) {
+    return vehicleCheck.collaborator?.email?.trim() || null;
   }
 
   private repairRequestVehicleLabel(vehicleCheck: {
