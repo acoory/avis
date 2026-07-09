@@ -5,6 +5,11 @@ import { VehicleChecksService } from './vehicle-checks.service';
 export class VehicleChecksPublicController {
   constructor(private readonly vehicleChecksService: VehicleChecksService) {}
 
+  @Get('decision/:token')
+  findPublicDecisionShare(@Param('token') token: string) {
+    return this.vehicleChecksService.findPublicDecisionShare(token);
+  }
+
   @Get(':token')
   findPublicShare(@Param('token') token: string) {
     return this.vehicleChecksService.findPublicShare(token);

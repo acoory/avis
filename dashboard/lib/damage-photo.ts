@@ -29,6 +29,12 @@ export function cloudinaryThumbnailUrl(photo: DamagePhoto, width = 320) {
   );
 }
 
+export function cloudinaryPreviewUrl(photo: DamagePhoto, width = 1200) {
+  return cloudinaryProxyUrl(
+    photo.secureUrl.replace("/upload/", `/upload/f_auto,q_auto,c_limit,w_${width}/`),
+  );
+}
+
 export function cloudinaryOriginalUrl(photo: DamagePhoto) {
   return cloudinaryProxyUrl(photo.secureUrl);
 }

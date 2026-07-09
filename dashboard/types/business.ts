@@ -139,9 +139,26 @@ export type VehicleCheck = {
     vehicleRecoveredById?: string | null;
     token: string;
   } | null;
+  decisionShares?: Array<{
+    createdAt: string;
+    emailSentAt?: string | null;
+    manager: {
+      email: string;
+      firstName: string;
+      id: string;
+      lastName: string;
+    };
+    managerId: string;
+    requestComment?: string | null;
+    token: string;
+  }>;
   items?: Array<{
     id: string;
     quantity: number;
+    unitInternalSavingAmount: string;
+    totalInternalSavingAmount: string;
+    unitInternalCost: string;
+    totalInternalCost: string;
     comment?: string | null;
     partOrderRequired: boolean;
     partOrderStatus: PartOrderStatus;
@@ -249,6 +266,13 @@ export type ExternalRepairCompany = {
   contacts?: ExternalRepairContact[];
 };
 
+export type DecisionManager = {
+  email: string;
+  firstName: string;
+  id: string;
+  lastName: string;
+};
+
 export type VehicleCheckPublicShare = {
   createdAt: string;
   externalRepairContact?: ExternalRepairContact | null;
@@ -266,6 +290,26 @@ export type PublicVehicleCheckShare = {
   vehicleRecoveredAt?: string | null;
   token: string;
   vehicleCheck: Omit<VehicleCheck, "collaborator" | "externalQuotes" | "items"> & {
+    items: VehicleCheckItem[];
+  };
+};
+
+export type VehicleCheckDecisionShare = {
+  createdAt: string;
+  emailSentAt?: string | null;
+  manager: {
+    email: string;
+    firstName: string;
+    id: string;
+    lastName: string;
+  };
+  managerId: string;
+  requestComment?: string | null;
+  token: string;
+};
+
+export type PublicVehicleCheckDecisionShare = VehicleCheckDecisionShare & {
+  vehicleCheck: Omit<VehicleCheck, "externalQuotes" | "items"> & {
     items: VehicleCheckItem[];
   };
 };

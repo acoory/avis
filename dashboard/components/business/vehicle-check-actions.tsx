@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Download, Mail, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle2, Download, Mail, MessageSquareText, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ManagerDecisionRequestDialog } from "@/components/business/manager-decision-request-dialog";
 import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
 import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-dialog";
 import { Button } from "@/components/ui/button";
@@ -23,8 +24,10 @@ export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdat
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [decisionDialogOpen, setDecisionDialogOpen] = useState(false);
   const [recoveredDialogOpen, setRecoveredDialogOpen] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
+  const canRequestDecision = vehicleCheck.status !== "DRAFT";
   const canShareSummary = vehicleCheck.status === "SUMMARY_READY";
   const canMarkRecovered = Boolean(vehicleCheck.publicShare && !vehicleCheck.publicShare.vehicleRecoveredAt);
   const canDelete = true;
@@ -83,6 +86,18 @@ export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdat
               Envoyer par email
             </Button>
           ) : null}
+          {canRequestDecision ? (
+            <Button
+              className="w-full sm:w-auto"
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={() => setDecisionDialogOpen(true)}
+            >
+              <MessageSquareText className="h-4 w-4" />
+              Avis manager
+            </Button>
+          ) : null}
           {canMarkRecovered ? (
             <Button
               className="w-full sm:w-auto"
@@ -129,6 +144,12 @@ export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdat
           router.push("/dashboard/vehicle-checks");
           router.refresh();
         }}
+      />
+      <ManagerDecisionRequestDialog
+        open={decisionDialogOpen}
+        vehicleCheck={vehicleCheck}
+        onOpenChange={setDecisionDialogOpen}
+        onSent={onUpdated}
       />
       <VehicleRecoveredDialog
         open={recoveredDialogOpen}

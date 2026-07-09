@@ -29,6 +29,7 @@ import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
+import { SendDecisionRequestEmailDto } from './dto/send-decision-request-email.dto';
 import { SendRepairRequestEmailDto } from './dto/send-repair-request-email.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
 
@@ -94,6 +95,23 @@ const vehicleCheckInclude = {
       token: true,
     },
   },
+  decisionShares: {
+    select: {
+      createdAt: true,
+      emailSentAt: true,
+      manager: {
+        select: {
+          email: true,
+          firstName: true,
+          id: true,
+          lastName: true,
+        },
+      },
+      managerId: true,
+      requestComment: true,
+      token: true,
+    },
+  },
 };
 
 const publicVehicleCheckInclude = {
@@ -105,6 +123,29 @@ const publicVehicleCheckInclude = {
       selectedForSummary: true,
       operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
     },
+    include: {
+      repairType: true,
+      vehiclePart: true,
+      photos: {
+        orderBy: { createdAt: 'asc' as const },
+      },
+    },
+    orderBy: { createdAt: 'asc' as const },
+  },
+};
+
+const publicDecisionVehicleCheckInclude = {
+  agency: true,
+  collaborator: {
+    select: {
+      email: true,
+      firstName: true,
+      lastName: true,
+    },
+  },
+  manufacturer: true,
+  vehicleModel: true,
+  items: {
     include: {
       repairType: true,
       vehiclePart: true,
@@ -143,6 +184,24 @@ export class VehicleChecksService {
       where,
       include: vehicleCheckInclude,
       orderBy: [{ checkDate: 'desc' }, { createdAt: 'desc' }],
+    });
+  }
+
+  async findDecisionManagers(user: CurrentUserPayload) {
+    const select = {
+      email: true,
+      firstName: true,
+      id: true,
+      lastName: true,
+    };
+
+    return this.prisma.user.findMany({
+      where: {
+        isActive: true,
+        role: Role.MANAGER,
+      },
+      orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
+      select,
     });
   }
 
@@ -265,6 +324,93 @@ export class VehicleChecksService {
     };
   }
 
+  async sendDecisionRequestEmail(
+    id: string,
+    user: CurrentUserPayload,
+    dto: SendDecisionRequestEmailDto,
+  ) {
+    const vehicleCheck = await this.findOne(id, user);
+
+    if (vehicleCheck.status === VehicleCheckStatus.DRAFT) {
+      throw new BadRequestException(
+        'The vehicle check must be completed before requesting a manager decision',
+      );
+    }
+
+    const manager = await this.prisma.user.findFirst({
+      where: {
+        id: dto.managerId,
+        isActive: true,
+        role: Role.MANAGER,
+      },
+      select: {
+        email: true,
+        firstName: true,
+        id: true,
+        lastName: true,
+      },
+    });
+
+    if (!manager) {
+      throw new BadRequestException('The selected manager is not available');
+    }
+
+    const requestComment = dto.requestComment?.trim() || null;
+    const existingShare =
+      await this.prisma.vehicleCheckDecisionShare.findUnique({
+        where: {
+          vehicleCheckId_managerId: {
+            managerId: manager.id,
+            vehicleCheckId: id,
+          },
+        },
+      });
+
+    const share = existingShare
+      ? await this.prisma.vehicleCheckDecisionShare.update({
+          where: { id: existingShare.id },
+          data: {
+            emailSentAt: new Date(),
+            isEnabled: true,
+            requestComment,
+          },
+          include: { manager: true },
+        })
+      : await this.prisma.vehicleCheckDecisionShare.create({
+          data: {
+            createdById: user.sub,
+            emailSentAt: new Date(),
+            managerId: manager.id,
+            requestComment,
+            token: await this.generateDecisionShareToken(),
+            vehicleCheckId: id,
+          },
+          include: { manager: true },
+        });
+
+    const publicUrl = this.publicDecisionRequestUrl(share.token);
+
+    await this.mailService.sendMail({
+      html: this.decisionRequestHtml(
+        vehicleCheck,
+        manager,
+        publicUrl,
+        requestComment,
+      ),
+      replyTo: vehicleCheck.collaborator?.email,
+      subject: this.decisionRequestSubject(vehicleCheck),
+      text: this.decisionRequestText(
+        vehicleCheck,
+        manager,
+        publicUrl,
+        requestComment,
+      ),
+      to: manager.email,
+    });
+
+    return this.decisionShareResponse(share);
+  }
+
   async findPublicShare(token: string) {
     const share = await this.prisma.vehicleCheckPublicShare.findUnique({
       where: { token },
@@ -321,6 +467,39 @@ export class VehicleChecksService {
     }
 
     return this.findPublicShare(token);
+  }
+
+  async findPublicDecisionShare(token: string) {
+    const share = await this.prisma.vehicleCheckDecisionShare.findUnique({
+      where: { token },
+      include: {
+        manager: {
+          select: {
+            email: true,
+            firstName: true,
+            id: true,
+            lastName: true,
+          },
+        },
+        vehicleCheck: {
+          include: publicDecisionVehicleCheckInclude,
+        },
+      },
+    });
+
+    if (!share?.isEnabled || share.vehicleCheck.status === VehicleCheckStatus.DRAFT) {
+      throw new NotFoundException('Public decision request not found');
+    }
+
+    return {
+      createdAt: share.createdAt,
+      emailSentAt: share.emailSentAt,
+      manager: share.manager,
+      managerId: share.managerId,
+      requestComment: share.requestComment,
+      token: share.token,
+      vehicleCheck: share.vehicleCheck,
+    };
   }
 
   async markVehicleRecovered(id: string, user: CurrentUserPayload) {
@@ -895,6 +1074,23 @@ export class VehicleChecksService {
     throw new BadRequestException('Unable to generate public share token');
   }
 
+  private async generateDecisionShareToken() {
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const token = randomBytes(24).toString('base64url');
+      const existingShare =
+        await this.prisma.vehicleCheckDecisionShare.findUnique({
+          where: { token },
+          select: { id: true },
+        });
+
+      if (!existingShare) {
+        return token;
+      }
+    }
+
+    throw new BadRequestException('Unable to generate decision share token');
+  }
+
   private async ensureExternalRepairContact(externalRepairContactId?: string) {
     if (!externalRepairContactId) {
       return undefined;
@@ -992,6 +1188,29 @@ export class VehicleChecksService {
     };
   }
 
+  private decisionShareResponse(share: {
+    createdAt: Date;
+    emailSentAt?: Date | null;
+    manager: {
+      email: string;
+      firstName: string;
+      id: string;
+      lastName: string;
+    };
+    managerId: string;
+    requestComment?: string | null;
+    token: string;
+  }) {
+    return {
+      createdAt: share.createdAt,
+      emailSentAt: share.emailSentAt ?? null,
+      manager: share.manager,
+      managerId: share.managerId,
+      requestComment: share.requestComment ?? null,
+      token: share.token,
+    };
+  }
+
   private publicRepairRequestUrl(token: string) {
     const frontendUrl = (
       this.configService.get<string>('FRONTEND_PUBLIC_URL') ??
@@ -1003,6 +1222,145 @@ export class VehicleChecksService {
       .filter(Boolean)[0];
 
     return new URL(`/public/repairs/${token}`, frontendUrl).toString();
+  }
+
+  private publicDecisionRequestUrl(token: string) {
+    const frontendUrl = (
+      this.configService.get<string>('FRONTEND_PUBLIC_URL') ??
+      this.configService.get<string>('FRONTEND_URL') ??
+      'http://localhost:3000'
+    )
+      .split(',')
+      .map((url) => url.trim())
+      .filter(Boolean)[0];
+
+    return new URL(`/public/decision/${token}`, frontendUrl).toString();
+  }
+
+  private decisionRequestSubject(vehicleCheck: {
+    licensePlate: string;
+    manufacturer?: { name: string } | null;
+  }) {
+    return `Avis manager demandé - ${vehicleCheck.licensePlate} - ${vehicleCheck.manufacturer?.name ?? 'Véhicule'}`;
+  }
+
+  private decisionRequestText(
+    vehicleCheck: {
+      checkDate: Date;
+      collaborator?: {
+        email: string;
+        firstName: string;
+        lastName: string;
+      } | null;
+      items?: unknown[];
+      licensePlate: string;
+      licensePlateCountry: string;
+      licensePlateRaw?: string | null;
+      manufacturer?: { name: string } | null;
+      vehicleModel?: { name: string } | null;
+    },
+    manager: { firstName: string; lastName: string },
+    publicUrl: string,
+    requestComment: string | null,
+  ) {
+    const licensePlate = formatLicensePlate(
+      vehicleCheck.licensePlate,
+      vehicleCheck.licensePlateCountry,
+      vehicleCheck.licensePlateRaw,
+    );
+    const checkDate = new Intl.DateTimeFormat('fr-FR').format(
+      vehicleCheck.checkDate,
+    );
+    const managerName = `${manager.firstName} ${manager.lastName}`.trim();
+    const contactName = this.repairRequestContactName(vehicleCheck);
+
+    return [
+      `Bonjour ${managerName},`,
+      '',
+      `${contactName} souhaite obtenir votre avis sur un contrôle véhicule.`,
+      '',
+      'Informations du véhicule',
+      `Véhicule : ${this.repairRequestVehicleLabel(vehicleCheck)}`,
+      `Immatriculation : ${licensePlate}`,
+      `Date du contrôle : ${checkDate}`,
+      `Réparations contrôlées : ${vehicleCheck.items?.length ?? 0}`,
+      requestComment ? '' : null,
+      requestComment ? `Commentaire : ${requestComment}` : null,
+      '',
+      'Dossier à consulter :',
+      publicUrl,
+    ]
+      .filter((line): line is string => line !== null)
+      .join('\n');
+  }
+
+  private decisionRequestHtml(
+    vehicleCheck: {
+      checkDate: Date;
+      collaborator?: {
+        email: string;
+        firstName: string;
+        lastName: string;
+      } | null;
+      items?: unknown[];
+      licensePlate: string;
+      licensePlateCountry: string;
+      licensePlateRaw?: string | null;
+      manufacturer?: { name: string } | null;
+      vehicleModel?: { name: string } | null;
+    },
+    manager: { firstName: string; lastName: string },
+    publicUrl: string,
+    requestComment: string | null,
+  ) {
+    const licensePlate = formatLicensePlate(
+      vehicleCheck.licensePlate,
+      vehicleCheck.licensePlateCountry,
+      vehicleCheck.licensePlateRaw,
+    );
+    const checkDate = new Intl.DateTimeFormat('fr-FR').format(
+      vehicleCheck.checkDate,
+    );
+    const managerName = this.escapeHtml(
+      `${manager.firstName} ${manager.lastName}`.trim(),
+    );
+    const contactName = this.escapeHtml(
+      this.repairRequestContactName(vehicleCheck),
+    );
+    const vehicleLabel = this.escapeHtml(
+      this.repairRequestVehicleLabel(vehicleCheck),
+    );
+    const safePublicUrl = this.escapeHtml(publicUrl);
+
+    return [
+      '<div style="margin:0;padding:0;background:#f8fafc">',
+      '<div style="font-family:Arial,sans-serif;color:#0f172a;line-height:1.5;max-width:620px;margin:0 auto;padding:24px 16px">',
+      '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:22px">',
+      `<p style="margin:0 0 14px;font-size:14px;color:#475569">Bonjour ${managerName},</p>`,
+      '<h1 style="margin:0 0 10px;font-size:20px;line-height:1.25;color:#0f172a">Avis manager demandé</h1>',
+      `<p style="margin:0 0 18px;font-size:15px;color:#334155">${contactName} souhaite obtenir votre avis sur ce contrôle véhicule.</p>`,
+      '<table style="border-collapse:separate;border-spacing:0;width:100%;margin:0 0 20px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">',
+      this.repairRequestInfoRow('Véhicule', vehicleLabel),
+      this.repairRequestInfoRow(
+        'Immatriculation',
+        this.escapeHtml(licensePlate),
+      ),
+      this.repairRequestInfoRow('Date du contrôle', this.escapeHtml(checkDate)),
+      this.repairRequestInfoRow(
+        'Réparations contrôlées',
+        String(vehicleCheck.items?.length ?? 0),
+      ),
+      '</table>',
+      requestComment
+        ? `<div style="margin:0 0 18px;padding:12px 14px;border-left:4px solid #0f766e;background:#f0fdfa;border-radius:8px"><p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#0f766e;text-transform:uppercase">Commentaire</p><p style="margin:0;font-size:14px;color:#134e4a">${this.escapeHtml(requestComment)}</p></div>`
+        : '',
+      '<p style="margin:0 0 16px;font-size:15px;color:#334155">Le dossier contient toutes les réparations contrôlées, les commentaires et les photos associées.</p>',
+      `<p style="margin:0 0 16px"><a href="${safePublicUrl}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:11px 16px;border-radius:7px;font-weight:700">Consulter le dossier</a></p>`,
+      `<p style="margin:0;font-size:12px;color:#64748b">Si le bouton ne fonctionne pas, copiez ce lien :<br><a href="${safePublicUrl}" style="color:#0f766e;word-break:break-all">${safePublicUrl}</a></p>`,
+      '</div>',
+      '</div>',
+      '</div>',
+    ].join('');
   }
 
   private repairRequestSubject(vehicleCheck: {

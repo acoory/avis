@@ -419,6 +419,7 @@ export type VehicleCheckWhereInput = {
   items?: Prisma.VehicleCheckItemListRelationFilter
   externalQuotes?: Prisma.ExternalQuoteListRelationFilter
   publicShare?: Prisma.XOR<Prisma.VehicleCheckPublicShareNullableScalarRelationFilter, Prisma.VehicleCheckPublicShareWhereInput> | null
+  decisionShares?: Prisma.VehicleCheckDecisionShareListRelationFilter
 }
 
 export type VehicleCheckOrderByWithRelationInput = {
@@ -455,6 +456,7 @@ export type VehicleCheckOrderByWithRelationInput = {
   items?: Prisma.VehicleCheckItemOrderByRelationAggregateInput
   externalQuotes?: Prisma.ExternalQuoteOrderByRelationAggregateInput
   publicShare?: Prisma.VehicleCheckPublicShareOrderByWithRelationInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareOrderByRelationAggregateInput
 }
 
 export type VehicleCheckWhereUniqueInput = Prisma.AtLeast<{
@@ -494,6 +496,7 @@ export type VehicleCheckWhereUniqueInput = Prisma.AtLeast<{
   items?: Prisma.VehicleCheckItemListRelationFilter
   externalQuotes?: Prisma.ExternalQuoteListRelationFilter
   publicShare?: Prisma.XOR<Prisma.VehicleCheckPublicShareNullableScalarRelationFilter, Prisma.VehicleCheckPublicShareWhereInput> | null
+  decisionShares?: Prisma.VehicleCheckDecisionShareListRelationFilter
 }, "id" | "checkNumber">
 
 export type VehicleCheckOrderByWithAggregationInput = {
@@ -592,6 +595,7 @@ export type VehicleCheckCreateInput = {
   items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateInput = {
@@ -624,6 +628,7 @@ export type VehicleCheckUncheckedCreateInput = {
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUpdateInput = {
@@ -656,6 +661,7 @@ export type VehicleCheckUpdateInput = {
   items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateInput = {
@@ -688,6 +694,7 @@ export type VehicleCheckUncheckedUpdateInput = {
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckCreateManyInput = {
@@ -1099,6 +1106,20 @@ export type VehicleCheckUpdateOneRequiredWithoutPublicShareNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VehicleCheckUpdateToOneWithWhereWithoutPublicShareInput, Prisma.VehicleCheckUpdateWithoutPublicShareInput>, Prisma.VehicleCheckUncheckedUpdateWithoutPublicShareInput>
 }
 
+export type VehicleCheckCreateNestedOneWithoutDecisionSharesInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckCreateWithoutDecisionSharesInput, Prisma.VehicleCheckUncheckedCreateWithoutDecisionSharesInput>
+  connectOrCreate?: Prisma.VehicleCheckCreateOrConnectWithoutDecisionSharesInput
+  connect?: Prisma.VehicleCheckWhereUniqueInput
+}
+
+export type VehicleCheckUpdateOneRequiredWithoutDecisionSharesNestedInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckCreateWithoutDecisionSharesInput, Prisma.VehicleCheckUncheckedCreateWithoutDecisionSharesInput>
+  connectOrCreate?: Prisma.VehicleCheckCreateOrConnectWithoutDecisionSharesInput
+  upsert?: Prisma.VehicleCheckUpsertWithoutDecisionSharesInput
+  connect?: Prisma.VehicleCheckWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VehicleCheckUpdateToOneWithWhereWithoutDecisionSharesInput, Prisma.VehicleCheckUpdateWithoutDecisionSharesInput>, Prisma.VehicleCheckUncheckedUpdateWithoutDecisionSharesInput>
+}
+
 export type VehicleCheckCreateNestedOneWithoutItemsInput = {
   create?: Prisma.XOR<Prisma.VehicleCheckCreateWithoutItemsInput, Prisma.VehicleCheckUncheckedCreateWithoutItemsInput>
   connectOrCreate?: Prisma.VehicleCheckCreateOrConnectWithoutItemsInput
@@ -1156,6 +1177,7 @@ export type VehicleCheckCreateWithoutCollaboratorInput = {
   items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateWithoutCollaboratorInput = {
@@ -1187,6 +1209,7 @@ export type VehicleCheckUncheckedCreateWithoutCollaboratorInput = {
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckCreateOrConnectWithoutCollaboratorInput = {
@@ -1276,6 +1299,7 @@ export type VehicleCheckCreateWithoutAgencyInput = {
   items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateWithoutAgencyInput = {
@@ -1307,6 +1331,7 @@ export type VehicleCheckUncheckedCreateWithoutAgencyInput = {
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckCreateOrConnectWithoutAgencyInput = {
@@ -1364,6 +1389,7 @@ export type VehicleCheckCreateWithoutManufacturerInput = {
   items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateWithoutManufacturerInput = {
@@ -1395,6 +1421,7 @@ export type VehicleCheckUncheckedCreateWithoutManufacturerInput = {
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckCreateOrConnectWithoutManufacturerInput = {
@@ -1452,6 +1479,7 @@ export type VehicleCheckCreateWithoutVehicleModelInput = {
   items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateWithoutVehicleModelInput = {
@@ -1483,6 +1511,7 @@ export type VehicleCheckUncheckedCreateWithoutVehicleModelInput = {
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckCreateOrConnectWithoutVehicleModelInput = {
@@ -1540,6 +1569,7 @@ export type VehicleCheckCreateWithoutPublicShareInput = {
   vehicleModel?: Prisma.VehicleModelCreateNestedOneWithoutChecksInput
   items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateWithoutPublicShareInput = {
@@ -1571,6 +1601,7 @@ export type VehicleCheckUncheckedCreateWithoutPublicShareInput = {
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckCreateOrConnectWithoutPublicShareInput = {
@@ -1618,6 +1649,7 @@ export type VehicleCheckUpdateWithoutPublicShareInput = {
   vehicleModel?: Prisma.VehicleModelUpdateOneWithoutChecksNestedInput
   items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateWithoutPublicShareInput = {
@@ -1649,6 +1681,151 @@ export type VehicleCheckUncheckedUpdateWithoutPublicShareInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
+}
+
+export type VehicleCheckCreateWithoutDecisionSharesInput = {
+  id?: string
+  checkNumber: string
+  licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
+  mileage?: number | null
+  checkDate?: Date | string
+  city: string
+  status?: $Enums.VehicleCheckStatus
+  totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalExternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  constructorAllowanceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionSummary?: string | null
+  notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
+  agency: Prisma.AgencyCreateNestedOneWithoutVehicleChecksInput
+  manufacturer: Prisma.ManufacturerCreateNestedOneWithoutChecksInput
+  vehicleModel?: Prisma.VehicleModelCreateNestedOneWithoutChecksInput
+  items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
+  externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
+  publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+}
+
+export type VehicleCheckUncheckedCreateWithoutDecisionSharesInput = {
+  id?: string
+  checkNumber: string
+  collaboratorId: string
+  agencyId: string
+  manufacturerId: string
+  vehicleModelId?: string | null
+  licensePlate: string
+  licensePlateRaw?: string | null
+  licensePlateCountry?: string
+  licensePlateRecognitionConfidence?: number | null
+  mileage?: number | null
+  checkDate?: Date | string
+  city: string
+  status?: $Enums.VehicleCheckStatus
+  totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalExternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  constructorAllowanceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowanceDifferenceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionSummary?: string | null
+  notes?: string | null
+  fieldCompletedAt?: Date | string | null
+  summaryFinalizedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
+  externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
+  publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+}
+
+export type VehicleCheckCreateOrConnectWithoutDecisionSharesInput = {
+  where: Prisma.VehicleCheckWhereUniqueInput
+  create: Prisma.XOR<Prisma.VehicleCheckCreateWithoutDecisionSharesInput, Prisma.VehicleCheckUncheckedCreateWithoutDecisionSharesInput>
+}
+
+export type VehicleCheckUpsertWithoutDecisionSharesInput = {
+  update: Prisma.XOR<Prisma.VehicleCheckUpdateWithoutDecisionSharesInput, Prisma.VehicleCheckUncheckedUpdateWithoutDecisionSharesInput>
+  create: Prisma.XOR<Prisma.VehicleCheckCreateWithoutDecisionSharesInput, Prisma.VehicleCheckUncheckedCreateWithoutDecisionSharesInput>
+  where?: Prisma.VehicleCheckWhereInput
+}
+
+export type VehicleCheckUpdateToOneWithWhereWithoutDecisionSharesInput = {
+  where?: Prisma.VehicleCheckWhereInput
+  data: Prisma.XOR<Prisma.VehicleCheckUpdateWithoutDecisionSharesInput, Prisma.VehicleCheckUncheckedUpdateWithoutDecisionSharesInput>
+}
+
+export type VehicleCheckUpdateWithoutDecisionSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVehicleCheckStatusFieldUpdateOperationsInput | $Enums.VehicleCheckStatus
+  totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalExternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  constructorAllowanceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
+  agency?: Prisma.AgencyUpdateOneRequiredWithoutVehicleChecksNestedInput
+  manufacturer?: Prisma.ManufacturerUpdateOneRequiredWithoutChecksNestedInput
+  vehicleModel?: Prisma.VehicleModelUpdateOneWithoutChecksNestedInput
+  items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
+  externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
+  publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+}
+
+export type VehicleCheckUncheckedUpdateWithoutDecisionSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  checkNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  collaboratorId?: Prisma.StringFieldUpdateOperationsInput | string
+  agencyId?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehicleModelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlate?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licensePlateCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  licensePlateRecognitionConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  mileage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  checkDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVehicleCheckStatusFieldUpdateOperationsInput | $Enums.VehicleCheckStatus
+  totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalExternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  constructorAllowanceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowanceDifferenceAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
+  externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
+  publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckCreateWithoutItemsInput = {
@@ -1680,6 +1857,7 @@ export type VehicleCheckCreateWithoutItemsInput = {
   vehicleModel?: Prisma.VehicleModelCreateNestedOneWithoutChecksInput
   externalQuotes?: Prisma.ExternalQuoteCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateWithoutItemsInput = {
@@ -1711,6 +1889,7 @@ export type VehicleCheckUncheckedCreateWithoutItemsInput = {
   updatedAt?: Date | string
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckCreateOrConnectWithoutItemsInput = {
@@ -1758,6 +1937,7 @@ export type VehicleCheckUpdateWithoutItemsInput = {
   vehicleModel?: Prisma.VehicleModelUpdateOneWithoutChecksNestedInput
   externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateWithoutItemsInput = {
@@ -1789,6 +1969,7 @@ export type VehicleCheckUncheckedUpdateWithoutItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckCreateWithoutExternalQuotesInput = {
@@ -1820,6 +2001,7 @@ export type VehicleCheckCreateWithoutExternalQuotesInput = {
   vehicleModel?: Prisma.VehicleModelCreateNestedOneWithoutChecksInput
   items?: Prisma.VehicleCheckItemCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckUncheckedCreateWithoutExternalQuotesInput = {
@@ -1851,6 +2033,7 @@ export type VehicleCheckUncheckedCreateWithoutExternalQuotesInput = {
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedOneWithoutVehicleCheckInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutVehicleCheckInput
 }
 
 export type VehicleCheckCreateOrConnectWithoutExternalQuotesInput = {
@@ -1898,6 +2081,7 @@ export type VehicleCheckUpdateWithoutExternalQuotesInput = {
   vehicleModel?: Prisma.VehicleModelUpdateOneWithoutChecksNestedInput
   items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateWithoutExternalQuotesInput = {
@@ -1929,6 +2113,7 @@ export type VehicleCheckUncheckedUpdateWithoutExternalQuotesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckCreateManyCollaboratorInput = {
@@ -1988,6 +2173,7 @@ export type VehicleCheckUpdateWithoutCollaboratorInput = {
   items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateWithoutCollaboratorInput = {
@@ -2019,6 +2205,7 @@ export type VehicleCheckUncheckedUpdateWithoutCollaboratorInput = {
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateManyWithoutCollaboratorInput = {
@@ -2106,6 +2293,7 @@ export type VehicleCheckUpdateWithoutAgencyInput = {
   items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateWithoutAgencyInput = {
@@ -2137,6 +2325,7 @@ export type VehicleCheckUncheckedUpdateWithoutAgencyInput = {
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateManyWithoutAgencyInput = {
@@ -2224,6 +2413,7 @@ export type VehicleCheckUpdateWithoutManufacturerInput = {
   items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateWithoutManufacturerInput = {
@@ -2255,6 +2445,7 @@ export type VehicleCheckUncheckedUpdateWithoutManufacturerInput = {
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateManyWithoutManufacturerInput = {
@@ -2342,6 +2533,7 @@ export type VehicleCheckUpdateWithoutVehicleModelInput = {
   items?: Prisma.VehicleCheckItemUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateWithoutVehicleModelInput = {
@@ -2373,6 +2565,7 @@ export type VehicleCheckUncheckedUpdateWithoutVehicleModelInput = {
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
   publicShare?: Prisma.VehicleCheckPublicShareUncheckedUpdateOneWithoutVehicleCheckNestedInput
+  decisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutVehicleCheckNestedInput
 }
 
 export type VehicleCheckUncheckedUpdateManyWithoutVehicleModelInput = {
@@ -2411,11 +2604,13 @@ export type VehicleCheckUncheckedUpdateManyWithoutVehicleModelInput = {
 export type VehicleCheckCountOutputType = {
   items: number
   externalQuotes: number
+  decisionShares: number
 }
 
 export type VehicleCheckCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | VehicleCheckCountOutputTypeCountItemsArgs
   externalQuotes?: boolean | VehicleCheckCountOutputTypeCountExternalQuotesArgs
+  decisionShares?: boolean | VehicleCheckCountOutputTypeCountDecisionSharesArgs
 }
 
 /**
@@ -2440,6 +2635,13 @@ export type VehicleCheckCountOutputTypeCountItemsArgs<ExtArgs extends runtime.Ty
  */
 export type VehicleCheckCountOutputTypeCountExternalQuotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ExternalQuoteWhereInput
+}
+
+/**
+ * VehicleCheckCountOutputType without action
+ */
+export type VehicleCheckCountOutputTypeCountDecisionSharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckDecisionShareWhereInput
 }
 
 
@@ -2477,6 +2679,7 @@ export type VehicleCheckSelect<ExtArgs extends runtime.Types.Extensions.Internal
   items?: boolean | Prisma.VehicleCheck$itemsArgs<ExtArgs>
   externalQuotes?: boolean | Prisma.VehicleCheck$externalQuotesArgs<ExtArgs>
   publicShare?: boolean | Prisma.VehicleCheck$publicShareArgs<ExtArgs>
+  decisionShares?: boolean | Prisma.VehicleCheck$decisionSharesArgs<ExtArgs>
   _count?: boolean | Prisma.VehicleCheckCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vehicleCheck"]>
 
@@ -2584,6 +2787,7 @@ export type VehicleCheckInclude<ExtArgs extends runtime.Types.Extensions.Interna
   items?: boolean | Prisma.VehicleCheck$itemsArgs<ExtArgs>
   externalQuotes?: boolean | Prisma.VehicleCheck$externalQuotesArgs<ExtArgs>
   publicShare?: boolean | Prisma.VehicleCheck$publicShareArgs<ExtArgs>
+  decisionShares?: boolean | Prisma.VehicleCheck$decisionSharesArgs<ExtArgs>
   _count?: boolean | Prisma.VehicleCheckCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VehicleCheckIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2609,6 +2813,7 @@ export type $VehicleCheckPayload<ExtArgs extends runtime.Types.Extensions.Intern
     items: Prisma.$VehicleCheckItemPayload<ExtArgs>[]
     externalQuotes: Prisma.$ExternalQuotePayload<ExtArgs>[]
     publicShare: Prisma.$VehicleCheckPublicSharePayload<ExtArgs> | null
+    decisionShares: Prisma.$VehicleCheckDecisionSharePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3038,6 +3243,7 @@ export interface Prisma__VehicleCheckClient<T, Null = never, ExtArgs extends run
   items<T extends Prisma.VehicleCheck$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheck$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   externalQuotes<T extends Prisma.VehicleCheck$externalQuotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheck$externalQuotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExternalQuotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   publicShare<T extends Prisma.VehicleCheck$publicShareArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheck$publicShareArgs<ExtArgs>>): Prisma.Prisma__VehicleCheckPublicShareClient<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPublicSharePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  decisionShares<T extends Prisma.VehicleCheck$decisionSharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheck$decisionSharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckDecisionSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3577,6 +3783,30 @@ export type VehicleCheck$publicShareArgs<ExtArgs extends runtime.Types.Extension
    */
   include?: Prisma.VehicleCheckPublicShareInclude<ExtArgs> | null
   where?: Prisma.VehicleCheckPublicShareWhereInput
+}
+
+/**
+ * VehicleCheck.decisionShares
+ */
+export type VehicleCheck$decisionSharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckDecisionShare
+   */
+  select?: Prisma.VehicleCheckDecisionShareSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckDecisionShare
+   */
+  omit?: Prisma.VehicleCheckDecisionShareOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckDecisionShareInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckDecisionShareWhereInput
+  orderBy?: Prisma.VehicleCheckDecisionShareOrderByWithRelationInput | Prisma.VehicleCheckDecisionShareOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckDecisionShareWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckDecisionShareScalarFieldEnum | Prisma.VehicleCheckDecisionShareScalarFieldEnum[]
 }
 
 /**

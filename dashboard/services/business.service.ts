@@ -4,6 +4,7 @@ import {
   DashboardSummary,
   DashboardTimelinePoint,
   DamagePhoto,
+  DecisionManager,
   ExternalRepairContact,
   ExternalRepairCompany,
   GtmotiveEstimate,
@@ -21,11 +22,13 @@ import {
   RepairDecisionInputItem,
   RepairDecisionPreview,
   VehicleCheck,
+  VehicleCheckDecisionShare,
   VehicleCheckItem,
   VehicleCheckItemOperationalStatus,
   VehicleCheckPublicShare,
   VehicleModel,
   VehiclePart,
+  PublicVehicleCheckDecisionShare,
   PublicVehicleCheckShare,
 } from "@/types/business";
 
@@ -95,6 +98,11 @@ export const businessService = {
     return data;
   },
 
+  async decisionManagers() {
+    const { data } = await api.get<DecisionManager[]>("/vehicle-checks/decision-managers");
+    return data;
+  },
+
   async findOrCreateExternalRepairContact(payload: {
     companyName?: string;
     email: string;
@@ -138,8 +146,24 @@ export const businessService = {
     return data;
   },
 
+  async sendVehicleCheckDecisionRequestEmail(
+    id: string,
+    payload: {
+      managerId: string;
+      requestComment?: string;
+    },
+  ) {
+    const { data } = await api.post<VehicleCheckDecisionShare>(`/vehicle-checks/${id}/decision-request-email`, payload);
+    return data;
+  },
+
   async publicVehicleCheckShare(token: string) {
     const { data } = await api.get<PublicVehicleCheckShare>(`/public/vehicle-checks/${token}`);
+    return data;
+  },
+
+  async publicVehicleCheckDecisionShare(token: string) {
+    const { data } = await api.get<PublicVehicleCheckDecisionShare>(`/public/vehicle-checks/decision/${token}`);
     return data;
   },
 

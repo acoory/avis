@@ -4,6 +4,7 @@ import { CheckCircle2, ChevronLeft, ChevronRight, FileText, X } from "lucide-rea
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { cloudinaryPreviewUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { PublicVehicleCheckShare, VehicleCheckItem } from "@/types/business";
@@ -53,6 +54,11 @@ export default function PublicRepairRequestPage() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gallery]);
+
+  useEffect(() => {
+    if (!gallery?.photos.length) return;
+    preloadGalleryPhotos(gallery.photos, gallery.index);
+  }, [gallery?.index, gallery?.photos]);
 
   if (isLoading) {
     return (
@@ -324,7 +330,13 @@ function PhotoCell({
           type="button"
           onClick={() => onOpenPhoto(item, item.photos ?? [], index)}
         >
-          <img alt="Degat constate" className="h-full w-full object-cover transition group-hover:scale-105" src={photo.secureUrl} />
+          <img
+            alt="Degat constate"
+            className="h-full w-full object-cover transition group-hover:scale-105"
+            decoding="async"
+            loading="lazy"
+            src={cloudinaryThumbnailUrl(photo, 160)}
+          />
         </button>
       ))}
       {item.photos.length > 3 ? (
@@ -382,7 +394,12 @@ function PhotoGalleryModal({
               <ChevronLeft className="h-6 w-6" />
             </button>
           ) : null}
-          <img alt="Degat constate" className="max-h-[75vh] max-w-full rounded-lg object-contain shadow-2xl" src={photo.secureUrl} />
+          <img
+            alt="Degat constate"
+            className="max-h-[75vh] max-w-full rounded-lg object-contain shadow-2xl"
+            decoding="async"
+            src={cloudinaryPreviewUrl(photo)}
+          />
           {hasMultiplePhotos ? (
             <button
               aria-label="Photo suivante"
@@ -405,6 +422,21 @@ function previousPhotoIndex(gallery: PhotoGallery) {
 
 function nextPhotoIndex(gallery: PhotoGallery) {
   return gallery.index === gallery.photos.length - 1 ? 0 : gallery.index + 1;
+}
+
+function preloadGalleryPhotos(photos: RepairPhoto[], index: number) {
+  const indexes = new Set([
+    index,
+    (index - 1 + photos.length) % photos.length,
+    (index + 1) % photos.length,
+  ]);
+
+  indexes.forEach((photoIndex) => {
+    const photo = photos[photoIndex];
+    if (!photo) return;
+    const image = new Image();
+    image.src = cloudinaryPreviewUrl(photo);
+  });
 }
 
 function PartOrderBadge({ item }: { item: VehicleCheckItem }) {

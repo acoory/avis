@@ -2,7 +2,6 @@
 
 import {
   CheckSquare2,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -16,7 +15,7 @@ import { toast } from "sonner";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { cloudinaryOriginalUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
+import { cloudinaryPreviewUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
@@ -33,7 +32,6 @@ export function VehicleCheckSummarySelection({
   const items = vehicleCheck.items ?? [];
   const isSummaryPending = vehicleCheck.status === "TO_ANALYZE" && !vehicleCheck.summaryFinalizedAt;
   const isSummaryReady = vehicleCheck.status === "SUMMARY_READY" || Boolean(vehicleCheck.summaryFinalizedAt);
-  const [isExpanded, setIsExpanded] = useState(isSummaryPending);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(
     () => new Set(items.filter((item) => item.selectedForSummary).map((item) => item.id)),
   );
@@ -52,10 +50,6 @@ export function VehicleCheckSummarySelection({
       new Set(items.filter((item) => item.selectedForSummary).map((item) => item.id)),
     );
   }, [vehicleCheck.id, vehicleCheck.summaryFinalizedAt, items]);
-
-  useEffect(() => {
-    setIsExpanded(isSummaryPending);
-  }, [vehicleCheck.id, isSummaryPending]);
 
   useEffect(() => {
     if (!photoGallery) {
@@ -86,6 +80,14 @@ export function VehicleCheckSummarySelection({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [photoGallery]);
+
+  useEffect(() => {
+    if (!photoGallery?.photos.length) {
+      return;
+    }
+
+    preloadGalleryPhotos(photoGallery.photos, photoGallery.index);
+  }, [photoGallery?.index, photoGallery?.photos]);
 
   const selectedForbiddenCount = useMemo(
     () =>
@@ -145,12 +147,7 @@ export function VehicleCheckSummarySelection({
   return (
     <Card className="mt-5 overflow-hidden border-gray-200 shadow-none" id="summary-selection">
       <CardHeader className="p-0">
-        <button
-          aria-expanded={isExpanded}
-          className="flex w-full flex-col gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 sm:flex-row sm:items-center sm:justify-between"
-          type="button"
-          onClick={() => setIsExpanded((current) => !current)}
-        >
+        <div className="flex w-full flex-col gap-3 px-4 py-3 text-left sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
             <span
               className={[
@@ -185,17 +182,10 @@ export function VehicleCheckSummarySelection({
             <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700">
               {selectedItemIds.size}/{items.length} selectionnee{selectedItemIds.size > 1 ? "s" : ""}
             </span>
-            <ChevronDown
-              className={[
-                "h-4 w-4 text-gray-400 transition-transform",
-                isExpanded ? "rotate-180" : "",
-              ].join(" ")}
-            />
           </div>
-        </button>
+        </div>
       </CardHeader>
-      {isExpanded ? (
-        <CardContent className="space-y-0 border-t border-gray-200 p-0">
+      <CardContent className="space-y-0 border-t border-gray-200 p-0">
           <div className="border-b border-gray-200 px-4 py-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-950">
               <span
@@ -255,6 +245,8 @@ export function VehicleCheckSummarySelection({
                             <img
                               alt="Degat"
                               className="h-full w-full object-cover"
+                              decoding="async"
+                              loading="lazy"
                               src={cloudinaryThumbnailUrl(photo, 160)}
                             />
                             <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-white transition-colors group-hover:bg-black/35">
@@ -305,8 +297,7 @@ export function VehicleCheckSummarySelection({
                 : "Valider la synthese"}
             </Button>
           </div>
-        </CardContent>
-      ) : null}
+      </CardContent>
       {photoGallery?.photos.length ? (
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4"
@@ -368,7 +359,8 @@ export function VehicleCheckSummarySelection({
           <img
             alt="Degat du vehicule en grand"
             className="max-h-[90vh] max-w-[95vw] rounded-lg object-contain shadow-2xl"
-            src={cloudinaryOriginalUrl(photoGallery.photos[photoGallery.index])}
+            decoding="async"
+            src={cloudinaryPreviewUrl(photoGallery.photos[photoGallery.index])}
             onClick={(event) => event.stopPropagation()}
           />
         </div>
@@ -444,4 +436,22 @@ export function VehicleCheckSummarySelection({
       ) : null}
     </Card>
   );
+}
+
+function preloadGalleryPhotos(
+  photos: NonNullable<NonNullable<VehicleCheck["items"]>[number]["photos"]>,
+  index: number,
+) {
+  const indexes = new Set([
+    index,
+    (index - 1 + photos.length) % photos.length,
+    (index + 1) % photos.length,
+  ]);
+
+  indexes.forEach((photoIndex) => {
+    const photo = photos[photoIndex];
+    if (!photo) return;
+    const image = new Image();
+    image.src = cloudinaryPreviewUrl(photo);
+  });
 }

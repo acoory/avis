@@ -63,6 +63,7 @@ export const ModelName = {
   ExternalRepairCompany: 'ExternalRepairCompany',
   ExternalRepairContact: 'ExternalRepairContact',
   VehicleCheckPublicShare: 'VehicleCheckPublicShare',
+  VehicleCheckDecisionShare: 'VehicleCheckDecisionShare',
   VehicleCheckItem: 'VehicleCheckItem',
   VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
@@ -281,6 +282,22 @@ export const VehicleCheckPublicShareScalarFieldEnum = {
 } as const
 
 export type VehicleCheckPublicShareScalarFieldEnum = (typeof VehicleCheckPublicShareScalarFieldEnum)[keyof typeof VehicleCheckPublicShareScalarFieldEnum]
+
+
+export const VehicleCheckDecisionShareScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckId: 'vehicleCheckId',
+  managerId: 'managerId',
+  token: 'token',
+  isEnabled: 'isEnabled',
+  requestComment: 'requestComment',
+  emailSentAt: 'emailSentAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehicleCheckDecisionShareScalarFieldEnum = (typeof VehicleCheckDecisionShareScalarFieldEnum)[keyof typeof VehicleCheckDecisionShareScalarFieldEnum]
 
 
 export const VehicleCheckItemScalarFieldEnum = {

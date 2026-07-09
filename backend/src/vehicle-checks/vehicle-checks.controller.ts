@@ -8,6 +8,7 @@ import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
+import { SendDecisionRequestEmailDto } from './dto/send-decision-request-email.dto';
 import { SendRepairRequestEmailDto } from './dto/send-repair-request-email.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
 import { VehicleChecksService } from './vehicle-checks.service';
@@ -23,6 +24,11 @@ export class VehicleChecksController {
   @Get()
   findAll(@CurrentUser() user: CurrentUserPayload, @Query() query: ListVehicleChecksQueryDto) {
     return this.vehicleChecksService.findAll(query, user);
+  }
+
+  @Get('decision-managers')
+  findDecisionManagers(@CurrentUser() user: CurrentUserPayload) {
+    return this.vehicleChecksService.findDecisionManagers(user);
   }
 
   @Get(':id')
@@ -75,6 +81,15 @@ export class VehicleChecksController {
     @Body() dto: SendRepairRequestEmailDto,
   ) {
     return this.vehicleChecksService.sendRepairRequestEmail(id, user, dto);
+  }
+
+  @Post(':id/decision-request-email')
+  sendDecisionRequestEmail(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: SendDecisionRequestEmailDto,
+  ) {
+    return this.vehicleChecksService.sendDecisionRequestEmail(id, user, dto);
   }
 
   @Post(':id/public-share/recovered')

@@ -74,6 +74,8 @@ model User {
   externalRepairContacts ExternalRepairContact[] @relation("ExternalRepairContactCreatedBy")
   vehicleCheckPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareCreatedBy")
   vehicleRecoveredPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareRecoveredBy")
+  vehicleCheckDecisionShares VehicleCheckDecisionShare[] @relation("VehicleCheckDecisionShareManager")
+  createdVehicleCheckDecisionShares VehicleCheckDecisionShare[] @relation("VehicleCheckDecisionShareCreatedBy")
 
   @@index([role])
   @@index([isActive])
@@ -237,6 +239,7 @@ model VehicleCheck {
   items          VehicleCheckItem[]
   externalQuotes ExternalQuote[]
   publicShare    VehicleCheckPublicShare?
+  decisionShares VehicleCheckDecisionShare[]
 
   @@index([collaboratorId])
   @@index([agencyId])
@@ -312,6 +315,31 @@ model VehicleCheckPublicShare {
   @@index([takenInChargeAt])
   @@index([vehicleRecoveredAt])
   @@index([vehicleRecoveredById])
+  @@index([createdById])
+}
+
+model VehicleCheckDecisionShare {
+  id                 String   @id @default(uuid())
+  vehicleCheckId     String
+  managerId          String
+  token              String   @unique
+  isEnabled          Boolean  @default(true)
+  requestComment     String?
+  emailSentAt        DateTime?
+  createdById        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  manager      User         @relation("VehicleCheckDecisionShareManager", fields: [managerId], references: [id], onDelete: Restrict)
+  createdBy    User?        @relation("VehicleCheckDecisionShareCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([vehicleCheckId, managerId])
+  @@index([vehicleCheckId])
+  @@index([managerId])
+  @@index([token])
+  @@index([isEnabled])
+  @@index([emailSentAt])
   @@index([createdById])
 }
 

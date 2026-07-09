@@ -396,6 +396,7 @@ export const ModelName = {
   ExternalRepairCompany: 'ExternalRepairCompany',
   ExternalRepairContact: 'ExternalRepairContact',
   VehicleCheckPublicShare: 'VehicleCheckPublicShare',
+  VehicleCheckDecisionShare: 'VehicleCheckDecisionShare',
   VehicleCheckItem: 'VehicleCheckItem',
   VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "externalRepairCompany" | "externalRepairContact" | "vehicleCheckPublicShare" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
+    modelProps: "user" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "externalRepairCompany" | "externalRepairContact" | "vehicleCheckPublicShare" | "vehicleCheckDecisionShare" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1308,6 +1309,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VehicleCheckDecisionShare: {
+      payload: Prisma.$VehicleCheckDecisionSharePayload<ExtArgs>
+      fields: Prisma.VehicleCheckDecisionShareFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VehicleCheckDecisionShareFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VehicleCheckDecisionShareFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>
+        }
+        findFirst: {
+          args: Prisma.VehicleCheckDecisionShareFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VehicleCheckDecisionShareFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>
+        }
+        findMany: {
+          args: Prisma.VehicleCheckDecisionShareFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>[]
+        }
+        create: {
+          args: Prisma.VehicleCheckDecisionShareCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>
+        }
+        createMany: {
+          args: Prisma.VehicleCheckDecisionShareCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VehicleCheckDecisionShareCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>[]
+        }
+        delete: {
+          args: Prisma.VehicleCheckDecisionShareDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>
+        }
+        update: {
+          args: Prisma.VehicleCheckDecisionShareUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>
+        }
+        deleteMany: {
+          args: Prisma.VehicleCheckDecisionShareDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VehicleCheckDecisionShareUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VehicleCheckDecisionShareUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>[]
+        }
+        upsert: {
+          args: Prisma.VehicleCheckDecisionShareUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleCheckDecisionSharePayload>
+        }
+        aggregate: {
+          args: Prisma.VehicleCheckDecisionShareAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVehicleCheckDecisionShare>
+        }
+        groupBy: {
+          args: Prisma.VehicleCheckDecisionShareGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckDecisionShareGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VehicleCheckDecisionShareCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleCheckDecisionShareCountAggregateOutputType> | number
+        }
+      }
+    }
     VehicleCheckItem: {
       payload: Prisma.$VehicleCheckItemPayload<ExtArgs>
       fields: Prisma.VehicleCheckItemFieldRefs
@@ -1914,6 +1989,22 @@ export const VehicleCheckPublicShareScalarFieldEnum = {
 export type VehicleCheckPublicShareScalarFieldEnum = (typeof VehicleCheckPublicShareScalarFieldEnum)[keyof typeof VehicleCheckPublicShareScalarFieldEnum]
 
 
+export const VehicleCheckDecisionShareScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckId: 'vehicleCheckId',
+  managerId: 'managerId',
+  token: 'token',
+  isEnabled: 'isEnabled',
+  requestComment: 'requestComment',
+  emailSentAt: 'emailSentAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehicleCheckDecisionShareScalarFieldEnum = (typeof VehicleCheckDecisionShareScalarFieldEnum)[keyof typeof VehicleCheckDecisionShareScalarFieldEnum]
+
+
 export const VehicleCheckItemScalarFieldEnum = {
   id: 'id',
   vehicleCheckId: 'vehicleCheckId',
@@ -2313,6 +2404,7 @@ export type GlobalOmitConfig = {
   externalRepairCompany?: Prisma.ExternalRepairCompanyOmit
   externalRepairContact?: Prisma.ExternalRepairContactOmit
   vehicleCheckPublicShare?: Prisma.VehicleCheckPublicShareOmit
+  vehicleCheckDecisionShare?: Prisma.VehicleCheckDecisionShareOmit
   vehicleCheckItem?: Prisma.VehicleCheckItemOmit
   vehicleCheckItemPhoto?: Prisma.VehicleCheckItemPhotoOmit
   vehicleCheckItemStatusHistory?: Prisma.VehicleCheckItemStatusHistoryOmit
