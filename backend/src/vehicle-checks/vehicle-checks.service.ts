@@ -32,6 +32,8 @@ import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
 import { SendRepairRequestEmailDto } from './dto/send-repair-request-email.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
 
+const CHECK_NUMBER_CREATE_ATTEMPTS = 5;
+
 const vehicleCheckInclude = {
   collaborator: {
     select: {
@@ -355,64 +357,77 @@ export class VehicleChecksService {
     const decision = dto.items.length
       ? await this.repairDecisionService.preview(dto.manufacturerId, dto.items)
       : await this.emptyDecisionForManufacturer(dto.manufacturerId);
-    const checkNumber = await this.generateCheckNumber();
 
-    return this.prisma.vehicleCheck.create({
-      data: {
-        checkNumber,
-        collaboratorId,
-        agencyId: dto.agencyId,
-        manufacturerId: dto.manufacturerId,
-        vehicleModelId: dto.vehicleModelId,
-        licensePlate: normalizeLicensePlate(dto.licensePlate),
-        licensePlateRaw: sanitizeLicensePlateRaw(dto.licensePlate),
-        licensePlateCountry: normalizeLicensePlateCountry(
-          dto.licensePlateCountry ?? 'FR',
-        ),
-        licensePlateRecognitionConfidence:
-          dto.licensePlateRecognitionConfidence,
-        mileage: dto.mileage,
-        checkDate: dto.checkDate ? new Date(dto.checkDate) : new Date(),
-        city: dto.city,
-        status: VehicleCheckStatus.DRAFT,
-        totalInternalSavingAmount: decision.totalInternalSavingAmount,
-        totalInternalCost: decision.totalInternalCost,
-        constructorAllowanceAmount: decision.constructorAllowanceAmount,
-        allowanceDifferenceAmount: decision.allowanceDifferenceAmount,
-        decisionSummary: decision.decisionSummary,
-        notes: dto.notes,
-        items: {
-          create: decision.items.map((item, index) => ({
-            repairTypeId: item.repairTypeId,
-            vehiclePartId: item.vehiclePartId,
-            quantity: item.quantity,
-            unitInternalSavingAmount: item.unitInternalSavingAmount,
-            totalInternalSavingAmount: item.totalInternalSavingAmount,
-            unitInternalCost: item.unitInternalCost,
-            totalInternalCost: item.totalInternalCost,
-            decisionStatus: item.decisionStatus,
-            decisionMessage: item.decisionMessage,
-            comment: item.comment,
-            partOrderRequired: item.partOrderRequired,
-            partOrderStatus: item.partOrderRequired
-              ? PartOrderStatus.TO_ORDER
-              : PartOrderStatus.NOT_REQUIRED,
-            photos: {
-              create: (dto.items[index]?.photos ?? []).map((photo) => ({
-                publicId: photo.publicId,
-                assetId: photo.assetId,
-                secureUrl: photo.secureUrl,
-                width: photo.width,
-                height: photo.height,
-                bytes: photo.bytes,
-                format: photo.format,
+    for (let attempt = 0; attempt < CHECK_NUMBER_CREATE_ATTEMPTS; attempt += 1) {
+      const checkNumber = await this.generateCheckNumber();
+
+      try {
+        return await this.prisma.vehicleCheck.create({
+          data: {
+            checkNumber,
+            collaboratorId,
+            agencyId: dto.agencyId,
+            manufacturerId: dto.manufacturerId,
+            vehicleModelId: dto.vehicleModelId,
+            licensePlate: normalizeLicensePlate(dto.licensePlate),
+            licensePlateRaw: sanitizeLicensePlateRaw(dto.licensePlate),
+            licensePlateCountry: normalizeLicensePlateCountry(
+              dto.licensePlateCountry ?? 'FR',
+            ),
+            licensePlateRecognitionConfidence:
+              dto.licensePlateRecognitionConfidence,
+            mileage: dto.mileage,
+            checkDate: dto.checkDate ? new Date(dto.checkDate) : new Date(),
+            city: dto.city,
+            status: VehicleCheckStatus.DRAFT,
+            totalInternalSavingAmount: decision.totalInternalSavingAmount,
+            totalInternalCost: decision.totalInternalCost,
+            constructorAllowanceAmount: decision.constructorAllowanceAmount,
+            allowanceDifferenceAmount: decision.allowanceDifferenceAmount,
+            decisionSummary: decision.decisionSummary,
+            notes: dto.notes,
+            items: {
+              create: decision.items.map((item, index) => ({
+                repairTypeId: item.repairTypeId,
+                vehiclePartId: item.vehiclePartId,
+                quantity: item.quantity,
+                unitInternalSavingAmount: item.unitInternalSavingAmount,
+                totalInternalSavingAmount: item.totalInternalSavingAmount,
+                unitInternalCost: item.unitInternalCost,
+                totalInternalCost: item.totalInternalCost,
+                decisionStatus: item.decisionStatus,
+                decisionMessage: item.decisionMessage,
+                comment: item.comment,
+                partOrderRequired: item.partOrderRequired,
+                partOrderStatus: item.partOrderRequired
+                  ? PartOrderStatus.TO_ORDER
+                  : PartOrderStatus.NOT_REQUIRED,
+                photos: {
+                  create: (dto.items[index]?.photos ?? []).map((photo) => ({
+                    publicId: photo.publicId,
+                    assetId: photo.assetId,
+                    secureUrl: photo.secureUrl,
+                    width: photo.width,
+                    height: photo.height,
+                    bytes: photo.bytes,
+                    format: photo.format,
+                  })),
+                },
               })),
             },
-          })),
-        },
-      },
-      include: vehicleCheckInclude,
-    });
+          },
+          include: vehicleCheckInclude,
+        });
+      } catch (error) {
+        if (!this.isUniqueConstraintError(error, 'checkNumber')) {
+          throw error;
+        }
+      }
+    }
+
+    throw new BadRequestException(
+      'Impossible de generer un numero de controle unique. Veuillez reessayer.',
+    );
   }
 
   async update(
@@ -802,15 +817,65 @@ export class VehicleChecksService {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     const prefix = `VC-${yyyy}${mm}${dd}`;
-    const count = await this.prisma.vehicleCheck.count({
+    const existingChecks = await this.prisma.vehicleCheck.findMany({
       where: {
         checkNumber: {
           startsWith: prefix,
         },
       },
+      select: {
+        checkNumber: true,
+      },
     });
 
-    return `${prefix}-${String(count + 1).padStart(4, '0')}`;
+    const lastSequence = existingChecks.reduce(
+      (max, check) =>
+        Math.max(max, Number(check.checkNumber.match(/-(\d+)$/)?.[1] ?? 0)),
+      0,
+    );
+
+    return `${prefix}-${String(lastSequence + 1).padStart(4, '0')}`;
+  }
+
+  private isUniqueConstraintError(error: unknown, fieldName: string) {
+    if (
+      !(error instanceof Prisma.PrismaClientKnownRequestError) ||
+      error.code !== 'P2002'
+    ) {
+      return false;
+    }
+
+    const meta = error.meta as
+      | {
+          target?: unknown;
+          fields?: unknown;
+          driverAdapterError?: {
+            cause?: {
+              constraint?: {
+                fields?: unknown;
+              };
+            };
+          };
+        }
+      | undefined;
+
+    const fields = [
+      ...this.normalizeConstraintFields(meta?.target),
+      ...this.normalizeConstraintFields(meta?.fields),
+      ...this.normalizeConstraintFields(
+        meta?.driverAdapterError?.cause?.constraint?.fields,
+      ),
+    ];
+
+    return fields.some((field) => field === fieldName);
+  }
+
+  private normalizeConstraintFields(value: unknown) {
+    const values = Array.isArray(value) ? value : [value];
+
+    return values
+      .filter((field): field is string => typeof field === 'string')
+      .map((field) => field.replace(/"/g, ''));
   }
 
   private async generatePublicShareToken() {
