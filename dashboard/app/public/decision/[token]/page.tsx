@@ -1,12 +1,13 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, FileText, X } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { DecisionBadge, VehicleCheckStatusBadge } from "@/components/business/decision-badge";
+import { DamagePhotoGallery } from "@/components/business/damage-photo-gallery";
+import { VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { Badge } from "@/components/ui/badge";
-import { cloudinaryPreviewUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
-import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
+import { cloudinaryThumbnailUrl } from "@/lib/damage-photo";
+import { formatDate, formatLicensePlate } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { PublicVehicleCheckDecisionShare, VehicleCheckItem } from "@/types/business";
 
@@ -33,24 +34,6 @@ export default function PublicDecisionRequestPage() {
 
   const items = useMemo(() => share?.vehicleCheck.items ?? [], [share?.vehicleCheck.items]);
   const vehicleCheck = share?.vehicleCheck;
-
-  useEffect(() => {
-    if (!gallery) return;
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setGallery(null);
-      if (event.key === "ArrowLeft") setGallery((current) => (current ? { ...current, index: previousPhotoIndex(current) } : current));
-      if (event.key === "ArrowRight") setGallery((current) => (current ? { ...current, index: nextPhotoIndex(current) } : current));
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gallery]);
-
-  useEffect(() => {
-    if (!gallery?.photos.length) return;
-    preloadGalleryPhotos(gallery.photos, gallery.index);
-  }, [gallery?.index, gallery?.photos]);
 
   if (isLoading) {
     return (
@@ -122,17 +105,9 @@ export default function PublicDecisionRequestPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-base font-bold text-slate-950">{item.vehiclePart.name}</h3>
-                    <DecisionBadge status={item.decisionStatus} />
                     {!item.selectedForSummary ? <Badge variant="outline">Hors synthese</Badge> : null}
                   </div>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {item.repairType.name} · Quantite {item.quantity}
-                  </p>
-                  <div className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
-                    <InfoLine label="Economie" value={formatMoney(item.totalInternalSavingAmount)} />
-                    <InfoLine label="Cout interne" value={formatMoney(item.totalInternalCost)} />
-                  </div>
-                  {item.decisionMessage ? <p className="mt-3 text-sm text-slate-600">{item.decisionMessage}</p> : null}
+                  <p className="mt-1 text-sm text-slate-500">{item.repairType.name}</p>
                   {item.comment ? (
                     <p className="mt-2 rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">{item.comment}</p>
                   ) : null}
@@ -144,7 +119,15 @@ export default function PublicDecisionRequestPage() {
         </div>
       </section>
 
-      {gallery ? <PhotoGalleryModal gallery={gallery} onChange={setGallery} onClose={() => setGallery(null)} /> : null}
+      {gallery ? (
+        <DamagePhotoGallery
+          index={gallery.index}
+          photos={gallery.photos}
+          title={gallery.title}
+          onClose={() => setGallery(null)}
+          onIndexChange={(index) => setGallery((current) => (current ? { ...current, index } : current))}
+        />
+      ) : null}
     </main>
   );
 }
@@ -155,14 +138,6 @@ function InfoTile({ label, value }: { label: string; value: string }) {
       <p className="text-[10px] font-bold uppercase text-slate-500">{label}</p>
       <p className="mt-0.5 truncate text-sm font-semibold text-slate-950">{value}</p>
     </div>
-  );
-}
-
-function InfoLine({ label, value }: { label: string; value: string }) {
-  return (
-    <p>
-      <span className="font-semibold text-slate-500">{label}</span> <span className="font-bold text-slate-950">{value}</span>
-    </p>
   );
 }
 
@@ -198,78 +173,4 @@ function PhotoStrip({
       ))}
     </div>
   );
-}
-
-function PhotoGalleryModal({
-  gallery,
-  onChange,
-  onClose,
-}: {
-  gallery: PhotoGallery;
-  onChange: (gallery: PhotoGallery) => void;
-  onClose: () => void;
-}) {
-  const photo = gallery.photos[gallery.index];
-  const hasMultiplePhotos = gallery.photos.length > 1;
-
-  if (!photo) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-3" role="dialog" aria-modal="true" onClick={onClose}>
-      <div className="relative flex max-h-full w-full max-w-5xl flex-col gap-3" onClick={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-2 shadow">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-slate-950">{gallery.title}</p>
-            <p className="text-xs font-medium text-slate-500">Photo {gallery.index + 1} / {gallery.photos.length}</p>
-          </div>
-          <button className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100" type="button" onClick={onClose}>
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="relative flex min-h-0 items-center justify-center rounded-lg bg-black/30">
-          {hasMultiplePhotos ? (
-            <button
-              aria-label="Photo precedente"
-              className="absolute left-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow hover:bg-white"
-              type="button"
-              onClick={() => onChange({ ...gallery, index: previousPhotoIndex(gallery) })}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-          ) : null}
-          <img alt="Degat constate" className="max-h-[75vh] max-w-full rounded-lg object-contain shadow-2xl" decoding="async" src={cloudinaryPreviewUrl(photo)} />
-          {hasMultiplePhotos ? (
-            <button
-              aria-label="Photo suivante"
-              className="absolute right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow hover:bg-white"
-              type="button"
-              onClick={() => onChange({ ...gallery, index: nextPhotoIndex(gallery) })}
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function previousPhotoIndex(gallery: PhotoGallery) {
-  return gallery.index === 0 ? gallery.photos.length - 1 : gallery.index - 1;
-}
-
-function nextPhotoIndex(gallery: PhotoGallery) {
-  return gallery.index === gallery.photos.length - 1 ? 0 : gallery.index + 1;
-}
-
-function preloadGalleryPhotos(photos: DecisionPhoto[], index: number) {
-  const indexes = new Set([index, (index - 1 + photos.length) % photos.length, (index + 1) % photos.length]);
-
-  indexes.forEach((photoIndex) => {
-    const photo = photos[photoIndex];
-    if (!photo) return;
-    const image = new Image();
-    image.src = cloudinaryPreviewUrl(photo);
-  });
 }

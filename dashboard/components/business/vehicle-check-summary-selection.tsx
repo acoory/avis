@@ -2,8 +2,6 @@
 
 import {
   CheckSquare2,
-  ChevronLeft,
-  ChevronRight,
   Download,
   Mail,
   Maximize2,
@@ -12,10 +10,11 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { DamagePhotoGallery } from "@/components/business/damage-photo-gallery";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { cloudinaryPreviewUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
+import { cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
@@ -43,6 +42,7 @@ export function VehicleCheckSummarySelection({
   const [photoGallery, setPhotoGallery] = useState<{
     photos: NonNullable<NonNullable<VehicleCheck["items"]>[number]["photos"]>;
     index: number;
+    title: string;
   } | null>(null);
 
   useEffect(() => {
@@ -50,44 +50,6 @@ export function VehicleCheckSummarySelection({
       new Set(items.filter((item) => item.selectedForSummary).map((item) => item.id)),
     );
   }, [vehicleCheck.id, vehicleCheck.summaryFinalizedAt, items]);
-
-  useEffect(() => {
-    if (!photoGallery) {
-      return;
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setPhotoGallery(null);
-      } else if (event.key === "ArrowLeft") {
-        setPhotoGallery((current) =>
-          current
-            ? {
-                ...current,
-                index: (current.index - 1 + current.photos.length) % current.photos.length,
-              }
-            : current,
-        );
-      } else if (event.key === "ArrowRight") {
-        setPhotoGallery((current) =>
-          current
-            ? { ...current, index: (current.index + 1) % current.photos.length }
-            : current,
-        );
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [photoGallery]);
-
-  useEffect(() => {
-    if (!photoGallery?.photos.length) {
-      return;
-    }
-
-    preloadGalleryPhotos(photoGallery.photos, photoGallery.index);
-  }, [photoGallery?.index, photoGallery?.photos]);
 
   const selectedForbiddenCount = useMemo(
     () =>
@@ -239,6 +201,7 @@ export function VehicleCheckSummarySelection({
                               setPhotoGallery({
                                 photos: item.photos ?? [],
                                 index: photoIndex,
+                                title: item.vehiclePart.name,
                               });
                             }}
                           >
@@ -299,71 +262,15 @@ export function VehicleCheckSummarySelection({
           </div>
       </CardContent>
       {photoGallery?.photos.length ? (
-        <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Photo du dommage"
-          onClick={() => setPhotoGallery(null)}
-        >
-          <button
-            aria-label="Fermer la photo"
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-900 shadow-lg"
-            type="button"
-            onClick={() => setPhotoGallery(null)}
-          >
-            <X className="h-5 w-5" />
-          </button>
-          {photoGallery.photos.length > 1 ? (
-            <>
-              <button
-                aria-label="Photo precedente"
-                className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-gray-950 shadow-lg hover:bg-white md:left-6"
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setPhotoGallery((current) =>
-                    current
-                      ? {
-                          ...current,
-                          index:
-                            (current.index - 1 + current.photos.length) %
-                            current.photos.length,
-                        }
-                      : current,
-                  );
-                }}
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <button
-                aria-label="Photo suivante"
-                className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-gray-950 shadow-lg hover:bg-white md:right-6"
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setPhotoGallery((current) =>
-                    current
-                      ? { ...current, index: (current.index + 1) % current.photos.length }
-                      : current,
-                  );
-                }}
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-sm font-medium text-white">
-                {photoGallery.index + 1} / {photoGallery.photos.length}
-              </div>
-            </>
-          ) : null}
-          <img
-            alt="Degat du vehicule en grand"
-            className="max-h-[90vh] max-w-[95vw] rounded-lg object-contain shadow-2xl"
-            decoding="async"
-            src={cloudinaryPreviewUrl(photoGallery.photos[photoGallery.index])}
-            onClick={(event) => event.stopPropagation()}
-          />
-        </div>
+        <DamagePhotoGallery
+          index={photoGallery.index}
+          photos={photoGallery.photos}
+          title={photoGallery.title}
+          onClose={() => setPhotoGallery(null)}
+          onIndexChange={(index) =>
+            setPhotoGallery((current) => (current ? { ...current, index } : current))
+          }
+        />
       ) : null}
       {isPostValidationOpen && finalizedVehicleCheck ? (
         <div
@@ -436,22 +343,4 @@ export function VehicleCheckSummarySelection({
       ) : null}
     </Card>
   );
-}
-
-function preloadGalleryPhotos(
-  photos: NonNullable<NonNullable<VehicleCheck["items"]>[number]["photos"]>,
-  index: number,
-) {
-  const indexes = new Set([
-    index,
-    (index - 1 + photos.length) % photos.length,
-    (index + 1) % photos.length,
-  ]);
-
-  indexes.forEach((photoIndex) => {
-    const photo = photos[photoIndex];
-    if (!photo) return;
-    const image = new Image();
-    image.src = cloudinaryPreviewUrl(photo);
-  });
 }
