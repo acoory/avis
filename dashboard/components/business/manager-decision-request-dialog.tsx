@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Send, X } from "lucide-react";
+import { Copy, ExternalLink, Loader2, Send, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,14 @@ export function ManagerDecisionRequestDialog({
     () => managers.find((manager) => manager.id === selectedManagerId),
     [managers, selectedManagerId],
   );
+  const existingShare = useMemo(
+    () => vehicleCheck.decisionShares?.find((share) => share.managerId === selectedManagerId),
+    [selectedManagerId, vehicleCheck.decisionShares],
+  );
+  const decisionUrl = useMemo(() => {
+    if (!existingShare?.token || typeof window === "undefined") return "";
+    return new URL(`/public/decision/${existingShare.token}`, window.location.origin).toString();
+  }, [existingShare?.token]);
 
   useEffect(() => {
     if (!open) return;
@@ -76,6 +84,17 @@ export function ManagerDecisionRequestDialog({
     } finally {
       setIsSending(false);
     }
+  }
+
+  async function copyDecisionUrl() {
+    if (!decisionUrl) return;
+    await navigator.clipboard.writeText(decisionUrl);
+    toast.success("Lien copie.");
+  }
+
+  function openDecisionUrl() {
+    if (!decisionUrl) return;
+    window.open(decisionUrl, "_blank", "noopener,noreferrer");
   }
 
   if (!open) {
@@ -143,6 +162,27 @@ export function ManagerDecisionRequestDialog({
           {selectedManager ? (
             <div className="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
               Envoi a {selectedManager.firstName} {selectedManager.lastName}
+            </div>
+          ) : null}
+
+          {decisionUrl ? (
+            <div className="rounded-lg border border-teal-100 bg-teal-50 p-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-teal-950">Lien deja genere</p>
+                  <p className="mt-0.5 truncate text-xs text-teal-700">{decisionUrl}</p>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <Button size="sm" type="button" variant="outline" onClick={() => void copyDecisionUrl()}>
+                    <Copy className="h-4 w-4" />
+                    Copier
+                  </Button>
+                  <Button size="sm" type="button" onClick={openDecisionUrl}>
+                    <ExternalLink className="h-4 w-4" />
+                    Ouvrir
+                  </Button>
+                </div>
+              </div>
             </div>
           ) : null}
         </fieldset>
