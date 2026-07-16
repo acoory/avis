@@ -16,6 +16,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -31,7 +32,7 @@ import {
   cloudinaryThumbnailUrl,
   optimizeDamagePhoto,
 } from "@/lib/damage-photo";
-import { formatLicensePlate, formatMoney, normalizeLicensePlate } from "@/lib/format";
+import { formatDate, formatLicensePlate, formatMoney, normalizeLicensePlate } from "@/lib/format";
 import { licensePlateCountries, sanitizeLicensePlateInput } from "@/lib/license-plate";
 import { businessService } from "@/services/business.service";
 import {
@@ -57,6 +58,13 @@ type DraftRepairLine = {
 
 type VehicleCheckFormProps = {
   initialVehicleCheck?: VehicleCheck;
+};
+
+type DuplicateVehicleCheck = {
+  checkDate: string;
+  checkNumber: string;
+  id: string;
+  status: string;
 };
 
 const formSteps = [
@@ -136,6 +144,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [repairSheetRemovedPhotos, setRepairSheetRemovedPhotos] = useState<DamagePhoto[]>([]);
   const [repairSheetPreview, setRepairSheetPreview] = useState<RepairDecisionPreview | null>(null);
   const [isLicensePlateScannerOpen, setIsLicensePlateScannerOpen] = useState(false);
+  const [duplicateVehicleCheck, setDuplicateVehicleCheck] = useState<DuplicateVehicleCheck | null>(null);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
@@ -588,7 +597,15 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             : "Brouillon enregistre avec succes.",
       );
       router.replace(`/dashboard/vehicle-checks/${finalVehicleCheck.id}`);
-    } catch {
+    } catch (error) {
+      const duplicateConflict = duplicateVehicleCheckConflictFromError(error);
+      if (duplicateConflict) {
+        setDuplicateVehicleCheck(duplicateConflict.existingVehicleCheck ?? null);
+        setActiveStep(0);
+        toast.error("Ce vehicule possede deja un controle.");
+        return;
+      }
+
       toast.error(
         shouldComplete
           ? "Impossible de terminer ce controle terrain."
@@ -670,6 +687,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                   onChange={(event) => {
                     setLicensePlateCountry(event.target.value);
                     setLicensePlateRecognitionConfidence(undefined);
+                    setDuplicateVehicleCheck(null);
                   }}
                 >
                   {licensePlateCountries.map((country) => (
@@ -687,6 +705,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                   onChange={(event) => {
                     setLicensePlate(sanitizeLicensePlateInput(event.target.value));
                     setLicensePlateRecognitionConfidence(undefined);
+                    setDuplicateVehicleCheck(null);
                   }}
                   placeholder="Plaque"
                 />
@@ -708,6 +727,20 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                     licensePlate,
                   )}
                 </p>
+              </div>
+            ) : null}
+
+            {duplicateVehicleCheck ? (
+              <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                <p className="font-semibold">Ce vehicule possede deja un controle.</p>
+                <p className="mt-1">
+                  {duplicateVehicleCheck.checkNumber} · {formatDate(duplicateVehicleCheck.checkDate)}
+                </p>
+                <Button asChild className="mt-3" size="sm" variant="outline">
+                  <Link href={`/dashboard/vehicle-checks/${duplicateVehicleCheck.id}`}>
+                    Ouvrir le controle existant
+                  </Link>
+                </Button>
               </div>
             ) : null}
           </CardContent>
@@ -1002,6 +1035,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             setLicensePlate(sanitizeLicensePlateInput(result.value));
             setLicensePlateCountry(result.country);
             setLicensePlateRecognitionConfidence(result.confidence);
+            setDuplicateVehicleCheck(null);
             setIsLicensePlateScannerOpen(false);
           }}
         />
@@ -1898,6 +1932,25 @@ function RecapLine({ label, value }: { label: string; value: string }) {
       <p className="mt-1 text-sm font-semibold text-gray-950">{value || "-"}</p>
     </div>
   );
+}
+
+function duplicateVehicleCheckConflictFromError(error: unknown) {
+  if (!error || typeof error !== "object" || !("response" in error)) {
+    return null;
+  }
+
+  const data = (error as {
+    response?: {
+      data?: {
+        code?: string;
+        existingVehicleCheck?: DuplicateVehicleCheck;
+      };
+    };
+  }).response?.data;
+
+  return data?.code === "VEHICLE_CHECK_DUPLICATE"
+    ? { existingVehicleCheck: data.existingVehicleCheck }
+    : null;
 }
 
 function normalizeSearchText(value: string) {

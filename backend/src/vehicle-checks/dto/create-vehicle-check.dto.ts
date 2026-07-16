@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDateString,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -27,6 +28,7 @@ export class CreateVehicleCheckDto {
   vehicleModelId?: string;
 
   @IsString()
+  @IsNotEmpty()
   @MaxLength(20)
   licensePlate: string;
 

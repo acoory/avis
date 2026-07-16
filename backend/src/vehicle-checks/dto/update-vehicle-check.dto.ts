@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDateString,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -30,6 +31,7 @@ export class UpdateVehicleCheckDto {
 
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(20)
   licensePlate?: string;
 

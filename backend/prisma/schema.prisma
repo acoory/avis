@@ -241,6 +241,7 @@ model VehicleCheck {
   publicShare    VehicleCheckPublicShare?
   decisionShares VehicleCheckDecisionShare[]
 
+  @@unique([licensePlateCountry, licensePlate])
   @@index([collaboratorId])
   @@index([agencyId])
   @@index([manufacturerId])

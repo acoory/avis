@@ -462,6 +462,7 @@ export type VehicleCheckOrderByWithRelationInput = {
 export type VehicleCheckWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   checkNumber?: string
+  licensePlateCountry_licensePlate?: Prisma.VehicleCheckLicensePlateCountryLicensePlateCompoundUniqueInput
   AND?: Prisma.VehicleCheckWhereInput | Prisma.VehicleCheckWhereInput[]
   OR?: Prisma.VehicleCheckWhereInput[]
   NOT?: Prisma.VehicleCheckWhereInput | Prisma.VehicleCheckWhereInput[]
@@ -497,7 +498,7 @@ export type VehicleCheckWhereUniqueInput = Prisma.AtLeast<{
   externalQuotes?: Prisma.ExternalQuoteListRelationFilter
   publicShare?: Prisma.XOR<Prisma.VehicleCheckPublicShareNullableScalarRelationFilter, Prisma.VehicleCheckPublicShareWhereInput> | null
   decisionShares?: Prisma.VehicleCheckDecisionShareListRelationFilter
-}, "id" | "checkNumber">
+}, "id" | "checkNumber" | "licensePlateCountry_licensePlate">
 
 export type VehicleCheckOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -788,6 +789,11 @@ export type VehicleCheckListRelationFilter = {
 
 export type VehicleCheckOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type VehicleCheckLicensePlateCountryLicensePlateCompoundUniqueInput = {
+  licensePlateCountry: string
+  licensePlate: string
 }
 
 export type VehicleCheckCountOrderByAggregateInput = {

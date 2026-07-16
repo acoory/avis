@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -25,6 +26,7 @@ import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
 import { CloudinaryService } from '../damage-photos/cloudinary.service';
+import { CheckVehicleCheckDuplicateDto } from './dto/check-vehicle-check-duplicate.dto';
 import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
@@ -203,6 +205,57 @@ export class VehicleChecksService {
       orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
       select,
     });
+  }
+
+  async checkDuplicate(
+    dto: CheckVehicleCheckDuplicateDto,
+    user: CurrentUserPayload,
+  ) {
+    const licensePlate = this.normalizedRequiredLicensePlate(dto.licensePlate);
+    const licensePlateCountry = normalizeLicensePlateCountry(
+      dto.licensePlateCountry ?? 'FR',
+    );
+    const excludedVehicleCheck = dto.excludedVehicleCheckId
+      ? await this.prisma.vehicleCheck.findFirst({
+          where: {
+            id: dto.excludedVehicleCheckId,
+            ...this.scopeWhere(user),
+          },
+          select: { id: true },
+        })
+      : null;
+    const duplicate = await this.findDuplicateVehicleCheck(
+      licensePlate,
+      licensePlateCountry,
+      excludedVehicleCheck?.id,
+    );
+
+    if (!duplicate) {
+      return { exists: false };
+    }
+
+    const accessibleDuplicate = await this.prisma.vehicleCheck.findFirst({
+      where: {
+        licensePlate,
+        licensePlateCountry,
+        ...(excludedVehicleCheck
+          ? { id: { not: excludedVehicleCheck.id } }
+          : {}),
+        ...this.scopeWhere(user),
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        checkDate: true,
+        checkNumber: true,
+        id: true,
+        status: true,
+      },
+    });
+
+    return {
+      exists: true,
+      existingVehicleCheck: accessibleDuplicate ?? undefined,
+    };
   }
 
   async findOne(id: string, user: CurrentUserPayload) {
@@ -487,7 +540,10 @@ export class VehicleChecksService {
       },
     });
 
-    if (!share?.isEnabled || share.vehicleCheck.status === VehicleCheckStatus.DRAFT) {
+    if (
+      !share?.isEnabled ||
+      share.vehicleCheck.status === VehicleCheckStatus.DRAFT
+    ) {
       throw new NotFoundException('Public decision request not found');
     }
 
@@ -526,7 +582,16 @@ export class VehicleChecksService {
     return this.findOne(id, user);
   }
 
-  async create(collaboratorId: string, dto: CreateVehicleCheckDto) {
+  async create(user: CurrentUserPayload, dto: CreateVehicleCheckDto) {
+    const licensePlate = this.normalizedRequiredLicensePlate(dto.licensePlate);
+    const licensePlateCountry = normalizeLicensePlateCountry(
+      dto.licensePlateCountry ?? 'FR',
+    );
+    await this.ensureNoDuplicateVehicleCheck(
+      licensePlate,
+      licensePlateCountry,
+      user,
+    );
     await this.ensureReferences(
       dto.agencyId,
       dto.manufacturerId,
@@ -537,22 +602,24 @@ export class VehicleChecksService {
       ? await this.repairDecisionService.preview(dto.manufacturerId, dto.items)
       : await this.emptyDecisionForManufacturer(dto.manufacturerId);
 
-    for (let attempt = 0; attempt < CHECK_NUMBER_CREATE_ATTEMPTS; attempt += 1) {
+    for (
+      let attempt = 0;
+      attempt < CHECK_NUMBER_CREATE_ATTEMPTS;
+      attempt += 1
+    ) {
       const checkNumber = await this.generateCheckNumber();
 
       try {
         return await this.prisma.vehicleCheck.create({
           data: {
             checkNumber,
-            collaboratorId,
+            collaboratorId: user.sub,
             agencyId: dto.agencyId,
             manufacturerId: dto.manufacturerId,
             vehicleModelId: dto.vehicleModelId,
-            licensePlate: normalizeLicensePlate(dto.licensePlate),
+            licensePlate,
             licensePlateRaw: sanitizeLicensePlateRaw(dto.licensePlate),
-            licensePlateCountry: normalizeLicensePlateCountry(
-              dto.licensePlateCountry ?? 'FR',
-            ),
+            licensePlateCountry,
             licensePlateRecognitionConfidence:
               dto.licensePlateRecognitionConfidence,
             mileage: dto.mileage,
@@ -598,6 +665,14 @@ export class VehicleChecksService {
           include: vehicleCheckInclude,
         });
       } catch (error) {
+        if (this.isVehicleIdentityUniqueConstraintError(error)) {
+          await this.throwDuplicateVehicleCheckConflict(
+            licensePlate,
+            licensePlateCountry,
+            user,
+          );
+        }
+
         if (!this.isUniqueConstraintError(error, 'checkNumber')) {
           throw error;
         }
@@ -620,6 +695,20 @@ export class VehicleChecksService {
     const manufacturerId = dto.manufacturerId ?? existing.manufacturerId;
     const vehicleModelId =
       dto.vehicleModelId ?? existing.vehicleModelId ?? undefined;
+    const licensePlate = dto.licensePlate
+      ? this.normalizedRequiredLicensePlate(dto.licensePlate)
+      : existing.licensePlate;
+    const licensePlateCountry = dto.licensePlateCountry
+      ? normalizeLicensePlateCountry(dto.licensePlateCountry)
+      : existing.licensePlateCountry;
+    if (dto.licensePlate || dto.licensePlateCountry) {
+      await this.ensureNoDuplicateVehicleCheck(
+        licensePlate,
+        licensePlateCountry,
+        user,
+        id,
+      );
+    }
     await this.ensureReferences(agencyId, manufacturerId, vehicleModelId);
     if (dto.items) {
       await this.ensureVehicleParts(
@@ -628,32 +717,40 @@ export class VehicleChecksService {
     }
 
     if (!dto.items) {
-      const updated = await this.prisma.vehicleCheck.update({
-        where: { id },
-        data: {
-          agencyId: dto.agencyId,
-          manufacturerId: dto.manufacturerId,
-          vehicleModelId: dto.vehicleModelId,
-          licensePlate: dto.licensePlate
-            ? normalizeLicensePlate(dto.licensePlate)
-            : undefined,
-          licensePlateRaw: dto.licensePlate
-            ? sanitizeLicensePlateRaw(dto.licensePlate)
-            : undefined,
-          licensePlateCountry: dto.licensePlateCountry
-            ? normalizeLicensePlateCountry(dto.licensePlateCountry)
-            : undefined,
-          licensePlateRecognitionConfidence:
-            dto.licensePlateRecognitionConfidence,
-          mileage: dto.mileage,
-          checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
-          city: dto.city,
-          notes: dto.notes,
-        },
-        include: vehicleCheckInclude,
-      });
-
-      return updated;
+      try {
+        return await this.prisma.vehicleCheck.update({
+          where: { id },
+          data: {
+            agencyId: dto.agencyId,
+            manufacturerId: dto.manufacturerId,
+            vehicleModelId: dto.vehicleModelId,
+            licensePlate: dto.licensePlate ? licensePlate : undefined,
+            licensePlateRaw: dto.licensePlate
+              ? sanitizeLicensePlateRaw(dto.licensePlate)
+              : undefined,
+            licensePlateCountry: dto.licensePlateCountry
+              ? licensePlateCountry
+              : undefined,
+            licensePlateRecognitionConfidence:
+              dto.licensePlateRecognitionConfidence,
+            mileage: dto.mileage,
+            checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
+            city: dto.city,
+            notes: dto.notes,
+          },
+          include: vehicleCheckInclude,
+        });
+      } catch (error) {
+        if (this.isVehicleIdentityUniqueConstraintError(error)) {
+          await this.throwDuplicateVehicleCheckConflict(
+            licensePlate,
+            licensePlateCountry,
+            user,
+            id,
+          );
+        }
+        throw error;
+      }
     }
 
     const decision = dto.items.length
@@ -672,74 +769,84 @@ export class VehicleChecksService {
       (publicId) => !retainedPhotoPublicIds.has(publicId),
     );
 
-    const updated = await this.prisma.$transaction(async (tx) => {
-      await tx.vehicleCheckItem.deleteMany({ where: { vehicleCheckId: id } });
+    const updated = await this.prisma
+      .$transaction(async (tx) => {
+        await tx.vehicleCheckItem.deleteMany({ where: { vehicleCheckId: id } });
 
-      return tx.vehicleCheck.update({
-        where: { id },
-        data: {
-          agencyId: dto.agencyId,
-          manufacturerId: dto.manufacturerId,
-          vehicleModelId: dto.vehicleModelId,
-          licensePlate: dto.licensePlate
-            ? normalizeLicensePlate(dto.licensePlate)
-            : undefined,
-          licensePlateRaw: dto.licensePlate
-            ? sanitizeLicensePlateRaw(dto.licensePlate)
-            : undefined,
-          licensePlateCountry: dto.licensePlateCountry
-            ? normalizeLicensePlateCountry(dto.licensePlateCountry)
-            : undefined,
-          licensePlateRecognitionConfidence:
-            dto.licensePlateRecognitionConfidence,
-          mileage: dto.mileage,
-          checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
-          city: dto.city,
-          notes: dto.notes,
-          totalInternalSavingAmount: decision.totalInternalSavingAmount,
-          totalInternalCost: decision.totalInternalCost,
-          constructorAllowanceAmount: decision.constructorAllowanceAmount,
-          allowanceDifferenceAmount: decision.allowanceDifferenceAmount,
-          decisionSummary: decision.decisionSummary,
-          status:
-            existing.status === VehicleCheckStatus.DRAFT
-              ? undefined
-              : VehicleCheckStatus.TO_ANALYZE,
-          summaryFinalizedAt:
-            existing.status === VehicleCheckStatus.DRAFT ? undefined : null,
-          items: {
-            create: decision.items.map((item, index) => ({
-              repairTypeId: item.repairTypeId,
-              vehiclePartId: item.vehiclePartId,
-              quantity: item.quantity,
-              unitInternalSavingAmount: item.unitInternalSavingAmount,
-              totalInternalSavingAmount: item.totalInternalSavingAmount,
-              unitInternalCost: item.unitInternalCost,
-              totalInternalCost: item.totalInternalCost,
-              decisionStatus: item.decisionStatus,
-              decisionMessage: item.decisionMessage,
-              comment: item.comment,
-              partOrderRequired: item.partOrderRequired,
-              partOrderStatus: item.partOrderRequired
-                ? PartOrderStatus.TO_ORDER
-                : PartOrderStatus.NOT_REQUIRED,
-              photos: {
-                create: (dto.items?.[index]?.photos ?? []).map((photo) => ({
-                  publicId: photo.publicId,
-                  assetId: photo.assetId,
-                  secureUrl: photo.secureUrl,
-                  width: photo.width,
-                  height: photo.height,
-                  bytes: photo.bytes,
-                  format: photo.format,
-                })),
-              },
-            })),
+        return tx.vehicleCheck.update({
+          where: { id },
+          data: {
+            agencyId: dto.agencyId,
+            manufacturerId: dto.manufacturerId,
+            vehicleModelId: dto.vehicleModelId,
+            licensePlate: dto.licensePlate ? licensePlate : undefined,
+            licensePlateRaw: dto.licensePlate
+              ? sanitizeLicensePlateRaw(dto.licensePlate)
+              : undefined,
+            licensePlateCountry: dto.licensePlateCountry
+              ? licensePlateCountry
+              : undefined,
+            licensePlateRecognitionConfidence:
+              dto.licensePlateRecognitionConfidence,
+            mileage: dto.mileage,
+            checkDate: dto.checkDate ? new Date(dto.checkDate) : undefined,
+            city: dto.city,
+            notes: dto.notes,
+            totalInternalSavingAmount: decision.totalInternalSavingAmount,
+            totalInternalCost: decision.totalInternalCost,
+            constructorAllowanceAmount: decision.constructorAllowanceAmount,
+            allowanceDifferenceAmount: decision.allowanceDifferenceAmount,
+            decisionSummary: decision.decisionSummary,
+            status:
+              existing.status === VehicleCheckStatus.DRAFT
+                ? undefined
+                : VehicleCheckStatus.TO_ANALYZE,
+            summaryFinalizedAt:
+              existing.status === VehicleCheckStatus.DRAFT ? undefined : null,
+            items: {
+              create: decision.items.map((item, index) => ({
+                repairTypeId: item.repairTypeId,
+                vehiclePartId: item.vehiclePartId,
+                quantity: item.quantity,
+                unitInternalSavingAmount: item.unitInternalSavingAmount,
+                totalInternalSavingAmount: item.totalInternalSavingAmount,
+                unitInternalCost: item.unitInternalCost,
+                totalInternalCost: item.totalInternalCost,
+                decisionStatus: item.decisionStatus,
+                decisionMessage: item.decisionMessage,
+                comment: item.comment,
+                partOrderRequired: item.partOrderRequired,
+                partOrderStatus: item.partOrderRequired
+                  ? PartOrderStatus.TO_ORDER
+                  : PartOrderStatus.NOT_REQUIRED,
+                photos: {
+                  create: (dto.items?.[index]?.photos ?? []).map((photo) => ({
+                    publicId: photo.publicId,
+                    assetId: photo.assetId,
+                    secureUrl: photo.secureUrl,
+                    width: photo.width,
+                    height: photo.height,
+                    bytes: photo.bytes,
+                    format: photo.format,
+                  })),
+                },
+              })),
+            },
           },
-        },
-        include: vehicleCheckInclude,
+          include: vehicleCheckInclude,
+        });
+      })
+      .catch(async (error: unknown) => {
+        if (this.isVehicleIdentityUniqueConstraintError(error)) {
+          await this.throwDuplicateVehicleCheckConflict(
+            licensePlate,
+            licensePlateCountry,
+            user,
+            id,
+          );
+        }
+        throw error;
       });
-    });
 
     await Promise.allSettled(
       removedPhotoPublicIds.map((publicId) =>
@@ -942,6 +1049,97 @@ export class VehicleChecksService {
     if (vehicleParts.length !== uniqueVehiclePartIds.length) {
       throw new NotFoundException('One or more vehicle parts were not found');
     }
+  }
+
+  private normalizedRequiredLicensePlate(value: string) {
+    const licensePlate = normalizeLicensePlate(value);
+    if (!licensePlate) {
+      throw new BadRequestException('License plate is required');
+    }
+    return licensePlate;
+  }
+
+  private async ensureNoDuplicateVehicleCheck(
+    licensePlate: string,
+    licensePlateCountry: string,
+    user: CurrentUserPayload,
+    excludedId?: string,
+  ) {
+    const duplicate = await this.findDuplicateVehicleCheck(
+      licensePlate,
+      licensePlateCountry,
+      excludedId,
+    );
+    if (duplicate) {
+      await this.throwDuplicateVehicleCheckConflict(
+        licensePlate,
+        licensePlateCountry,
+        user,
+        excludedId,
+      );
+    }
+  }
+
+  private findDuplicateVehicleCheck(
+    licensePlate: string,
+    licensePlateCountry: string,
+    excludedId?: string,
+  ) {
+    return this.prisma.vehicleCheck.findFirst({
+      where: {
+        licensePlate,
+        licensePlateCountry,
+        ...(excludedId ? { id: { not: excludedId } } : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        checkDate: true,
+        checkNumber: true,
+        id: true,
+        status: true,
+      },
+    });
+  }
+
+  private async throwDuplicateVehicleCheckConflict(
+    licensePlate: string,
+    licensePlateCountry: string,
+    user: CurrentUserPayload,
+    excludedId?: string,
+  ): Promise<never> {
+    const duplicate = await this.findDuplicateVehicleCheck(
+      licensePlate,
+      licensePlateCountry,
+      excludedId,
+    );
+    const accessibleDuplicate = duplicate
+      ? await this.prisma.vehicleCheck.findFirst({
+          where: {
+            id: duplicate.id,
+            ...this.scopeWhere(user),
+          },
+          select: { id: true },
+        })
+      : null;
+
+    throw new ConflictException({
+      code: 'VEHICLE_CHECK_DUPLICATE',
+      message: 'Un controle existe deja pour ce vehicule.',
+      existingVehicleCheck:
+        duplicate && accessibleDuplicate ? duplicate : undefined,
+    });
+  }
+
+  private isVehicleIdentityUniqueConstraintError(error: unknown) {
+    return (
+      this.isUniqueConstraintError(error, 'licensePlate') ||
+      this.isUniqueConstraintError(error, 'licensePlateCountry') ||
+      (error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002' &&
+        JSON.stringify(error.meta).includes(
+          'VehicleCheck_licensePlateCountry_licensePlate_key',
+        ))
+    );
   }
 
   private async emptyDecisionForManufacturer(

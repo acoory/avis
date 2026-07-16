@@ -1,9 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PreviewRepairDecisionDto } from '../repair-decisions/dto/preview-repair-decision.dto';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
+import { CheckVehicleCheckDuplicateDto } from './dto/check-vehicle-check-duplicate.dto';
 import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
@@ -22,7 +33,10 @@ export class VehicleChecksController {
   ) {}
 
   @Get()
-  findAll(@CurrentUser() user: CurrentUserPayload, @Query() query: ListVehicleChecksQueryDto) {
+  findAll(
+    @CurrentUser() user: CurrentUserPayload,
+    @Query() query: ListVehicleChecksQueryDto,
+  ) {
     return this.vehicleChecksService.findAll(query, user);
   }
 
@@ -31,18 +45,33 @@ export class VehicleChecksController {
     return this.vehicleChecksService.findDecisionManagers(user);
   }
 
+  @Post('duplicate-check')
+  checkDuplicate(
+    @CurrentUser() user: CurrentUserPayload,
+    @Body() dto: CheckVehicleCheckDuplicateDto,
+  ) {
+    return this.vehicleChecksService.checkDuplicate(dto, user);
+  }
+
   @Get(':id')
   findOne(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
     return this.vehicleChecksService.findOne(id, user);
   }
 
   @Post()
-  create(@CurrentUser() user: CurrentUserPayload, @Body() dto: CreateVehicleCheckDto) {
-    return this.vehicleChecksService.create(user.sub, dto);
+  create(
+    @CurrentUser() user: CurrentUserPayload,
+    @Body() dto: CreateVehicleCheckDto,
+  ) {
+    return this.vehicleChecksService.create(user, dto);
   }
 
   @Patch(':id')
-  update(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string, @Body() dto: UpdateVehicleCheckDto) {
+  update(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: UpdateVehicleCheckDto,
+  ) {
     return this.vehicleChecksService.update(id, dto, user);
   }
 
@@ -93,7 +122,10 @@ export class VehicleChecksController {
   }
 
   @Post(':id/public-share/recovered')
-  markVehicleRecovered(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+  markVehicleRecovered(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+  ) {
     return this.vehicleChecksService.markVehicleRecovered(id, user);
   }
 
