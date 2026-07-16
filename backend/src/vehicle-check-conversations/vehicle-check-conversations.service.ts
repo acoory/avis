@@ -16,6 +16,7 @@ import {
   VehicleCheckStatus,
 } from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
+import { formatLicensePlate } from '../common/utils/license-plate';
 import { CloudinaryService } from '../damage-photos/cloudinary.service';
 import { NotificationEmailWorkerService } from '../notifications/notification-email-worker.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -591,7 +592,10 @@ export class VehicleCheckConversationsService {
         id: true,
         licensePlate: true,
         licensePlateCountry: true,
+        licensePlateRaw: true,
+        manufacturer: { select: { name: true } },
         status: true,
+        vehicleModel: { select: { name: true } },
         collaborator: {
           select: {
             firstName: true,
@@ -807,6 +811,9 @@ export class VehicleCheckConversationsService {
         id: string;
         licensePlate: string;
         licensePlateCountry: string;
+        licensePlateRaw: string | null;
+        manufacturer: { name: string };
+        vehicleModel: { name: string } | null;
       };
     },
   ) {
@@ -884,6 +891,9 @@ export class VehicleCheckConversationsService {
       checkNumber: string;
       licensePlate: string;
       licensePlateCountry: string;
+      licensePlateRaw: string | null;
+      manufacturer: { name: string };
+      vehicleModel: { name: string } | null;
     },
     excerpt: string,
     attachmentNames: string[],
@@ -894,11 +904,25 @@ export class VehicleCheckConversationsService {
     const attachmentText = attachmentNames.length
       ? `\nDocuments : ${attachmentNames.join(', ')}`
       : '';
-    const subject = `Nouvel echange - ${vehicleCheck.licensePlate} - ${vehicleCheck.checkNumber}`;
+    const licensePlate = formatLicensePlate(
+      vehicleCheck.licensePlate,
+      vehicleCheck.licensePlateCountry,
+      vehicleCheck.licensePlateRaw,
+    );
+    const vehicleLabel = [
+      vehicleCheck.manufacturer.name,
+      vehicleCheck.vehicleModel?.name,
+    ]
+      .filter(Boolean)
+      .join(' ');
+    const subject = `Nouvel echange - ${licensePlate} - ${vehicleCheck.checkNumber}`;
     const text = [
       `Bonjour ${recipientName},`,
       '',
-      `${actorName} a publie une reponse concernant le controle ${vehicleCheck.checkNumber}.`,
+      `${actorName} a publie une reponse concernant ce vehicule.`,
+      '',
+      `Vehicule : ${licensePlate}${vehicleLabel ? ` - ${vehicleLabel}` : ''}`,
+      `Controle : ${vehicleCheck.checkNumber}`,
       '',
       excerpt,
       attachmentText,
@@ -908,7 +932,12 @@ export class VehicleCheckConversationsService {
     const html = [
       '<div style="font-family:Arial,sans-serif;color:#111827;line-height:1.5;max-width:600px;margin:auto;padding:24px">',
       `<p>Bonjour ${this.escapeHtml(recipientName)},</p>`,
-      `<p><strong>${this.escapeHtml(actorName)}</strong> a publie une reponse concernant le controle ${this.escapeHtml(vehicleCheck.checkNumber)}.</p>`,
+      `<p><strong>${this.escapeHtml(actorName)}</strong> a publie une reponse concernant ce vehicule.</p>`,
+      '<div style="margin:16px 0;padding:13px 15px;border:1px solid #99f6e4;border-radius:8px;background:#f0fdfa">',
+      '<p style="margin:0 0 3px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#0f766e">Vehicule concerne</p>',
+      `<p style="margin:0;font-size:17px;font-weight:700;color:#0f172a">${this.escapeHtml(licensePlate)}${vehicleLabel ? ` · ${this.escapeHtml(vehicleLabel)}` : ''}</p>`,
+      `<p style="margin:3px 0 0;font-size:12px;color:#64748b">Controle ${this.escapeHtml(vehicleCheck.checkNumber)}</p>`,
+      '</div>',
       `<div style="border-left:3px solid #0f766e;background:#f8fafc;padding:12px 14px;margin:18px 0">${this.escapeHtml(excerpt)}</div>`,
       attachmentNames.length
         ? `<p style="font-size:13px;color:#475569">Documents : ${this.escapeHtml(attachmentNames.join(', '))}</p>`

@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   Camera,
   CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -909,70 +910,184 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             const vehiclePartName = lineRequiresNoVehiclePart
               ? "Aucun element requis"
               : vehicleParts.find((vehiclePart) => vehiclePart.id === line.vehiclePartId)?.name ?? "Element non selectionne";
+            const firstPhoto = line.photos[0];
 
             return (
-              <div className="space-y-3 rounded-md border border-gray-200 bg-white p-3" key={line.id}>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-gray-950">Reparation #{index + 1}</p>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      aria-label="Modifier la reparation"
-                      className="h-9 px-2 md:hidden"
-                      type="button"
-                      variant="ghost"
-                      onClick={() => openRepairSheet(line)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      aria-label="Retirer la reparation"
-                      className="h-9 px-2 text-red-600 hover:bg-red-50"
-                      type="button"
-                      variant="ghost"
-                      onClick={() => removeLine(line.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+              <div key={line.id}>
+                <div className="flex min-h-28 overflow-hidden rounded-lg border border-gray-200 bg-white md:hidden">
+                  <button
+                    aria-label={
+                      firstPhoto
+                        ? `Modifier la reparation ${vehiclePartName}`
+                        : `Ajouter une photo a la reparation ${vehiclePartName}`
+                    }
+                    className="relative w-24 shrink-0 overflow-hidden border-r border-gray-100 bg-gray-50"
+                    type="button"
+                    onClick={() => openRepairSheet(line)}
+                  >
+                    {firstPhoto ? (
+                      <img
+                        alt={`Degat ${vehiclePartName}`}
+                        className="h-full w-full object-cover"
+                        decoding="async"
+                        loading="lazy"
+                        src={cloudinaryThumbnailUrl(firstPhoto, 240)}
+                      />
+                    ) : (
+                      <span className="flex h-full flex-col items-center justify-center gap-1 text-gray-400">
+                        <Camera className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">
+                          Sans photo
+                        </span>
+                      </span>
+                    )}
+                    {line.photos.length > 1 ? (
+                      <span className="absolute bottom-1.5 right-1.5 rounded-full bg-black/65 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                        +{line.photos.length - 1}
+                      </span>
+                    ) : null}
+                  </button>
+
+                  <div className="flex min-w-0 flex-1 flex-col justify-between gap-2 p-3">
+                    <div className="flex min-w-0 items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                          Reparation {index + 1}
+                        </p>
+                        <p className="mt-0.5 truncate text-sm font-semibold text-gray-950">
+                          {vehiclePartName}
+                        </p>
+                        <p className="truncate text-xs text-gray-500">
+                          {repairTypeName}
+                        </p>
+                      </div>
+                      {previewLine ? (
+                        <DecisionBadge status={previewLine.decisionStatus} />
+                      ) : null}
+                    </div>
+
+                    <div className="flex min-w-0 items-end justify-between gap-2">
+                      <div className="min-w-0">
+                        {line.comment.trim() ? (
+                          <p className="truncate text-xs text-gray-500">
+                            {line.comment}
+                          </p>
+                        ) : null}
+                        {line.partOrderRequired ? <PartOrderDraftBadge /> : null}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-0.5">
+                        <Button
+                          aria-label="Modifier la reparation"
+                          className="h-8 w-8 p-0"
+                          type="button"
+                          variant="ghost"
+                          onClick={() => openRepairSheet(line)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          aria-label="Retirer la reparation"
+                          className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
+                          type="button"
+                          variant="ghost"
+                          onClick={() => removeLine(line.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-2 md:hidden">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium text-gray-950">{repairTypeName}</p>
-                      <p className="mt-1 text-sm text-gray-500">{vehiclePartName}</p>
-                    </div>
-                    {previewLine ? <DecisionBadge status={previewLine.decisionStatus} /> : null}
-                  </div>
-                  {line.comment.trim() ? <p className="text-sm text-gray-600">{line.comment}</p> : null}
-                  {line.partOrderRequired ? <PartOrderDraftBadge /> : null}
-                </div>
-
-                <div className="hidden md:block">
-                  <RepairEditorFields
-                    line={line}
-                    repairTypes={repairTypes}
-                    vehicleParts={vehicleParts}
-                    isVehiclePartOptional={isVehiclePartOptional}
-                    onPatch={(patch) => updateLine(line.id, patch)}
-                    onAddPhoto={(file) => addPhotoToRepairLine(line.id, file)}
-                    onRemovePhoto={(photo) => removePhotoFromRepairLine(line.id, photo)}
-                    onVehiclePartChange={(vehiclePartId) => changeVehiclePart(line.id, vehiclePartId)}
-                    onRepairTypeChange={(repairTypeId) => changeRepairType(line.id, repairTypeId)}
-                  />
-                </div>
-
-                {previewLine ? (
-                  <div className="hidden flex-col gap-2 rounded-md bg-gray-50 p-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between md:flex">
-                    <div className="flex items-center gap-2">
-                      <DecisionBadge status={previewLine.decisionStatus} />
-                      <span>{previewLine.decisionMessage}</span>
-                    </div>
-                    <span className="font-medium text-gray-950">
-                      {formatMoney(previewLine.totalInternalSavingAmount)} economie reference
+                <details className="group hidden overflow-hidden rounded-lg border border-gray-200 bg-white md:block">
+                  <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 transition hover:bg-gray-50">
+                    <span className="flex h-12 w-12 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+                      {firstPhoto ? (
+                        <img
+                          alt={`Degat ${vehiclePartName}`}
+                          className="h-full w-full object-cover"
+                          decoding="async"
+                          loading="lazy"
+                          src={cloudinaryThumbnailUrl(firstPhoto, 160)}
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-gray-400">
+                          <Camera className="h-4 w-4" />
+                        </span>
+                      )}
                     </span>
+
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                        Reparation {index + 1}
+                      </span>
+                      <span className="block truncate text-sm font-semibold text-gray-950">
+                        {vehiclePartName}
+                      </span>
+                      <span className="block truncate text-xs text-gray-500">
+                        {repairTypeName}
+                      </span>
+                      {line.comment.trim() ? (
+                        <span className="mt-0.5 block truncate text-xs text-gray-400">
+                          {line.comment}
+                        </span>
+                      ) : null}
+                    </span>
+
+                    <span className="flex shrink-0 items-center gap-3">
+                      {previewLine ? (
+                        <DecisionBadge status={previewLine.decisionStatus} />
+                      ) : null}
+                      <span className="text-xs text-gray-500">
+                        {line.photos.length} photo
+                        {line.photos.length > 1 ? "s" : ""}
+                      </span>
+                      <ChevronDown className="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" />
+                    </span>
+                  </summary>
+
+                  <div className="space-y-3 border-t border-gray-100 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs font-medium text-gray-500">
+                        Modifier la reparation
+                      </p>
+                      <Button
+                        aria-label="Retirer la reparation"
+                        className="h-8 px-2 text-red-600 hover:bg-red-50"
+                        type="button"
+                        variant="ghost"
+                        onClick={() => removeLine(line.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Supprimer
+                      </Button>
+                    </div>
+
+                    <RepairEditorFields
+                      line={line}
+                      repairTypes={repairTypes}
+                      vehicleParts={vehicleParts}
+                      isVehiclePartOptional={isVehiclePartOptional}
+                      onPatch={(patch) => updateLine(line.id, patch)}
+                      onAddPhoto={(file) => addPhotoToRepairLine(line.id, file)}
+                      onRemovePhoto={(photo) => removePhotoFromRepairLine(line.id, photo)}
+                      onVehiclePartChange={(vehiclePartId) => changeVehiclePart(line.id, vehiclePartId)}
+                      onRepairTypeChange={(repairTypeId) => changeRepairType(line.id, repairTypeId)}
+                    />
+
+                    {previewLine ? (
+                      <div className="flex items-center justify-between gap-3 rounded-md bg-gray-50 p-3 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <DecisionBadge status={previewLine.decisionStatus} />
+                          <span>{previewLine.decisionMessage}</span>
+                        </div>
+                        <span className="font-medium text-gray-950">
+                          {formatMoney(previewLine.totalInternalSavingAmount)} economie reference
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
+                </details>
               </div>
             );
           })}
@@ -1500,14 +1615,14 @@ function RepairPhotoField({
         className={
           compact
             ? "flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            : "grid grid-cols-3 gap-2"
+            : "flex flex-wrap gap-2"
         }
       >
         {photos.map((photo) => (
           <div
             className={[
-              "relative aspect-square overflow-hidden rounded-md border border-gray-200 bg-gray-100",
-              compact ? "h-16 w-16 shrink-0" : "",
+              "relative shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-100",
+              compact ? "h-16 w-16" : "h-28 w-28",
             ].join(" ")}
             key={photo.publicId}
           >
@@ -1535,7 +1650,7 @@ function RepairPhotoField({
               "flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 font-medium text-gray-600 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800",
               compact
                 ? "h-16 w-16 shrink-0 gap-1 text-xs"
-                : "aspect-square min-h-20 gap-2 text-sm",
+                : "h-28 w-28 shrink-0 gap-1.5 text-xs",
             ].join(" ")}
             disabled={isUploading}
             type="button"

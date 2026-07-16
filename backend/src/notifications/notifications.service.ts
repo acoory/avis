@@ -20,6 +20,15 @@ export class NotificationsService {
               lastName: true,
             },
           },
+          vehicleCheck: {
+            select: {
+              licensePlate: true,
+              licensePlateCountry: true,
+              licensePlateRaw: true,
+              manufacturer: { select: { name: true } },
+              vehicleModel: { select: { name: true } },
+            },
+          },
         },
       }),
       this.prisma.notification.count({

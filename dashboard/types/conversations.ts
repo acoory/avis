@@ -90,6 +90,13 @@ export type AppNotification = {
   route: string;
   title: string;
   type: AppNotificationType;
+  vehicleCheck?: {
+    licensePlate: string;
+    licensePlateCountry: string;
+    licensePlateRaw?: string | null;
+    manufacturer: { name: string };
+    vehicleModel?: { name: string } | null;
+  } | null;
   vehicleCheckId?: string | null;
 };
 

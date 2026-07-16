@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatLicensePlate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { businessService } from "@/services/business.service";
 import { AppNotification } from "@/types/conversations";
@@ -87,7 +88,7 @@ export function NotificationsButton() {
           ) : null}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] max-w-sm p-0">
+      <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] max-w-md p-0">
         <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
           <div>
             <p className="text-sm font-semibold text-slate-950">Notifications</p>
@@ -152,6 +153,9 @@ function NotificationLink({ notification, onOpen }: { notification: AppNotificat
           <span className="line-clamp-2 text-sm font-semibold text-slate-950">{notification.title}</span>
           {!notification.readAt ? <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-600" /> : null}
         </span>
+        {notification.vehicleCheck ? (
+          <VehicleIdentity vehicleCheck={notification.vehicleCheck} />
+        ) : null}
         {notification.excerpt ? (
           <span className="mt-0.5 line-clamp-2 text-xs leading-4 text-slate-500">{notification.excerpt}</span>
         ) : null}
@@ -160,6 +164,36 @@ function NotificationLink({ notification, onOpen }: { notification: AppNotificat
         </span>
       </span>
     </Link>
+  );
+}
+
+function VehicleIdentity({
+  vehicleCheck,
+}: {
+  vehicleCheck: NonNullable<AppNotification["vehicleCheck"]>;
+}) {
+  const licensePlate = formatLicensePlate(
+    vehicleCheck.licensePlate,
+    vehicleCheck.licensePlateCountry,
+    vehicleCheck.licensePlateRaw,
+  );
+  const vehicleLabel = [
+    vehicleCheck.manufacturer.name,
+    vehicleCheck.vehicleModel?.name,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <span className="mt-1 flex min-w-0 items-center gap-1.5 rounded-md bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-inset ring-slate-200">
+      <Car className="h-3.5 w-3.5 shrink-0 text-teal-700" />
+      <span className="shrink-0">{licensePlate}</span>
+      {vehicleLabel ? (
+        <span className="truncate font-medium text-slate-500">
+          · {vehicleLabel}
+        </span>
+      ) : null}
+    </span>
   );
 }
 
