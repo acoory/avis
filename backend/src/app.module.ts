@@ -18,6 +18,8 @@ import { LicensePlatesModule } from './license-plates/license-plates.module';
 import { DamagePhotosModule } from './damage-photos/damage-photos.module';
 import { GtmotiveModule } from './gtmotive/gtmotive.module';
 import { ExternalRepairContactsModule } from './external-repair-contacts/external-repair-contacts.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { VehicleCheckConversationsModule } from './vehicle-check-conversations/vehicle-check-conversations.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { ExternalRepairContactsModule } from './external-repair-contacts/externa
     DamagePhotosModule,
     GtmotiveModule,
     ExternalRepairContactsModule,
+    NotificationsModule,
+    VehicleCheckConversationsModule,
   ],
 })
 export class AppModule {}

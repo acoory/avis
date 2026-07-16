@@ -6,7 +6,7 @@
 /*
  * This file should be your main import to use Prisma-related types and utilities in a browser. 
  * Use it to get access to models, enums, and input types.
- *
+ * 
  * This file does not contain a `PrismaClient` class, nor several other helpers that are intended as server-side only.
  * See `client.ts` for the standard, server-side entry point.
  *
@@ -19,9 +19,19 @@ export * as $Enums from './enums.cjs'
 export * from './enums.cjs';
 /**
  * Model User
- *
+ * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model PublicAccessSession
+ * 
+ */
+export type PublicAccessSession = Prisma.PublicAccessSessionModel
+/**
+ * Model UserManagerAssignment
+ * 
+ */
+export type UserManagerAssignment = Prisma.UserManagerAssignmentModel
 /**
  * Model Agency
  * 
@@ -79,9 +89,44 @@ export type ExternalRepairContact = Prisma.ExternalRepairContactModel
 export type VehicleCheckPublicShare = Prisma.VehicleCheckPublicShareModel
 /**
  * Model VehicleCheckDecisionShare
- *
+ * 
  */
 export type VehicleCheckDecisionShare = Prisma.VehicleCheckDecisionShareModel
+/**
+ * Model VehicleCheckConversation
+ * 
+ */
+export type VehicleCheckConversation = Prisma.VehicleCheckConversationModel
+/**
+ * Model VehicleCheckConversationParticipant
+ * 
+ */
+export type VehicleCheckConversationParticipant = Prisma.VehicleCheckConversationParticipantModel
+/**
+ * Model VehicleCheckMessage
+ * 
+ */
+export type VehicleCheckMessage = Prisma.VehicleCheckMessageModel
+/**
+ * Model VehicleCheckMessageAttachment
+ * 
+ */
+export type VehicleCheckMessageAttachment = Prisma.VehicleCheckMessageAttachmentModel
+/**
+ * Model VehicleCheckMessageMention
+ * 
+ */
+export type VehicleCheckMessageMention = Prisma.VehicleCheckMessageMentionModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
+ * Model NotificationEmail
+ * 
+ */
+export type NotificationEmail = Prisma.NotificationEmailModel
 /**
  * Model VehicleCheckItem
  * 

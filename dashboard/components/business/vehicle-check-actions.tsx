@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Download, Mail, MessageSquareText, Pencil, Trash2 } from "lucide-react";
+import {
+  CheckCircle2,
+  Download,
+  Mail,
+  MessageSquareText,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -19,7 +26,11 @@ type VehicleCheckActionsProps = {
   onUpdated: (vehicleCheck: VehicleCheck) => void;
 };
 
-export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdated }: VehicleCheckActionsProps) {
+export function VehicleCheckActions({
+  vehicleCheck,
+  onSendRepairRequest,
+  onUpdated,
+}: VehicleCheckActionsProps) {
   const router = useRouter();
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -29,14 +40,27 @@ export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdat
   const canComplete = vehicleCheck.status === "DRAFT";
   const canRequestDecision = vehicleCheck.status !== "DRAFT";
   const canShareSummary = vehicleCheck.status === "SUMMARY_READY";
-  const canMarkRecovered = Boolean(vehicleCheck.publicShare && !vehicleCheck.publicShare.vehicleRecoveredAt);
+  const canMarkRecovered = Boolean(
+    vehicleCheck.publicShare && !vehicleCheck.publicShare.vehicleRecoveredAt,
+  );
   const canDelete = true;
+  const latestDecisionShare = (vehicleCheck.decisionShares ?? []).reduce<
+    NonNullable<VehicleCheck["decisionShares"]>[number] | null
+  >(
+    (latest, share) =>
+      !latest || new Date(share.createdAt) > new Date(latest.createdAt)
+        ? share
+        : latest,
+    null,
+  );
 
   async function handleComplete() {
     setIsCompleting(true);
 
     try {
-      const completed = await businessService.completeVehicleCheck(vehicleCheck.id);
+      const completed = await businessService.completeVehicleCheck(
+        vehicleCheck.id,
+      );
       onUpdated(completed);
       toast.success("Controle terrain termine. Il est maintenant a analyser.");
     } catch {
@@ -87,16 +111,30 @@ export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdat
             </Button>
           ) : null}
           {canRequestDecision ? (
-            <Button
-              className="w-full sm:w-auto"
-              size="sm"
-              type="button"
-              variant="outline"
-              onClick={() => setDecisionDialogOpen(true)}
-            >
-              <MessageSquareText className="h-4 w-4" />
-              Avis manager
-            </Button>
+            latestDecisionShare ? (
+              <Button
+                asChild
+                className="w-full sm:w-auto"
+                size="sm"
+                variant="outline"
+              >
+                <Link href={`/public/decision/${latestDecisionShare.token}`}>
+                  <MessageSquareText className="h-4 w-4" />
+                  Consulter l&apos;avis
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                className="w-full sm:w-auto"
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() => setDecisionDialogOpen(true)}
+              >
+                <MessageSquareText className="h-4 w-4" />
+                Avis manager
+              </Button>
+            )
           ) : null}
           {canMarkRecovered ? (
             <Button
@@ -110,7 +148,12 @@ export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdat
               Marquer recupere
             </Button>
           ) : null}
-          <Button asChild className="w-full sm:w-auto" size="sm" variant="outline">
+          <Button
+            asChild
+            className="w-full sm:w-auto"
+            size="sm"
+            variant="outline"
+          >
             <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>
               <Pencil className="h-4 w-4" />
               Modifier
@@ -129,7 +172,12 @@ export function VehicleCheckActions({ vehicleCheck, onSendRepairRequest, onUpdat
             </Button>
           ) : null}
           {canComplete ? (
-            <Button className="w-full sm:w-auto" disabled={isCompleting} size="sm" onClick={handleComplete}>
+            <Button
+              className="w-full sm:w-auto"
+              disabled={isCompleting}
+              size="sm"
+              onClick={handleComplete}
+            >
               <CheckCircle2 className="h-4 w-4" />
               {isCompleting ? "Finalisation..." : "Terminer le controle"}
             </Button>

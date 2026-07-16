@@ -6,11 +6,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Prisma, Role } from '../../prisma/generated/client.cjs';
+import {
+  Prisma,
+  Role,
+  VehicleCheckConversationParticipantRole,
+} from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+const managerSelect = {
+  id: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  role: true,
+} satisfies Prisma.UserSelect;
 
 const userSelect = {
   id: true,
@@ -18,15 +30,15 @@ const userSelect = {
   firstName: true,
   lastName: true,
   role: true,
-  managerId: true,
-  manager: {
+  managerAssignments: {
+    where: { isActive: true },
     select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      role: true,
+      assignedAt: true,
+      isPrimary: true,
+      managerId: true,
+      manager: { select: managerSelect },
     },
+    orderBy: [{ isPrimary: 'desc' as const }, { assignedAt: 'asc' as const }],
   },
   isActive: true,
   lastLoginAt: true,
@@ -34,7 +46,7 @@ const userSelect = {
   updatedAt: true,
   _count: {
     select: {
-      collaborators: true,
+      managedCollaboratorAssignments: { where: { isActive: true } },
       vehicleChecks: true,
     },
   },
@@ -66,13 +78,17 @@ export class UsersService {
 
   findCollaborators(managerId: string, requester: CurrentUserPayload) {
     if (requester.role === Role.MANAGER && requester.sub !== managerId) {
-      throw new ForbiddenException('You can only access your own collaborators');
+      throw new ForbiddenException(
+        'You can only access your own collaborators',
+      );
     }
 
     return this.prisma.user.findMany({
       where: {
-        managerId,
         role: Role.COLLABORATOR,
+        managerAssignments: {
+          some: { managerId, isActive: true },
+        },
       },
       select: userSelect,
       orderBy: [{ firstName: 'asc' }, { lastName: 'asc' }],
@@ -106,45 +122,87 @@ export class UsersService {
     }
 
     const role = requester.role === Role.MANAGER ? Role.COLLABORATOR : dto.role;
-    const managerId = requester.role === Role.MANAGER ? requester.sub : dto.managerId;
+    const managerIds =
+      requester.role === Role.MANAGER
+        ? [requester.sub]
+        : (dto.managerIds ?? []);
 
     if (requester.role === Role.MANAGER && dto.role !== Role.COLLABORATOR) {
       throw new ForbiddenException('Managers can only create collaborators');
     }
 
-    await this.validateManagerAssignment(role, managerId);
+    await this.validateManagerAssignments(role, managerIds);
     const password = await bcrypt.hash(dto.password, 12);
 
-    return this.prisma.user.create({
-      data: {
-        email: dto.email,
-        password,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        role,
-        isActive: dto.isActive ?? true,
-        managerId: role === Role.COLLABORATOR ? managerId : null,
-      },
-      select: userSelect,
+    return this.prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          email: dto.email,
+          password,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          role,
+          isActive: dto.isActive ?? true,
+        },
+        select: { id: true },
+      });
+
+      if (role === Role.COLLABORATOR && managerIds.length) {
+        await tx.userManagerAssignment.createMany({
+          data: managerIds.map((managerId, index) => ({
+            collaboratorId: created.id,
+            createdById: requester.sub,
+            isPrimary: index === 0,
+            managerId,
+          })),
+        });
+      }
+
+      return tx.user.findUniqueOrThrow({
+        where: { id: created.id },
+        select: userSelect,
+      });
     });
   }
 
   async update(id: string, dto: UpdateUserDto, requester: CurrentUserPayload) {
     const existingUser = await this.findOne(id, requester);
-    const nextRole = requester.role === Role.ADMIN ? dto.role ?? existingUser.role : existingUser.role;
-    const nextManagerId = requester.role === Role.MANAGER ? requester.sub : dto.managerId;
+    const nextRole =
+      requester.role === Role.ADMIN
+        ? (dto.role ?? existingUser.role)
+        : existingUser.role;
+    const currentManagerIds = existingUser.managerAssignments.map(
+      (assignment) => assignment.managerId,
+    );
+    const nextManagerIds =
+      nextRole === Role.COLLABORATOR
+        ? requester.role === Role.MANAGER
+          ? currentManagerIds
+          : (dto.managerIds ?? currentManagerIds)
+        : [];
 
     if (requester.role === Role.MANAGER) {
-      if (existingUser.role !== Role.COLLABORATOR || existingUser.managerId !== requester.sub) {
-        throw new ForbiddenException('Managers can only update their own collaborators');
+      const managesUser = currentManagerIds.includes(requester.sub);
+      if (existingUser.role !== Role.COLLABORATOR || !managesUser) {
+        throw new ForbiddenException(
+          'Managers can only update their own collaborators',
+        );
       }
 
       if (dto.role && dto.role !== Role.COLLABORATOR) {
-        throw new ForbiddenException('Managers cannot change collaborator roles');
+        throw new ForbiddenException(
+          'Managers cannot change collaborator roles',
+        );
+      }
+
+      if (dto.managerIds !== undefined) {
+        throw new ForbiddenException(
+          'Only administrators can change manager assignments',
+        );
       }
     }
 
-    await this.validateManagerAssignment(nextRole, nextManagerId, id);
+    await this.validateManagerAssignments(nextRole, nextManagerIds, id);
 
     const data: Prisma.UserUpdateInput = {
       email: dto.email,
@@ -154,33 +212,61 @@ export class UsersService {
       isActive: dto.isActive,
     };
 
-    if (requester.role === Role.MANAGER || dto.managerId !== undefined || dto.role !== undefined) {
-      data.manager =
-        nextRole === Role.COLLABORATOR && nextManagerId
-          ? { connect: { id: nextManagerId } }
-          : { disconnect: true };
-    }
-
     if (dto.password) {
       data.password = await bcrypt.hash(dto.password, 12);
       data.refreshTokenHash = null;
     }
 
-    if (existingUser.role === Role.MANAGER && nextRole !== Role.MANAGER) {
-      await this.prisma.user.updateMany({
-        where: { managerId: id },
-        data: { managerId: null },
-      });
-    }
-
     try {
-      return await this.prisma.user.update({
-        where: { id },
-        data,
-        select: userSelect,
+      return await this.prisma.$transaction(async (tx) => {
+        await tx.user.update({ where: { id }, data, select: { id: true } });
+
+        if (
+          existingUser.role === Role.MANAGER &&
+          (nextRole !== Role.MANAGER || dto.isActive === false)
+        ) {
+          const managedCollaborators = await tx.userManagerAssignment.findMany({
+            where: { managerId: id, isActive: true },
+            select: { collaboratorId: true },
+          });
+          await tx.userManagerAssignment.updateMany({
+            where: { managerId: id, isActive: true },
+            data: {
+              isActive: false,
+              isPrimary: false,
+              unassignedAt: new Date(),
+            },
+          });
+          await this.revokeManagerConversationAccess(
+            tx,
+            id,
+            managedCollaborators.map((assignment) => assignment.collaboratorId),
+          );
+          await tx.publicAccessSession.updateMany({
+            where: { userId: id, revokedAt: null },
+            data: { revokedAt: new Date() },
+          });
+        }
+
+        const shouldSyncManagers =
+          requester.role === Role.ADMIN &&
+          (dto.managerIds !== undefined || dto.role !== undefined);
+        if (shouldSyncManagers) {
+          await this.syncManagerAssignments(
+            tx,
+            id,
+            nextManagerIds,
+            requester.sub,
+          );
+        }
+
+        return tx.user.findUniqueOrThrow({ where: { id }, select: userSelect });
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Email already exists');
       }
 
@@ -191,8 +277,16 @@ export class UsersService {
   async remove(id: string, requester: CurrentUserPayload) {
     const user = await this.findOne(id, requester);
 
-    if (requester.role === Role.MANAGER && (user.role !== Role.COLLABORATOR || user.managerId !== requester.sub)) {
-      throw new ForbiddenException('Managers can only delete their own collaborators');
+    if (
+      requester.role === Role.MANAGER &&
+      (user.role !== Role.COLLABORATOR ||
+        !user.managerAssignments.some(
+          (assignment) => assignment.managerId === requester.sub,
+        ))
+    ) {
+      throw new ForbiddenException(
+        'Managers can only delete their own collaborators',
+      );
     }
 
     await this.prisma.user.delete({ where: { id } });
@@ -205,34 +299,115 @@ export class UsersService {
     }
 
     return {
-      OR: [{ id: requester.sub }, { managerId: requester.sub }],
+      OR: [
+        { id: requester.sub },
+        {
+          managerAssignments: {
+            some: { managerId: requester.sub, isActive: true },
+          },
+        },
+      ],
     };
   }
 
-  private async validateManagerAssignment(role: Role, managerId?: string | null, userId?: string) {
-    if (!managerId) {
+  private async validateManagerAssignments(
+    role: Role,
+    managerIds: string[],
+    userId?: string,
+  ) {
+    const uniqueManagerIds = [...new Set(managerIds)];
+    if (uniqueManagerIds.length !== managerIds.length) {
+      throw new BadRequestException('A manager can only be assigned once');
+    }
+
+    if (!managerIds.length) {
       return;
     }
 
     if (role !== Role.COLLABORATOR) {
-      throw new BadRequestException('Only collaborators can be attached to a manager');
+      throw new BadRequestException(
+        'Only collaborators can be attached to managers',
+      );
     }
 
-    if (managerId === userId) {
+    if (userId && managerIds.includes(userId)) {
       throw new BadRequestException('A user cannot be their own manager');
     }
 
-    const manager = await this.prisma.user.findUnique({
-      where: { id: managerId },
-      select: { id: true, role: true, isActive: true },
+    const managers = await this.prisma.user.findMany({
+      where: { id: { in: managerIds }, role: Role.MANAGER, isActive: true },
+      select: { id: true },
+    });
+    if (managers.length !== managerIds.length) {
+      throw new BadRequestException('Every selected manager must be active');
+    }
+  }
+
+  private async syncManagerAssignments(
+    tx: Prisma.TransactionClient,
+    collaboratorId: string,
+    managerIds: string[],
+    createdById: string,
+  ) {
+    const existingAssignments = await tx.userManagerAssignment.findMany({
+      where: { collaboratorId, isActive: true },
+      select: { managerId: true },
+    });
+    const removedManagerIds = existingAssignments
+      .map((assignment) => assignment.managerId)
+      .filter((managerId) => !managerIds.includes(managerId));
+
+    await tx.userManagerAssignment.updateMany({
+      where: { collaboratorId, isActive: true },
+      data: { isActive: false, isPrimary: false, unassignedAt: new Date() },
     });
 
-    if (!manager) {
-      throw new NotFoundException('Manager not found');
+    for (const [index, managerId] of managerIds.entries()) {
+      await tx.userManagerAssignment.upsert({
+        where: { collaboratorId_managerId: { collaboratorId, managerId } },
+        create: {
+          collaboratorId,
+          createdById,
+          isPrimary: index === 0,
+          managerId,
+        },
+        update: {
+          assignedAt: new Date(),
+          createdById,
+          isActive: true,
+          isPrimary: index === 0,
+          unassignedAt: null,
+        },
+      });
     }
+    for (const managerId of removedManagerIds) {
+      await this.revokeManagerConversationAccess(tx, managerId, [
+        collaboratorId,
+      ]);
+    }
+  }
 
-    if (manager.role !== Role.MANAGER || !manager.isActive) {
-      throw new BadRequestException('The selected manager must be an active manager');
-    }
+  private async revokeManagerConversationAccess(
+    tx: Prisma.TransactionClient,
+    managerId: string,
+    collaboratorIds: string[],
+  ) {
+    if (!collaboratorIds.length) return;
+    await tx.vehicleCheckConversationParticipant.deleteMany({
+      where: {
+        role: VehicleCheckConversationParticipantRole.DECISION_MAKER,
+        userId: managerId,
+        conversation: {
+          vehicleCheck: { collaboratorId: { in: collaboratorIds } },
+        },
+      },
+    });
+    await tx.vehicleCheckDecisionShare.updateMany({
+      where: {
+        managerId,
+        vehicleCheck: { collaboratorId: { in: collaboratorIds } },
+      },
+      data: { isEnabled: false },
+    });
   }
 }

@@ -15,12 +15,25 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/documents/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-store",
+          },
+        ],
+      },
     ];
   },
   async rewrites() {
     return [
       {
         source: "/cloudinary/:path*",
+        destination: "https://res.cloudinary.com/:path*",
+      },
+      {
+        source: "/documents/:path*",
         destination: "https://res.cloudinary.com/:path*",
       },
     ];

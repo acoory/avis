@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, ClipboardList, Euro, ListChecks, PackageCheck, Plus, RotateCcw, Wrench, type LucideIcon } from "lucide-react";
+import { CheckCircle2, ClipboardList, Euro, ListChecks, PackageCheck, Plus, Wrench, type LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ExportButton } from "@/components/business/export-button";
 import { VehicleCheckTable } from "@/components/business/vehicle-check-table";
@@ -75,6 +75,7 @@ export default function VehicleChecksPage() {
 
 type VehicleCheckStats = {
   completedCount: number;
+  draftCount: number;
   recoveredCount: number;
   takenInChargeCount: number;
   toAnalyzeCount: number;
@@ -85,13 +86,13 @@ type VehicleCheckStats = {
 
 function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
   const cards = [
-    // {
-    //   description: "Sur la periode",
-    //   icon: ClipboardList,
-    //   title: "Controles",
-    //   tone: "blue",
-    //   value: formatInteger(stats.totalCount),
-    // },
+    {
+      description: "Brouillons en cours",
+      icon: ClipboardList,
+      title: "En cours",
+      tone: "slate",
+      value: formatInteger(stats.draftCount),
+    },
     {
       description: "Decisions a traiter",
       icon: ListChecks,
@@ -99,41 +100,34 @@ function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
       tone: "amber",
       value: formatInteger(stats.toAnalyzeCount),
     },
-    // {
-    //   description: "Syntheses finalisees",
-    //   icon: CheckCircle2,
-    //   title: "Completes",
-    //   tone: "teal",
-    //   value: formatInteger(stats.completedCount),
-    // },
     {
-      description: "Chez prestataire",
+      description: "En reparation",
       icon: Wrench,
-      title: "Prestataire",
+      title: "Chez carrossier",
       tone: "emerald",
       value: formatInteger(stats.takenInChargeCount),
     },
     {
-      description: "Retour confirme",
-      icon: RotateCcw,
-      title: "Recuperes",
-      tone: "blue",
-      value: formatInteger(stats.recoveredCount),
-    },
-    {
       description: "Pieces a commander",
       icon: PackageCheck,
-      title: "Commandes",
-      tone: "amber",
+      title: "Pieces a commander",
+      tone: "blue",
       value: formatInteger(stats.toOrderCount),
     },
-    // {
-    //   description: "Gain reference",
-    //   icon: Euro,
-    //   title: "Economies",
-    //   tone: "emerald",
-    //   value: formatCompactMoney(stats.totalSavingAmount),
-    // },
+    {
+      description: "Syntheses finalisees",
+      icon: CheckCircle2,
+      title: "Completes",
+      tone: "teal",
+      value: formatInteger(stats.completedCount),
+    },
+    {
+      description: "Gain reference",
+      icon: Euro,
+      title: "Economies",
+      tone: "emerald",
+      value: formatCompactMoney(stats.totalSavingAmount),
+    },
   ] satisfies Array<{
     description: string;
     icon: LucideIcon;
@@ -143,7 +137,7 @@ function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
   }>;
 
   return (
-    <section className="mb-5 flex snap-x gap-3 overflow-x-auto pb-2 pr-4 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pb-0 sm:pr-0 lg:grid-cols-4 2xl:grid-cols-7">
+    <section className="mb-5 flex snap-x gap-3 overflow-x-auto pb-2 pr-4 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pb-0 sm:pr-0 lg:grid-cols-3 2xl:grid-cols-6">
       {cards.map((card) => (
         <StatCard description={card.description} icon={card.icon} key={card.title} title={card.title} tone={card.tone} value={card.value} />
       ))}
@@ -151,12 +145,13 @@ function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
   );
 }
 
-type StatTone = "amber" | "blue" | "emerald" | "teal";
+type StatTone = "amber" | "blue" | "emerald" | "slate" | "teal";
 
 const statToneStyles: Record<StatTone, string> = {
   amber: "bg-amber-50 text-amber-600 ring-amber-100",
   blue: "bg-blue-50 text-blue-600 ring-blue-100",
   emerald: "bg-emerald-50 text-emerald-600 ring-emerald-100",
+  slate: "bg-slate-100 text-slate-600 ring-slate-200",
   teal: "bg-teal-50 text-teal-600 ring-teal-100",
 };
 
@@ -188,6 +183,7 @@ function vehicleCheckStats(vehicleChecks: VehicleCheck[]): VehicleCheckStats {
       stats.totalSavingAmount += numberValue(check.totalInternalSavingAmount);
       if (check.status === "SUMMARY_READY") stats.completedCount += 1;
       if (check.status === "TO_ANALYZE") stats.toAnalyzeCount += 1;
+      if (check.status === "DRAFT") stats.draftCount += 1;
       if (check.publicShare && !check.publicShare.vehicleRecoveredAt) stats.takenInChargeCount += 1;
       if (check.publicShare?.vehicleRecoveredAt) stats.recoveredCount += 1;
       stats.toOrderCount += activeItems.filter((item) => item.partOrderStatus === "TO_ORDER").length;
@@ -196,6 +192,7 @@ function vehicleCheckStats(vehicleChecks: VehicleCheck[]): VehicleCheckStats {
     },
     {
       completedCount: 0,
+      draftCount: 0,
       recoveredCount: 0,
       takenInChargeCount: 0,
       toAnalyzeCount: 0,

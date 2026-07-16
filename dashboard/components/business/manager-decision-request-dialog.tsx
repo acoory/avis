@@ -31,30 +31,47 @@ export function ManagerDecisionRequestDialog({
     [managers, selectedManagerId],
   );
   const existingShare = useMemo(
-    () => vehicleCheck.decisionShares?.find((share) => share.managerId === selectedManagerId),
+    () =>
+      vehicleCheck.decisionShares?.find(
+        (share) => share.managerId === selectedManagerId,
+      ),
     [selectedManagerId, vehicleCheck.decisionShares],
   );
-  const decisionUrl = useMemo(() => {
-    if (!existingShare?.token || typeof window === "undefined") return "";
-    return new URL(`/public/decision/${existingShare.token}`, window.location.origin).toString();
-  }, [existingShare?.token]);
+  const decisionUrl =
+    existingShare?.token && typeof window !== "undefined"
+      ? new URL(
+          `/public/decision/${existingShare.token}`,
+          window.location.origin,
+        ).toString()
+      : "";
 
   useEffect(() => {
     if (!open) return;
 
-    setIsLoadingManagers(true);
-    void businessService
-      .decisionManagers()
-      .then((data) => {
-        setManagers(data);
-        setSelectedManagerId((current) => current || data[0]?.id || "");
-      })
-      .catch(() => {
-        setManagers([]);
-        toast.error("Impossible de charger les managers.");
-      })
-      .finally(() => setIsLoadingManagers(false));
-  }, [open]);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setIsLoadingManagers(true);
+      void businessService
+        .decisionManagers(vehicleCheck.id)
+        .then((data) => {
+          if (cancelled) return;
+          setManagers(data);
+          setSelectedManagerId((current) => current || data[0]?.id || "");
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setManagers([]);
+          toast.error("Impossible de charger les managers.");
+        })
+        .finally(() => {
+          if (!cancelled) setIsLoadingManagers(false);
+        });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, vehicleCheck.id]);
 
   async function sendRequest() {
     if (!selectedManagerId) {
@@ -65,15 +82,20 @@ export function ManagerDecisionRequestDialog({
     setIsSending(true);
 
     try {
-      const share = await businessService.sendVehicleCheckDecisionRequestEmail(vehicleCheck.id, {
-        managerId: selectedManagerId,
-        requestComment: requestComment.trim() || undefined,
-      });
+      const share = await businessService.sendVehicleCheckDecisionRequestEmail(
+        vehicleCheck.id,
+        {
+          managerId: selectedManagerId,
+          requestComment: requestComment.trim() || undefined,
+        },
+      );
 
       onSent?.({
         ...vehicleCheck,
         decisionShares: [
-          ...(vehicleCheck.decisionShares ?? []).filter((item) => item.managerId !== share.managerId),
+          ...(vehicleCheck.decisionShares ?? []).filter(
+            (item) => item.managerId !== share.managerId,
+          ),
           share,
         ],
       });
@@ -103,7 +125,10 @@ export function ManagerDecisionRequestDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4">
-      <div aria-busy={isSending} className="relative w-full max-w-lg overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl">
+      <div
+        aria-busy={isSending}
+        className="relative w-full max-w-lg overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl"
+      >
         {isSending ? (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/80 text-sm font-semibold text-slate-700 backdrop-blur-sm">
             <Loader2 className="h-6 w-6 animate-spin text-teal-700" />
@@ -113,7 +138,9 @@ export function ManagerDecisionRequestDialog({
 
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
           <div>
-            <p className="text-base font-bold text-slate-950">Demander l'avis manager</p>
+            <p className="text-base font-bold text-slate-950">
+              Demander l&apos;avis manager
+            </p>
             <p className="mt-1 text-sm text-slate-500">
               Le manager recevra un lien avec toutes les reparations et photos.
             </p>
@@ -132,13 +159,19 @@ export function ManagerDecisionRequestDialog({
 
         <fieldset className="space-y-4 p-4" disabled={isSending}>
           <label className="grid gap-1.5">
-            <span className="text-xs font-semibold uppercase text-slate-500">Manager</span>
+            <span className="text-xs font-semibold uppercase text-slate-500">
+              Manager
+            </span>
             <select
               className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm"
               value={selectedManagerId}
               onChange={(event) => setSelectedManagerId(event.target.value)}
             >
-              <option value="">{isLoadingManagers ? "Chargement..." : "Selectionner un manager"}</option>
+              <option value="">
+                {isLoadingManagers
+                  ? "Chargement..."
+                  : "Selectionner un manager"}
+              </option>
               {managers.map((manager) => (
                 <option key={manager.id} value={manager.id}>
                   {manager.firstName} {manager.lastName} - {manager.email}
@@ -148,7 +181,9 @@ export function ManagerDecisionRequestDialog({
           </label>
 
           <label className="grid gap-1.5">
-            <span className="text-xs font-semibold uppercase text-slate-500">Commentaire</span>
+            <span className="text-xs font-semibold uppercase text-slate-500">
+              Commentaire
+            </span>
             <textarea
               className="min-h-28 resize-y rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-teal-500"
               maxLength={1000}
@@ -156,7 +191,9 @@ export function ManagerDecisionRequestDialog({
               value={requestComment}
               onChange={(event) => setRequestComment(event.target.value)}
             />
-            <span className="text-right text-xs text-slate-400">{requestComment.length}/1000</span>
+            <span className="text-right text-xs text-slate-400">
+              {requestComment.length}/1000
+            </span>
           </label>
 
           {selectedManager ? (
@@ -169,11 +206,20 @@ export function ManagerDecisionRequestDialog({
             <div className="rounded-lg border border-teal-100 bg-teal-50 p-3">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-teal-950">Lien deja genere</p>
-                  <p className="mt-0.5 truncate text-xs text-teal-700">{decisionUrl}</p>
+                  <p className="text-sm font-semibold text-teal-950">
+                    Lien deja genere
+                  </p>
+                  <p className="mt-0.5 truncate text-xs text-teal-700">
+                    {decisionUrl}
+                  </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <Button size="sm" type="button" variant="outline" onClick={() => void copyDecisionUrl()}>
+                  <Button
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                    onClick={() => void copyDecisionUrl()}
+                  >
                     <Copy className="h-4 w-4" />
                     Copier
                   </Button>
@@ -188,11 +234,24 @@ export function ManagerDecisionRequestDialog({
         </fieldset>
 
         <div className="flex flex-col-reverse gap-2 border-t border-slate-100 p-4 sm:flex-row sm:justify-end">
-          <Button disabled={isSending} type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            disabled={isSending}
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
             Annuler
           </Button>
-          <Button disabled={isSending || !selectedManagerId} type="button" onClick={() => void sendRequest()}>
-            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          <Button
+            disabled={isSending || !selectedManagerId}
+            type="button"
+            onClick={() => void sendRequest()}
+          >
+            {isSending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
             Envoyer la demande
           </Button>
         </div>

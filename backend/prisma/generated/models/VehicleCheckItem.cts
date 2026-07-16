@@ -377,6 +377,7 @@ export type VehicleCheckItemWhereInput = {
   vehiclePart?: Prisma.XOR<Prisma.VehiclePartScalarRelationFilter, Prisma.VehiclePartWhereInput>
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryListRelationFilter
   photos?: Prisma.VehicleCheckItemPhotoListRelationFilter
+  messageMentions?: Prisma.VehicleCheckMessageMentionListRelationFilter
 }
 
 export type VehicleCheckItemOrderByWithRelationInput = {
@@ -407,6 +408,7 @@ export type VehicleCheckItemOrderByWithRelationInput = {
   vehiclePart?: Prisma.VehiclePartOrderByWithRelationInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryOrderByRelationAggregateInput
   photos?: Prisma.VehicleCheckItemPhotoOrderByRelationAggregateInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionOrderByRelationAggregateInput
 }
 
 export type VehicleCheckItemWhereUniqueInput = Prisma.AtLeast<{
@@ -440,6 +442,7 @@ export type VehicleCheckItemWhereUniqueInput = Prisma.AtLeast<{
   vehiclePart?: Prisma.XOR<Prisma.VehiclePartScalarRelationFilter, Prisma.VehiclePartWhereInput>
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryListRelationFilter
   photos?: Prisma.VehicleCheckItemPhotoListRelationFilter
+  messageMentions?: Prisma.VehicleCheckMessageMentionListRelationFilter
 }, "id">
 
 export type VehicleCheckItemOrderByWithAggregationInput = {
@@ -525,6 +528,7 @@ export type VehicleCheckItemCreateInput = {
   vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemUncheckedCreateInput = {
@@ -552,6 +556,7 @@ export type VehicleCheckItemUncheckedCreateInput = {
   updatedAt?: Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemUpdateInput = {
@@ -579,6 +584,7 @@ export type VehicleCheckItemUpdateInput = {
   vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateInput = {
@@ -606,6 +612,7 @@ export type VehicleCheckItemUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemCreateManyInput = {
@@ -688,6 +695,11 @@ export type VehicleCheckItemListRelationFilter = {
 
 export type VehicleCheckItemOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type VehicleCheckItemScalarRelationFilter = {
+  is?: Prisma.VehicleCheckItemWhereInput
+  isNot?: Prisma.VehicleCheckItemWhereInput
 }
 
 export type VehicleCheckItemCountOrderByAggregateInput = {
@@ -781,11 +793,6 @@ export type VehicleCheckItemSumOrderByAggregateInput = {
   unitInternalCost?: Prisma.SortOrder
   totalInternalCost?: Prisma.SortOrder
   partOrderPrice?: Prisma.SortOrder
-}
-
-export type VehicleCheckItemScalarRelationFilter = {
-  is?: Prisma.VehicleCheckItemWhereInput
-  isNot?: Prisma.VehicleCheckItemWhereInput
 }
 
 export type VehicleCheckItemCreateNestedManyWithoutRepairTypeInput = {
@@ -914,6 +921,20 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput = 
   deleteMany?: Prisma.VehicleCheckItemScalarWhereInput | Prisma.VehicleCheckItemScalarWhereInput[]
 }
 
+export type VehicleCheckItemCreateNestedOneWithoutMessageMentionsInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutMessageMentionsInput, Prisma.VehicleCheckItemUncheckedCreateWithoutMessageMentionsInput>
+  connectOrCreate?: Prisma.VehicleCheckItemCreateOrConnectWithoutMessageMentionsInput
+  connect?: Prisma.VehicleCheckItemWhereUniqueInput
+}
+
+export type VehicleCheckItemUpdateOneRequiredWithoutMessageMentionsNestedInput = {
+  create?: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutMessageMentionsInput, Prisma.VehicleCheckItemUncheckedCreateWithoutMessageMentionsInput>
+  connectOrCreate?: Prisma.VehicleCheckItemCreateOrConnectWithoutMessageMentionsInput
+  upsert?: Prisma.VehicleCheckItemUpsertWithoutMessageMentionsInput
+  connect?: Prisma.VehicleCheckItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VehicleCheckItemUpdateToOneWithWhereWithoutMessageMentionsInput, Prisma.VehicleCheckItemUpdateWithoutMessageMentionsInput>, Prisma.VehicleCheckItemUncheckedUpdateWithoutMessageMentionsInput>
+}
+
 export type EnumRepairDecisionStatusFieldUpdateOperationsInput = {
   set?: $Enums.RepairDecisionStatus
 }
@@ -978,6 +999,7 @@ export type VehicleCheckItemCreateWithoutRepairTypeInput = {
   vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemUncheckedCreateWithoutRepairTypeInput = {
@@ -1004,6 +1026,7 @@ export type VehicleCheckItemUncheckedCreateWithoutRepairTypeInput = {
   updatedAt?: Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemCreateOrConnectWithoutRepairTypeInput = {
@@ -1084,6 +1107,7 @@ export type VehicleCheckItemCreateWithoutVehiclePartInput = {
   repairType: Prisma.RepairTypeCreateNestedOneWithoutVehicleCheckItemsInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemUncheckedCreateWithoutVehiclePartInput = {
@@ -1110,6 +1134,7 @@ export type VehicleCheckItemUncheckedCreateWithoutVehiclePartInput = {
   updatedAt?: Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemCreateOrConnectWithoutVehiclePartInput = {
@@ -1162,6 +1187,7 @@ export type VehicleCheckItemCreateWithoutVehicleCheckInput = {
   vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemUncheckedCreateWithoutVehicleCheckInput = {
@@ -1188,6 +1214,7 @@ export type VehicleCheckItemUncheckedCreateWithoutVehicleCheckInput = {
   updatedAt?: Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutVehicleCheckItemInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemCreateOrConnectWithoutVehicleCheckInput = {
@@ -1216,6 +1243,130 @@ export type VehicleCheckItemUpdateManyWithWhereWithoutVehicleCheckInput = {
   data: Prisma.XOR<Prisma.VehicleCheckItemUpdateManyMutationInput, Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckInput>
 }
 
+export type VehicleCheckItemCreateWithoutMessageMentionsInput = {
+  id?: string
+  quantity?: number
+  unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: $Enums.RepairDecisionStatus
+  decisionMessage?: string | null
+  comment?: string | null
+  operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
+  operationalComment?: string | null
+  selectedForSummary?: boolean
+  partOrderRequired?: boolean
+  partOrderStatus?: $Enums.PartOrderStatus
+  partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: string | null
+  partOrderedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleCheck: Prisma.VehicleCheckCreateNestedOneWithoutItemsInput
+  repairType: Prisma.RepairTypeCreateNestedOneWithoutVehicleCheckItemsInput
+  vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
+  statusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutVehicleCheckItemInput
+  photos?: Prisma.VehicleCheckItemPhotoCreateNestedManyWithoutVehicleCheckItemInput
+}
+
+export type VehicleCheckItemUncheckedCreateWithoutMessageMentionsInput = {
+  id?: string
+  vehicleCheckId: string
+  repairTypeId: string
+  vehiclePartId: string
+  quantity?: number
+  unitInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: $Enums.RepairDecisionStatus
+  decisionMessage?: string | null
+  comment?: string | null
+  operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
+  operationalComment?: string | null
+  selectedForSummary?: boolean
+  partOrderRequired?: boolean
+  partOrderStatus?: $Enums.PartOrderStatus
+  partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: string | null
+  partOrderedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+  photos?: Prisma.VehicleCheckItemPhotoUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+}
+
+export type VehicleCheckItemCreateOrConnectWithoutMessageMentionsInput = {
+  where: Prisma.VehicleCheckItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutMessageMentionsInput, Prisma.VehicleCheckItemUncheckedCreateWithoutMessageMentionsInput>
+}
+
+export type VehicleCheckItemUpsertWithoutMessageMentionsInput = {
+  update: Prisma.XOR<Prisma.VehicleCheckItemUpdateWithoutMessageMentionsInput, Prisma.VehicleCheckItemUncheckedUpdateWithoutMessageMentionsInput>
+  create: Prisma.XOR<Prisma.VehicleCheckItemCreateWithoutMessageMentionsInput, Prisma.VehicleCheckItemUncheckedCreateWithoutMessageMentionsInput>
+  where?: Prisma.VehicleCheckItemWhereInput
+}
+
+export type VehicleCheckItemUpdateToOneWithWhereWithoutMessageMentionsInput = {
+  where?: Prisma.VehicleCheckItemWhereInput
+  data: Prisma.XOR<Prisma.VehicleCheckItemUpdateWithoutMessageMentionsInput, Prisma.VehicleCheckItemUncheckedUpdateWithoutMessageMentionsInput>
+}
+
+export type VehicleCheckItemUpdateWithoutMessageMentionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: Prisma.EnumRepairDecisionStatusFieldUpdateOperationsInput | $Enums.RepairDecisionStatus
+  decisionMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
+  operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
+  partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleCheck?: Prisma.VehicleCheckUpdateOneRequiredWithoutItemsNestedInput
+  repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
+  vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
+  statusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutVehicleCheckItemNestedInput
+  photos?: Prisma.VehicleCheckItemPhotoUpdateManyWithoutVehicleCheckItemNestedInput
+}
+
+export type VehicleCheckItemUncheckedUpdateWithoutMessageMentionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  vehicleCheckId?: Prisma.StringFieldUpdateOperationsInput | string
+  repairTypeId?: Prisma.StringFieldUpdateOperationsInput | string
+  vehiclePartId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unitInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalSavingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInternalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  decisionStatus?: Prisma.EnumRepairDecisionStatusFieldUpdateOperationsInput | $Enums.RepairDecisionStatus
+  decisionMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
+  operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
+  partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  partOrderReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+  photos?: Prisma.VehicleCheckItemPhotoUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+}
+
 export type VehicleCheckItemCreateWithoutPhotosInput = {
   id?: string
   quantity?: number
@@ -1240,6 +1391,7 @@ export type VehicleCheckItemCreateWithoutPhotosInput = {
   repairType: Prisma.RepairTypeCreateNestedOneWithoutVehicleCheckItemsInput
   vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemUncheckedCreateWithoutPhotosInput = {
@@ -1266,6 +1418,7 @@ export type VehicleCheckItemUncheckedCreateWithoutPhotosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemCreateOrConnectWithoutPhotosInput = {
@@ -1308,6 +1461,7 @@ export type VehicleCheckItemUpdateWithoutPhotosInput = {
   repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateWithoutPhotosInput = {
@@ -1334,6 +1488,7 @@ export type VehicleCheckItemUncheckedUpdateWithoutPhotosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemCreateWithoutStatusHistoriesInput = {
@@ -1360,6 +1515,7 @@ export type VehicleCheckItemCreateWithoutStatusHistoriesInput = {
   repairType: Prisma.RepairTypeCreateNestedOneWithoutVehicleCheckItemsInput
   vehiclePart: Prisma.VehiclePartCreateNestedOneWithoutVehicleCheckItemsInput
   photos?: Prisma.VehicleCheckItemPhotoCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemUncheckedCreateWithoutStatusHistoriesInput = {
@@ -1386,6 +1542,7 @@ export type VehicleCheckItemUncheckedCreateWithoutStatusHistoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   photos?: Prisma.VehicleCheckItemPhotoUncheckedCreateNestedManyWithoutVehicleCheckItemInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedCreateNestedManyWithoutVehicleCheckItemInput
 }
 
 export type VehicleCheckItemCreateOrConnectWithoutStatusHistoriesInput = {
@@ -1428,6 +1585,7 @@ export type VehicleCheckItemUpdateWithoutStatusHistoriesInput = {
   repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateWithoutStatusHistoriesInput = {
@@ -1454,6 +1612,7 @@ export type VehicleCheckItemUncheckedUpdateWithoutStatusHistoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photos?: Prisma.VehicleCheckItemPhotoUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemCreateManyRepairTypeInput = {
@@ -1504,6 +1663,7 @@ export type VehicleCheckItemUpdateWithoutRepairTypeInput = {
   vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateWithoutRepairTypeInput = {
@@ -1530,6 +1690,7 @@ export type VehicleCheckItemUncheckedUpdateWithoutRepairTypeInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateManyWithoutRepairTypeInput = {
@@ -1604,6 +1765,7 @@ export type VehicleCheckItemUpdateWithoutVehiclePartInput = {
   repairType?: Prisma.RepairTypeUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateWithoutVehiclePartInput = {
@@ -1630,6 +1792,7 @@ export type VehicleCheckItemUncheckedUpdateWithoutVehiclePartInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateManyWithoutVehiclePartInput = {
@@ -1704,6 +1867,7 @@ export type VehicleCheckItemUpdateWithoutVehicleCheckInput = {
   vehiclePart?: Prisma.VehiclePartUpdateOneRequiredWithoutVehicleCheckItemsNestedInput
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateWithoutVehicleCheckInput = {
@@ -1730,6 +1894,7 @@ export type VehicleCheckItemUncheckedUpdateWithoutVehicleCheckInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   statusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
   photos?: Prisma.VehicleCheckItemPhotoUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
+  messageMentions?: Prisma.VehicleCheckMessageMentionUncheckedUpdateManyWithoutVehicleCheckItemNestedInput
 }
 
 export type VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckInput = {
@@ -1764,11 +1929,13 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckInput = {
 export type VehicleCheckItemCountOutputType = {
   statusHistories: number
   photos: number
+  messageMentions: number
 }
 
 export type VehicleCheckItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   statusHistories?: boolean | VehicleCheckItemCountOutputTypeCountStatusHistoriesArgs
   photos?: boolean | VehicleCheckItemCountOutputTypeCountPhotosArgs
+  messageMentions?: boolean | VehicleCheckItemCountOutputTypeCountMessageMentionsArgs
 }
 
 /**
@@ -1793,6 +1960,13 @@ export type VehicleCheckItemCountOutputTypeCountStatusHistoriesArgs<ExtArgs exte
  */
 export type VehicleCheckItemCountOutputTypeCountPhotosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.VehicleCheckItemPhotoWhereInput
+}
+
+/**
+ * VehicleCheckItemCountOutputType without action
+ */
+export type VehicleCheckItemCountOutputTypeCountMessageMentionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckMessageMentionWhereInput
 }
 
 
@@ -1824,6 +1998,7 @@ export type VehicleCheckItemSelect<ExtArgs extends runtime.Types.Extensions.Inte
   vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
   statusHistories?: boolean | Prisma.VehicleCheckItem$statusHistoriesArgs<ExtArgs>
   photos?: boolean | Prisma.VehicleCheckItem$photosArgs<ExtArgs>
+  messageMentions?: boolean | Prisma.VehicleCheckItem$messageMentionsArgs<ExtArgs>
   _count?: boolean | Prisma.VehicleCheckItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vehicleCheckItem"]>
 
@@ -1915,6 +2090,7 @@ export type VehicleCheckItemInclude<ExtArgs extends runtime.Types.Extensions.Int
   vehiclePart?: boolean | Prisma.VehiclePartDefaultArgs<ExtArgs>
   statusHistories?: boolean | Prisma.VehicleCheckItem$statusHistoriesArgs<ExtArgs>
   photos?: boolean | Prisma.VehicleCheckItem$photosArgs<ExtArgs>
+  messageMentions?: boolean | Prisma.VehicleCheckItem$messageMentionsArgs<ExtArgs>
   _count?: boolean | Prisma.VehicleCheckItemCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VehicleCheckItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1936,6 +2112,7 @@ export type $VehicleCheckItemPayload<ExtArgs extends runtime.Types.Extensions.In
     vehiclePart: Prisma.$VehiclePartPayload<ExtArgs>
     statusHistories: Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>[]
     photos: Prisma.$VehicleCheckItemPhotoPayload<ExtArgs>[]
+    messageMentions: Prisma.$VehicleCheckMessageMentionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2359,6 +2536,7 @@ export interface Prisma__VehicleCheckItemClient<T, Null = never, ExtArgs extends
   vehiclePart<T extends Prisma.VehiclePartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehiclePartDefaultArgs<ExtArgs>>): Prisma.Prisma__VehiclePartClient<runtime.Types.Result.GetResult<Prisma.$VehiclePartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   statusHistories<T extends Prisma.VehicleCheckItem$statusHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheckItem$statusHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   photos<T extends Prisma.VehicleCheckItem$photosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheckItem$photosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckItemPhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messageMentions<T extends Prisma.VehicleCheckItem$messageMentionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VehicleCheckItem$messageMentionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckMessageMentionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2856,6 +3034,30 @@ export type VehicleCheckItem$photosArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.VehicleCheckItemPhotoScalarFieldEnum | Prisma.VehicleCheckItemPhotoScalarFieldEnum[]
+}
+
+/**
+ * VehicleCheckItem.messageMentions
+ */
+export type VehicleCheckItem$messageMentionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckMessageMention
+   */
+  select?: Prisma.VehicleCheckMessageMentionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckMessageMention
+   */
+  omit?: Prisma.VehicleCheckMessageMentionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckMessageMentionInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckMessageMentionWhereInput
+  orderBy?: Prisma.VehicleCheckMessageMentionOrderByWithRelationInput | Prisma.VehicleCheckMessageMentionOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckMessageMentionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckMessageMentionScalarFieldEnum | Prisma.VehicleCheckMessageMentionScalarFieldEnum[]
 }
 
 /**

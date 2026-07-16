@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, Gauge, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -11,11 +12,13 @@ import { useAuthStore } from "@/stores/auth.store";
 import { Role } from "@/types/auth";
 
 type NavigationItem = {
-  href: string;
+  href?: string;
   icon: LucideIcon;
   label: string;
   roles?: Role[];
   sublabel?: string;
+  comingSoon?: boolean;
+  subItems?: NavigationItem[];
 };
 
 const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
@@ -27,14 +30,7 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
     label: "Activite",
     items: [
       { label: "Controles", sublabel: "(Buy Back)", href: "/dashboard/vehicle-checks", icon: ClipboardList },
-      { label: "Pièces & Main-d'œuvre", sublabel: "(Estimation)", href: "/dashboard/estimation", icon: Calculator },
-    ],
-  },
-  {
-    label: "Gestion",
-    items: [
-      { label: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["ADMIN", "MANAGER"] },
-      { label: "Agences", href: "/dashboard/agencies", icon: MapPin, roles: ["ADMIN"] },
+      { label: "Pièces & Main-d'œuvre", sublabel: "(Estimation)", href: "/dashboard/estimation", icon: Calculator, comingSoon: true },
     ],
   },
   {
@@ -46,7 +42,16 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
   },
   {
     label: "Systeme",
-    items: [{ label: "Parametres", href: "/dashboard/settings", icon: Settings }],
+    items: [
+      {
+        label: "Paramètres",
+        icon: Settings,
+        subItems: [
+          { label: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["ADMIN", "MANAGER"] },
+          { label: "Agences", href: "/dashboard/agencies", icon: MapPin, roles: ["ADMIN"] },
+        ],
+      },
+    ],
   },
 ];
 
@@ -59,12 +64,33 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout, user } = useAuthStore();
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(
+    () => new Set(["Paramètres"]),
+  );
+
   const visibleSections = navigationSections
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => !item.roles || (user && item.roles.includes(user.role))),
+      items: section.items
+        .map((item) => ({
+          ...item,
+          subItems: item.subItems?.filter((sub) => !sub.roles || (user && sub.roles.includes(user.role))),
+        }))
+        .filter((item) => {
+          if (item.subItems !== undefined) return (item.subItems?.length ?? 0) > 0;
+          return !item.roles || (user && item.roles.includes(user.role));
+        }),
     }))
     .filter((section) => section.items.length > 0);
+
+  function toggleExpanded(label: string) {
+    setExpandedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
+      return next;
+    });
+  }
 
   async function handleLogout() {
     try {
@@ -108,8 +134,88 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                 <div className="space-y-1">
                   {section.items.map((item) => {
                     const Icon = item.icon;
-                    const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+
+                    if (item.subItems !== undefined) {
+                      const expanded = expandedItems.has(item.label);
+                      const hasActiveChild = item.subItems.some(
+                        (sub) => sub.href && (pathname === sub.href || pathname.startsWith(sub.href)),
+                      );
+
+                      return (
+                        <div key={item.label}>
+                          <button
+                            type="button"
+                            className={cn(
+                              "flex w-full min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 md:min-h-10",
+                              hasActiveChild && "text-teal-800",
+                            )}
+                            onClick={() => toggleExpanded(item.label)}
+                          >
+                            <Icon className="h-4 w-4" />
+                            <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                              <span className="truncate">{item.label}</span>
+                              <ChevronDown
+                                className={cn("h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform", expanded && "rotate-180")}
+                              />
+                            </span>
+                          </button>
+                          {expanded && (
+                            <div className="mt-1 ml-4 space-y-1 border-l border-gray-200 pl-3">
+                              {item.subItems.map((sub) => {
+                                const SubIcon = sub.icon;
+                                const active = sub.href ? pathname === sub.href || pathname.startsWith(sub.href) : false;
+                                const accessBadge = sub.roles?.length ? accessBadgeLabel(sub.roles) : null;
+
+                                return (
+                                  <Link
+                                    key={sub.href}
+                                    href={sub.href!}
+                                    className={cn(
+                                      "flex min-h-10 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 md:min-h-9",
+                                      active && "bg-teal-50 text-teal-800",
+                                    )}
+                                    onClick={onClose}
+                                  >
+                                    <SubIcon className="h-3.5 w-3.5" />
+                                    <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                                      <span className="truncate">{sub.label}</span>
+                                      {accessBadge ? (
+                                        <span className={cn("shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500", active && "bg-teal-100 text-teal-700")}>
+                                          {accessBadge}
+                                        </span>
+                                      ) : null}
+                                    </span>
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    const active = item.href ? (pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))) : false;
                     const accessBadge = item.roles?.length ? accessBadgeLabel(item.roles) : null;
+
+                    if (item.comingSoon) {
+                      return (
+                        <div
+                          className="flex min-h-11 cursor-not-allowed items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-400 opacity-60 md:min-h-10"
+                          key={item.href}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                            <span className="min-w-0 leading-tight">
+                              <span className="block truncate">{item.label}</span>
+                              {item.sublabel ? <span className="block text-[11px] font-normal text-gray-300">{item.sublabel}</span> : null}
+                            </span>
+                            <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600">
+                              Bientôt
+                            </span>
+                          </span>
+                        </div>
+                      );
+                    }
 
                     return (
                       <Link
@@ -117,7 +223,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                           "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 md:min-h-10",
                           active && "bg-teal-50 text-teal-800",
                         )}
-                        href={item.href}
+                        href={item.href!}
                         key={item.href}
                         onClick={onClose}
                       >

@@ -20,8 +20,22 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  publicAccessCodeVersion: number | null
+  publicAccessCodeFailedAttempts: number | null
+  publicAccessCodeEmailCount: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  publicAccessCodeVersion: number | null
+  publicAccessCodeFailedAttempts: number | null
+  publicAccessCodeEmailCount: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -32,11 +46,20 @@ export type UserMinAggregateOutputType = {
   lastName: string | null
   role: $Enums.Role | null
   refreshTokenHash: string | null
+  publicAccessCodeHash: string | null
+  publicAccessCodeEncrypted: string | null
+  publicAccessCodeFingerprint: string | null
+  publicAccessCodeVersion: number | null
+  publicAccessCodeIssuedAt: Date | null
+  publicAccessCodeFailedAttempts: number | null
+  publicAccessCodeLockedUntil: Date | null
+  publicAccessCodeLastEmailedAt: Date | null
+  publicAccessCodeEmailWindowAt: Date | null
+  publicAccessCodeEmailCount: number | null
   isActive: boolean | null
   lastLoginAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
-  managerId: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -47,11 +70,20 @@ export type UserMaxAggregateOutputType = {
   lastName: string | null
   role: $Enums.Role | null
   refreshTokenHash: string | null
+  publicAccessCodeHash: string | null
+  publicAccessCodeEncrypted: string | null
+  publicAccessCodeFingerprint: string | null
+  publicAccessCodeVersion: number | null
+  publicAccessCodeIssuedAt: Date | null
+  publicAccessCodeFailedAttempts: number | null
+  publicAccessCodeLockedUntil: Date | null
+  publicAccessCodeLastEmailedAt: Date | null
+  publicAccessCodeEmailWindowAt: Date | null
+  publicAccessCodeEmailCount: number | null
   isActive: boolean | null
   lastLoginAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
-  managerId: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -62,14 +94,35 @@ export type UserCountAggregateOutputType = {
   lastName: number
   role: number
   refreshTokenHash: number
+  publicAccessCodeHash: number
+  publicAccessCodeEncrypted: number
+  publicAccessCodeFingerprint: number
+  publicAccessCodeVersion: number
+  publicAccessCodeIssuedAt: number
+  publicAccessCodeFailedAttempts: number
+  publicAccessCodeLockedUntil: number
+  publicAccessCodeLastEmailedAt: number
+  publicAccessCodeEmailWindowAt: number
+  publicAccessCodeEmailCount: number
   isActive: number
   lastLoginAt: number
   createdAt: number
   updatedAt: number
-  managerId: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  publicAccessCodeVersion?: true
+  publicAccessCodeFailedAttempts?: true
+  publicAccessCodeEmailCount?: true
+}
+
+export type UserSumAggregateInputType = {
+  publicAccessCodeVersion?: true
+  publicAccessCodeFailedAttempts?: true
+  publicAccessCodeEmailCount?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -79,11 +132,20 @@ export type UserMinAggregateInputType = {
   lastName?: true
   role?: true
   refreshTokenHash?: true
+  publicAccessCodeHash?: true
+  publicAccessCodeEncrypted?: true
+  publicAccessCodeFingerprint?: true
+  publicAccessCodeVersion?: true
+  publicAccessCodeIssuedAt?: true
+  publicAccessCodeFailedAttempts?: true
+  publicAccessCodeLockedUntil?: true
+  publicAccessCodeLastEmailedAt?: true
+  publicAccessCodeEmailWindowAt?: true
+  publicAccessCodeEmailCount?: true
   isActive?: true
   lastLoginAt?: true
   createdAt?: true
   updatedAt?: true
-  managerId?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -94,11 +156,20 @@ export type UserMaxAggregateInputType = {
   lastName?: true
   role?: true
   refreshTokenHash?: true
+  publicAccessCodeHash?: true
+  publicAccessCodeEncrypted?: true
+  publicAccessCodeFingerprint?: true
+  publicAccessCodeVersion?: true
+  publicAccessCodeIssuedAt?: true
+  publicAccessCodeFailedAttempts?: true
+  publicAccessCodeLockedUntil?: true
+  publicAccessCodeLastEmailedAt?: true
+  publicAccessCodeEmailWindowAt?: true
+  publicAccessCodeEmailCount?: true
   isActive?: true
   lastLoginAt?: true
   createdAt?: true
   updatedAt?: true
-  managerId?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -109,11 +180,20 @@ export type UserCountAggregateInputType = {
   lastName?: true
   role?: true
   refreshTokenHash?: true
+  publicAccessCodeHash?: true
+  publicAccessCodeEncrypted?: true
+  publicAccessCodeFingerprint?: true
+  publicAccessCodeVersion?: true
+  publicAccessCodeIssuedAt?: true
+  publicAccessCodeFailedAttempts?: true
+  publicAccessCodeLockedUntil?: true
+  publicAccessCodeLastEmailedAt?: true
+  publicAccessCodeEmailWindowAt?: true
+  publicAccessCodeEmailCount?: true
   isActive?: true
   lastLoginAt?: true
   createdAt?: true
   updatedAt?: true
-  managerId?: true
   _all?: true
 }
 
@@ -155,6 +235,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -185,6 +277,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -197,12 +291,23 @@ export type UserGroupByOutputType = {
   lastName: string
   role: $Enums.Role
   refreshTokenHash: string | null
+  publicAccessCodeHash: string | null
+  publicAccessCodeEncrypted: string | null
+  publicAccessCodeFingerprint: string | null
+  publicAccessCodeVersion: number
+  publicAccessCodeIssuedAt: Date | null
+  publicAccessCodeFailedAttempts: number
+  publicAccessCodeLockedUntil: Date | null
+  publicAccessCodeLastEmailedAt: Date | null
+  publicAccessCodeEmailWindowAt: Date | null
+  publicAccessCodeEmailCount: number
   isActive: boolean
   lastLoginAt: Date | null
   createdAt: Date
   updatedAt: Date
-  managerId: string | null
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -233,14 +338,24 @@ export type UserWhereInput = {
   lastName?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   refreshTokenHash?: Prisma.StringNullableFilter<"User"> | string | null
+  publicAccessCodeHash?: Prisma.StringNullableFilter<"User"> | string | null
+  publicAccessCodeEncrypted?: Prisma.StringNullableFilter<"User"> | string | null
+  publicAccessCodeFingerprint?: Prisma.StringNullableFilter<"User"> | string | null
+  publicAccessCodeVersion?: Prisma.IntFilter<"User"> | number
+  publicAccessCodeIssuedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFilter<"User"> | number
+  publicAccessCodeLockedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFilter<"User"> | number
   isActive?: Prisma.BoolFilter<"User"> | boolean
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  managerId?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleChecks?: Prisma.VehicleCheckListRelationFilter
-  manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  collaborators?: Prisma.UserListRelationFilter
+  managerAssignments?: Prisma.UserManagerAssignmentListRelationFilter
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentListRelationFilter
+  createdManagerAssignments?: Prisma.UserManagerAssignmentListRelationFilter
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryListRelationFilter
   externalRepairCompanies?: Prisma.ExternalRepairCompanyListRelationFilter
   externalRepairContacts?: Prisma.ExternalRepairContactListRelationFilter
@@ -248,6 +363,13 @@ export type UserWhereInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareListRelationFilter
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareListRelationFilter
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationListRelationFilter
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantListRelationFilter
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageListRelationFilter
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentListRelationFilter
+  receivedNotifications?: Prisma.NotificationListRelationFilter
+  actedNotifications?: Prisma.NotificationListRelationFilter
+  publicAccessSessions?: Prisma.PublicAccessSessionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -258,14 +380,24 @@ export type UserOrderByWithRelationInput = {
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
   refreshTokenHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeVersion?: Prisma.SortOrder
+  publicAccessCodeIssuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeFailedAttempts?: Prisma.SortOrder
+  publicAccessCodeLockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeLastEmailedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeEmailWindowAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeEmailCount?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  managerId?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleChecks?: Prisma.VehicleCheckOrderByRelationAggregateInput
-  manager?: Prisma.UserOrderByWithRelationInput
-  collaborators?: Prisma.UserOrderByRelationAggregateInput
+  managerAssignments?: Prisma.UserManagerAssignmentOrderByRelationAggregateInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentOrderByRelationAggregateInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentOrderByRelationAggregateInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryOrderByRelationAggregateInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyOrderByRelationAggregateInput
   externalRepairContacts?: Prisma.ExternalRepairContactOrderByRelationAggregateInput
@@ -273,11 +405,19 @@ export type UserOrderByWithRelationInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareOrderByRelationAggregateInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareOrderByRelationAggregateInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareOrderByRelationAggregateInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationOrderByRelationAggregateInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantOrderByRelationAggregateInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageOrderByRelationAggregateInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentOrderByRelationAggregateInput
+  receivedNotifications?: Prisma.NotificationOrderByRelationAggregateInput
+  actedNotifications?: Prisma.NotificationOrderByRelationAggregateInput
+  publicAccessSessions?: Prisma.PublicAccessSessionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  publicAccessCodeFingerprint?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -286,14 +426,23 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   lastName?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   refreshTokenHash?: Prisma.StringNullableFilter<"User"> | string | null
+  publicAccessCodeHash?: Prisma.StringNullableFilter<"User"> | string | null
+  publicAccessCodeEncrypted?: Prisma.StringNullableFilter<"User"> | string | null
+  publicAccessCodeVersion?: Prisma.IntFilter<"User"> | number
+  publicAccessCodeIssuedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFilter<"User"> | number
+  publicAccessCodeLockedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFilter<"User"> | number
   isActive?: Prisma.BoolFilter<"User"> | boolean
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  managerId?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleChecks?: Prisma.VehicleCheckListRelationFilter
-  manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  collaborators?: Prisma.UserListRelationFilter
+  managerAssignments?: Prisma.UserManagerAssignmentListRelationFilter
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentListRelationFilter
+  createdManagerAssignments?: Prisma.UserManagerAssignmentListRelationFilter
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryListRelationFilter
   externalRepairCompanies?: Prisma.ExternalRepairCompanyListRelationFilter
   externalRepairContacts?: Prisma.ExternalRepairContactListRelationFilter
@@ -301,7 +450,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareListRelationFilter
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareListRelationFilter
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareListRelationFilter
-}, "id" | "email">
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationListRelationFilter
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantListRelationFilter
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageListRelationFilter
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentListRelationFilter
+  receivedNotifications?: Prisma.NotificationListRelationFilter
+  actedNotifications?: Prisma.NotificationListRelationFilter
+  publicAccessSessions?: Prisma.PublicAccessSessionListRelationFilter
+}, "id" | "email" | "publicAccessCodeFingerprint">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -311,14 +467,25 @@ export type UserOrderByWithAggregationInput = {
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
   refreshTokenHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeVersion?: Prisma.SortOrder
+  publicAccessCodeIssuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeFailedAttempts?: Prisma.SortOrder
+  publicAccessCodeLockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeLastEmailedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeEmailWindowAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicAccessCodeEmailCount?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  managerId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -332,11 +499,20 @@ export type UserScalarWhereWithAggregatesInput = {
   lastName?: Prisma.StringWithAggregatesFilter<"User"> | string
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   refreshTokenHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  publicAccessCodeHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  publicAccessCodeEncrypted?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  publicAccessCodeFingerprint?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  publicAccessCodeVersion?: Prisma.IntWithAggregatesFilter<"User"> | number
+  publicAccessCodeIssuedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntWithAggregatesFilter<"User"> | number
+  publicAccessCodeLockedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntWithAggregatesFilter<"User"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
-  managerId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -347,13 +523,24 @@ export type UserCreateInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
@@ -361,6 +548,13 @@ export type UserCreateInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -371,13 +565,24 @@ export type UserUncheckedCreateInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
@@ -385,6 +590,13 @@ export type UserUncheckedCreateInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -395,13 +607,24 @@ export type UserUpdateInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
@@ -409,6 +632,13 @@ export type UserUpdateInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -419,13 +649,24 @@ export type UserUncheckedUpdateInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -433,6 +674,13 @@ export type UserUncheckedUpdateInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -443,11 +691,20 @@ export type UserCreateManyInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -458,6 +715,16 @@ export type UserUpdateManyMutationInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -472,26 +739,20 @@ export type UserUncheckedUpdateManyInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-}
-
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
-}
-
-export type UserListRelationFilter = {
-  every?: Prisma.UserWhereInput
-  some?: Prisma.UserWhereInput
-  none?: Prisma.UserWhereInput
-}
-
-export type UserOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -502,11 +763,26 @@ export type UserCountOrderByAggregateInput = {
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
   refreshTokenHash?: Prisma.SortOrder
+  publicAccessCodeHash?: Prisma.SortOrder
+  publicAccessCodeEncrypted?: Prisma.SortOrder
+  publicAccessCodeFingerprint?: Prisma.SortOrder
+  publicAccessCodeVersion?: Prisma.SortOrder
+  publicAccessCodeIssuedAt?: Prisma.SortOrder
+  publicAccessCodeFailedAttempts?: Prisma.SortOrder
+  publicAccessCodeLockedUntil?: Prisma.SortOrder
+  publicAccessCodeLastEmailedAt?: Prisma.SortOrder
+  publicAccessCodeEmailWindowAt?: Prisma.SortOrder
+  publicAccessCodeEmailCount?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  managerId?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  publicAccessCodeVersion?: Prisma.SortOrder
+  publicAccessCodeFailedAttempts?: Prisma.SortOrder
+  publicAccessCodeEmailCount?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -517,11 +793,20 @@ export type UserMaxOrderByAggregateInput = {
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
   refreshTokenHash?: Prisma.SortOrder
+  publicAccessCodeHash?: Prisma.SortOrder
+  publicAccessCodeEncrypted?: Prisma.SortOrder
+  publicAccessCodeFingerprint?: Prisma.SortOrder
+  publicAccessCodeVersion?: Prisma.SortOrder
+  publicAccessCodeIssuedAt?: Prisma.SortOrder
+  publicAccessCodeFailedAttempts?: Prisma.SortOrder
+  publicAccessCodeLockedUntil?: Prisma.SortOrder
+  publicAccessCodeLastEmailedAt?: Prisma.SortOrder
+  publicAccessCodeEmailWindowAt?: Prisma.SortOrder
+  publicAccessCodeEmailCount?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  managerId?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -532,11 +817,26 @@ export type UserMinOrderByAggregateInput = {
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
   refreshTokenHash?: Prisma.SortOrder
+  publicAccessCodeHash?: Prisma.SortOrder
+  publicAccessCodeEncrypted?: Prisma.SortOrder
+  publicAccessCodeFingerprint?: Prisma.SortOrder
+  publicAccessCodeVersion?: Prisma.SortOrder
+  publicAccessCodeIssuedAt?: Prisma.SortOrder
+  publicAccessCodeFailedAttempts?: Prisma.SortOrder
+  publicAccessCodeLockedUntil?: Prisma.SortOrder
+  publicAccessCodeLastEmailedAt?: Prisma.SortOrder
+  publicAccessCodeEmailWindowAt?: Prisma.SortOrder
+  publicAccessCodeEmailCount?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  managerId?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  publicAccessCodeVersion?: Prisma.SortOrder
+  publicAccessCodeFailedAttempts?: Prisma.SortOrder
+  publicAccessCodeEmailCount?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -544,24 +844,9 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
-export type UserCreateNestedOneWithoutCollaboratorsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCollaboratorsInput, Prisma.UserUncheckedCreateWithoutCollaboratorsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCollaboratorsInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserCreateNestedManyWithoutManagerInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutManagerInput, Prisma.UserUncheckedCreateWithoutManagerInput> | Prisma.UserCreateWithoutManagerInput[] | Prisma.UserUncheckedCreateWithoutManagerInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagerInput | Prisma.UserCreateOrConnectWithoutManagerInput[]
-  createMany?: Prisma.UserCreateManyManagerInputEnvelope
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-}
-
-export type UserUncheckedCreateNestedManyWithoutManagerInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutManagerInput, Prisma.UserUncheckedCreateWithoutManagerInput> | Prisma.UserCreateWithoutManagerInput[] | Prisma.UserUncheckedCreateWithoutManagerInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagerInput | Prisma.UserCreateOrConnectWithoutManagerInput[]
-  createMany?: Prisma.UserCreateManyManagerInputEnvelope
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -576,54 +861,82 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type UserUpdateOneWithoutCollaboratorsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCollaboratorsInput, Prisma.UserUncheckedCreateWithoutCollaboratorsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCollaboratorsInput
-  upsert?: Prisma.UserUpsertWithoutCollaboratorsInput
+export type UserCreateNestedOneWithoutPublicAccessSessionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPublicAccessSessionsInput, Prisma.UserUncheckedCreateWithoutPublicAccessSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPublicAccessSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPublicAccessSessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPublicAccessSessionsInput, Prisma.UserUncheckedCreateWithoutPublicAccessSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPublicAccessSessionsInput
+  upsert?: Prisma.UserUpsertWithoutPublicAccessSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPublicAccessSessionsInput, Prisma.UserUpdateWithoutPublicAccessSessionsInput>, Prisma.UserUncheckedUpdateWithoutPublicAccessSessionsInput>
+}
+
+export type UserCreateNestedOneWithoutManagerAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagerAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagerAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutManagedCollaboratorAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManagedCollaboratorAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagedCollaboratorAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagedCollaboratorAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutCreatedManagerAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedManagerAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedManagerAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutManagerAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagerAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagerAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutManagerAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutManagerAssignmentsInput, Prisma.UserUpdateWithoutManagerAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutManagerAssignmentsInput>
+}
+
+export type UserUpdateOneRequiredWithoutManagedCollaboratorAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManagedCollaboratorAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagedCollaboratorAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagedCollaboratorAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutManagedCollaboratorAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutManagedCollaboratorAssignmentsInput, Prisma.UserUpdateWithoutManagedCollaboratorAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutManagedCollaboratorAssignmentsInput>
+}
+
+export type UserUpdateOneWithoutCreatedManagerAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedManagerAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedManagerAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedManagerAssignmentsInput
   disconnect?: Prisma.UserWhereInput | boolean
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCollaboratorsInput, Prisma.UserUpdateWithoutCollaboratorsInput>, Prisma.UserUncheckedUpdateWithoutCollaboratorsInput>
-}
-
-export type UserUpdateManyWithoutManagerNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutManagerInput, Prisma.UserUncheckedCreateWithoutManagerInput> | Prisma.UserCreateWithoutManagerInput[] | Prisma.UserUncheckedCreateWithoutManagerInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagerInput | Prisma.UserCreateOrConnectWithoutManagerInput[]
-  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutManagerInput | Prisma.UserUpsertWithWhereUniqueWithoutManagerInput[]
-  createMany?: Prisma.UserCreateManyManagerInputEnvelope
-  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  update?: Prisma.UserUpdateWithWhereUniqueWithoutManagerInput | Prisma.UserUpdateWithWhereUniqueWithoutManagerInput[]
-  updateMany?: Prisma.UserUpdateManyWithWhereWithoutManagerInput | Prisma.UserUpdateManyWithWhereWithoutManagerInput[]
-  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-}
-
-export type UserUncheckedUpdateManyWithoutManagerNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutManagerInput, Prisma.UserUncheckedCreateWithoutManagerInput> | Prisma.UserCreateWithoutManagerInput[] | Prisma.UserUncheckedCreateWithoutManagerInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagerInput | Prisma.UserCreateOrConnectWithoutManagerInput[]
-  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutManagerInput | Prisma.UserUpsertWithWhereUniqueWithoutManagerInput[]
-  createMany?: Prisma.UserCreateManyManagerInputEnvelope
-  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  update?: Prisma.UserUpdateWithWhereUniqueWithoutManagerInput | Prisma.UserUpdateWithWhereUniqueWithoutManagerInput[]
-  updateMany?: Prisma.UserUpdateManyWithWhereWithoutManagerInput | Prisma.UserUpdateManyWithWhereWithoutManagerInput[]
-  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedManagerAssignmentsInput, Prisma.UserUpdateWithoutCreatedManagerAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutCreatedManagerAssignmentsInput>
 }
 
 export type UserCreateNestedOneWithoutVehicleChecksInput = {
@@ -734,6 +1047,98 @@ export type UserUpdateOneWithoutCreatedVehicleCheckDecisionSharesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedVehicleCheckDecisionSharesInput, Prisma.UserUpdateWithoutCreatedVehicleCheckDecisionSharesInput>, Prisma.UserUncheckedUpdateWithoutCreatedVehicleCheckDecisionSharesInput>
 }
 
+export type UserCreateNestedOneWithoutCreatedVehicleCheckConversationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedVehicleCheckConversationsInput, Prisma.UserUncheckedCreateWithoutCreatedVehicleCheckConversationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedVehicleCheckConversationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedVehicleCheckConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedVehicleCheckConversationsInput, Prisma.UserUncheckedCreateWithoutCreatedVehicleCheckConversationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedVehicleCheckConversationsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedVehicleCheckConversationsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedVehicleCheckConversationsInput, Prisma.UserUpdateWithoutCreatedVehicleCheckConversationsInput>, Prisma.UserUncheckedUpdateWithoutCreatedVehicleCheckConversationsInput>
+}
+
+export type UserCreateNestedOneWithoutVehicleCheckConversationParticipantsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckConversationParticipantsInput, Prisma.UserUncheckedCreateWithoutVehicleCheckConversationParticipantsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckConversationParticipantsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutVehicleCheckConversationParticipantsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckConversationParticipantsInput, Prisma.UserUncheckedCreateWithoutVehicleCheckConversationParticipantsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckConversationParticipantsInput
+  upsert?: Prisma.UserUpsertWithoutVehicleCheckConversationParticipantsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleCheckConversationParticipantsInput, Prisma.UserUpdateWithoutVehicleCheckConversationParticipantsInput>, Prisma.UserUncheckedUpdateWithoutVehicleCheckConversationParticipantsInput>
+}
+
+export type UserCreateNestedOneWithoutVehicleCheckMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckMessagesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutVehicleCheckMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckMessagesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckMessagesInput
+  upsert?: Prisma.UserUpsertWithoutVehicleCheckMessagesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleCheckMessagesInput, Prisma.UserUpdateWithoutVehicleCheckMessagesInput>, Prisma.UserUncheckedUpdateWithoutVehicleCheckMessagesInput>
+}
+
+export type UserCreateNestedOneWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUploadedVehicleCheckMessageAttachmentsInput, Prisma.UserUncheckedCreateWithoutUploadedVehicleCheckMessageAttachmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUploadedVehicleCheckMessageAttachmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutUploadedVehicleCheckMessageAttachmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUploadedVehicleCheckMessageAttachmentsInput, Prisma.UserUncheckedCreateWithoutUploadedVehicleCheckMessageAttachmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUploadedVehicleCheckMessageAttachmentsInput
+  upsert?: Prisma.UserUpsertWithoutUploadedVehicleCheckMessageAttachmentsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUploadedVehicleCheckMessageAttachmentsInput, Prisma.UserUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput>, Prisma.UserUncheckedUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput>
+}
+
+export type UserCreateNestedOneWithoutReceivedNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutActedNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActedNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReceivedNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutReceivedNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedNotificationsInput, Prisma.UserUpdateWithoutReceivedNotificationsInput>, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>
+}
+
+export type UserUpdateOneWithoutActedNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActedNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutActedNotificationsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutActedNotificationsInput, Prisma.UserUpdateWithoutActedNotificationsInput>, Prisma.UserUncheckedUpdateWithoutActedNotificationsInput>
+}
+
 export type UserCreateNestedOneWithoutVehicleCheckItemStatusHistoriesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckItemStatusHistoriesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleCheckItemStatusHistoriesInput
@@ -750,7 +1155,7 @@ export type UserUpdateOneWithoutVehicleCheckItemStatusHistoriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleCheckItemStatusHistoriesInput, Prisma.UserUpdateWithoutVehicleCheckItemStatusHistoriesInput>, Prisma.UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput>
 }
 
-export type UserCreateWithoutCollaboratorsInput = {
+export type UserCreateWithoutPublicAccessSessionsInput = {
   id?: string
   email: string
   password: string
@@ -758,12 +1163,24 @@ export type UserCreateWithoutCollaboratorsInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
@@ -771,9 +1188,15 @@ export type UserCreateWithoutCollaboratorsInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
-export type UserUncheckedCreateWithoutCollaboratorsInput = {
+export type UserUncheckedCreateWithoutPublicAccessSessionsInput = {
   id?: string
   email: string
   password: string
@@ -781,12 +1204,24 @@ export type UserUncheckedCreateWithoutCollaboratorsInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
@@ -794,81 +1229,31 @@ export type UserUncheckedCreateWithoutCollaboratorsInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
-export type UserCreateOrConnectWithoutCollaboratorsInput = {
+export type UserCreateOrConnectWithoutPublicAccessSessionsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutCollaboratorsInput, Prisma.UserUncheckedCreateWithoutCollaboratorsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPublicAccessSessionsInput, Prisma.UserUncheckedCreateWithoutPublicAccessSessionsInput>
 }
 
-export type UserCreateWithoutManagerInput = {
-  id?: string
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-  role?: $Enums.Role
-  refreshTokenHash?: string | null
-  isActive?: boolean
-  lastLoginAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
-  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
-  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
-  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
-  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
-  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
-  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
-  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
-}
-
-export type UserUncheckedCreateWithoutManagerInput = {
-  id?: string
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-  role?: $Enums.Role
-  refreshTokenHash?: string | null
-  isActive?: boolean
-  lastLoginAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
-  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
-  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
-  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
-  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
-  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
-  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
-  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
-}
-
-export type UserCreateOrConnectWithoutManagerInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutManagerInput, Prisma.UserUncheckedCreateWithoutManagerInput>
-}
-
-export type UserCreateManyManagerInputEnvelope = {
-  data: Prisma.UserCreateManyManagerInput | Prisma.UserCreateManyManagerInput[]
-  skipDuplicates?: boolean
-}
-
-export type UserUpsertWithoutCollaboratorsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutCollaboratorsInput, Prisma.UserUncheckedUpdateWithoutCollaboratorsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutCollaboratorsInput, Prisma.UserUncheckedCreateWithoutCollaboratorsInput>
+export type UserUpsertWithoutPublicAccessSessionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPublicAccessSessionsInput, Prisma.UserUncheckedUpdateWithoutPublicAccessSessionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPublicAccessSessionsInput, Prisma.UserUncheckedCreateWithoutPublicAccessSessionsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutCollaboratorsInput = {
+export type UserUpdateToOneWithWhereWithoutPublicAccessSessionsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutCollaboratorsInput, Prisma.UserUncheckedUpdateWithoutCollaboratorsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPublicAccessSessionsInput, Prisma.UserUncheckedUpdateWithoutPublicAccessSessionsInput>
 }
 
-export type UserUpdateWithoutCollaboratorsInput = {
+export type UserUpdateWithoutPublicAccessSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
@@ -876,12 +1261,24 @@ export type UserUpdateWithoutCollaboratorsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
@@ -889,9 +1286,15 @@ export type UserUpdateWithoutCollaboratorsInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
-export type UserUncheckedUpdateWithoutCollaboratorsInput = {
+export type UserUncheckedUpdateWithoutPublicAccessSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
@@ -899,12 +1302,24 @@ export type UserUncheckedUpdateWithoutCollaboratorsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -912,40 +1327,552 @@ export type UserUncheckedUpdateWithoutCollaboratorsInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
-export type UserUpsertWithWhereUniqueWithoutManagerInput = {
+export type UserCreateWithoutManagerAssignmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutManagerAssignmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutManagerAssignmentsInput = {
   where: Prisma.UserWhereUniqueInput
-  update: Prisma.XOR<Prisma.UserUpdateWithoutManagerInput, Prisma.UserUncheckedUpdateWithoutManagerInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutManagerInput, Prisma.UserUncheckedCreateWithoutManagerInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagerAssignmentsInput>
 }
 
-export type UserUpdateWithWhereUniqueWithoutManagerInput = {
+export type UserCreateWithoutManagedCollaboratorAssignmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutManagedCollaboratorAssignmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutManagedCollaboratorAssignmentsInput = {
   where: Prisma.UserWhereUniqueInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutManagerInput, Prisma.UserUncheckedUpdateWithoutManagerInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutManagedCollaboratorAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagedCollaboratorAssignmentsInput>
 }
 
-export type UserUpdateManyWithWhereWithoutManagerInput = {
-  where: Prisma.UserScalarWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutManagerInput>
+export type UserCreateWithoutCreatedManagerAssignmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
-export type UserScalarWhereInput = {
-  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-  OR?: Prisma.UserScalarWhereInput[]
-  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-  id?: Prisma.StringFilter<"User"> | string
-  email?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringFilter<"User"> | string
-  firstName?: Prisma.StringFilter<"User"> | string
-  lastName?: Prisma.StringFilter<"User"> | string
-  role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
-  refreshTokenHash?: Prisma.StringNullableFilter<"User"> | string | null
-  isActive?: Prisma.BoolFilter<"User"> | boolean
-  lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  managerId?: Prisma.StringNullableFilter<"User"> | string | null
+export type UserUncheckedCreateWithoutCreatedManagerAssignmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedManagerAssignmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedManagerAssignmentsInput>
+}
+
+export type UserUpsertWithoutManagerAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutManagerAssignmentsInput, Prisma.UserUncheckedUpdateWithoutManagerAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagerAssignmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutManagerAssignmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutManagerAssignmentsInput, Prisma.UserUncheckedUpdateWithoutManagerAssignmentsInput>
+}
+
+export type UserUpdateWithoutManagerAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutManagerAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutManagedCollaboratorAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutManagedCollaboratorAssignmentsInput, Prisma.UserUncheckedUpdateWithoutManagedCollaboratorAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutManagedCollaboratorAssignmentsInput, Prisma.UserUncheckedCreateWithoutManagedCollaboratorAssignmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutManagedCollaboratorAssignmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutManagedCollaboratorAssignmentsInput, Prisma.UserUncheckedUpdateWithoutManagedCollaboratorAssignmentsInput>
+}
+
+export type UserUpdateWithoutManagedCollaboratorAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutManagedCollaboratorAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutCreatedManagerAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedManagerAssignmentsInput, Prisma.UserUncheckedUpdateWithoutCreatedManagerAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedManagerAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedManagerAssignmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedManagerAssignmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedManagerAssignmentsInput, Prisma.UserUncheckedUpdateWithoutCreatedManagerAssignmentsInput>
+}
+
+export type UserUpdateWithoutCreatedManagerAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedManagerAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleChecksInput = {
@@ -956,12 +1883,23 @@ export type UserCreateWithoutVehicleChecksInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
@@ -969,6 +1907,13 @@ export type UserCreateWithoutVehicleChecksInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleChecksInput = {
@@ -979,12 +1924,23 @@ export type UserUncheckedCreateWithoutVehicleChecksInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
@@ -992,6 +1948,13 @@ export type UserUncheckedCreateWithoutVehicleChecksInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleChecksInput = {
@@ -1018,12 +1981,23 @@ export type UserUpdateWithoutVehicleChecksInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
@@ -1031,6 +2005,13 @@ export type UserUpdateWithoutVehicleChecksInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleChecksInput = {
@@ -1041,12 +2022,23 @@ export type UserUncheckedUpdateWithoutVehicleChecksInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1054,6 +2046,13 @@ export type UserUncheckedUpdateWithoutVehicleChecksInput = {
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExternalRepairCompaniesInput = {
@@ -1064,19 +2063,37 @@ export type UserCreateWithoutExternalRepairCompaniesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExternalRepairCompaniesInput = {
@@ -1087,19 +2104,37 @@ export type UserUncheckedCreateWithoutExternalRepairCompaniesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExternalRepairCompaniesInput = {
@@ -1126,19 +2161,37 @@ export type UserUpdateWithoutExternalRepairCompaniesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExternalRepairCompaniesInput = {
@@ -1149,19 +2202,37 @@ export type UserUncheckedUpdateWithoutExternalRepairCompaniesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExternalRepairContactsInput = {
@@ -1172,19 +2243,37 @@ export type UserCreateWithoutExternalRepairContactsInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExternalRepairContactsInput = {
@@ -1195,19 +2284,37 @@ export type UserUncheckedCreateWithoutExternalRepairContactsInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExternalRepairContactsInput = {
@@ -1234,19 +2341,37 @@ export type UserUpdateWithoutExternalRepairContactsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExternalRepairContactsInput = {
@@ -1257,19 +2382,37 @@ export type UserUncheckedUpdateWithoutExternalRepairContactsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckPublicSharesInput = {
@@ -1280,19 +2423,37 @@ export type UserCreateWithoutVehicleCheckPublicSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckPublicSharesInput = {
@@ -1303,19 +2464,37 @@ export type UserUncheckedCreateWithoutVehicleCheckPublicSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckPublicSharesInput = {
@@ -1331,19 +2510,37 @@ export type UserCreateWithoutVehicleRecoveredPublicSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput = {
@@ -1354,19 +2551,37 @@ export type UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleRecoveredPublicSharesInput = {
@@ -1393,19 +2608,37 @@ export type UserUpdateWithoutVehicleCheckPublicSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput = {
@@ -1416,19 +2649,37 @@ export type UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutVehicleRecoveredPublicSharesInput = {
@@ -1450,19 +2701,37 @@ export type UserUpdateWithoutVehicleRecoveredPublicSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput = {
@@ -1473,19 +2742,37 @@ export type UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckDecisionSharesInput = {
@@ -1496,19 +2783,37 @@ export type UserCreateWithoutVehicleCheckDecisionSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckDecisionSharesInput = {
@@ -1519,19 +2824,37 @@ export type UserUncheckedCreateWithoutVehicleCheckDecisionSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckDecisionSharesInput = {
@@ -1547,19 +2870,37 @@ export type UserCreateWithoutCreatedVehicleCheckDecisionSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -1570,19 +2911,37 @@ export type UserUncheckedCreateWithoutCreatedVehicleCheckDecisionSharesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -1609,19 +2968,37 @@ export type UserUpdateWithoutVehicleCheckDecisionSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckDecisionSharesInput = {
@@ -1632,19 +3009,37 @@ export type UserUncheckedUpdateWithoutVehicleCheckDecisionSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -1666,19 +3061,37 @@ export type UserUpdateWithoutCreatedVehicleCheckDecisionSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -1689,19 +3102,1117 @@ export type UserUncheckedUpdateWithoutCreatedVehicleCheckDecisionSharesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCreatedVehicleCheckConversationsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedVehicleCheckConversationsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedVehicleCheckConversationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedVehicleCheckConversationsInput, Prisma.UserUncheckedCreateWithoutCreatedVehicleCheckConversationsInput>
+}
+
+export type UserUpsertWithoutCreatedVehicleCheckConversationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedVehicleCheckConversationsInput, Prisma.UserUncheckedUpdateWithoutCreatedVehicleCheckConversationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedVehicleCheckConversationsInput, Prisma.UserUncheckedCreateWithoutCreatedVehicleCheckConversationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedVehicleCheckConversationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedVehicleCheckConversationsInput, Prisma.UserUncheckedUpdateWithoutCreatedVehicleCheckConversationsInput>
+}
+
+export type UserUpdateWithoutCreatedVehicleCheckConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedVehicleCheckConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutVehicleCheckConversationParticipantsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutVehicleCheckConversationParticipantsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutVehicleCheckConversationParticipantsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckConversationParticipantsInput, Prisma.UserUncheckedCreateWithoutVehicleCheckConversationParticipantsInput>
+}
+
+export type UserUpsertWithoutVehicleCheckConversationParticipantsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVehicleCheckConversationParticipantsInput, Prisma.UserUncheckedUpdateWithoutVehicleCheckConversationParticipantsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckConversationParticipantsInput, Prisma.UserUncheckedCreateWithoutVehicleCheckConversationParticipantsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVehicleCheckConversationParticipantsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVehicleCheckConversationParticipantsInput, Prisma.UserUncheckedUpdateWithoutVehicleCheckConversationParticipantsInput>
+}
+
+export type UserUpdateWithoutVehicleCheckConversationParticipantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVehicleCheckConversationParticipantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutVehicleCheckMessagesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutVehicleCheckMessagesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutVehicleCheckMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckMessagesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckMessagesInput>
+}
+
+export type UserUpsertWithoutVehicleCheckMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVehicleCheckMessagesInput, Prisma.UserUncheckedUpdateWithoutVehicleCheckMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleCheckMessagesInput, Prisma.UserUncheckedCreateWithoutVehicleCheckMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVehicleCheckMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVehicleCheckMessagesInput, Prisma.UserUncheckedUpdateWithoutVehicleCheckMessagesInput>
+}
+
+export type UserUpdateWithoutVehicleCheckMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVehicleCheckMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUploadedVehicleCheckMessageAttachmentsInput, Prisma.UserUncheckedCreateWithoutUploadedVehicleCheckMessageAttachmentsInput>
+}
+
+export type UserUpsertWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput, Prisma.UserUncheckedUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUploadedVehicleCheckMessageAttachmentsInput, Prisma.UserUncheckedCreateWithoutUploadedVehicleCheckMessageAttachmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput, Prisma.UserUncheckedUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput>
+}
+
+export type UserUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutReceivedNotificationsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReceivedNotificationsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReceivedNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+}
+
+export type UserCreateWithoutActedNotificationsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutActedNotificationsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutActedNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+}
+
+export type UserUpsertWithoutReceivedNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReceivedNotificationsInput, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReceivedNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReceivedNotificationsInput, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>
+}
+
+export type UserUpdateWithoutReceivedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReceivedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutActedNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutActedNotificationsInput, Prisma.UserUncheckedUpdateWithoutActedNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutActedNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutActedNotificationsInput, Prisma.UserUncheckedUpdateWithoutActedNotificationsInput>
+}
+
+export type UserUpdateWithoutActedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutActedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -1712,19 +4223,37 @@ export type UserCreateWithoutVehicleCheckItemStatusHistoriesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
-  manager?: Prisma.UserCreateNestedOneWithoutCollaboratorsInput
-  collaborators?: Prisma.UserCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -1735,19 +4264,37 @@ export type UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput = {
   lastName: string
   role?: $Enums.Role
   refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
   isActive?: boolean
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  managerId?: string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
-  collaborators?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -1774,19 +4321,37 @@ export type UserUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  manager?: Prisma.UserUpdateOneWithoutCollaboratorsNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -1797,93 +4362,37 @@ export type UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
   externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
   vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
   vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
   createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
-}
-
-export type UserCreateManyManagerInput = {
-  id?: string
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-  role?: $Enums.Role
-  refreshTokenHash?: string | null
-  isActive?: boolean
-  lastLoginAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type UserUpdateWithoutManagerInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  firstName?: Prisma.StringFieldUpdateOperationsInput | string
-  lastName?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUpdateManyWithoutManagerNestedInput
-  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
-  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
-  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
-  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
-  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
-  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
-  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
-}
-
-export type UserUncheckedUpdateWithoutManagerInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  firstName?: Prisma.StringFieldUpdateOperationsInput | string
-  lastName?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
-  collaborators?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
-  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
-  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
-  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
-  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
-  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
-  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
-  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
-}
-
-export type UserUncheckedUpdateManyWithoutManagerInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  firstName?: Prisma.StringFieldUpdateOperationsInput | string
-  lastName?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1893,7 +4402,9 @@ export type UserUncheckedUpdateManyWithoutManagerInput = {
 
 export type UserCountOutputType = {
   vehicleChecks: number
-  collaborators: number
+  managerAssignments: number
+  managedCollaboratorAssignments: number
+  createdManagerAssignments: number
   vehicleCheckItemStatusHistories: number
   externalRepairCompanies: number
   externalRepairContacts: number
@@ -1901,11 +4412,20 @@ export type UserCountOutputType = {
   vehicleRecoveredPublicShares: number
   vehicleCheckDecisionShares: number
   createdVehicleCheckDecisionShares: number
+  createdVehicleCheckConversations: number
+  vehicleCheckConversationParticipants: number
+  vehicleCheckMessages: number
+  uploadedVehicleCheckMessageAttachments: number
+  receivedNotifications: number
+  actedNotifications: number
+  publicAccessSessions: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleChecks?: boolean | UserCountOutputTypeCountVehicleChecksArgs
-  collaborators?: boolean | UserCountOutputTypeCountCollaboratorsArgs
+  managerAssignments?: boolean | UserCountOutputTypeCountManagerAssignmentsArgs
+  managedCollaboratorAssignments?: boolean | UserCountOutputTypeCountManagedCollaboratorAssignmentsArgs
+  createdManagerAssignments?: boolean | UserCountOutputTypeCountCreatedManagerAssignmentsArgs
   vehicleCheckItemStatusHistories?: boolean | UserCountOutputTypeCountVehicleCheckItemStatusHistoriesArgs
   externalRepairCompanies?: boolean | UserCountOutputTypeCountExternalRepairCompaniesArgs
   externalRepairContacts?: boolean | UserCountOutputTypeCountExternalRepairContactsArgs
@@ -1913,6 +4433,13 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   vehicleRecoveredPublicShares?: boolean | UserCountOutputTypeCountVehicleRecoveredPublicSharesArgs
   vehicleCheckDecisionShares?: boolean | UserCountOutputTypeCountVehicleCheckDecisionSharesArgs
   createdVehicleCheckDecisionShares?: boolean | UserCountOutputTypeCountCreatedVehicleCheckDecisionSharesArgs
+  createdVehicleCheckConversations?: boolean | UserCountOutputTypeCountCreatedVehicleCheckConversationsArgs
+  vehicleCheckConversationParticipants?: boolean | UserCountOutputTypeCountVehicleCheckConversationParticipantsArgs
+  vehicleCheckMessages?: boolean | UserCountOutputTypeCountVehicleCheckMessagesArgs
+  uploadedVehicleCheckMessageAttachments?: boolean | UserCountOutputTypeCountUploadedVehicleCheckMessageAttachmentsArgs
+  receivedNotifications?: boolean | UserCountOutputTypeCountReceivedNotificationsArgs
+  actedNotifications?: boolean | UserCountOutputTypeCountActedNotificationsArgs
+  publicAccessSessions?: boolean | UserCountOutputTypeCountPublicAccessSessionsArgs
 }
 
 /**
@@ -1935,8 +4462,22 @@ export type UserCountOutputTypeCountVehicleChecksArgs<ExtArgs extends runtime.Ty
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountCollaboratorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
+export type UserCountOutputTypeCountManagerAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserManagerAssignmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountManagedCollaboratorAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserManagerAssignmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedManagerAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserManagerAssignmentWhereInput
 }
 
 /**
@@ -1988,6 +4529,55 @@ export type UserCountOutputTypeCountCreatedVehicleCheckDecisionSharesArgs<ExtArg
   where?: Prisma.VehicleCheckDecisionShareWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedVehicleCheckConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckConversationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVehicleCheckConversationParticipantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckConversationParticipantWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVehicleCheckMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckMessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUploadedVehicleCheckMessageAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleCheckMessageAttachmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceivedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountActedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPublicAccessSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PublicAccessSessionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1997,14 +4587,24 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   lastName?: boolean
   role?: boolean
   refreshTokenHash?: boolean
+  publicAccessCodeHash?: boolean
+  publicAccessCodeEncrypted?: boolean
+  publicAccessCodeFingerprint?: boolean
+  publicAccessCodeVersion?: boolean
+  publicAccessCodeIssuedAt?: boolean
+  publicAccessCodeFailedAttempts?: boolean
+  publicAccessCodeLockedUntil?: boolean
+  publicAccessCodeLastEmailedAt?: boolean
+  publicAccessCodeEmailWindowAt?: boolean
+  publicAccessCodeEmailCount?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  managerId?: boolean
   vehicleChecks?: boolean | Prisma.User$vehicleChecksArgs<ExtArgs>
-  manager?: boolean | Prisma.User$managerArgs<ExtArgs>
-  collaborators?: boolean | Prisma.User$collaboratorsArgs<ExtArgs>
+  managerAssignments?: boolean | Prisma.User$managerAssignmentsArgs<ExtArgs>
+  managedCollaboratorAssignments?: boolean | Prisma.User$managedCollaboratorAssignmentsArgs<ExtArgs>
+  createdManagerAssignments?: boolean | Prisma.User$createdManagerAssignmentsArgs<ExtArgs>
   vehicleCheckItemStatusHistories?: boolean | Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs>
   externalRepairCompanies?: boolean | Prisma.User$externalRepairCompaniesArgs<ExtArgs>
   externalRepairContacts?: boolean | Prisma.User$externalRepairContactsArgs<ExtArgs>
@@ -2012,6 +4612,13 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   vehicleRecoveredPublicShares?: boolean | Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs>
   vehicleCheckDecisionShares?: boolean | Prisma.User$vehicleCheckDecisionSharesArgs<ExtArgs>
   createdVehicleCheckDecisionShares?: boolean | Prisma.User$createdVehicleCheckDecisionSharesArgs<ExtArgs>
+  createdVehicleCheckConversations?: boolean | Prisma.User$createdVehicleCheckConversationsArgs<ExtArgs>
+  vehicleCheckConversationParticipants?: boolean | Prisma.User$vehicleCheckConversationParticipantsArgs<ExtArgs>
+  vehicleCheckMessages?: boolean | Prisma.User$vehicleCheckMessagesArgs<ExtArgs>
+  uploadedVehicleCheckMessageAttachments?: boolean | Prisma.User$uploadedVehicleCheckMessageAttachmentsArgs<ExtArgs>
+  receivedNotifications?: boolean | Prisma.User$receivedNotificationsArgs<ExtArgs>
+  actedNotifications?: boolean | Prisma.User$actedNotificationsArgs<ExtArgs>
+  publicAccessSessions?: boolean | Prisma.User$publicAccessSessionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2023,12 +4630,20 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   lastName?: boolean
   role?: boolean
   refreshTokenHash?: boolean
+  publicAccessCodeHash?: boolean
+  publicAccessCodeEncrypted?: boolean
+  publicAccessCodeFingerprint?: boolean
+  publicAccessCodeVersion?: boolean
+  publicAccessCodeIssuedAt?: boolean
+  publicAccessCodeFailedAttempts?: boolean
+  publicAccessCodeLockedUntil?: boolean
+  publicAccessCodeLastEmailedAt?: boolean
+  publicAccessCodeEmailWindowAt?: boolean
+  publicAccessCodeEmailCount?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  managerId?: boolean
-  manager?: boolean | Prisma.User$managerArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2039,12 +4654,20 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   lastName?: boolean
   role?: boolean
   refreshTokenHash?: boolean
+  publicAccessCodeHash?: boolean
+  publicAccessCodeEncrypted?: boolean
+  publicAccessCodeFingerprint?: boolean
+  publicAccessCodeVersion?: boolean
+  publicAccessCodeIssuedAt?: boolean
+  publicAccessCodeFailedAttempts?: boolean
+  publicAccessCodeLockedUntil?: boolean
+  publicAccessCodeLastEmailedAt?: boolean
+  publicAccessCodeEmailWindowAt?: boolean
+  publicAccessCodeEmailCount?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  managerId?: boolean
-  manager?: boolean | Prisma.User$managerArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -2055,18 +4678,28 @@ export type UserSelectScalar = {
   lastName?: boolean
   role?: boolean
   refreshTokenHash?: boolean
+  publicAccessCodeHash?: boolean
+  publicAccessCodeEncrypted?: boolean
+  publicAccessCodeFingerprint?: boolean
+  publicAccessCodeVersion?: boolean
+  publicAccessCodeIssuedAt?: boolean
+  publicAccessCodeFailedAttempts?: boolean
+  publicAccessCodeLockedUntil?: boolean
+  publicAccessCodeLastEmailedAt?: boolean
+  publicAccessCodeEmailWindowAt?: boolean
+  publicAccessCodeEmailCount?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  managerId?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "role" | "refreshTokenHash" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "managerId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "role" | "refreshTokenHash" | "publicAccessCodeHash" | "publicAccessCodeEncrypted" | "publicAccessCodeFingerprint" | "publicAccessCodeVersion" | "publicAccessCodeIssuedAt" | "publicAccessCodeFailedAttempts" | "publicAccessCodeLockedUntil" | "publicAccessCodeLastEmailedAt" | "publicAccessCodeEmailWindowAt" | "publicAccessCodeEmailCount" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleChecks?: boolean | Prisma.User$vehicleChecksArgs<ExtArgs>
-  manager?: boolean | Prisma.User$managerArgs<ExtArgs>
-  collaborators?: boolean | Prisma.User$collaboratorsArgs<ExtArgs>
+  managerAssignments?: boolean | Prisma.User$managerAssignmentsArgs<ExtArgs>
+  managedCollaboratorAssignments?: boolean | Prisma.User$managedCollaboratorAssignmentsArgs<ExtArgs>
+  createdManagerAssignments?: boolean | Prisma.User$createdManagerAssignmentsArgs<ExtArgs>
   vehicleCheckItemStatusHistories?: boolean | Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs>
   externalRepairCompanies?: boolean | Prisma.User$externalRepairCompaniesArgs<ExtArgs>
   externalRepairContacts?: boolean | Prisma.User$externalRepairContactsArgs<ExtArgs>
@@ -2074,21 +4707,25 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   vehicleRecoveredPublicShares?: boolean | Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs>
   vehicleCheckDecisionShares?: boolean | Prisma.User$vehicleCheckDecisionSharesArgs<ExtArgs>
   createdVehicleCheckDecisionShares?: boolean | Prisma.User$createdVehicleCheckDecisionSharesArgs<ExtArgs>
+  createdVehicleCheckConversations?: boolean | Prisma.User$createdVehicleCheckConversationsArgs<ExtArgs>
+  vehicleCheckConversationParticipants?: boolean | Prisma.User$vehicleCheckConversationParticipantsArgs<ExtArgs>
+  vehicleCheckMessages?: boolean | Prisma.User$vehicleCheckMessagesArgs<ExtArgs>
+  uploadedVehicleCheckMessageAttachments?: boolean | Prisma.User$uploadedVehicleCheckMessageAttachmentsArgs<ExtArgs>
+  receivedNotifications?: boolean | Prisma.User$receivedNotificationsArgs<ExtArgs>
+  actedNotifications?: boolean | Prisma.User$actedNotificationsArgs<ExtArgs>
+  publicAccessSessions?: boolean | Prisma.User$publicAccessSessionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  manager?: boolean | Prisma.User$managerArgs<ExtArgs>
-}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  manager?: boolean | Prisma.User$managerArgs<ExtArgs>
-}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
     vehicleChecks: Prisma.$VehicleCheckPayload<ExtArgs>[]
-    manager: Prisma.$UserPayload<ExtArgs> | null
-    collaborators: Prisma.$UserPayload<ExtArgs>[]
+    managerAssignments: Prisma.$UserManagerAssignmentPayload<ExtArgs>[]
+    managedCollaboratorAssignments: Prisma.$UserManagerAssignmentPayload<ExtArgs>[]
+    createdManagerAssignments: Prisma.$UserManagerAssignmentPayload<ExtArgs>[]
     vehicleCheckItemStatusHistories: Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>[]
     externalRepairCompanies: Prisma.$ExternalRepairCompanyPayload<ExtArgs>[]
     externalRepairContacts: Prisma.$ExternalRepairContactPayload<ExtArgs>[]
@@ -2096,6 +4733,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     vehicleRecoveredPublicShares: Prisma.$VehicleCheckPublicSharePayload<ExtArgs>[]
     vehicleCheckDecisionShares: Prisma.$VehicleCheckDecisionSharePayload<ExtArgs>[]
     createdVehicleCheckDecisionShares: Prisma.$VehicleCheckDecisionSharePayload<ExtArgs>[]
+    createdVehicleCheckConversations: Prisma.$VehicleCheckConversationPayload<ExtArgs>[]
+    vehicleCheckConversationParticipants: Prisma.$VehicleCheckConversationParticipantPayload<ExtArgs>[]
+    vehicleCheckMessages: Prisma.$VehicleCheckMessagePayload<ExtArgs>[]
+    uploadedVehicleCheckMessageAttachments: Prisma.$VehicleCheckMessageAttachmentPayload<ExtArgs>[]
+    receivedNotifications: Prisma.$NotificationPayload<ExtArgs>[]
+    actedNotifications: Prisma.$NotificationPayload<ExtArgs>[]
+    publicAccessSessions: Prisma.$PublicAccessSessionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2105,11 +4749,20 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     lastName: string
     role: $Enums.Role
     refreshTokenHash: string | null
+    publicAccessCodeHash: string | null
+    publicAccessCodeEncrypted: string | null
+    publicAccessCodeFingerprint: string | null
+    publicAccessCodeVersion: number
+    publicAccessCodeIssuedAt: Date | null
+    publicAccessCodeFailedAttempts: number
+    publicAccessCodeLockedUntil: Date | null
+    publicAccessCodeLastEmailedAt: Date | null
+    publicAccessCodeEmailWindowAt: Date | null
+    publicAccessCodeEmailCount: number
     isActive: boolean
     lastLoginAt: Date | null
     createdAt: Date
     updatedAt: Date
-    managerId: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2505,8 +5158,9 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   vehicleChecks<T extends Prisma.User$vehicleChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  manager<T extends Prisma.User$managerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$managerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  collaborators<T extends Prisma.User$collaboratorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$collaboratorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  managerAssignments<T extends Prisma.User$managerAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$managerAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserManagerAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  managedCollaboratorAssignments<T extends Prisma.User$managedCollaboratorAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$managedCollaboratorAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserManagerAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdManagerAssignments<T extends Prisma.User$createdManagerAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdManagerAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserManagerAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vehicleCheckItemStatusHistories<T extends Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleCheckItemStatusHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckItemStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   externalRepairCompanies<T extends Prisma.User$externalRepairCompaniesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$externalRepairCompaniesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExternalRepairCompanyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   externalRepairContacts<T extends Prisma.User$externalRepairContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$externalRepairContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExternalRepairContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2514,6 +5168,13 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   vehicleRecoveredPublicShares<T extends Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleRecoveredPublicSharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPublicSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vehicleCheckDecisionShares<T extends Prisma.User$vehicleCheckDecisionSharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleCheckDecisionSharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckDecisionSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdVehicleCheckDecisionShares<T extends Prisma.User$createdVehicleCheckDecisionSharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdVehicleCheckDecisionSharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckDecisionSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdVehicleCheckConversations<T extends Prisma.User$createdVehicleCheckConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdVehicleCheckConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleCheckConversationParticipants<T extends Prisma.User$vehicleCheckConversationParticipantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleCheckConversationParticipantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckConversationParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleCheckMessages<T extends Prisma.User$vehicleCheckMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleCheckMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  uploadedVehicleCheckMessageAttachments<T extends Prisma.User$uploadedVehicleCheckMessageAttachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$uploadedVehicleCheckMessageAttachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckMessageAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receivedNotifications<T extends Prisma.User$receivedNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  actedNotifications<T extends Prisma.User$actedNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$actedNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  publicAccessSessions<T extends Prisma.User$publicAccessSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$publicAccessSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublicAccessSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2550,11 +5211,20 @@ export interface UserFieldRefs {
   readonly lastName: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly refreshTokenHash: Prisma.FieldRef<"User", 'String'>
+  readonly publicAccessCodeHash: Prisma.FieldRef<"User", 'String'>
+  readonly publicAccessCodeEncrypted: Prisma.FieldRef<"User", 'String'>
+  readonly publicAccessCodeFingerprint: Prisma.FieldRef<"User", 'String'>
+  readonly publicAccessCodeVersion: Prisma.FieldRef<"User", 'Int'>
+  readonly publicAccessCodeIssuedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly publicAccessCodeFailedAttempts: Prisma.FieldRef<"User", 'Int'>
+  readonly publicAccessCodeLockedUntil: Prisma.FieldRef<"User", 'DateTime'>
+  readonly publicAccessCodeLastEmailedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly publicAccessCodeEmailWindowAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly publicAccessCodeEmailCount: Prisma.FieldRef<"User", 'Int'>
   readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
-  readonly managerId: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -2809,10 +5479,6 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2883,10 +5549,6 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2980,46 +5642,75 @@ export type User$vehicleChecksArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * User.manager
+ * User.managerAssignments
  */
-export type User$managerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$managerAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the UserManagerAssignment
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.UserManagerAssignmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the UserManagerAssignment
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.UserManagerAssignmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
+  include?: Prisma.UserManagerAssignmentInclude<ExtArgs> | null
+  where?: Prisma.UserManagerAssignmentWhereInput
+  orderBy?: Prisma.UserManagerAssignmentOrderByWithRelationInput | Prisma.UserManagerAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.UserManagerAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserManagerAssignmentScalarFieldEnum | Prisma.UserManagerAssignmentScalarFieldEnum[]
 }
 
 /**
- * User.collaborators
+ * User.managedCollaboratorAssignments
  */
-export type User$collaboratorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$managedCollaboratorAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the UserManagerAssignment
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.UserManagerAssignmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the UserManagerAssignment
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.UserManagerAssignmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
-  cursor?: Prisma.UserWhereUniqueInput
+  include?: Prisma.UserManagerAssignmentInclude<ExtArgs> | null
+  where?: Prisma.UserManagerAssignmentWhereInput
+  orderBy?: Prisma.UserManagerAssignmentOrderByWithRelationInput | Prisma.UserManagerAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.UserManagerAssignmentWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  distinct?: Prisma.UserManagerAssignmentScalarFieldEnum | Prisma.UserManagerAssignmentScalarFieldEnum[]
+}
+
+/**
+ * User.createdManagerAssignments
+ */
+export type User$createdManagerAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserManagerAssignment
+   */
+  select?: Prisma.UserManagerAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserManagerAssignment
+   */
+  omit?: Prisma.UserManagerAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserManagerAssignmentInclude<ExtArgs> | null
+  where?: Prisma.UserManagerAssignmentWhereInput
+  orderBy?: Prisma.UserManagerAssignmentOrderByWithRelationInput | Prisma.UserManagerAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.UserManagerAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserManagerAssignmentScalarFieldEnum | Prisma.UserManagerAssignmentScalarFieldEnum[]
 }
 
 /**
@@ -3188,6 +5879,174 @@ export type User$createdVehicleCheckDecisionSharesArgs<ExtArgs extends runtime.T
   take?: number
   skip?: number
   distinct?: Prisma.VehicleCheckDecisionShareScalarFieldEnum | Prisma.VehicleCheckDecisionShareScalarFieldEnum[]
+}
+
+/**
+ * User.createdVehicleCheckConversations
+ */
+export type User$createdVehicleCheckConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckConversation
+   */
+  select?: Prisma.VehicleCheckConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckConversation
+   */
+  omit?: Prisma.VehicleCheckConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckConversationInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckConversationWhereInput
+  orderBy?: Prisma.VehicleCheckConversationOrderByWithRelationInput | Prisma.VehicleCheckConversationOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckConversationScalarFieldEnum | Prisma.VehicleCheckConversationScalarFieldEnum[]
+}
+
+/**
+ * User.vehicleCheckConversationParticipants
+ */
+export type User$vehicleCheckConversationParticipantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckConversationParticipant
+   */
+  select?: Prisma.VehicleCheckConversationParticipantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckConversationParticipant
+   */
+  omit?: Prisma.VehicleCheckConversationParticipantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckConversationParticipantInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckConversationParticipantWhereInput
+  orderBy?: Prisma.VehicleCheckConversationParticipantOrderByWithRelationInput | Prisma.VehicleCheckConversationParticipantOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckConversationParticipantWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckConversationParticipantScalarFieldEnum | Prisma.VehicleCheckConversationParticipantScalarFieldEnum[]
+}
+
+/**
+ * User.vehicleCheckMessages
+ */
+export type User$vehicleCheckMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckMessage
+   */
+  select?: Prisma.VehicleCheckMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckMessage
+   */
+  omit?: Prisma.VehicleCheckMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckMessageInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckMessageWhereInput
+  orderBy?: Prisma.VehicleCheckMessageOrderByWithRelationInput | Prisma.VehicleCheckMessageOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckMessageScalarFieldEnum | Prisma.VehicleCheckMessageScalarFieldEnum[]
+}
+
+/**
+ * User.uploadedVehicleCheckMessageAttachments
+ */
+export type User$uploadedVehicleCheckMessageAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleCheckMessageAttachment
+   */
+  select?: Prisma.VehicleCheckMessageAttachmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleCheckMessageAttachment
+   */
+  omit?: Prisma.VehicleCheckMessageAttachmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleCheckMessageAttachmentInclude<ExtArgs> | null
+  where?: Prisma.VehicleCheckMessageAttachmentWhereInput
+  orderBy?: Prisma.VehicleCheckMessageAttachmentOrderByWithRelationInput | Prisma.VehicleCheckMessageAttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleCheckMessageAttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleCheckMessageAttachmentScalarFieldEnum | Prisma.VehicleCheckMessageAttachmentScalarFieldEnum[]
+}
+
+/**
+ * User.receivedNotifications
+ */
+export type User$receivedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.actedNotifications
+ */
+export type User$actedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.publicAccessSessions
+ */
+export type User$publicAccessSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PublicAccessSession
+   */
+  select?: Prisma.PublicAccessSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PublicAccessSession
+   */
+  omit?: Prisma.PublicAccessSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PublicAccessSessionInclude<ExtArgs> | null
+  where?: Prisma.PublicAccessSessionWhereInput
+  orderBy?: Prisma.PublicAccessSessionOrderByWithRelationInput | Prisma.PublicAccessSessionOrderByWithRelationInput[]
+  cursor?: Prisma.PublicAccessSessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PublicAccessSessionScalarFieldEnum | Prisma.PublicAccessSessionScalarFieldEnum[]
 }
 
 /**

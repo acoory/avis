@@ -12,12 +12,16 @@ export class CloudinaryService {
   private readonly apiKey: string;
   private readonly apiSecret: string;
   private readonly folder: string;
+  private readonly conversationFolder: string;
 
   constructor(configService: ConfigService) {
     this.cloudName = configService.get<string>('CLOUDINARY_CLOUD_NAME') ?? '';
     this.apiKey = configService.get<string>('CLOUDINARY_API_KEY') ?? '';
     this.apiSecret = configService.get<string>('CLOUDINARY_API_SECRET') ?? '';
     this.folder = configService.get<string>('CLOUDINARY_FOLDER') ?? 'avis';
+    this.conversationFolder =
+      configService.get<string>('CLOUDINARY_CONVERSATION_FOLDER') ??
+      `${this.folder}/conversations`;
   }
 
   createUploadSignature(userId: string) {
@@ -42,7 +46,45 @@ export class CloudinaryService {
     };
   }
 
-  async destroy(publicId: string) {
+  createConversationUploadSignature(vehicleCheckId: string, userId: string) {
+    this.ensureConfigured();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const publicId = randomUUID();
+    const folder = `${this.conversationFolder}/${vehicleCheckId}/${userId}`;
+    const allowedFormats = 'jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx';
+    const maxFileSize = 10 * 1024 * 1024;
+    const params = {
+      allowed_formats: allowedFormats,
+      folder,
+      overwrite: 'false',
+      public_id: publicId,
+      timestamp: timestamp.toString(),
+    };
+
+    return {
+      allowedFormats: allowedFormats.split(','),
+      apiKey: this.apiKey,
+      cloudName: this.cloudName,
+      folder,
+      maxFileSize,
+      publicId,
+      timestamp,
+      signature: this.sign(params),
+      uploadUrl: `https://api.cloudinary.com/v1_1/${this.cloudName}/auto/upload`,
+    };
+  }
+
+  isConversationAsset(
+    publicId: string,
+    vehicleCheckId: string,
+    userId: string,
+  ) {
+    return publicId.startsWith(
+      `${this.conversationFolder}/${vehicleCheckId}/${userId}/`,
+    );
+  }
+
+  async destroy(publicId: string, resourceType = 'image') {
     this.ensureConfigured();
     if (!publicId.startsWith(`${this.folder}/`)) {
       throw new BadRequestException('Invalid Cloudinary photo folder');
@@ -62,7 +104,7 @@ export class CloudinaryService {
       timestamp: timestamp.toString(),
     });
     const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`,
+      `https://api.cloudinary.com/v1_1/${this.cloudName}/${resourceType}/destroy`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

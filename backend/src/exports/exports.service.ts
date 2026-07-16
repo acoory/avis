@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/client';
 import ExcelJS from 'exceljs';
-import { Prisma, Role, VehicleCheckItemOperationalStatus } from '../../prisma/generated/client.cjs';
+import {
+  Prisma,
+  Role,
+  VehicleCheckItemOperationalStatus,
+} from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { formatLicensePlate } from '../common/utils/license-plate';
 import { PrismaService } from '../prisma/prisma.service';
@@ -78,7 +82,11 @@ export class ExportsService {
     }));
 
     const totalColumns = [
-      { header: 'Economie réalisée', key: 'totalInternalSavingAmount', width: 18 },
+      {
+        header: 'Economie réalisée',
+        key: 'totalInternalSavingAmount',
+        width: 18,
+      },
     ];
 
     const columns = [...fixedColumns, ...repairColumns, ...totalColumns];
@@ -107,8 +115,12 @@ export class ExportsService {
       );
 
       for (const item of activeItems) {
-        const currentQuantity = quantitiesByRepairCode.get(item.repairType.code) ?? 0;
-        quantitiesByRepairCode.set(item.repairType.code, currentQuantity + item.quantity);
+        const currentQuantity =
+          quantitiesByRepairCode.get(item.repairType.code) ?? 0;
+        quantitiesByRepairCode.set(
+          item.repairType.code,
+          currentQuantity + item.quantity,
+        );
       }
 
       const row: Record<string, string | number | Date | null> = {
@@ -125,13 +137,19 @@ export class ExportsService {
       };
 
       for (const repairType of orderedRepairTypes) {
-        row[`repair_${repairType.code}`] = quantitiesByRepairCode.get(repairType.code) ?? '';
+        row[`repair_${repairType.code}`] =
+          quantitiesByRepairCode.get(repairType.code) ?? '';
       }
 
       worksheet.addRow(row);
     }
 
-    this.styleSummaryBody(worksheet, columns.length, fixedColumns.length, repairColumns.length);
+    this.styleSummaryBody(
+      worksheet,
+      columns.length,
+      fixedColumns.length,
+      repairColumns.length,
+    );
 
     const repairTypesWorksheet = workbook.addWorksheet('Type reparations');
     repairTypesWorksheet.columns = [
@@ -180,7 +198,16 @@ export class ExportsService {
 
     if (user.role === Role.MANAGER) {
       return {
-        OR: [{ collaboratorId: user.sub }, { collaborator: { managerId: user.sub } }],
+        OR: [
+          { collaboratorId: user.sub },
+          {
+            collaborator: {
+              managerAssignments: {
+                some: { managerId: user.sub, isActive: true },
+              },
+            },
+          },
+        ],
       };
     }
 
@@ -202,7 +229,9 @@ export class ExportsService {
   }
 
   private orderRepairTypes<T extends { code: string }>(repairTypes: T[]): T[] {
-    const positionByCode = new Map(preferredRepairTypeCodes.map((code, index) => [code, index]));
+    const positionByCode = new Map(
+      preferredRepairTypeCodes.map((code, index) => [code, index]),
+    );
 
     return [...repairTypes].sort((a, b) => {
       const positionA = positionByCode.get(a.code) ?? Number.MAX_SAFE_INTEGER;
@@ -221,7 +250,11 @@ export class ExportsService {
       pattern: 'solid',
       fgColor: { argb: 'FFD9D9D9' },
     };
-    header.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    header.alignment = {
+      vertical: 'middle',
+      horizontal: 'center',
+      wrapText: true,
+    };
     header.height = 42;
     header.eachCell((cell) => {
       cell.border = {
@@ -253,14 +286,22 @@ export class ExportsService {
           bottom: { style: 'thin', color: { argb: 'FF9CA3AF' } },
           right: { style: 'thin', color: { argb: 'FF9CA3AF' } },
         };
-        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: 'center',
+          wrapText: true,
+        };
       });
     });
 
     worksheet.getColumn('checkDate').numFmt = 'dd/mm/yyyy';
     worksheet.getColumn('totalInternalSavingAmount').numFmt = '#,##0.00 €';
 
-    for (let rowNumber = 4; rowNumber <= Math.max(12, worksheet.rowCount); rowNumber += 1) {
+    for (
+      let rowNumber = 4;
+      rowNumber <= Math.max(12, worksheet.rowCount);
+      rowNumber += 1
+    ) {
       const row = worksheet.getRow(rowNumber);
       for (let columnIndex = 1; columnIndex <= columnCount; columnIndex += 1) {
         const cell = row.getCell(columnIndex);
@@ -270,15 +311,26 @@ export class ExportsService {
           bottom: { style: 'thin', color: { argb: 'FF9CA3AF' } },
           right: { style: 'thin', color: { argb: 'FF9CA3AF' } },
         };
-        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: 'center',
+          wrapText: true,
+        };
       }
       row.height = 22;
     }
 
     const firstRepairColumn = fixedColumnCount + 1;
     const lastRepairColumn = fixedColumnCount + repairColumnCount;
-    for (let columnIndex = firstRepairColumn; columnIndex <= lastRepairColumn; columnIndex += 1) {
-      worksheet.getColumn(columnIndex).alignment = { horizontal: 'center', vertical: 'middle' };
+    for (
+      let columnIndex = firstRepairColumn;
+      columnIndex <= lastRepairColumn;
+      columnIndex += 1
+    ) {
+      worksheet.getColumn(columnIndex).alignment = {
+        horizontal: 'center',
+        vertical: 'middle',
+      };
     }
   }
 
@@ -290,7 +342,11 @@ export class ExportsService {
       pattern: 'solid',
       fgColor: { argb: 'FF111827' },
     };
-    header.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    header.alignment = {
+      vertical: 'middle',
+      horizontal: 'center',
+      wrapText: true,
+    };
     worksheet.autoFilter = {
       from: { row: 1, column: 1 },
       to: { row: 1, column: worksheet.columnCount },
@@ -299,7 +355,11 @@ export class ExportsService {
 
   private styleRepairTypesWorksheet(worksheet: ExcelJS.Worksheet) {
     worksheet.getRow(1).height = 26;
-    worksheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'FF111827' } };
+    worksheet.getCell('A1').font = {
+      bold: true,
+      size: 16,
+      color: { argb: 'FF111827' },
+    };
 
     const header = worksheet.getRow(3);
     header.font = { bold: true, color: { argb: 'FF1F2937' } };
@@ -317,7 +377,11 @@ export class ExportsService {
     };
     worksheet.getColumn('savingAmount').numFmt = '#,##0.00 €';
 
-    for (let rowNumber = 3; rowNumber <= Math.max(11, worksheet.rowCount); rowNumber += 1) {
+    for (
+      let rowNumber = 3;
+      rowNumber <= Math.max(11, worksheet.rowCount);
+      rowNumber += 1
+    ) {
       const row = worksheet.getRow(rowNumber);
       row.eachCell({ includeEmpty: true }, (cell, columnNumber) => {
         if (columnNumber > 2) return;

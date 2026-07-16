@@ -22,7 +22,7 @@ export * as $Enums from './enums.cjs'
 export * from "./enums.cjs"
 /**
  * ## Prisma Client
- *
+ * 
  * Type-safe database client for TypeScript
  * @example
  * ```
@@ -32,7 +32,7 @@ export * from "./enums.cjs"
  * // Fetch zero or more Users
  * const users = await prisma.user.findMany()
  * ```
- *
+ * 
  * Read more in our [docs](https://pris.ly/d/client).
  */
 export const PrismaClient = $Class.getPrismaClientClass()
@@ -44,6 +44,16 @@ export { Prisma }
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model PublicAccessSession
+ * 
+ */
+export type PublicAccessSession = Prisma.PublicAccessSessionModel
+/**
+ * Model UserManagerAssignment
+ * 
+ */
+export type UserManagerAssignment = Prisma.UserManagerAssignmentModel
 /**
  * Model Agency
  * 
@@ -101,9 +111,44 @@ export type ExternalRepairContact = Prisma.ExternalRepairContactModel
 export type VehicleCheckPublicShare = Prisma.VehicleCheckPublicShareModel
 /**
  * Model VehicleCheckDecisionShare
- *
+ * 
  */
 export type VehicleCheckDecisionShare = Prisma.VehicleCheckDecisionShareModel
+/**
+ * Model VehicleCheckConversation
+ * 
+ */
+export type VehicleCheckConversation = Prisma.VehicleCheckConversationModel
+/**
+ * Model VehicleCheckConversationParticipant
+ * 
+ */
+export type VehicleCheckConversationParticipant = Prisma.VehicleCheckConversationParticipantModel
+/**
+ * Model VehicleCheckMessage
+ * 
+ */
+export type VehicleCheckMessage = Prisma.VehicleCheckMessageModel
+/**
+ * Model VehicleCheckMessageAttachment
+ * 
+ */
+export type VehicleCheckMessageAttachment = Prisma.VehicleCheckMessageAttachmentModel
+/**
+ * Model VehicleCheckMessageMention
+ * 
+ */
+export type VehicleCheckMessageMention = Prisma.VehicleCheckMessageMentionModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
+ * Model NotificationEmail
+ * 
+ */
+export type NotificationEmail = Prisma.NotificationEmailModel
 /**
  * Model VehicleCheckItem
  * 

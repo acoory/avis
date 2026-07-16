@@ -27,7 +27,13 @@ export class DamagePhotosService {
                   vehicleCheck: {
                     OR: [
                       { collaboratorId: user.sub },
-                      { collaborator: { managerId: user.sub } },
+                      {
+                        collaborator: {
+                          managerAssignments: {
+                            some: { managerId: user.sub, isActive: true },
+                          },
+                        },
+                      },
                     ],
                   },
                 },
@@ -51,12 +57,16 @@ export class DamagePhotosService {
     });
 
     if (!photo && !publicId.startsWith(`avis/${user.sub}/`)) {
-      throw new ForbiddenException('This uploaded photo does not belong to the current user');
+      throw new ForbiddenException(
+        'This uploaded photo does not belong to the current user',
+      );
     }
 
     await this.cloudinary.destroy(publicId);
     if (photo) {
-      await this.prisma.vehicleCheckItemPhoto.delete({ where: { id: photo.id } });
+      await this.prisma.vehicleCheckItemPhoto.delete({
+        where: { id: photo.id },
+      });
     }
 
     return { success: true };

@@ -343,11 +343,13 @@ export function RepairItemsTable({
             header: "Element",
             className: "px-4 py-3 font-medium text-gray-950",
             cell: (item) => (
-              <RepairItemOpenButton
-                canOpen={canEditOperationalStatus}
-                label={item.vehiclePart.name}
-                onClick={() => openItemSheet(item)}
-              />
+              <span className="scroll-mt-20 rounded-sm transition" id={`repair-${item.id}`}>
+                <RepairItemOpenButton
+                  canOpen={canEditOperationalStatus}
+                  label={item.vehiclePart.name}
+                  onClick={() => openItemSheet(item)}
+                />
+              </span>
             ),
             sortValue: (item) => item.vehiclePart.name,
             searchValue: (item) => item.vehiclePart.name,

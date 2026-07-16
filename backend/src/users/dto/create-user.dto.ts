@@ -1,4 +1,13 @@
-import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MinLength,
+} from 'class-validator';
 import { Role } from '../../../prisma/generated/client.cjs';
 
 export class CreateUserDto {
@@ -23,6 +32,7 @@ export class CreateUserDto {
   isActive?: boolean;
 
   @IsOptional()
-  @IsUUID()
-  managerId?: string;
+  @IsArray()
+  @IsUUID('4', { each: true })
+  managerIds?: string[];
 }

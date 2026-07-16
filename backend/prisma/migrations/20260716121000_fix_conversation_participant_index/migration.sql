@@ -1,0 +1,2 @@
+-- RenameIndex
+ALTER INDEX "VehicleCheckConversationParticipant_conversationId_lastReadAt_i" RENAME TO "VehicleCheckConversationParticipant_conversationId_lastRead_idx";

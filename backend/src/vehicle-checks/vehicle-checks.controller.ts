@@ -41,8 +41,11 @@ export class VehicleChecksController {
   }
 
   @Get('decision-managers')
-  findDecisionManagers(@CurrentUser() user: CurrentUserPayload) {
-    return this.vehicleChecksService.findDecisionManagers(user);
+  findDecisionManagers(
+    @CurrentUser() user: CurrentUserPayload,
+    @Query('vehicleCheckId') vehicleCheckId?: string,
+  ) {
+    return this.vehicleChecksService.findDecisionManagers(user, vehicleCheckId);
   }
 
   @Post('duplicate-check')

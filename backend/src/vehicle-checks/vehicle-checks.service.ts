@@ -7,10 +7,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
 import {
+  NotificationType,
   PartOrderStatus,
   Prisma,
   RepairDecisionStatus,
   Role,
+  VehicleCheckConversationParticipantRole,
+  VehicleCheckConversationStatus,
   VehicleCheckItemOperationalStatus,
   VehicleCheckStatus,
 } from '../../prisma/generated/client.cjs';
@@ -26,6 +29,8 @@ import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { RepairDecisionService } from '../repair-decisions/repair-decision.service';
 import { CloudinaryService } from '../damage-photos/cloudinary.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { PublicAccessCodeService } from '../public-access/public-access-code.service';
 import { CheckVehicleCheckDuplicateDto } from './dto/check-vehicle-check-duplicate.dto';
 import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
@@ -98,6 +103,8 @@ const vehicleCheckInclude = {
     },
   },
   decisionShares: {
+    where: { isEnabled: true },
+    orderBy: { createdAt: 'desc' as const },
     select: {
       createdAt: true,
       emailSentAt: true,
@@ -168,6 +175,8 @@ export class VehicleChecksService {
     private readonly contactsService: ExternalRepairContactsService,
     private readonly configService: ConfigService,
     private readonly mailService: MailService,
+    private readonly notificationsService: NotificationsService,
+    private readonly publicAccessCodeService: PublicAccessCodeService,
   ) {}
 
   findAll(query: ListVehicleChecksQueryDto = {}, user: CurrentUserPayload) {
@@ -189,18 +198,34 @@ export class VehicleChecksService {
     });
   }
 
-  async findDecisionManagers(user: CurrentUserPayload) {
+  async findDecisionManagers(
+    user: CurrentUserPayload,
+    vehicleCheckId?: string,
+  ) {
     const select = {
       email: true,
       firstName: true,
       id: true,
       lastName: true,
     };
+    const vehicleCheck = vehicleCheckId
+      ? await this.findOne(vehicleCheckId, user)
+      : null;
 
     return this.prisma.user.findMany({
       where: {
         isActive: true,
         role: Role.MANAGER,
+        ...(vehicleCheck
+          ? {
+              managedCollaboratorAssignments: {
+                some: {
+                  collaboratorId: vehicleCheck.collaborator.id,
+                  isActive: true,
+                },
+              },
+            }
+          : {}),
       },
       orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
       select,
@@ -395,6 +420,12 @@ export class VehicleChecksService {
         id: dto.managerId,
         isActive: true,
         role: Role.MANAGER,
+        managedCollaboratorAssignments: {
+          some: {
+            collaboratorId: vehicleCheck.collaborator.id,
+            isActive: true,
+          },
+        },
       },
       select: {
         email: true,
@@ -442,6 +473,98 @@ export class VehicleChecksService {
         });
 
     const publicUrl = this.publicDecisionRequestUrl(share.token);
+    await this.prisma.$transaction(async (tx) => {
+      const conversation = await tx.vehicleCheckConversation.upsert({
+        where: { vehicleCheckId: id },
+        create: {
+          createdById: user.sub,
+          status: VehicleCheckConversationStatus.OPEN,
+          vehicleCheckId: id,
+        },
+        update: {
+          closedAt: null,
+          resolvedAt: null,
+          status: VehicleCheckConversationStatus.OPEN,
+        },
+      });
+      await tx.vehicleCheckConversationParticipant.upsert({
+        where: {
+          conversationId_userId: {
+            conversationId: conversation.id,
+            userId: vehicleCheck.collaborator.id,
+          },
+        },
+        create: {
+          conversationId: conversation.id,
+          role: VehicleCheckConversationParticipantRole.REQUESTER,
+          userId: vehicleCheck.collaborator.id,
+        },
+        update: {
+          emailNotificationsEnabled: true,
+          role: VehicleCheckConversationParticipantRole.REQUESTER,
+        },
+      });
+      await tx.vehicleCheckConversationParticipant.upsert({
+        where: {
+          conversationId_userId: {
+            conversationId: conversation.id,
+            userId: manager.id,
+          },
+        },
+        create: {
+          conversationId: conversation.id,
+          role: VehicleCheckConversationParticipantRole.DECISION_MAKER,
+          userId: manager.id,
+        },
+        update: {
+          emailNotificationsEnabled: true,
+          role: VehicleCheckConversationParticipantRole.DECISION_MAKER,
+        },
+      });
+      if (
+        user.sub !== vehicleCheck.collaborator.id &&
+        user.sub !== manager.id
+      ) {
+        await tx.vehicleCheckConversationParticipant.upsert({
+          where: {
+            conversationId_userId: {
+              conversationId: conversation.id,
+              userId: user.sub,
+            },
+          },
+          create: {
+            conversationId: conversation.id,
+            role: VehicleCheckConversationParticipantRole.OBSERVER,
+            userId: user.sub,
+          },
+          update: {},
+        });
+      }
+      const message = await tx.vehicleCheckMessage.create({
+        data: {
+          authorId: user.sub,
+          body:
+            requestComment ??
+            "Demande d'avis manager envoyee pour ce vehicule.",
+          conversationId: conversation.id,
+        },
+      });
+      await tx.notification.create({
+        data: {
+          actorId: user.sub,
+          conversationId: conversation.id,
+          excerpt: requestComment,
+          messageId: message.id,
+          recipientId: manager.id,
+          route: `/public/decision/${share.token}#avis`,
+          title: "Nouvelle demande d'avis manager",
+          type: NotificationType.CONVERSATION_MESSAGE,
+          vehicleCheckId: id,
+        },
+      });
+    });
+    const personalAccessCode =
+      await this.publicAccessCodeService.getOrCreatePersonalCode(manager.id);
 
     await this.mailService.sendMail({
       html: this.decisionRequestHtml(
@@ -449,6 +572,7 @@ export class VehicleChecksService {
         manager,
         publicUrl,
         requestComment,
+        personalAccessCode,
       ),
       replyTo: vehicleCheck.collaborator?.email,
       subject: this.decisionRequestSubject(vehicleCheck),
@@ -457,6 +581,7 @@ export class VehicleChecksService {
         manager,
         publicUrl,
         requestComment,
+        personalAccessCode,
       ),
       to: manager.email,
     });
@@ -517,6 +642,10 @@ export class VehicleChecksService {
         where: { id: share.id },
         data: { takenInChargeAt: new Date() },
       });
+      await this.notificationsService.notifyVehicleEvent(
+        share.vehicleCheckId,
+        NotificationType.TAKEN_IN_CHARGE,
+      );
     }
 
     return this.findPublicShare(token);
@@ -577,6 +706,11 @@ export class VehicleChecksService {
           vehicleRecoveredById: user.sub,
         },
       });
+      await this.notificationsService.notifyVehicleEvent(
+        id,
+        NotificationType.VEHICLE_RECOVERED,
+        user.sub,
+      );
     }
 
     return this.findOne(id, user);
@@ -985,7 +1119,13 @@ export class VehicleChecksService {
       return {
         OR: [
           { collaboratorId: user.sub },
-          { collaborator: { managerId: user.sub } },
+          {
+            collaborator: {
+              managerAssignments: {
+                some: { managerId: user.sub, isActive: true },
+              },
+            },
+          },
         ],
       };
     }
@@ -1460,6 +1600,7 @@ export class VehicleChecksService {
     manager: { firstName: string; lastName: string },
     publicUrl: string,
     requestComment: string | null,
+    personalAccessCode: string,
   ) {
     const licensePlate = formatLicensePlate(
       vehicleCheck.licensePlate,
@@ -1487,6 +1628,10 @@ export class VehicleChecksService {
       '',
       'Dossier à consulter :',
       publicUrl,
+      '',
+      'VOTRE CODE PERSONNEL PERMANENT',
+      personalAccessCode,
+      'Ce code reste identique pour toutes vos demandes.',
     ]
       .filter((line): line is string => line !== null)
       .join('\n');
@@ -1510,6 +1655,7 @@ export class VehicleChecksService {
     manager: { firstName: string; lastName: string },
     publicUrl: string,
     requestComment: string | null,
+    personalAccessCode: string,
   ) {
     const licensePlate = formatLicensePlate(
       vehicleCheck.licensePlate,
@@ -1554,6 +1700,11 @@ export class VehicleChecksService {
         : '',
       '<p style="margin:0 0 16px;font-size:15px;color:#334155">Le dossier contient toutes les réparations contrôlées, les commentaires et les photos associées.</p>',
       `<p style="margin:0 0 16px"><a href="${safePublicUrl}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:11px 16px;border-radius:7px;font-weight:700">Consulter le dossier</a></p>`,
+      '<div style="margin:18px 0;padding:16px;text-align:center;background:#f0fdfa;border:2px solid #0f766e;border-radius:10px">',
+      '<p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#0f766e">Votre code personnel permanent</p>',
+      `<p style="margin:0;font-family:Arial,sans-serif;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:4px;color:#0f172a">${this.escapeHtml(personalAccessCode)}</p>`,
+      '<p style="margin:8px 0 0;font-size:11px;color:#64748b">Ce code reste identique pour toutes vos demandes.</p>',
+      '</div>',
       `<p style="margin:0;font-size:12px;color:#64748b">Si le bouton ne fonctionne pas, copiez ce lien :<br><a href="${safePublicUrl}" style="color:#0f766e;word-break:break-all">${safePublicUrl}</a></p>`,
       '</div>',
       '</div>',

@@ -52,34 +52,114 @@ enum VehicleCheckItemOperationalStatus {
   CANCELLED
 }
 
-model User {
-  id               String    @id @default(uuid())
-  email            String    @unique
-  password         String
-  firstName        String
-  lastName         String
-  role             Role      @default(COLLABORATOR)
-  refreshTokenHash String?
-  isActive         Boolean   @default(true)
-  lastLoginAt      DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  managerId        String?
+enum VehicleCheckConversationStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
 
-  vehicleChecks VehicleCheck[] @relation("VehicleCheckCollaborator")
-  manager       User?          @relation("ManagerCollaborators", fields: [managerId], references: [id], onDelete: SetNull)
-  collaborators User[]         @relation("ManagerCollaborators")
-  vehicleCheckItemStatusHistories VehicleCheckItemStatusHistory[]
-  externalRepairCompanies ExternalRepairCompany[] @relation("ExternalRepairCompanyCreatedBy")
-  externalRepairContacts ExternalRepairContact[] @relation("ExternalRepairContactCreatedBy")
-  vehicleCheckPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareCreatedBy")
-  vehicleRecoveredPublicShares VehicleCheckPublicShare[] @relation("VehicleCheckPublicShareRecoveredBy")
-  vehicleCheckDecisionShares VehicleCheckDecisionShare[] @relation("VehicleCheckDecisionShareManager")
-  createdVehicleCheckDecisionShares VehicleCheckDecisionShare[] @relation("VehicleCheckDecisionShareCreatedBy")
+enum VehicleCheckConversationParticipantRole {
+  REQUESTER
+  DECISION_MAKER
+  OBSERVER
+}
+
+enum NotificationType {
+  CONVERSATION_MESSAGE
+  CONVERSATION_PARTICIPANT_ADDED
+  CONVERSATION_STATUS_CHANGED
+  TAKEN_IN_CHARGE
+  VEHICLE_RECOVERED
+}
+
+enum NotificationEmailStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+}
+
+model User {
+  id                             String    @id @default(uuid())
+  email                          String    @unique
+  password                       String
+  firstName                      String
+  lastName                       String
+  role                           Role      @default(COLLABORATOR)
+  refreshTokenHash               String?
+  publicAccessCodeHash           String?
+  publicAccessCodeEncrypted      String?
+  publicAccessCodeFingerprint    String?   @unique
+  publicAccessCodeVersion        Int       @default(0)
+  publicAccessCodeIssuedAt       DateTime?
+  publicAccessCodeFailedAttempts Int       @default(0)
+  publicAccessCodeLockedUntil    DateTime?
+  publicAccessCodeLastEmailedAt  DateTime?
+  publicAccessCodeEmailWindowAt  DateTime?
+  publicAccessCodeEmailCount     Int       @default(0)
+  isActive                       Boolean   @default(true)
+  lastLoginAt                    DateTime?
+  createdAt                      DateTime  @default(now())
+  updatedAt                      DateTime  @updatedAt
+
+  vehicleChecks                          VehicleCheck[]                        @relation("VehicleCheckCollaborator")
+  managerAssignments                     UserManagerAssignment[]               @relation("CollaboratorManagerAssignments")
+  managedCollaboratorAssignments         UserManagerAssignment[]               @relation("ManagerCollaboratorAssignments")
+  createdManagerAssignments              UserManagerAssignment[]               @relation("CreatedManagerAssignments")
+  vehicleCheckItemStatusHistories        VehicleCheckItemStatusHistory[]
+  externalRepairCompanies                ExternalRepairCompany[]               @relation("ExternalRepairCompanyCreatedBy")
+  externalRepairContacts                 ExternalRepairContact[]               @relation("ExternalRepairContactCreatedBy")
+  vehicleCheckPublicShares               VehicleCheckPublicShare[]             @relation("VehicleCheckPublicShareCreatedBy")
+  vehicleRecoveredPublicShares           VehicleCheckPublicShare[]             @relation("VehicleCheckPublicShareRecoveredBy")
+  vehicleCheckDecisionShares             VehicleCheckDecisionShare[]           @relation("VehicleCheckDecisionShareManager")
+  createdVehicleCheckDecisionShares      VehicleCheckDecisionShare[]           @relation("VehicleCheckDecisionShareCreatedBy")
+  createdVehicleCheckConversations       VehicleCheckConversation[]            @relation("VehicleCheckConversationCreatedBy")
+  vehicleCheckConversationParticipants   VehicleCheckConversationParticipant[]
+  vehicleCheckMessages                   VehicleCheckMessage[]                 @relation("VehicleCheckMessageAuthor")
+  uploadedVehicleCheckMessageAttachments VehicleCheckMessageAttachment[]       @relation("VehicleCheckMessageAttachmentUploadedBy")
+  receivedNotifications                  Notification[]                        @relation("NotificationRecipient")
+  actedNotifications                     Notification[]                        @relation("NotificationActor")
+  publicAccessSessions                   PublicAccessSession[]
 
   @@index([role])
   @@index([isActive])
-  @@index([managerId])
+}
+
+model PublicAccessSession {
+  id            String    @id @default(uuid())
+  userId        String
+  tokenHash     String    @unique
+  codeVersion   Int
+  userAgentHash String?
+  expiresAt     DateTime
+  lastUsedAt    DateTime  @default(now())
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, expiresAt])
+  @@index([expiresAt])
+}
+
+model UserManagerAssignment {
+  id             String    @id @default(uuid())
+  collaboratorId String
+  managerId      String
+  isPrimary      Boolean   @default(false)
+  isActive       Boolean   @default(true)
+  assignedAt     DateTime  @default(now())
+  unassignedAt   DateTime?
+  createdById    String?
+
+  collaborator User  @relation("CollaboratorManagerAssignments", fields: [collaboratorId], references: [id], onDelete: Cascade)
+  manager      User  @relation("ManagerCollaboratorAssignments", fields: [managerId], references: [id], onDelete: Cascade)
+  createdBy    User? @relation("CreatedManagerAssignments", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([collaboratorId, managerId])
+  @@index([collaboratorId, isActive])
+  @@index([managerId, isActive])
+  @@index([createdById])
 }
 
 model Agency {
@@ -232,14 +312,16 @@ model VehicleCheck {
   createdAt                         DateTime           @default(now())
   updatedAt                         DateTime           @updatedAt
 
-  collaborator   User               @relation("VehicleCheckCollaborator", fields: [collaboratorId], references: [id], onDelete: Restrict)
-  agency         Agency             @relation(fields: [agencyId], references: [id], onDelete: Restrict)
-  manufacturer   Manufacturer       @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
-  vehicleModel   VehicleModel?      @relation(fields: [vehicleModelId], references: [id], onDelete: SetNull)
+  collaborator   User                        @relation("VehicleCheckCollaborator", fields: [collaboratorId], references: [id], onDelete: Restrict)
+  agency         Agency                      @relation(fields: [agencyId], references: [id], onDelete: Restrict)
+  manufacturer   Manufacturer                @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  vehicleModel   VehicleModel?               @relation(fields: [vehicleModelId], references: [id], onDelete: SetNull)
   items          VehicleCheckItem[]
   externalQuotes ExternalQuote[]
   publicShare    VehicleCheckPublicShare?
   decisionShares VehicleCheckDecisionShare[]
+  conversation   VehicleCheckConversation?
+  notifications  Notification[]
 
   @@unique([licensePlateCountry, licensePlate])
   @@index([collaboratorId])
@@ -261,7 +343,7 @@ model ExternalRepairCompany {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdBy User? @relation("ExternalRepairCompanyCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy User?                   @relation("ExternalRepairCompanyCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   contacts  ExternalRepairContact[]
 
   @@index([isActive])
@@ -282,8 +364,8 @@ model ExternalRepairContact {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdBy User? @relation("ExternalRepairContactCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  company   ExternalRepairCompany? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  createdBy    User?                     @relation("ExternalRepairContactCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  company      ExternalRepairCompany?    @relation(fields: [companyId], references: [id], onDelete: SetNull)
   publicShares VehicleCheckPublicShare[]
 
   @@index([isActive])
@@ -293,22 +375,22 @@ model ExternalRepairContact {
 }
 
 model VehicleCheckPublicShare {
-  id             String   @id @default(uuid())
-  vehicleCheckId String   @unique
+  id                      String    @id @default(uuid())
+  vehicleCheckId          String    @unique
   externalRepairContactId String?
-  token          String   @unique
-  isEnabled      Boolean  @default(true)
-  takenInChargeAt DateTime?
-  vehicleRecoveredAt DateTime?
-  vehicleRecoveredById String?
-  createdById    String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  token                   String    @unique
+  isEnabled               Boolean   @default(true)
+  takenInChargeAt         DateTime?
+  vehicleRecoveredAt      DateTime?
+  vehicleRecoveredById    String?
+  createdById             String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
-  vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  vehicleCheck          VehicleCheck           @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
   externalRepairContact ExternalRepairContact? @relation(fields: [externalRepairContactId], references: [id], onDelete: SetNull)
-  createdBy    User?        @relation("VehicleCheckPublicShareCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  vehicleRecoveredBy User?  @relation("VehicleCheckPublicShareRecoveredBy", fields: [vehicleRecoveredById], references: [id], onDelete: SetNull)
+  createdBy             User?                  @relation("VehicleCheckPublicShareCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  vehicleRecoveredBy    User?                  @relation("VehicleCheckPublicShareRecoveredBy", fields: [vehicleRecoveredById], references: [id], onDelete: SetNull)
 
   @@index([token])
   @@index([isEnabled])
@@ -320,16 +402,16 @@ model VehicleCheckPublicShare {
 }
 
 model VehicleCheckDecisionShare {
-  id                 String   @id @default(uuid())
-  vehicleCheckId     String
-  managerId          String
-  token              String   @unique
-  isEnabled          Boolean  @default(true)
-  requestComment     String?
-  emailSentAt        DateTime?
-  createdById        String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id             String    @id @default(uuid())
+  vehicleCheckId String
+  managerId      String
+  token          String    @unique
+  isEnabled      Boolean   @default(true)
+  requestComment String?
+  emailSentAt    DateTime?
+  createdById    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   vehicleCheck VehicleCheck @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
   manager      User         @relation("VehicleCheckDecisionShareManager", fields: [managerId], references: [id], onDelete: Restrict)
@@ -342,6 +424,145 @@ model VehicleCheckDecisionShare {
   @@index([isEnabled])
   @@index([emailSentAt])
   @@index([createdById])
+}
+
+model VehicleCheckConversation {
+  id             String                         @id @default(uuid())
+  vehicleCheckId String                         @unique
+  createdById    String?
+  status         VehicleCheckConversationStatus @default(OPEN)
+  resolvedAt     DateTime?
+  closedAt       DateTime?
+  createdAt      DateTime                       @default(now())
+  updatedAt      DateTime                       @updatedAt
+
+  vehicleCheck  VehicleCheck                          @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  createdBy     User?                                 @relation("VehicleCheckConversationCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  participants  VehicleCheckConversationParticipant[]
+  messages      VehicleCheckMessage[]
+  notifications Notification[]
+
+  @@index([createdById])
+  @@index([status])
+  @@index([updatedAt])
+}
+
+model VehicleCheckConversationParticipant {
+  id                        String                                  @id @default(uuid())
+  conversationId            String
+  userId                    String
+  role                      VehicleCheckConversationParticipantRole
+  emailNotificationsEnabled Boolean                                 @default(true)
+  joinedAt                  DateTime                                @default(now())
+  lastReadAt                DateTime?
+
+  conversation VehicleCheckConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+  @@index([conversationId, lastReadAt])
+}
+
+model VehicleCheckMessage {
+  id             String    @id @default(uuid())
+  conversationId String
+  authorId       String?
+  body           String?
+  createdAt      DateTime  @default(now())
+  editedAt       DateTime?
+
+  conversation  VehicleCheckConversation        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  author        User?                           @relation("VehicleCheckMessageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  attachments   VehicleCheckMessageAttachment[]
+  mentions      VehicleCheckMessageMention[]
+  notifications Notification[]
+
+  @@index([conversationId, createdAt])
+  @@index([authorId])
+}
+
+model VehicleCheckMessageAttachment {
+  id           String   @id @default(uuid())
+  messageId    String
+  uploadedById String?
+  publicId     String   @unique
+  resourceType String
+  secureUrl    String
+  originalName String
+  mimeType     String
+  bytes        Int
+  format       String?
+  createdAt    DateTime @default(now())
+
+  message    VehicleCheckMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  uploadedBy User?               @relation("VehicleCheckMessageAttachmentUploadedBy", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([messageId])
+  @@index([uploadedById])
+  @@index([createdAt])
+}
+
+model VehicleCheckMessageMention {
+  id                 String @id @default(uuid())
+  messageId          String
+  vehicleCheckItemId String
+  label              String
+
+  message          VehicleCheckMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  vehicleCheckItem VehicleCheckItem    @relation(fields: [vehicleCheckItemId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, vehicleCheckItemId])
+  @@index([vehicleCheckItemId])
+}
+
+model Notification {
+  id             String           @id @default(uuid())
+  recipientId    String
+  actorId        String?
+  type           NotificationType
+  vehicleCheckId String?
+  conversationId String?
+  messageId      String?
+  title          String
+  excerpt        String?
+  route          String
+  createdAt      DateTime         @default(now())
+  readAt         DateTime?
+
+  recipient    User                      @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor        User?                     @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  vehicleCheck VehicleCheck?             @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
+  conversation VehicleCheckConversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message      VehicleCheckMessage?      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  email        NotificationEmail?
+
+  @@index([recipientId, readAt, createdAt])
+  @@index([vehicleCheckId])
+  @@index([conversationId])
+  @@index([messageId])
+}
+
+model NotificationEmail {
+  id                  String                  @id @default(uuid())
+  notificationId      String                  @unique
+  recipientEmail      String
+  subject             String
+  text                String
+  html                String
+  status              NotificationEmailStatus @default(PENDING)
+  attempts            Int                     @default(0)
+  lastError           String?
+  sentAt              DateTime?
+  processingStartedAt DateTime?
+  nextAttemptAt       DateTime?
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([status, nextAttemptAt, createdAt])
 }
 
 model VehicleCheckItem {
@@ -373,6 +594,7 @@ model VehicleCheckItem {
   vehiclePart     VehiclePart                     @relation(fields: [vehiclePartId], references: [id], onDelete: Restrict)
   statusHistories VehicleCheckItemStatusHistory[]
   photos          VehicleCheckItemPhoto[]
+  messageMentions VehicleCheckMessageMention[]
 
   @@index([vehicleCheckId])
   @@index([repairTypeId])

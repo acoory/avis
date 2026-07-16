@@ -32,7 +32,10 @@ export class DashboardService {
     ] = await Promise.all([
       this.prisma.vehicleCheck.count({ where: vehicleCheckScope }),
       this.prisma.vehicleCheck.count({
-        where: { ...vehicleCheckScope, status: VehicleCheckStatus.SUMMARY_READY },
+        where: {
+          ...vehicleCheckScope,
+          status: VehicleCheckStatus.SUMMARY_READY,
+        },
       }),
       this.prisma.vehicleCheck.count({
         where: { ...vehicleCheckScope, status: VehicleCheckStatus.TO_ANALYZE },
@@ -90,7 +93,10 @@ export class DashboardService {
       }),
       this.prisma.vehicleCheckPublicShare.findMany({
         where: {
-          OR: [{ takenInChargeAt: { not: null } }, { vehicleRecoveredAt: { not: null } }],
+          OR: [
+            { takenInChargeAt: { not: null } },
+            { vehicleRecoveredAt: { not: null } },
+          ],
           vehicleCheck: vehicleCheckScope,
         },
         take: 6,
@@ -113,7 +119,9 @@ export class DashboardService {
       completedVehicleChecksCount,
       vehicleChecksToAnalyzeCount,
       draftVehicleChecksCount,
-      totalInternalSavingAmount: this.money(totals._sum.totalInternalSavingAmount),
+      totalInternalSavingAmount: this.money(
+        totals._sum.totalInternalSavingAmount,
+      ),
       totalInternalCost: this.money(totals._sum.totalInternalCost),
       totalExternalCost: this.money(totals._sum.totalExternalCost),
       totalDifferenceAmount: this.money(totals._sum.totalDifferenceAmount),
@@ -176,7 +184,10 @@ export class DashboardService {
     };
   }
 
-  async savingsByManufacturer(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+  async savingsByManufacturer(
+    user: CurrentUserPayload,
+    query: DashboardQueryDto = {},
+  ) {
     const where = this.vehicleCheckScope(user, query);
     const grouped = await this.prisma.vehicleCheck.groupBy({
       by: ['manufacturerId'],
@@ -198,11 +209,14 @@ export class DashboardService {
       where: { id: { in: grouped.map((row) => row.manufacturerId) } },
       select: { id: true, name: true },
     });
-    const manufacturersById = new Map(manufacturers.map((manufacturer) => [manufacturer.id, manufacturer]));
+    const manufacturersById = new Map(
+      manufacturers.map((manufacturer) => [manufacturer.id, manufacturer]),
+    );
 
     return grouped.map((row) => ({
       manufacturerId: row.manufacturerId,
-      manufacturerName: manufacturersById.get(row.manufacturerId)?.name ?? 'Inconnu',
+      manufacturerName:
+        manufacturersById.get(row.manufacturerId)?.name ?? 'Inconnu',
       vehicleChecksCount: row._count._all,
       totalInternalSavingAmount: this.money(row._sum.totalInternalSavingAmount),
       totalInternalCost: this.money(row._sum.totalInternalCost),
@@ -210,7 +224,10 @@ export class DashboardService {
     }));
   }
 
-  async savingsByCollaborator(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+  async savingsByCollaborator(
+    user: CurrentUserPayload,
+    query: DashboardQueryDto = {},
+  ) {
     const where = this.vehicleCheckScope(user, query);
     const grouped = await this.prisma.vehicleCheck.groupBy({
       by: ['collaboratorId'],
@@ -231,7 +248,9 @@ export class DashboardService {
       where: { id: { in: grouped.map((row) => row.collaboratorId) } },
       select: { id: true, firstName: true, lastName: true, email: true },
     });
-    const collaboratorsById = new Map(collaborators.map((collaborator) => [collaborator.id, collaborator]));
+    const collaboratorsById = new Map(
+      collaborators.map((collaborator) => [collaborator.id, collaborator]),
+    );
 
     return grouped.map((row) => {
       const collaborator = collaboratorsById.get(row.collaboratorId);
@@ -243,13 +262,18 @@ export class DashboardService {
           : 'Inconnu',
         collaboratorEmail: collaborator?.email ?? null,
         vehicleChecksCount: row._count._all,
-        totalInternalSavingAmount: this.money(row._sum.totalInternalSavingAmount),
+        totalInternalSavingAmount: this.money(
+          row._sum.totalInternalSavingAmount,
+        ),
         totalInternalCost: this.money(row._sum.totalInternalCost),
       };
     });
   }
 
-  async repairTypeFrequency(user: CurrentUserPayload, query: DashboardQueryDto = {}) {
+  async repairTypeFrequency(
+    user: CurrentUserPayload,
+    query: DashboardQueryDto = {},
+  ) {
     const where = this.vehicleCheckItemScope(user, query);
     const grouped = await this.prisma.vehicleCheckItem.groupBy({
       by: ['repairTypeId', 'decisionStatus'],
@@ -271,7 +295,9 @@ export class DashboardService {
       where: { id: { in: grouped.map((row) => row.repairTypeId) } },
       select: { id: true, code: true, name: true },
     });
-    const repairTypesById = new Map(repairTypes.map((repairType) => [repairType.id, repairType]));
+    const repairTypesById = new Map(
+      repairTypes.map((repairType) => [repairType.id, repairType]),
+    );
 
     return grouped.map((row) => {
       const repairType = repairTypesById.get(row.repairTypeId);
@@ -283,7 +309,9 @@ export class DashboardService {
         decisionStatus: row.decisionStatus,
         linesCount: row._count._all,
         quantity: row._sum.quantity ?? 0,
-        totalInternalSavingAmount: this.money(row._sum.totalInternalSavingAmount),
+        totalInternalSavingAmount: this.money(
+          row._sum.totalInternalSavingAmount,
+        ),
         totalInternalCost: this.money(row._sum.totalInternalCost),
       };
     });
@@ -359,9 +387,12 @@ export class DashboardService {
       };
 
       bucket.vehicleChecksCount += 1;
-      if (check.status === VehicleCheckStatus.SUMMARY_READY) bucket.completedVehicleChecksCount += 1;
-      if (check.status === VehicleCheckStatus.TO_ANALYZE) bucket.vehicleChecksToAnalyzeCount += 1;
-      if (check.status === VehicleCheckStatus.DRAFT) bucket.draftVehicleChecksCount += 1;
+      if (check.status === VehicleCheckStatus.SUMMARY_READY)
+        bucket.completedVehicleChecksCount += 1;
+      if (check.status === VehicleCheckStatus.TO_ANALYZE)
+        bucket.vehicleChecksToAnalyzeCount += 1;
+      if (check.status === VehicleCheckStatus.DRAFT)
+        bucket.draftVehicleChecksCount += 1;
 
       const alertStatuses: RepairDecisionStatus[] = [
         RepairDecisionStatus.FORBIDDEN,
@@ -379,9 +410,15 @@ export class DashboardService {
         }
       });
 
-      totals.totalDifferenceAmount = totals.totalDifferenceAmount.add(check.totalDifferenceAmount);
-      totals.totalInternalCost = totals.totalInternalCost.add(check.totalInternalCost);
-      totals.totalInternalSavingAmount = totals.totalInternalSavingAmount.add(check.totalInternalSavingAmount);
+      totals.totalDifferenceAmount = totals.totalDifferenceAmount.add(
+        check.totalDifferenceAmount,
+      );
+      totals.totalInternalCost = totals.totalInternalCost.add(
+        check.totalInternalCost,
+      );
+      totals.totalInternalSavingAmount = totals.totalInternalSavingAmount.add(
+        check.totalInternalSavingAmount,
+      );
       numericBuckets.set(key, totals);
     });
 
@@ -394,7 +431,9 @@ export class DashboardService {
 
       bucket.totalDifferenceAmount = this.money(totals.totalDifferenceAmount);
       bucket.totalInternalCost = this.money(totals.totalInternalCost);
-      bucket.totalInternalSavingAmount = this.money(totals.totalInternalSavingAmount);
+      bucket.totalInternalSavingAmount = this.money(
+        totals.totalInternalSavingAmount,
+      );
     });
 
     return Array.from(buckets.values());
@@ -404,7 +443,10 @@ export class DashboardService {
     return (value ?? new Decimal(0)).toFixed(2);
   }
 
-  private vehicleCheckScope(user: CurrentUserPayload, query: DashboardQueryDto = {}): Prisma.VehicleCheckWhereInput {
+  private vehicleCheckScope(
+    user: CurrentUserPayload,
+    query: DashboardQueryDto = {},
+  ): Prisma.VehicleCheckWhereInput {
     const periodWhere = this.periodWhere(query);
     const collaboratorWhere = query.collaboratorId
       ? { collaboratorId: query.collaboratorId }
@@ -421,7 +463,16 @@ export class DashboardService {
       return {
         ...periodWhere,
         ...collaboratorWhere,
-        OR: [{ collaboratorId: user.sub }, { collaborator: { managerId: user.sub } }],
+        OR: [
+          { collaboratorId: user.sub },
+          {
+            collaborator: {
+              managerAssignments: {
+                some: { managerId: user.sub, isActive: true },
+              },
+            },
+          },
+        ],
       };
     }
 
@@ -431,7 +482,10 @@ export class DashboardService {
     };
   }
 
-  private vehicleCheckItemScope(user: CurrentUserPayload, query: DashboardQueryDto = {}): Prisma.VehicleCheckItemWhereInput {
+  private vehicleCheckItemScope(
+    user: CurrentUserPayload,
+    query: DashboardQueryDto = {},
+  ): Prisma.VehicleCheckItemWhereInput {
     const vehicleCheckScope = this.vehicleCheckScope(user, query);
     const baseWhere: Prisma.VehicleCheckItemWhereInput = {
       operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
@@ -484,8 +538,12 @@ export class DashboardService {
 
   private timelinePeriod(query: DashboardQueryDto) {
     const todayKey = this.dateKey(new Date());
-    const to = query.dateTo ? this.endOfDay(query.dateTo) : this.endOfDay(todayKey);
-    const from = query.dateFrom ? this.startOfDay(query.dateFrom) : this.startOfDay(this.dateKey(this.addDays(to, -30)));
+    const to = query.dateTo
+      ? this.endOfDay(query.dateTo)
+      : this.endOfDay(todayKey);
+    const from = query.dateFrom
+      ? this.startOfDay(query.dateFrom)
+      : this.startOfDay(this.dateKey(this.addDays(to, -30)));
 
     if (from <= to) {
       return {

@@ -67,3 +67,42 @@ export const VehicleCheckItemOperationalStatus = {
 } as const
 
 export type VehicleCheckItemOperationalStatus = (typeof VehicleCheckItemOperationalStatus)[keyof typeof VehicleCheckItemOperationalStatus]
+
+
+export const VehicleCheckConversationStatus = {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type VehicleCheckConversationStatus = (typeof VehicleCheckConversationStatus)[keyof typeof VehicleCheckConversationStatus]
+
+
+export const VehicleCheckConversationParticipantRole = {
+  REQUESTER: 'REQUESTER',
+  DECISION_MAKER: 'DECISION_MAKER',
+  OBSERVER: 'OBSERVER'
+} as const
+
+export type VehicleCheckConversationParticipantRole = (typeof VehicleCheckConversationParticipantRole)[keyof typeof VehicleCheckConversationParticipantRole]
+
+
+export const NotificationType = {
+  CONVERSATION_MESSAGE: 'CONVERSATION_MESSAGE',
+  CONVERSATION_PARTICIPANT_ADDED: 'CONVERSATION_PARTICIPANT_ADDED',
+  CONVERSATION_STATUS_CHANGED: 'CONVERSATION_STATUS_CHANGED',
+  TAKEN_IN_CHARGE: 'TAKEN_IN_CHARGE',
+  VEHICLE_RECOVERED: 'VEHICLE_RECOVERED'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const NotificationEmailStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type NotificationEmailStatus = (typeof NotificationEmailStatus)[keyof typeof NotificationEmailStatus]

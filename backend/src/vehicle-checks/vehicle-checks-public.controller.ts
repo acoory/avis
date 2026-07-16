@@ -1,12 +1,21 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req } from '@nestjs/common';
+import type { Request } from 'express';
+import { PublicAccessCodeService } from '../public-access/public-access-code.service';
 import { VehicleChecksService } from './vehicle-checks.service';
 
 @Controller('public/vehicle-checks')
 export class VehicleChecksPublicController {
-  constructor(private readonly vehicleChecksService: VehicleChecksService) {}
+  constructor(
+    private readonly vehicleChecksService: VehicleChecksService,
+    private readonly publicAccessService: PublicAccessCodeService,
+  ) {}
 
   @Get('decision/:token')
-  findPublicDecisionShare(@Param('token') token: string) {
+  async findPublicDecisionShare(
+    @Param('token') token: string,
+    @Req() request: Request,
+  ) {
+    await this.publicAccessService.requireAccess(token, request);
     return this.vehicleChecksService.findPublicDecisionShare(token);
   }
 

@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/role-guard";
+import { ManagerMultiSelect } from "@/components/business/manager-multi-select";
 import { DataTable } from "@/components/dashboard/data-table";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +52,7 @@ export default function UsersPage() {
     firstName: "",
     lastName: "",
     role: "COLLABORATOR",
-    managerId: null,
+    managerIds: [],
     isActive: true,
   });
 
@@ -95,7 +96,7 @@ export default function UsersPage() {
     try {
       const updatedUser = await usersService.updateUser(user.id, {
         role,
-        managerId: role === "COLLABORATOR" ? user.managerId ?? null : null,
+        managerIds: role === "COLLABORATOR" ? activeManagerIds(user) : [],
       });
       replaceUser(updatedUser);
       toast.success("Role utilisateur mis a jour.");
@@ -106,7 +107,7 @@ export default function UsersPage() {
     }
   }, [currentUser?.role, replaceUser]);
 
-  const updateManager = useCallback(async (user: UserListItem, managerId: string) => {
+  const updateManagers = useCallback(async (user: UserListItem, managerIds: string[]) => {
     if (currentUser?.role !== "ADMIN") {
       return;
     }
@@ -114,10 +115,10 @@ export default function UsersPage() {
     setUpdatingUserId(user.id);
     try {
       const updatedUser = await usersService.updateUser(user.id, {
-        managerId: managerId || null,
+        managerIds,
       });
       replaceUser(updatedUser);
-      toast.success("Manager attribue.");
+      toast.success("Managers attribues.");
     } catch {
       toast.error("Impossible d'attribuer ce manager.");
     } finally {
@@ -210,12 +211,12 @@ export default function UsersPage() {
       const payload: CreateUserPayload = {
         ...createForm,
         role: currentUser?.role === "MANAGER" ? "COLLABORATOR" : createForm.role,
-        managerId:
+        managerIds:
           currentUser?.role === "MANAGER"
-            ? currentUser.id
+            ? [currentUser.id]
             : createForm.role === "COLLABORATOR"
-              ? createForm.managerId || null
-              : null,
+              ? createForm.managerIds ?? []
+              : [],
       };
       const createdUser = await usersService.createUser(payload);
       setUsers((current) => [createdUser, ...current]);
@@ -226,7 +227,7 @@ export default function UsersPage() {
         firstName: "",
         lastName: "",
         role: "COLLABORATOR",
-        managerId: null,
+        managerIds: [],
         isActive: true,
       });
     } catch {
@@ -279,9 +280,9 @@ export default function UsersPage() {
         id: "collaborators",
         header: "Equipe",
         cell: (user: UserListItem) => (
-          <span className="font-medium text-gray-900">{user._count?.collaborators ?? 0}</span>
+          <span className="font-medium text-gray-900">{user._count?.managedCollaboratorAssignments ?? 0}</span>
         ),
-        sortValue: (user: UserListItem) => user._count?.collaborators ?? 0,
+        sortValue: (user: UserListItem) => user._count?.managedCollaboratorAssignments ?? 0,
       },
       {
         id: "checks",
@@ -311,7 +312,7 @@ export default function UsersPage() {
         id: "actions",
         header: "Actions",
         cell: (user: UserListItem) =>
-          currentUser?.role === "ADMIN" || user.managerId === currentUser?.id ? (
+          currentUser?.role === "ADMIN" || activeManagerIds(user).includes(currentUser?.id ?? "") ? (
             <Button size="sm" type="button" variant="outline" onClick={() => startEdit(user)}>
               Modifier
             </Button>
@@ -324,35 +325,27 @@ export default function UsersPage() {
       if (currentUser?.role === "ADMIN") {
         baseColumns.splice(2, 0, {
           id: "manager",
-          header: "Manager",
+          header: "Managers",
           cell: (user: UserListItem) =>
             user.role === "COLLABORATOR" ? (
-              <select
-                className="h-9 w-48 rounded-md border border-gray-200 bg-white px-2 text-sm text-gray-900 shadow-sm disabled:opacity-50"
+              <ManagerMultiSelect
                 disabled={updatingUserId === user.id}
-                value={user.managerId ?? ""}
-                onChange={(event) => void updateManager(user, event.target.value)}
-              >
-                <option value="">Aucun manager</option>
-                {managers.map((manager) => (
-                  <option key={manager.id} value={manager.id}>
-                    {manager.firstName} {manager.lastName}
-                  </option>
-                ))}
-              </select>
+                isSaving={updatingUserId === user.id}
+                managers={managers}
+                value={activeManagerIds(user)}
+                onSave={(managerIds) => updateManagers(user, managerIds)}
+              />
             ) : (
               <span className="text-gray-400">Non applicable</span>
             ),
-          sortValue: (user: UserListItem) =>
-            user.manager ? `${user.manager.firstName} ${user.manager.lastName}` : "",
-          searchValue: (user: UserListItem) =>
-            user.manager ? `${user.manager.firstName} ${user.manager.lastName}` : "",
+          sortValue: (user: UserListItem) => managerNames(user),
+          searchValue: (user: UserListItem) => managerNames(user),
         });
       }
 
       return baseColumns;
     },
-    [currentUser?.id, currentUser?.role, managers, startEdit, updateManager, updateRole, updatingUserId],
+    [currentUser?.id, currentUser?.role, managers, startEdit, updateManagers, updateRole, updatingUserId],
   );
 
   return (
@@ -401,7 +394,7 @@ export default function UsersPage() {
                   setCreateForm((current) => ({
                     ...current,
                     role: event.target.value as Role,
-                    managerId: event.target.value === "COLLABORATOR" ? current.managerId : null,
+                    managerIds: event.target.value === "COLLABORATOR" ? current.managerIds : [],
                   }))
                 }
               >
@@ -417,22 +410,20 @@ export default function UsersPage() {
               </div>
             )}
             {currentUser?.role === "ADMIN" && createForm.role === "COLLABORATOR" ? (
-              <select
-                className="h-10 rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 shadow-sm"
-                value={createForm.managerId ?? ""}
-                onChange={(event) =>
-                  setCreateForm((current) => ({ ...current, managerId: event.target.value || null }))
-                }
-              >
-                <option value="">Aucun manager</option>
-                {managers.map((manager) => (
-                  <option key={manager.id} value={manager.id}>
-                    {manager.firstName} {manager.lastName}
-                  </option>
-                ))}
-              </select>
+              <div className="lg:col-span-2">
+                <ManagerMultiSelect
+                  managers={managers}
+                  value={createForm.managerIds ?? []}
+                  onChange={(managerIds) =>
+                    setCreateForm((current) => ({
+                      ...current,
+                      managerIds,
+                    }))
+                  }
+                />
+              </div>
             ) : null}
-            <Button className="lg:col-start-6" disabled={isCreating} type="submit">
+            <Button disabled={isCreating} type="submit">
               {isCreating ? "Creation..." : "Ajouter"}
             </Button>
           </form>
@@ -527,4 +518,14 @@ export default function UsersPage() {
       />
     </RoleGuard>
   );
+}
+
+function activeManagerIds(user: UserListItem) {
+  return (user.managerAssignments ?? []).map((assignment) => assignment.managerId);
+}
+
+function managerNames(user: UserListItem) {
+  return (user.managerAssignments ?? [])
+    .map((assignment) => `${assignment.manager.firstName} ${assignment.manager.lastName}`.trim())
+    .join(" ");
 }

@@ -6,20 +6,24 @@ export type UserListItem = {
   firstName: string;
   lastName: string;
   role: Role;
-  managerId?: string | null;
-  manager?: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: Role;
-  } | null;
+  managerAssignments?: Array<{
+    assignedAt: string;
+    isPrimary: boolean;
+    managerId: string;
+    manager: {
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      role: Role;
+    };
+  }>;
   isActive: boolean;
   lastLoginAt?: string | null;
   createdAt: string;
   updatedAt: string;
   _count?: {
-    collaborators: number;
+    managedCollaboratorAssignments: number;
     vehicleChecks: number;
   };
 };
@@ -31,7 +35,7 @@ export type UpdateUserPayload = Partial<{
   lastName: string;
   role: Role;
   isActive: boolean;
-  managerId: string | null;
+  managerIds: string[];
 }>;
 
 export type CreateUserPayload = {
@@ -41,5 +45,5 @@ export type CreateUserPayload = {
   lastName: string;
   role: Role;
   isActive?: boolean;
-  managerId?: string | null;
+  managerIds?: string[];
 };

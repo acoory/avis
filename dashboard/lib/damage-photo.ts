@@ -3,7 +3,10 @@ import { DamagePhoto } from "@/types/business";
 export async function optimizeDamagePhoto(file: File) {
   const image = await loadImage(file);
   const maximumDimension = 1600;
-  const scale = Math.min(1, maximumDimension / Math.max(image.naturalWidth, image.naturalHeight));
+  const scale = Math.min(
+    1,
+    maximumDimension / Math.max(image.naturalWidth, image.naturalHeight),
+  );
   const width = Math.max(1, Math.round(image.naturalWidth * scale));
   const height = Math.max(1, Math.round(image.naturalHeight * scale));
   const canvas = document.createElement("canvas");
@@ -18,20 +21,30 @@ export async function optimizeDamagePhoto(file: File) {
   const blob = webp ?? (await canvasToBlob(canvas, "image/jpeg", 0.78));
   if (!blob) throw new Error("Image compression failed");
 
-  return new File([blob], `damage-${Date.now()}.${blob.type === "image/webp" ? "webp" : "jpg"}`, {
-    type: blob.type,
-  });
+  return new File(
+    [blob],
+    `damage-${Date.now()}.${blob.type === "image/webp" ? "webp" : "jpg"}`,
+    {
+      type: blob.type,
+    },
+  );
 }
 
 export function cloudinaryThumbnailUrl(photo: DamagePhoto, width = 320) {
   return cloudinaryProxyUrl(
-    photo.secureUrl.replace("/upload/", `/upload/f_auto,q_auto,c_limit,w_${width}/`),
+    photo.secureUrl.replace(
+      "/upload/",
+      `/upload/f_auto,q_auto,c_limit,w_${width}/`,
+    ),
   );
 }
 
 export function cloudinaryPreviewUrl(photo: DamagePhoto, width = 1200) {
   return cloudinaryProxyUrl(
-    photo.secureUrl.replace("/upload/", `/upload/f_auto,q_auto,c_limit,w_${width}/`),
+    photo.secureUrl.replace(
+      "/upload/",
+      `/upload/f_auto,q_auto,c_limit,w_${width}/`,
+    ),
   );
 }
 
@@ -41,6 +54,19 @@ export function cloudinaryOriginalUrl(photo: DamagePhoto) {
 
 export function cloudinaryImageUrl(url: string) {
   return cloudinaryProxyUrl(url);
+}
+
+export function cloudinaryAssetUrl(url: string) {
+  if (url.startsWith("/documents/")) {
+    return url;
+  }
+
+  const parsedUrl = parseUrl(url);
+  if (!parsedUrl || parsedUrl.hostname !== "res.cloudinary.com") {
+    return url;
+  }
+
+  return `/documents${parsedUrl.pathname}${parsedUrl.search}`;
 }
 
 export function cloudinaryStorageUrl(url: string) {
@@ -88,6 +114,12 @@ function loadImage(file: File) {
   });
 }
 
-function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number) {
-  return new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality));
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality: number,
+) {
+  return new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, type, quality),
+  );
 }

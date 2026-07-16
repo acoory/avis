@@ -52,6 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  PublicAccessSession: 'PublicAccessSession',
+  UserManagerAssignment: 'UserManagerAssignment',
   Agency: 'Agency',
   Manufacturer: 'Manufacturer',
   VehicleModel: 'VehicleModel',
@@ -64,6 +66,13 @@ export const ModelName = {
   ExternalRepairContact: 'ExternalRepairContact',
   VehicleCheckPublicShare: 'VehicleCheckPublicShare',
   VehicleCheckDecisionShare: 'VehicleCheckDecisionShare',
+  VehicleCheckConversation: 'VehicleCheckConversation',
+  VehicleCheckConversationParticipant: 'VehicleCheckConversationParticipant',
+  VehicleCheckMessage: 'VehicleCheckMessage',
+  VehicleCheckMessageAttachment: 'VehicleCheckMessageAttachment',
+  VehicleCheckMessageMention: 'VehicleCheckMessageMention',
+  Notification: 'Notification',
+  NotificationEmail: 'NotificationEmail',
   VehicleCheckItem: 'VehicleCheckItem',
   VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
@@ -95,14 +104,52 @@ export const UserScalarFieldEnum = {
   lastName: 'lastName',
   role: 'role',
   refreshTokenHash: 'refreshTokenHash',
+  publicAccessCodeHash: 'publicAccessCodeHash',
+  publicAccessCodeEncrypted: 'publicAccessCodeEncrypted',
+  publicAccessCodeFingerprint: 'publicAccessCodeFingerprint',
+  publicAccessCodeVersion: 'publicAccessCodeVersion',
+  publicAccessCodeIssuedAt: 'publicAccessCodeIssuedAt',
+  publicAccessCodeFailedAttempts: 'publicAccessCodeFailedAttempts',
+  publicAccessCodeLockedUntil: 'publicAccessCodeLockedUntil',
+  publicAccessCodeLastEmailedAt: 'publicAccessCodeLastEmailedAt',
+  publicAccessCodeEmailWindowAt: 'publicAccessCodeEmailWindowAt',
+  publicAccessCodeEmailCount: 'publicAccessCodeEmailCount',
   isActive: 'isActive',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  managerId: 'managerId'
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PublicAccessSessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  codeVersion: 'codeVersion',
+  userAgentHash: 'userAgentHash',
+  expiresAt: 'expiresAt',
+  lastUsedAt: 'lastUsedAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PublicAccessSessionScalarFieldEnum = (typeof PublicAccessSessionScalarFieldEnum)[keyof typeof PublicAccessSessionScalarFieldEnum]
+
+
+export const UserManagerAssignmentScalarFieldEnum = {
+  id: 'id',
+  collaboratorId: 'collaboratorId',
+  managerId: 'managerId',
+  isPrimary: 'isPrimary',
+  isActive: 'isActive',
+  assignedAt: 'assignedAt',
+  unassignedAt: 'unassignedAt',
+  createdById: 'createdById'
+} as const
+
+export type UserManagerAssignmentScalarFieldEnum = (typeof UserManagerAssignmentScalarFieldEnum)[keyof typeof UserManagerAssignmentScalarFieldEnum]
 
 
 export const AgencyScalarFieldEnum = {
@@ -298,6 +345,110 @@ export const VehicleCheckDecisionShareScalarFieldEnum = {
 } as const
 
 export type VehicleCheckDecisionShareScalarFieldEnum = (typeof VehicleCheckDecisionShareScalarFieldEnum)[keyof typeof VehicleCheckDecisionShareScalarFieldEnum]
+
+
+export const VehicleCheckConversationScalarFieldEnum = {
+  id: 'id',
+  vehicleCheckId: 'vehicleCheckId',
+  createdById: 'createdById',
+  status: 'status',
+  resolvedAt: 'resolvedAt',
+  closedAt: 'closedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehicleCheckConversationScalarFieldEnum = (typeof VehicleCheckConversationScalarFieldEnum)[keyof typeof VehicleCheckConversationScalarFieldEnum]
+
+
+export const VehicleCheckConversationParticipantScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  userId: 'userId',
+  role: 'role',
+  emailNotificationsEnabled: 'emailNotificationsEnabled',
+  joinedAt: 'joinedAt',
+  lastReadAt: 'lastReadAt'
+} as const
+
+export type VehicleCheckConversationParticipantScalarFieldEnum = (typeof VehicleCheckConversationParticipantScalarFieldEnum)[keyof typeof VehicleCheckConversationParticipantScalarFieldEnum]
+
+
+export const VehicleCheckMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt',
+  editedAt: 'editedAt'
+} as const
+
+export type VehicleCheckMessageScalarFieldEnum = (typeof VehicleCheckMessageScalarFieldEnum)[keyof typeof VehicleCheckMessageScalarFieldEnum]
+
+
+export const VehicleCheckMessageAttachmentScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  uploadedById: 'uploadedById',
+  publicId: 'publicId',
+  resourceType: 'resourceType',
+  secureUrl: 'secureUrl',
+  originalName: 'originalName',
+  mimeType: 'mimeType',
+  bytes: 'bytes',
+  format: 'format',
+  createdAt: 'createdAt'
+} as const
+
+export type VehicleCheckMessageAttachmentScalarFieldEnum = (typeof VehicleCheckMessageAttachmentScalarFieldEnum)[keyof typeof VehicleCheckMessageAttachmentScalarFieldEnum]
+
+
+export const VehicleCheckMessageMentionScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  vehicleCheckItemId: 'vehicleCheckItemId',
+  label: 'label'
+} as const
+
+export type VehicleCheckMessageMentionScalarFieldEnum = (typeof VehicleCheckMessageMentionScalarFieldEnum)[keyof typeof VehicleCheckMessageMentionScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  recipientId: 'recipientId',
+  actorId: 'actorId',
+  type: 'type',
+  vehicleCheckId: 'vehicleCheckId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  title: 'title',
+  excerpt: 'excerpt',
+  route: 'route',
+  createdAt: 'createdAt',
+  readAt: 'readAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const NotificationEmailScalarFieldEnum = {
+  id: 'id',
+  notificationId: 'notificationId',
+  recipientEmail: 'recipientEmail',
+  subject: 'subject',
+  text: 'text',
+  html: 'html',
+  status: 'status',
+  attempts: 'attempts',
+  lastError: 'lastError',
+  sentAt: 'sentAt',
+  processingStartedAt: 'processingStartedAt',
+  nextAttemptAt: 'nextAttemptAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationEmailScalarFieldEnum = (typeof NotificationEmailScalarFieldEnum)[keyof typeof NotificationEmailScalarFieldEnum]
 
 
 export const VehicleCheckItemScalarFieldEnum = {

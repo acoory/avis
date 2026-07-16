@@ -145,6 +145,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [repairSheetPreview, setRepairSheetPreview] = useState<RepairDecisionPreview | null>(null);
   const [isLicensePlateScannerOpen, setIsLicensePlateScannerOpen] = useState(false);
   const [duplicateVehicleCheck, setDuplicateVehicleCheck] = useState<DuplicateVehicleCheck | null>(null);
+  const [hasDuplicateVehicleCheck, setHasDuplicateVehicleCheck] = useState(false);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
@@ -600,6 +602,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     } catch (error) {
       const duplicateConflict = duplicateVehicleCheckConflictFromError(error);
       if (duplicateConflict) {
+        setHasDuplicateVehicleCheck(true);
         setDuplicateVehicleCheck(duplicateConflict.existingVehicleCheck ?? null);
         setActiveStep(0);
         toast.error("Ce vehicule possede deja un controle.");
@@ -630,9 +633,38 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     setIsRecapOpen(true);
   }
 
-  function goToNextStep() {
+  async function goToNextStep() {
+    if (isCheckingDuplicate) {
+      return;
+    }
+
     if (!validateCurrentStep()) {
       return;
+    }
+
+    if (activeStep === 0) {
+      setIsCheckingDuplicate(true);
+
+      try {
+        const result = await businessService.checkVehicleCheckDuplicate({
+          excludedVehicleCheckId: initialVehicleCheck?.id,
+          licensePlate,
+          licensePlateCountry,
+        });
+
+        setHasDuplicateVehicleCheck(result.exists);
+        setDuplicateVehicleCheck(result.existingVehicleCheck ?? null);
+
+        if (result.exists) {
+          toast.error("Ce vehicule possede deja un controle.");
+          return;
+        }
+      } catch {
+        toast.error("Impossible de verifier l'immatriculation pour le moment.");
+        return;
+      } finally {
+        setIsCheckingDuplicate(false);
+      }
     }
 
     setActiveStep((current) => Math.min(current + 1, formSteps.length - 1));
@@ -649,7 +681,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     }
 
     if (step === activeStep + 1) {
-      goToNextStep();
+      void goToNextStep();
     }
   }
 
@@ -664,6 +696,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           <CardContent className="mx-auto max-w-xl space-y-5 p-4 md:p-8">
             <Button
               className="h-14 w-full text-base"
+              disabled={isCheckingDuplicate}
               type="button"
               onClick={() => setIsLicensePlateScannerOpen(true)}
             >
@@ -683,11 +716,13 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                 <select
                   aria-label="Pays de la plaque"
                   className="h-12 min-w-0 rounded-md border border-gray-200 bg-white px-2 text-sm text-gray-950 shadow-sm"
+                  disabled={isCheckingDuplicate}
                   value={licensePlateCountry}
                   onChange={(event) => {
                     setLicensePlateCountry(event.target.value);
                     setLicensePlateRecognitionConfidence(undefined);
                     setDuplicateVehicleCheck(null);
+                    setHasDuplicateVehicleCheck(false);
                   }}
                 >
                   {licensePlateCountries.map((country) => (
@@ -700,12 +735,14 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                   autoCapitalize="characters"
                   autoComplete="off"
                   className="h-12 min-w-0 text-base font-semibold uppercase tracking-wide"
+                  disabled={isCheckingDuplicate}
                   maxLength={20}
                   value={licensePlate}
                   onChange={(event) => {
                     setLicensePlate(sanitizeLicensePlateInput(event.target.value));
                     setLicensePlateRecognitionConfidence(undefined);
                     setDuplicateVehicleCheck(null);
+                    setHasDuplicateVehicleCheck(false);
                   }}
                   placeholder="Plaque"
                 />
@@ -730,17 +767,23 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
               </div>
             ) : null}
 
-            {duplicateVehicleCheck ? (
+            {hasDuplicateVehicleCheck ? (
               <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
                 <p className="font-semibold">Ce vehicule possede deja un controle.</p>
-                <p className="mt-1">
-                  {duplicateVehicleCheck.checkNumber} · {formatDate(duplicateVehicleCheck.checkDate)}
-                </p>
-                <Button asChild className="mt-3" size="sm" variant="outline">
-                  <Link href={`/dashboard/vehicle-checks/${duplicateVehicleCheck.id}`}>
-                    Ouvrir le controle existant
-                  </Link>
-                </Button>
+                {duplicateVehicleCheck ? (
+                  <>
+                    <p className="mt-1">
+                      {duplicateVehicleCheck.checkNumber} · {formatDate(duplicateVehicleCheck.checkDate)}
+                    </p>
+                    <Button asChild className="mt-3" size="sm" variant="outline">
+                      <Link href={`/dashboard/vehicle-checks/${duplicateVehicleCheck.id}`}>
+                        Ouvrir le controle existant
+                      </Link>
+                    </Button>
+                  </>
+                ) : (
+                  <p className="mt-1">Ce controle appartient a un autre utilisateur.</p>
+                )}
               </div>
             ) : null}
           </CardContent>
@@ -975,6 +1018,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
         ) : null}
         <StepActions
           activeStep={activeStep}
+          isCheckingDuplicate={isCheckingDuplicate}
           isLastStep={isLastStep}
           isSaving={isSaving}
           isCompletedEdit={isCompletedEdit}
@@ -987,6 +1031,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
       <div className="hidden border-t border-gray-100 pt-4 md:block">
         <StepActions
           activeStep={activeStep}
+          isCheckingDuplicate={isCheckingDuplicate}
           isLastStep={isLastStep}
           isSaving={isSaving}
           isCompletedEdit={isCompletedEdit}
@@ -1036,6 +1081,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
             setLicensePlateCountry(result.country);
             setLicensePlateRecognitionConfidence(result.confidence);
             setDuplicateVehicleCheck(null);
+            setHasDuplicateVehicleCheck(false);
             setIsLicensePlateScannerOpen(false);
           }}
         />
@@ -1115,6 +1161,7 @@ function StepHeader({
 
 function StepActions({
   activeStep,
+  isCheckingDuplicate,
   isLastStep,
   isSaving,
   isCompletedEdit,
@@ -1123,6 +1170,7 @@ function StepActions({
   onValidate,
 }: {
   activeStep: number;
+  isCheckingDuplicate: boolean;
   isLastStep: boolean;
   isSaving: boolean;
   isCompletedEdit: boolean;
@@ -1137,9 +1185,18 @@ function StepActions({
           <ChevronLeft className="h-4 w-4" />
           Retour
         </Button>
-        <Button disabled={isSaving} type="button" onClick={onNext}>
-          Suivant
-          <ChevronRight className="h-4 w-4" />
+        <Button disabled={isSaving || isCheckingDuplicate} type="button" onClick={onNext}>
+          {isCheckingDuplicate ? (
+            <>
+              <LoaderCircle className="h-4 w-4 animate-spin" />
+              Verification...
+            </>
+          ) : (
+            <>
+              Suivant
+              <ChevronRight className="h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
     );
