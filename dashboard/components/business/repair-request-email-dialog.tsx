@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Loader2, Mail, Send, X } from "lucide-react";
+import { CarFront, Copy, Loader2, Mail, Send, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,7 @@ export function RepairRequestEmailDialog({
   );
   const selectedCompany = companies.find((company) => company.id === selectedCompanyId);
   const companyContacts = selectedCompany?.contacts ?? [];
+  const isAlreadyDeposited = Boolean(vehicleCheck.publicShare?.takenInChargeAt);
   const isNewCompany = selectedCompanyId === NEW_COMPANY_VALUE;
   const isNewSingleContact = selectedSingleContactId === NEW_CONTACT_VALUE || !companyContacts.length;
 
@@ -162,10 +163,12 @@ export function RepairRequestEmailDialog({
       const url = new URL(`/public/repairs/${share.token}`, window.location.origin).toString();
       setPublicUrl(url);
       onSent?.({ ...vehicleCheck, publicShare: share });
-      toast.success(`Email envoye a ${share.recipientEmails.length} destinataire(s).`);
+      toast.success(
+        `Dépôt confirmé chez ${companyName}. Le dossier a été envoyé à ${share.recipientEmails.length} destinataire(s).`,
+      );
       onOpenChange(false);
     } catch {
-      toast.error("Impossible d'envoyer l'email prestataire.");
+      toast.error("Impossible de confirmer le dépôt chez le prestataire.");
     } finally {
       setIsSending(false);
     }
@@ -189,8 +192,12 @@ export function RepairRequestEmailDialog({
       <div aria-busy={isSending} className="relative w-full max-w-2xl overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl">
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
           <div>
-            <p className="text-base font-bold text-slate-950">Envoyer a un prestataire</p>
-            <p className="mt-1 text-sm text-slate-500">Selectionne une entreprise, puis un ou plusieurs emails.</p>
+            <p className="text-base font-bold text-slate-950">Confirmer le dépôt</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {isAlreadyDeposited
+                ? "Le dépôt est déjà confirmé. Vous pouvez mettre à jour le prestataire et renvoyer le dossier."
+                : "Sélectionnez le prestataire chez lequel le véhicule est déposé."}
+            </p>
           </div>
           <Button
             aria-label="Fermer"
@@ -282,10 +289,17 @@ export function RepairRequestEmailDialog({
             </>
           ) : null}
 
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-            <p className="font-semibold text-slate-950">Email envoye directement</p>
-            <p className="mt-1">{mailSubject(vehicleCheck)}</p>
-            <p className="mt-1 text-xs">{selectedItemsCount} reparation(s) selectionnee(s), photos incluses dans le lien public.</p>
+          <div className="rounded-lg border border-teal-100 bg-teal-50/70 p-3 text-sm text-teal-900">
+            <p className="font-semibold">En confirmant le dépôt :</p>
+            <p className="mt-1">
+              {isAlreadyDeposited
+                ? "le véhicule restera au statut « Chez le prestataire » et le dossier sera renvoyé par email aux contacts sélectionnés."
+                : "le véhicule passera au statut « Chez le prestataire » et le dossier sera envoyé par email aux contacts sélectionnés."}
+            </p>
+            <p className="mt-2 flex items-start gap-2 text-xs text-teal-800">
+              <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>{mailSubject(vehicleCheck)} · {selectedItemsCount} réparation(s), photos accessibles depuis le lien public.</span>
+            </p>
           </div>
 
           {publicUrl ? (
@@ -301,8 +315,8 @@ export function RepairRequestEmailDialog({
             Annuler
           </Button>
           <Button disabled={isSending} type="button" onClick={() => void sendEmail()}>
-            {isSending ? <Send className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
-            {isSending ? "Envoi..." : "Envoyer l'email"}
+            {isSending ? <Send className="h-4 w-4" /> : <CarFront className="h-4 w-4" />}
+            {isSending ? "Confirmation..." : "Confirmer le dépôt"}
           </Button>
         </div>
 
@@ -310,8 +324,8 @@ export function RepairRequestEmailDialog({
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/80 backdrop-blur-sm">
             <div className="rounded-lg border border-slate-200 bg-white px-5 py-4 text-center shadow-lg">
               <Loader2 className="mx-auto h-6 w-6 animate-spin text-teal-700" />
-              <p className="mt-3 text-sm font-semibold text-slate-950">{"Envoi de l'email en cours"}</p>
-              <p className="mt-1 text-xs text-slate-500">Merci de patienter quelques secondes.</p>
+              <p className="mt-3 text-sm font-semibold text-slate-950">Confirmation du dépôt</p>
+              <p className="mt-1 text-xs text-slate-500">Le dossier est envoyé au prestataire.</p>
             </div>
           </div>
         ) : null}

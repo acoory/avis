@@ -115,9 +115,9 @@ function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
       value: formatInteger(stats.toOrderCount),
     },
     {
-      description: "Syntheses finalisees",
+      description: "Dossiers reellement termines",
       icon: CheckCircle2,
-      title: "Completes",
+      title: "Termines",
       tone: "teal",
       value: formatInteger(stats.completedCount),
     },
@@ -181,10 +181,14 @@ function vehicleCheckStats(vehicleChecks: VehicleCheck[]): VehicleCheckStats {
 
       stats.totalCount += 1;
       stats.totalSavingAmount += numberValue(check.totalInternalSavingAmount);
-      if (check.status === "SUMMARY_READY") stats.completedCount += 1;
+      if (
+        check.status === "CLOSED_NO_DAMAGE" ||
+        check.status === "COMPLETED"
+      )
+        stats.completedCount += 1;
       if (check.status === "TO_ANALYZE") stats.toAnalyzeCount += 1;
       if (check.status === "DRAFT") stats.draftCount += 1;
-      if (check.publicShare && !check.publicShare.vehicleRecoveredAt) stats.takenInChargeCount += 1;
+      if (check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt) stats.takenInChargeCount += 1;
       if (check.publicShare?.vehicleRecoveredAt) stats.recoveredCount += 1;
       stats.toOrderCount += activeItems.filter((item) => item.partOrderStatus === "TO_ORDER").length;
 

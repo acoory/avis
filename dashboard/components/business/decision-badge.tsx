@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { RepairDecisionStatus, VehicleCheckStatus } from "@/types/business";
+import { RepairDecisionStatus, VehicleCheck, VehicleCheckStatus } from "@/types/business";
 
 const decisionLabels: Record<RepairDecisionStatus, string> = {
   ACCEPTED: "Accepte",
@@ -25,10 +25,38 @@ const checkLabels: Record<VehicleCheckStatus, string> = {
   DRAFT: "Brouillon",
   TO_ANALYZE: "A analyser",
   SUMMARY_READY: "Synthese prete",
+  CLOSED_NO_DAMAGE: "Terminé",
+  COMPLETED: "Terminé",
   CANCELLED: "Annule",
 };
 
-export function VehicleCheckStatusBadge({ status }: { status: VehicleCheckStatus }) {
+type VehicleCheckStatusBadgeProps = {
+  publicShare?: VehicleCheck["publicShare"];
+  status: VehicleCheckStatus;
+  workflowStage?: boolean;
+};
+
+export function VehicleCheckStatusBadge({
+  publicShare,
+  status,
+  workflowStage = false,
+}: VehicleCheckStatusBadgeProps) {
+  if (
+    status === "CLOSED_NO_DAMAGE" ||
+    status === "COMPLETED" ||
+    (workflowStage && Boolean(publicShare?.vehicleRecoveredAt))
+  ) {
+    return <Badge className="bg-blue-50 text-blue-700">Terminé</Badge>;
+  }
+
+  if (workflowStage && status === "SUMMARY_READY") {
+    return (
+      <Badge variant="warning">
+        {publicShare?.takenInChargeAt ? "Récupération" : "Dépôt à confirmer"}
+      </Badge>
+    );
+  }
+
   const variant =
     status === "SUMMARY_READY"
       ? "success"

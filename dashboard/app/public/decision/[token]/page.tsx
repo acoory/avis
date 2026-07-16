@@ -36,11 +36,8 @@ export default function PublicDecisionRequestPage() {
   const [code, setCode] = useState("");
   const [gallery, setGallery] = useState<PhotoGallery | null>(null);
 
-  const loadShare = useCallback(async () => {
-    const nextShare = await businessService.publicVehicleCheckDecisionShare(
-      params.token,
-    );
-    setShare(nextShare);
+  const fetchShare = useCallback(async () => {
+    return businessService.publicVehicleCheckDecisionShare(params.token);
   }, [params.token]);
 
   const loadAccess = useCallback(async () => {
@@ -54,15 +51,16 @@ export default function PublicDecisionRequestPage() {
         // once so the personal-code screen remains available.
         nextAccess = await businessService.publicDecisionAccess(params.token);
       }
+      const nextShare = nextAccess.authenticated ? await fetchShare() : null;
+      setShare(nextShare);
       setAccess(nextAccess);
-      if (nextAccess.authenticated) await loadShare();
     } catch {
       setAccess(null);
       setShare(null);
     } finally {
       setIsLoading(false);
     }
-  }, [loadShare, params.token]);
+  }, [fetchShare, params.token]);
 
   useEffect(() => {
     queueMicrotask(() => void loadAccess());
@@ -75,17 +73,24 @@ export default function PublicDecisionRequestPage() {
       return;
     }
     setIsVerifying(true);
+    let identityVerified = false;
     try {
       const nextAccess = await businessService.verifyPublicDecisionAccessCode(
         params.token,
         code,
       );
+      identityVerified = true;
+      const nextShare = await fetchShare();
+      setShare(nextShare);
       setAccess(nextAccess);
-      await loadShare();
       setCode("");
       toast.success("Identite verifiee. Cet appareil est maintenant reconnu.");
     } catch {
-      toast.error("Code incorrect ou temporairement bloque.");
+      toast.error(
+        identityVerified
+          ? "Identite verifiee, mais le dossier n'a pas pu etre charge. Reessayez."
+          : "Code incorrect ou temporairement bloque.",
+      );
     } finally {
       setIsVerifying(false);
     }

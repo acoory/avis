@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cloudinaryPreviewUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
-import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
+import { formatDate, formatLicensePlate } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { PublicVehicleCheckShare, VehicleCheckItem } from "@/types/business";
 
@@ -445,14 +445,7 @@ function PartOrderBadge({ item }: { item: VehicleCheckItem }) {
   }
 
   if (item.partOrderStatus === "ORDERED") {
-    return (
-      <div className="space-y-1">
-        <Badge variant="success">Piece commandee</Badge>
-        <p className="text-xs text-slate-500">
-          {formatMoney(item.partOrderPrice)}{item.partOrderReference ? ` | ${item.partOrderReference}` : ""}
-        </p>
-      </div>
-    );
+    return <Badge variant="success">Piece commandee</Badge>;
   }
 
   return <Badge variant="warning">Piece a commander</Badge>;

@@ -469,8 +469,6 @@ export const businessService = {
     payload: {
       partOrderRequired?: boolean;
       partOrderStatus?: "NOT_REQUIRED" | "TO_ORDER" | "ORDERED";
-      partOrderPrice?: number;
-      partOrderReference?: string;
     },
   ) {
     const { data } = await api.patch<VehicleCheckItem>(

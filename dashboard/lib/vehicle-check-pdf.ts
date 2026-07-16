@@ -17,7 +17,11 @@ const operationalStatusLabels = {
 } as const;
 
 export async function createVehicleCheckPdfFile(vehicleCheck: VehicleCheck) {
-  if (vehicleCheck.status !== "SUMMARY_READY") {
+  if (
+    vehicleCheck.status !== "SUMMARY_READY" &&
+    vehicleCheck.status !== "CLOSED_NO_DAMAGE" &&
+    vehicleCheck.status !== "COMPLETED"
+  ) {
     throw new Error("The summary is not ready");
   }
 
@@ -154,9 +158,7 @@ export async function createVehicleCheckPdfFile(vehicleCheck: VehicleCheck) {
         item.comment?.trim() ? `Commentaire : ${item.comment}` : null,
         item.operationalComment?.trim() ? `Suivi : ${item.operationalComment}` : null,
         item.partOrderRequired
-          ? `Commande piece : ${item.partOrderStatus === "ORDERED" ? "commandee" : "a commander"}${
-              item.partOrderReference ? ` (${item.partOrderReference})` : ""
-            }`
+          ? `Commande piece : ${item.partOrderStatus === "ORDERED" ? "commandee" : "a commander"}`
           : null,
       ].filter((value): value is string => Boolean(value));
       const estimatedHeight = 19 + detailLines.join(" ").length / 55 * 4;

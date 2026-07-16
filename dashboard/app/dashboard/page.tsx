@@ -154,11 +154,11 @@ export default function DashboardPage() {
         value: formatInteger(vehicleChecksCount),
       },
       {
-        description: "Syntheses finalisees",
+        description: "Dossiers reellement termines",
         chartData: timelineChartData(timeline, "completedVehicleChecksCount"),
         chartValueFormatter: formatInteger,
         icon: CheckCircle2,
-        title: "Controles completes",
+        title: "Controles termines",
         tone: "teal" as KpiTone,
         trend: trendLabel(completedVehicleChecksCount, previousCompletedVehicleChecksCount),
         trendTooltip: comparisonTooltip,
@@ -504,7 +504,7 @@ function ActivityRow({ check, index }: { check: VehicleCheck; index: number }) {
   const collaborator = check.collaborator ? `${check.collaborator.firstName} ${check.collaborator.lastName}` : "Controle non assigne";
   const damageCount = check.items?.length ?? 0;
   const selectedDamageCount = check.items?.filter((item) => item.selectedForSummary).length ?? 0;
-  const status = statusLabel(check.status);
+  const status = statusLabel(check);
 
   return (
     <Link
@@ -618,8 +618,17 @@ function trendLabel(current: number, previous: number): KpiTrend {
   };
 }
 
-function statusLabel(status: VehicleCheck["status"]) {
-  if (status === "SUMMARY_READY") return { className: "bg-emerald-50 text-emerald-700", label: "Complete" };
+function statusLabel(check: VehicleCheck) {
+  const { publicShare, status } = check;
+
+  if (status === "CLOSED_NO_DAMAGE" || status === "COMPLETED" || publicShare?.vehicleRecoveredAt) {
+    return { className: "bg-blue-50 text-blue-700", label: "Terminé" };
+  }
+  if (status === "SUMMARY_READY") {
+    return publicShare?.takenInChargeAt
+      ? { className: "bg-amber-50 text-amber-700", label: "Récupération" }
+      : { className: "bg-amber-50 text-amber-700", label: "Dépôt à confirmer" };
+  }
   if (status === "TO_ANALYZE") return { className: "bg-amber-50 text-amber-700", label: "A analyser" };
   if (status === "CANCELLED") return { className: "bg-red-50 text-red-700", label: "Annule" };
   return { className: "bg-slate-100 text-slate-600", label: "Brouillon" };

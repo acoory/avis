@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import {
+  CarFront,
   CheckCircle2,
   Download,
-  Mail,
   MessageSquareText,
   Pencil,
   Trash2,
@@ -38,10 +38,21 @@ export function VehicleCheckActions({
   const [decisionDialogOpen, setDecisionDialogOpen] = useState(false);
   const [recoveredDialogOpen, setRecoveredDialogOpen] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
-  const canRequestDecision = vehicleCheck.status !== "DRAFT";
-  const canShareSummary = vehicleCheck.status === "SUMMARY_READY";
+  const canRequestDecision =
+    vehicleCheck.status !== "DRAFT" &&
+    vehicleCheck.status !== "CLOSED_NO_DAMAGE" &&
+    vehicleCheck.status !== "COMPLETED";
+  const canDownloadSummary =
+    vehicleCheck.status === "SUMMARY_READY" ||
+    vehicleCheck.status === "CLOSED_NO_DAMAGE" ||
+    vehicleCheck.status === "COMPLETED";
+  const canConfirmDeposit = vehicleCheck.status === "SUMMARY_READY";
+  const canEdit = vehicleCheck.status !== "COMPLETED";
   const canMarkRecovered = Boolean(
-    vehicleCheck.publicShare && !vehicleCheck.publicShare.vehicleRecoveredAt,
+    vehicleCheck.status === "SUMMARY_READY" &&
+      vehicleCheck.publicShare &&
+      vehicleCheck.publicShare.takenInChargeAt &&
+      !vehicleCheck.publicShare.vehicleRecoveredAt,
   );
   const canDelete = true;
   const latestDecisionShare = (vehicleCheck.decisionShares ?? []).reduce<
@@ -86,7 +97,7 @@ export function VehicleCheckActions({
     <>
       <div className="flex flex-col gap-2 sm:items-end">
         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:max-w-xl sm:flex-wrap sm:justify-end">
-          {canShareSummary ? (
+          {canDownloadSummary ? (
             <Button
               className="w-full sm:w-auto"
               disabled={isDownloading}
@@ -98,20 +109,18 @@ export function VehicleCheckActions({
               {isDownloading ? "Generation..." : "PDF"}
             </Button>
           ) : null}
-          {canShareSummary ? (
+          {canConfirmDeposit ? (
             <Button
               className="w-full sm:w-auto"
               size="sm"
               type="button"
-              variant="outline"
               onClick={onSendRepairRequest}
             >
-              <Mail className="h-4 w-4" />
-              Envoyer par email
+              <CarFront className="h-4 w-4" />
+              Confirmer le dépôt
             </Button>
           ) : null}
-          {canRequestDecision ? (
-            latestDecisionShare ? (
+          {latestDecisionShare ? (
               <Button
                 asChild
                 className="w-full sm:w-auto"
@@ -123,7 +132,7 @@ export function VehicleCheckActions({
                   Consulter l&apos;avis
                 </Link>
               </Button>
-            ) : (
+          ) : canRequestDecision ? (
               <Button
                 className="w-full sm:w-auto"
                 size="sm"
@@ -134,7 +143,6 @@ export function VehicleCheckActions({
                 <MessageSquareText className="h-4 w-4" />
                 Avis manager
               </Button>
-            )
           ) : null}
           {canMarkRecovered ? (
             <Button
@@ -148,28 +156,33 @@ export function VehicleCheckActions({
               Marquer recupere
             </Button>
           ) : null}
-          <Button
-            asChild
-            className="w-full sm:w-auto"
-            size="sm"
-            variant="outline"
-          >
-            <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>
-              <Pencil className="h-4 w-4" />
-              Modifier
-            </Link>
-          </Button>
-          {canDelete ? (
-            <Button
-              className="w-full border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 sm:w-auto"
-              size="sm"
-              type="button"
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <Trash2 className="h-4 w-4" />
-              Supprimer
-            </Button>
+          {canEdit || canDelete ? (
+            <div className="col-span-2 flex items-center justify-end gap-1 sm:col-auto">
+              {canEdit ? (
+                <Button asChild className="h-8 w-8" size="icon" variant="ghost">
+                  <Link
+                    aria-label="Modifier le contrôle"
+                    href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}
+                    title="Modifier"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              ) : null}
+              {canDelete ? (
+                <Button
+                  aria-label="Supprimer le contrôle"
+                  className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700"
+                  size="icon"
+                  title="Supprimer"
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setDeleteDialogOpen(true)}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              ) : null}
+            </div>
           ) : null}
           {canComplete ? (
             <Button

@@ -1,4 +1,10 @@
-export type VehicleCheckStatus = "DRAFT" | "TO_ANALYZE" | "SUMMARY_READY" | "CANCELLED";
+export type VehicleCheckStatus =
+  | "DRAFT"
+  | "TO_ANALYZE"
+  | "SUMMARY_READY"
+  | "CLOSED_NO_DAMAGE"
+  | "COMPLETED"
+  | "CANCELLED";
 export type RepairDecisionStatus =
   | "ACCEPTED"
   | "TO_CHECK"

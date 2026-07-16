@@ -8,7 +8,6 @@ import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-
 import { DataTable } from "@/components/dashboard/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cloudinaryOriginalUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
@@ -121,7 +120,13 @@ export function VehicleCheckTable({
           {
             id: "status",
             header: "Statut",
-            cell: (check) => <VehicleCheckStatusBadge status={check.status} />,
+            cell: (check) => (
+              <VehicleCheckStatusBadge
+                publicShare={check.publicShare}
+                status={check.status}
+                workflowStage
+              />
+            ),
             sortValue: (check) => check.status,
             searchValue: (check) => check.status,
           },
@@ -137,12 +142,24 @@ export function VehicleCheckTable({
             header: "Prestataire",
             cell: (check) => <PublicShareStatusBadge vehicleCheck={check} />,
             sortValue: (check) =>
-              check.publicShare?.vehicleRecoveredAt ? 3 : check.publicShare ? 2 : 0,
+              check.status === "CLOSED_NO_DAMAGE"
+                ? 4
+                : check.publicShare?.vehicleRecoveredAt
+                  ? 3
+                  : check.publicShare?.takenInChargeAt
+                    ? 2
+                    : check.publicShare
+                      ? 1
+                    : 0,
             searchValue: (check) =>
-              check.publicShare?.vehicleRecoveredAt
+              check.status === "CLOSED_NO_DAMAGE"
+                ? "Non requis"
+                : check.publicShare?.vehicleRecoveredAt
                 ? "Recupere"
-                : check.publicShare
+                : check.publicShare?.takenInChargeAt
                   ? "Chez le prestataire"
+                  : check.publicShare
+                    ? "Depot a confirmer"
                   : "Non envoye",
           },
           {
@@ -151,7 +168,7 @@ export function VehicleCheckTable({
             className: "px-4 py-3",
             cell: (check) => (
               <div className="flex flex-nowrap gap-1.5">
-                {check.publicShare && !check.publicShare.vehicleRecoveredAt ? (
+                {check.status === "SUMMARY_READY" && check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt ? (
                   <Button
                     aria-label={`Marquer le vehicule ${formatLicensePlate(
                       check.licensePlate,
@@ -238,7 +255,12 @@ function VehicleCheckMobileCard({
   onDelete: () => void;
   onRecover: () => void;
 }) {
-  const canRecover = Boolean(check.publicShare && !check.publicShare.vehicleRecoveredAt);
+  const canRecover = Boolean(
+    check.status === "SUMMARY_READY" &&
+      check.publicShare &&
+      check.publicShare.takenInChargeAt &&
+      !check.publicShare.vehicleRecoveredAt,
+  );
   const vehicleLabel = formatLicensePlate(
     check.licensePlate,
     check.licensePlateCountry,
@@ -257,7 +279,11 @@ function VehicleCheckMobileCard({
           </Link>
           <p className="mt-1 text-xs font-semibold text-gray-500">{check.checkNumber}</p>
         </div>
-        <VehicleCheckStatusBadge status={check.status} />
+        <VehicleCheckStatusBadge
+          publicShare={check.publicShare}
+          status={check.status}
+          workflowStage
+        />
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
@@ -486,6 +512,10 @@ function PartOrderSummaryBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck })
 function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
   const share = vehicleCheck.publicShare;
 
+  if (vehicleCheck.status === "CLOSED_NO_DAMAGE") {
+    return <Badge variant="outline">Non requis</Badge>;
+  }
+
   if (!share) {
     return <Badge variant="outline">Non envoye</Badge>;
   }
@@ -495,6 +525,19 @@ function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }
       <div className="space-y-1">
         <Badge className="bg-blue-50 text-blue-700">Recupere</Badge>
         <p className="text-xs font-medium text-gray-500">{formatShortDateTime(share.vehicleRecoveredAt)}</p>
+        {share.externalRepairContact ? (
+          <p className="max-w-40 truncate text-xs font-medium text-gray-500" title={externalRepairContactLabel(share.externalRepairContact)}>
+            {externalRepairContactLabel(share.externalRepairContact)}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (!share.takenInChargeAt) {
+    return (
+      <div className="space-y-1">
+        <Badge variant="outline">Dépôt à confirmer</Badge>
         {share.externalRepairContact ? (
           <p className="max-w-40 truncate text-xs font-medium text-gray-500" title={externalRepairContactLabel(share.externalRepairContact)}>
             {externalRepairContactLabel(share.externalRepairContact)}
@@ -819,8 +862,6 @@ function PartOrderCell({
   item: VehicleCheckItem;
   onPartOrderUpdated?: (item: VehicleCheckItem) => void;
 }) {
-  const [price, setPrice] = useState(item.partOrderPrice ? String(item.partOrderPrice) : "");
-  const [reference, setReference] = useState(item.partOrderReference ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
   if (item.operationalStatus !== "ACTIVE") {
@@ -833,12 +874,15 @@ function PartOrderCell({
 
   if (item.partOrderStatus === "ORDERED") {
     return (
-      <div className="space-y-1 text-sm">
+      <div className="flex min-w-40 flex-col items-start gap-2 text-sm">
         <span className="inline-flex rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
           Commandée
         </span>
-        <p className="text-gray-600">{formatMoney(item.partOrderPrice)}</p>
-        {item.partOrderReference ? <p className="text-xs text-gray-500">{item.partOrderReference}</p> : null}
+        {onPartOrderUpdated ? (
+          <Button disabled={isSaving} size="sm" type="button" variant="outline" onClick={() => updateOrderStatus("TO_ORDER")}>
+            {isSaving ? "Mise à jour..." : "Marquer à commander"}
+          </Button>
+        ) : null}
       </div>
     );
   }
@@ -851,53 +895,33 @@ function PartOrderCell({
     );
   }
 
-  async function confirmOrder() {
-    const numericPrice = Number(price);
-    if (!price || Number.isNaN(numericPrice) || numericPrice < 0) {
-      toast.error("Renseigne le prix de la pièce commandée.");
-      return;
-    }
-
+  async function updateOrderStatus(partOrderStatus: "TO_ORDER" | "ORDERED") {
     setIsSaving(true);
     try {
       const updatedItem = await businessService.updatePartOrder(item.id, {
         partOrderRequired: true,
-        partOrderStatus: "ORDERED",
-        partOrderPrice: numericPrice,
-        partOrderReference: reference || undefined,
+        partOrderStatus,
       });
       onPartOrderUpdated?.(updatedItem);
-      toast.success("Commande pièce confirmée.");
+      toast.success(
+        partOrderStatus === "ORDERED"
+          ? "Pièce marquée comme commandée."
+          : "Pièce remise à commander.",
+      );
     } catch {
-      toast.error("Impossible de confirmer la commande pièce.");
+      toast.error("Impossible de mettre à jour la commande pièce.");
     } finally {
       setIsSaving(false);
     }
   }
 
   return (
-    <div className="min-w-52 space-y-2">
+    <div className="flex min-w-40 flex-col items-start gap-2">
       <span className="inline-flex rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
         À commander
       </span>
-      <div className="grid grid-cols-2 gap-2">
-        <Input
-          className="h-9"
-          inputMode="decimal"
-          placeholder="Prix"
-          type="number"
-          value={price}
-          onChange={(event) => setPrice(event.target.value)}
-        />
-        <Input
-          className="h-9"
-          placeholder="Ref."
-          value={reference}
-          onChange={(event) => setReference(event.target.value)}
-        />
-      </div>
-      <Button className="h-9 w-full" disabled={isSaving} size="sm" type="button" onClick={confirmOrder}>
-        {isSaving ? "Confirmation..." : "Confirmer commande"}
+      <Button disabled={isSaving} size="sm" type="button" onClick={() => updateOrderStatus("ORDERED")}>
+        {isSaving ? "Confirmation..." : "Marquer commandée"}
       </Button>
     </div>
   );

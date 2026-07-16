@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,13 @@ export function VehicleRecoveredDialog({
     selectedVehicleCheck.licensePlateCountry,
     selectedVehicleCheck.licensePlateRaw,
   );
+  const pendingPartOrdersCount = (selectedVehicleCheck.items ?? []).filter(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.partOrderRequired &&
+      item.partOrderStatus === "TO_ORDER",
+  ).length;
 
   function closeDialog() {
     if (!isSaving) {
@@ -44,11 +51,15 @@ export function VehicleRecoveredDialog({
     setIsSaving(true);
     try {
       const updated = await businessService.markVehicleRecovered(selectedVehicleCheck.id);
-      toast.success("Vehicule marque comme recupere.");
+      toast.success("Vehicule recupere. Le dossier est termine.");
       onRecovered?.(updated);
       onOpenChange(false);
-    } catch {
-      toast.error("Impossible de marquer le vehicule comme recupere.");
+    } catch (error) {
+      toast.error(
+        apiErrorCode(error) === "VEHICLE_CHECK_PENDING_PART_ORDERS"
+          ? "Finalisez les commandes de pieces avant de recuperer le vehicule."
+          : "Impossible de marquer le vehicule comme recupere.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -77,7 +88,7 @@ export function VehicleRecoveredDialog({
               </h2>
               <p className="mt-2 text-sm leading-6 text-gray-600">
                 Le vehicule <span className="font-medium text-gray-950">{vehicleLabel}</span> passera au statut{" "}
-                <span className="font-medium text-gray-950">Recupere</span> dans le suivi prestataire.
+                <span className="font-medium text-gray-950">Terminé</span>. Cette action cloture le suivi prestataire.
               </p>
             </div>
           </div>
@@ -86,16 +97,32 @@ export function VehicleRecoveredDialog({
           </Button>
         </div>
 
+        {pendingPartOrdersCount > 0 ? (
+          <div className="mt-4 flex gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <p>
+              {pendingPartOrdersCount} piece{pendingPartOrdersCount > 1 ? "s" : ""} reste{pendingPartOrdersCount > 1 ? "nt" : ""} a commander. Finalisez {pendingPartOrdersCount > 1 ? "ces commandes" : "cette commande"} avant la recuperation.
+            </p>
+          </div>
+        ) : null}
+
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button disabled={isSaving} type="button" variant="outline" onClick={closeDialog}>
             Annuler
           </Button>
-          <Button disabled={isSaving} type="button" onClick={confirmRecovered}>
+          <Button disabled={isSaving || pendingPartOrdersCount > 0} type="button" onClick={confirmRecovered}>
             <CheckCircle2 className="h-4 w-4" />
-            {isSaving ? "Validation..." : "Confirmer"}
+            {isSaving ? "Validation..." : "Confirmer et terminer"}
           </Button>
         </div>
       </div>
     </div>
   );
+}
+
+function apiErrorCode(error: unknown) {
+  if (!error || typeof error !== "object") return null;
+
+  const response = (error as { response?: { data?: { code?: unknown } } }).response;
+  return typeof response?.data?.code === "string" ? response.data.code : null;
 }

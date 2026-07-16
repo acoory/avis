@@ -60,7 +60,11 @@ export default function VehicleCheckPrintPage() {
     return <PageHeader title="Controle introuvable" description="Impossible de charger cette synthese." />;
   }
 
-  if (vehicleCheck.status !== "SUMMARY_READY") {
+  if (
+    vehicleCheck.status !== "SUMMARY_READY" &&
+    vehicleCheck.status !== "CLOSED_NO_DAMAGE" &&
+    vehicleCheck.status !== "COMPLETED"
+  ) {
     return (
       <PageHeader
         title="Synthese non disponible"
@@ -121,7 +125,11 @@ export default function VehicleCheckPrintPage() {
             </div>
             <div className="space-y-1 text-sm">
               <div className="flex justify-end">
-                <VehicleCheckStatusBadge status={vehicleCheck.status} />
+                <VehicleCheckStatusBadge
+                  publicShare={vehicleCheck.publicShare}
+                  status={vehicleCheck.status}
+                  workflowStage
+                />
               </div>
               <p className="text-right text-xs text-gray-600">
                 Genere le {formatDate(new Date())}
@@ -264,14 +272,7 @@ function PartOrderBadge({ item }: { item: NonNullable<VehicleCheck["items"]>[num
   }
 
   if (item.partOrderStatus === "ORDERED") {
-    return (
-      <div className="space-y-1">
-        <Badge variant="success">Piece commandee</Badge>
-        <p className="text-xs text-gray-500">
-          {formatMoney(item.partOrderPrice)}{item.partOrderReference ? ` | ${item.partOrderReference}` : ""}
-        </p>
-      </div>
-    );
+    return <Badge variant="success">Piece commandee</Badge>;
   }
 
   return <Badge variant="warning">Piece a commander</Badge>;
