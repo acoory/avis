@@ -602,7 +602,8 @@ export class VehicleChecksService {
 
     if (
       !share?.isEnabled ||
-      share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY
+      (share.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY &&
+        share.vehicleCheck.status !== VehicleCheckStatus.COMPLETED)
     ) {
       throw new NotFoundException('Public repair request not found');
     }
@@ -690,22 +691,71 @@ export class VehicleChecksService {
   async markVehicleRecovered(id: string, user: CurrentUserPayload) {
     const vehicleCheck = await this.findOne(id, user);
 
+    if (
+      vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY &&
+      vehicleCheck.status !== VehicleCheckStatus.COMPLETED
+    ) {
+      throw new BadRequestException(
+        'Only a vehicle sent to a repair provider can be marked as recovered',
+      );
+    }
+
     if (!vehicleCheck.publicShare) {
       throw new BadRequestException(
         'The repair request must be shared before marking the vehicle as recovered',
       );
     }
 
-    if (!vehicleCheck.publicShare.vehicleRecoveredAt) {
-      await this.prisma.vehicleCheckPublicShare.update({
-        where: { vehicleCheckId: id },
-        data: {
-          takenInChargeAt:
-            vehicleCheck.publicShare.takenInChargeAt ?? new Date(),
-          vehicleRecoveredAt: new Date(),
-          vehicleRecoveredById: user.sub,
-        },
+    if (!vehicleCheck.publicShare.takenInChargeAt) {
+      throw new BadRequestException(
+        'The vehicle must be deposited with the repair provider before it can be recovered',
+      );
+    }
+
+    const shouldMarkAsRecovered = !vehicleCheck.publicShare.vehicleRecoveredAt;
+    const pendingPartOrders = (vehicleCheck.items ?? []).filter(
+      (item) =>
+        item.selectedForSummary &&
+        item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
+        item.partOrderRequired &&
+        item.partOrderStatus === PartOrderStatus.TO_ORDER,
+    );
+
+    if (shouldMarkAsRecovered && pendingPartOrders.length > 0) {
+      throw new BadRequestException({
+        code: 'VEHICLE_CHECK_PENDING_PART_ORDERS',
+        message:
+          'All required part orders must be completed before recovering the vehicle',
+        pendingPartOrdersCount: pendingPartOrders.length,
       });
+    }
+
+    const recoveredAt = new Date();
+    let vehicleWasMarkedAsRecovered = false;
+    await this.prisma.$transaction(async (transaction) => {
+      if (shouldMarkAsRecovered) {
+        const updateResult =
+          await transaction.vehicleCheckPublicShare.updateMany({
+            where: { vehicleCheckId: id, vehicleRecoveredAt: null },
+            data: {
+              takenInChargeAt:
+                vehicleCheck.publicShare?.takenInChargeAt ?? recoveredAt,
+              vehicleRecoveredAt: recoveredAt,
+              vehicleRecoveredById: user.sub,
+            },
+          });
+        vehicleWasMarkedAsRecovered = updateResult.count > 0;
+      }
+
+      if (vehicleCheck.status !== VehicleCheckStatus.COMPLETED) {
+        await transaction.vehicleCheck.update({
+          where: { id },
+          data: { status: VehicleCheckStatus.COMPLETED },
+        });
+      }
+    });
+
+    if (vehicleWasMarkedAsRecovered) {
       await this.notificationsService.notifyVehicleEvent(
         id,
         NotificationType.VEHICLE_RECOVERED,
@@ -824,6 +874,12 @@ export class VehicleChecksService {
     user: CurrentUserPayload,
   ) {
     const existing = await this.findOne(id, user);
+
+    if (existing.status === VehicleCheckStatus.COMPLETED) {
+      throw new BadRequestException(
+        'A completed vehicle check cannot be modified',
+      );
+    }
 
     const agencyId = dto.agencyId ?? existing.agencyId;
     const manufacturerId = dto.manufacturerId ?? existing.manufacturerId;
@@ -1057,6 +1113,9 @@ export class VehicleChecksService {
       (item) =>
         item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE,
     );
+    const closesWithoutDamage =
+      activeSelectedItems.length === 0 &&
+      !vehicleCheck.publicShare?.takenInChargeAt;
     const totalInternalSavingAmount = activeSelectedItems.reduce(
       (total, item) => total.plus(item.totalInternalSavingAmount),
       new Prisma.Decimal(0),
@@ -1082,10 +1141,19 @@ export class VehicleChecksService {
         });
       }
 
+      if (closesWithoutDamage) {
+        await tx.vehicleCheckPublicShare.updateMany({
+          where: { vehicleCheckId: id },
+          data: { isEnabled: false },
+        });
+      }
+
       return tx.vehicleCheck.update({
         where: { id },
         data: {
-          status: VehicleCheckStatus.SUMMARY_READY,
+          status: closesWithoutDamage
+            ? VehicleCheckStatus.CLOSED_NO_DAMAGE
+            : VehicleCheckStatus.SUMMARY_READY,
           summaryFinalizedAt: new Date(),
           totalInternalSavingAmount,
           totalInternalCost,

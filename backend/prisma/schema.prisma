@@ -20,6 +20,8 @@ enum VehicleCheckStatus {
   DRAFT
   TO_ANALYZE
   SUMMARY_READY
+  CLOSED_NO_DAMAGE
+  COMPLETED
   CANCELLED
 }
 

@@ -1,5 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PartOrderStatus, Prisma, VehicleCheckItemOperationalStatus } from '../../prisma/generated/client.cjs';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  PartOrderStatus,
+  Prisma,
+  VehicleCheckItemOperationalStatus,
+  VehicleCheckStatus,
+} from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateOperationalStatusDto } from './dto/update-operational-status.dto';
@@ -12,7 +21,11 @@ export class VehicleCheckItemsService {
   async updatePartOrder(id: string, dto: UpdatePartOrderDto) {
     const item = await this.prisma.vehicleCheckItem.findUnique({
       where: { id },
-      select: { id: true, operationalStatus: true },
+      select: {
+        id: true,
+        operationalStatus: true,
+        vehicleCheck: { select: { status: true } },
+      },
     });
 
     if (!item) {
@@ -20,24 +33,34 @@ export class VehicleCheckItemsService {
     }
 
     if (item.operationalStatus !== VehicleCheckItemOperationalStatus.ACTIVE) {
-      throw new BadRequestException('Part orders cannot be updated on an inactive repair item');
+      throw new BadRequestException(
+        'Part orders cannot be updated on an inactive repair item',
+      );
+    }
+
+    if (item.vehicleCheck.status === VehicleCheckStatus.COMPLETED) {
+      throw new BadRequestException(
+        'Part orders cannot be updated on a completed vehicle check',
+      );
     }
 
     const status = dto.partOrderStatus;
-
-    if (status === PartOrderStatus.ORDERED && dto.partOrderPrice === undefined) {
-      throw new BadRequestException('Part order price is required when confirming an order');
-    }
 
     return this.prisma.vehicleCheckItem.update({
       where: { id },
       data: {
         partOrderRequired:
-          dto.partOrderRequired ?? (status ? status !== PartOrderStatus.NOT_REQUIRED : undefined),
+          dto.partOrderRequired ??
+          (status ? status !== PartOrderStatus.NOT_REQUIRED : undefined),
         partOrderStatus: status,
-        partOrderPrice: status === PartOrderStatus.NOT_REQUIRED ? null : dto.partOrderPrice,
-        partOrderReference: status === PartOrderStatus.NOT_REQUIRED ? null : dto.partOrderReference,
-        partOrderedAt: status === PartOrderStatus.ORDERED ? new Date() : undefined,
+        partOrderPrice: status ? null : undefined,
+        partOrderReference: status ? null : undefined,
+        partOrderedAt:
+          status === PartOrderStatus.ORDERED
+            ? new Date()
+            : status
+              ? null
+              : undefined,
       },
       include: { repairType: true, vehiclePart: true },
     });
@@ -64,8 +87,13 @@ export class VehicleCheckItemsService {
 
     const operationalComment = dto.operationalComment?.trim() || null;
 
-    if (dto.operationalStatus !== VehicleCheckItemOperationalStatus.ACTIVE && !operationalComment) {
-      throw new BadRequestException('A comment is required for this repair status');
+    if (
+      dto.operationalStatus !== VehicleCheckItemOperationalStatus.ACTIVE &&
+      !operationalComment
+    ) {
+      throw new BadRequestException(
+        'A comment is required for this repair status',
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {

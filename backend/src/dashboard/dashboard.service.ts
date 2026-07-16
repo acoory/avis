@@ -34,7 +34,12 @@ export class DashboardService {
       this.prisma.vehicleCheck.count({
         where: {
           ...vehicleCheckScope,
-          status: VehicleCheckStatus.SUMMARY_READY,
+          status: {
+            in: [
+              VehicleCheckStatus.CLOSED_NO_DAMAGE,
+              VehicleCheckStatus.COMPLETED,
+            ],
+          },
         },
       }),
       this.prisma.vehicleCheck.count({
@@ -88,6 +93,25 @@ export class DashboardService {
           vehicleModel: true,
           items: {
             include: { repairType: true, vehiclePart: true },
+          },
+          publicShare: {
+            select: {
+              createdAt: true,
+              externalRepairContact: true,
+              externalRepairContactId: true,
+              takenInChargeAt: true,
+              vehicleRecoveredAt: true,
+              vehicleRecoveredBy: {
+                select: {
+                  email: true,
+                  firstName: true,
+                  id: true,
+                  lastName: true,
+                },
+              },
+              vehicleRecoveredById: true,
+              token: true,
+            },
           },
         },
       }),
@@ -180,6 +204,7 @@ export class DashboardService {
         agency: check.agency,
         collaborator: check.collaborator,
         items: check.items,
+        publicShare: check.publicShare,
       })),
     };
   }
@@ -387,7 +412,10 @@ export class DashboardService {
       };
 
       bucket.vehicleChecksCount += 1;
-      if (check.status === VehicleCheckStatus.SUMMARY_READY)
+      if (
+        check.status === VehicleCheckStatus.CLOSED_NO_DAMAGE ||
+        check.status === VehicleCheckStatus.COMPLETED
+      )
         bucket.completedVehicleChecksCount += 1;
       if (check.status === VehicleCheckStatus.TO_ANALYZE)
         bucket.vehicleChecksToAnalyzeCount += 1;
