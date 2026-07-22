@@ -447,11 +447,17 @@ export const businessService = {
     return data;
   },
 
-  async finalizeVehicleCheckSummary(id: string, selectedItemIds: string[]) {
+  async finalizeVehicleCheckSummary(
+    id: string,
+    items: Array<{
+      executionMode: "ON_SITE" | "EXTERNAL_PROVIDER";
+      id: string;
+    }>,
+  ) {
     const { data } = await api.post<VehicleCheck>(
       `/vehicle-checks/${id}/finalize-summary`,
       {
-        selectedItemIds,
+        items,
       },
     );
     return data;
@@ -474,6 +480,17 @@ export const businessService = {
     const { data } = await api.patch<VehicleCheckItem>(
       `/vehicle-check-items/${id}/part-order`,
       payload,
+    );
+    return data;
+  },
+
+  async updateVehicleCheckItemExecutionStatus(
+    id: string,
+    completed: boolean,
+  ) {
+    const { data } = await api.patch<VehicleCheckItem>(
+      `/vehicle-check-items/${id}/execution-status`,
+      { completed },
     );
     return data;
   },

@@ -66,6 +66,12 @@ export default function VehicleCheckDetailsPage() {
   const agencyName = formatAgencyName(vehicleCheck.agency?.name);
   const repairCount = vehicleCheck.items?.length ?? 0;
   const selectedRepairCount = (vehicleCheck.items ?? []).filter((item) => item.selectedForSummary).length;
+  const externalRepairCount = (vehicleCheck.items ?? []).filter(
+    (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE" && item.executionMode === "EXTERNAL_PROVIDER",
+  ).length;
+  const onSiteRepairCount = (vehicleCheck.items ?? []).filter(
+    (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE" && item.executionMode === "ON_SITE",
+  ).length;
   const hasDetailsComment = Boolean(vehicleCheck.notes?.trim());
   const hasSummaryToPrepare = vehicleCheck.status === "TO_ANALYZE" && !vehicleCheck.summaryFinalizedAt;
   const isClosedWithoutDamage = vehicleCheck.status === "CLOSED_NO_DAMAGE";
@@ -93,6 +99,7 @@ export default function VehicleCheckDetailsPage() {
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-sm font-medium text-gray-500">{vehicleCheck.checkNumber}</p>
               <VehicleCheckStatusBadge
+                items={vehicleCheck.items}
                 publicShare={vehicleCheck.publicShare}
                 status={vehicleCheck.status}
                 workflowStage
@@ -122,8 +129,11 @@ export default function VehicleCheckDetailsPage() {
         ) : null}
 
         {vehicleCheck.status === "SUMMARY_READY" || isCompleted ? (
-          <div className="border-t border-gray-200 px-5 py-4">
-            <RepairRequestStatus vehicleCheck={vehicleCheck} onSendRepairRequest={() => setEmailDialogOpen(true)} />
+          <div className="space-y-3 border-t border-gray-200 px-5 py-4">
+            {onSiteRepairCount ? <OnSiteRepairStatus vehicleCheck={vehicleCheck} /> : null}
+            {externalRepairCount ? (
+              <RepairRequestStatus vehicleCheck={vehicleCheck} onSendRepairRequest={() => setEmailDialogOpen(true)} />
+            ) : null}
           </div>
         ) : null}
 
@@ -159,7 +169,7 @@ export default function VehicleCheckDetailsPage() {
         </details>
       </section>
 
-      {displaysSummary ? <VehicleCheckSummarySelection vehicleCheck={vehicleCheck} onUpdated={setVehicleCheck} /> : null}
+      {displaysSummary ? <VehicleCheckSummarySelection key={vehicleCheck.id} vehicleCheck={vehicleCheck} onUpdated={setVehicleCheck} /> : null}
 
       {!displaysSummary ? (
         <section className="mt-6">
@@ -178,7 +188,7 @@ export default function VehicleCheckDetailsPage() {
         </section>
       ) : null}
 
-      {vehicleCheck.status === "SUMMARY_READY" ? (
+      {vehicleCheck.status === "SUMMARY_READY" && externalRepairCount > 0 ? (
         <RepairRequestEmailDialog open={emailDialogOpen} vehicleCheck={vehicleCheck} onOpenChange={setEmailDialogOpen} onSent={setVehicleCheck} />
       ) : null}
     </>
@@ -197,46 +207,100 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
   const isWithProvider =
     isCompleted || Boolean(vehicleCheck.publicShare?.takenInChargeAt);
   const isRecovered = isCompleted || Boolean(vehicleCheck.publicShare?.vehicleRecoveredAt);
-  const steps = [
+  const selectedItems = (vehicleCheck.items ?? []).filter(
+    (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE",
+  );
+  const onSiteItems = selectedItems.filter((item) => item.executionMode === "ON_SITE");
+  const onSiteCount = onSiteItems.length;
+  const onSiteDoneCount = onSiteItems.filter((item) => Boolean(item.executionCompletedAt)).length;
+  const externalCount = selectedItems.filter((item) => item.executionMode === "EXTERNAL_PROVIDER").length;
+  const hasExternalRepairs = externalCount > 0;
+  type InterventionBranch = {
+    detail?: string;
+    label: string;
+    status: string;
+    tone?: "info" | "success" | "warning";
+  };
+  const providerName = vehicleCheck.publicShare?.externalRepairContact
+    ? externalRepairContactLabel(vehicleCheck.publicShare.externalRepairContact)
+    : "";
+  const providerDepositStatus = isRecovered
+    ? "Véhicule récupéré"
+    : isWithProvider
+      ? "Dépôt confirmé"
+      : "Dépôt non confirmé";
+  const providerDepositTone: InterventionBranch["tone"] = isWithProvider ? "success" : "warning";
+  const interventionBranches: InterventionBranch[] | undefined =
+    !isClosedWithoutDamage && isSummaryDone
+      ? [
+          {
+            label: "Sur place",
+            status: onSiteCount
+              ? `${onSiteDoneCount}/${onSiteCount} terminée${onSiteCount > 1 ? "s" : ""}`
+              : "Aucune",
+            tone: onSiteCount
+              ? onSiteDoneCount === onSiteCount
+                ? "success"
+                : "warning"
+              : undefined,
+          },
+          {
+            detail: providerName || "Prestataire non renseigné",
+            label: "Chez prestataire",
+            status: externalCount
+              ? `${externalCount} réparation${externalCount > 1 ? "s" : ""} · ${providerDepositStatus}`
+              : "Aucune",
+            tone: externalCount ? providerDepositTone : undefined,
+          },
+        ]
+      : undefined;
+  const steps: Array<{
+    branches?: InterventionBranch[];
+    completed: boolean;
+    descriptionLines: string[];
+    label: string;
+    skipped?: boolean;
+  }> = [
     {
       completed: isFieldDone,
-      description: isFieldDone ? "Termine" : "En cours",
+      descriptionLines: [isFieldDone ? "Termine" : "En cours"],
       label: "Controle",
     },
     {
       completed: isSummaryDone,
-      description: isClosedWithoutDamage
-        ? "Aucune reparation retenue"
-        : isSummaryDone
-          ? "Validee"
-          : isFieldDone
-            ? "A realiser"
-            : "En attente",
+      descriptionLines: [
+        isClosedWithoutDamage
+          ? "Aucune reparation retenue"
+          : isSummaryDone
+            ? "Validee"
+            : isFieldDone
+              ? "A realiser"
+              : "En attente",
+      ],
       label: "Synthese",
     },
     {
-      completed: isClosedWithoutDamage || isWithProvider,
-      description: isClosedWithoutDamage
-        ? "Non requis"
-        : isWithProvider
-          ? "Chez prestataire"
-          : isSummaryDone
-            ? "A envoyer"
-            : "En attente",
-      label: "Prestataire",
+      branches: interventionBranches,
+      completed: isClosedWithoutDamage || isCompleted,
+      descriptionLines: [isClosedWithoutDamage ? "Non requis" : "En attente"],
+      label: "Interventions",
       skipped: isClosedWithoutDamage,
     },
     {
-      completed: isClosedWithoutDamage || isRecovered,
-      description: isClosedWithoutDamage
-        ? "Non applicable"
-        : isRecovered
-          ? "Recupere"
-          : isWithProvider
-            ? "A recuperer"
-            : "En attente",
+      completed: isClosedWithoutDamage || !hasExternalRepairs || isRecovered,
+      descriptionLines: [
+        isClosedWithoutDamage
+          ? "Non applicable"
+          : !hasExternalRepairs
+            ? "Non applicable"
+            : isRecovered
+              ? "Recupere"
+              : isWithProvider
+                ? "A recuperer"
+                : "En attente",
+      ],
       label: "Recuperation",
-      skipped: isClosedWithoutDamage,
+      skipped: isClosedWithoutDamage || !hasExternalRepairs,
     },
   ];
   const completedCount = steps.filter((step) => step.completed).length;
@@ -244,6 +308,27 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
   const normalizedCurrentStepIndex = firstIncompleteStepIndex === -1 ? steps.length - 1 : firstIncompleteStepIndex;
   const currentStep = steps[normalizedCurrentStepIndex];
   const progressPercent = Math.round((completedCount / steps.length) * 100);
+  const stepCircleClassName = (step: (typeof steps)[number], index: number) => {
+    const isCurrent = index === normalizedCurrentStepIndex && !step.completed;
+    return step.skipped
+      ? "border-gray-200 bg-gray-100 text-gray-500"
+      : step.completed
+        ? "bg-teal-700 text-white"
+        : isCurrent
+          ? "border-amber-300 bg-amber-50 text-amber-700"
+          : "border-gray-200 bg-white text-gray-400";
+  };
+  const stepLabelClassName = (step: (typeof steps)[number], index: number) => {
+    const isCurrent = index === normalizedCurrentStepIndex && !step.completed;
+    return step.skipped
+      ? "text-gray-500"
+      : step.completed
+        ? "text-gray-950"
+        : isCurrent
+          ? "text-amber-800"
+          : "text-gray-500";
+  };
+  const desktopStepPositions = ["8%", "35%", "50%", "92%"];
 
   return (
     <div className="border-t border-gray-200 px-5 py-4">
@@ -260,29 +345,170 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
         </div>
         <p className="rounded-md bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700">{progressPercent}%</p>
       </div>
-      <div className="relative">
-        <div className="absolute left-4 right-4 top-4 hidden h-px bg-gray-200 md:block" />
-        <div className="relative grid gap-3 md:grid-cols-4">
-          {steps.map((step, index) => {
-            const isCurrent = index === normalizedCurrentStepIndex && !step.completed;
-            const circleClassName = step.skipped
-              ? "border-gray-200 bg-gray-100 text-gray-500"
-              : step.completed
-                ? "bg-teal-700 text-white"
-                : isCurrent
-                  ? "border-amber-300 bg-amber-50 text-amber-700"
-                  : "border-gray-200 bg-white text-gray-400";
-            const labelClassName = step.skipped
-              ? "text-gray-500"
-              : step.completed
-                ? "text-gray-950"
-                : isCurrent
-                  ? "text-amber-800"
-                  : "text-gray-500";
+      <div className="relative lg:hidden">
+        <div className="relative grid gap-3">
+          {steps.map((step, index) => (
+            <div className="flex min-w-0 items-start gap-2" key={step.label}>
+              <div className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${stepCircleClassName(step, index)}`}>
+                {step.skipped ? (
+                  <Minus className="h-4 w-4" />
+                ) : step.completed ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  index + 1
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className={`truncate text-xs font-semibold ${stepLabelClassName(step, index)}`}>{step.label}</p>
+                {step.branches?.length ? (
+                  <div className="relative mt-2 space-y-2 pl-4 text-left">
+                    <span className="absolute bottom-2 left-0 top-2 w-px bg-gray-300" aria-hidden="true" />
+                    {step.branches.map((branch) => (
+                      <div
+                        className={[
+                          "relative rounded-md border px-2.5 py-1.5",
+                          branch.tone === "success"
+                            ? "border-emerald-300 bg-emerald-50"
+                            : branch.tone === "warning"
+                              ? "border-amber-300 bg-amber-50"
+                              : branch.tone === "info"
+                                ? "border-blue-300 bg-blue-50"
+                                : "border-gray-200 bg-gray-50",
+                        ].join(" ")}
+                        key={branch.label}
+                      >
+                        <span className="absolute -left-4 top-2 h-px w-3 bg-gray-300" aria-hidden="true" />
+                        <p className="whitespace-nowrap text-xs font-semibold text-gray-800">{branch.label}</p>
+                        {branch.detail ? <p className="max-w-56 truncate text-[11px] text-gray-500">{branch.detail}</p> : null}
+                        <p
+                          className={[
+                            "mt-0.5 max-w-56 text-[11px] font-medium",
+                            branch.tone === "success"
+                              ? "text-emerald-800"
+                              : branch.tone === "warning"
+                                ? "text-amber-900"
+                                : branch.tone === "info"
+                                  ? "text-blue-800"
+                                  : "text-gray-500",
+                          ].join(" ")}
+                        >
+                          {branch.status}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-0.5 space-y-0.5">
+                    {step.descriptionLines.map((descriptionLine) => (
+                      <p className="whitespace-nowrap text-xs text-gray-500" key={descriptionLine}>{descriptionLine}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-            return (
-              <div className="flex min-w-0 items-start gap-2 md:flex-col md:items-center md:text-center" key={step.label}>
-                <div className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${circleClassName}`}>
+      {interventionBranches?.length ? (
+        <div className="relative hidden min-h-36 lg:block">
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-32 w-full overflow-visible"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 128"
+          >
+            <path d="M 2 60 H 58" fill="none" stroke="#0f766e" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+            <path
+              d="M 58 60 V 28 H 80 V 60"
+              fill="none"
+              stroke={onSiteCount ? (onSiteDoneCount === onSiteCount ? "#0f766e" : "#f59e0b") : "#d1d5db"}
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d="M 58 60 V 92 H 80 V 60"
+              fill="none"
+              stroke={externalCount ? (isWithProvider ? "#0f766e" : "#f59e0b") : "#d1d5db"}
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d="M 80 60 H 98"
+              fill="none"
+              stroke={isRecovered ? "#0f766e" : isWithProvider ? "#f59e0b" : "#d1d5db"}
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+          {steps.map((step, index) => (
+            <div
+              className="absolute top-11 z-10 flex -translate-x-1/2 flex-col items-center text-center"
+              key={step.label}
+              style={{ left: desktopStepPositions[index] }}
+            >
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold ${stepCircleClassName(step, index)}`}>
+                {step.skipped ? (
+                  <Minus className="h-4 w-4" />
+                ) : step.completed ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  index + 1
+                )}
+              </div>
+              <div className="mt-1 min-w-0">
+                <p className={`whitespace-nowrap text-xs font-semibold ${stepLabelClassName(step, index)}`}>{step.label}</p>
+                {index !== 2 ? (
+                  <div className="mt-0.5">
+                    {step.descriptionLines.map((descriptionLine) => (
+                      <p className="whitespace-nowrap text-xs text-gray-500" key={descriptionLine}>{descriptionLine}</p>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ))}
+          {interventionBranches.map((branch, branchIndex) => (
+            <div
+              className={[
+                "absolute left-[69%] z-20 min-w-40 max-w-56 -translate-x-1/2 -translate-y-1/2 rounded-md border px-3 py-1.5 text-left shadow-sm",
+                branch.tone === "success"
+                  ? "border-emerald-300 bg-emerald-50 shadow-emerald-100"
+                  : branch.tone === "warning"
+                    ? "border-amber-300 bg-amber-50 shadow-amber-100"
+                    : branch.tone === "info"
+                      ? "border-blue-300 bg-blue-50 shadow-blue-100"
+                      : "border-gray-200 bg-white",
+              ].join(" ")}
+              key={branch.label}
+              style={{ top: branchIndex === 0 ? 28 : 92 }}
+            >
+              <p className="whitespace-nowrap text-xs font-semibold text-gray-800">{branch.label}</p>
+              {branch.detail ? <p className="truncate text-[11px] text-gray-500">{branch.detail}</p> : null}
+              <p
+                className={[
+                  "mt-0.5 text-[11px] font-medium",
+                  branch.tone === "success"
+                    ? "text-emerald-800"
+                    : branch.tone === "warning"
+                      ? "text-amber-900"
+                      : branch.tone === "info"
+                        ? "text-blue-800"
+                        : "text-gray-500",
+                ].join(" ")}
+              >
+                {branch.status}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="relative hidden lg:block">
+          <div className="absolute left-4 right-4 top-4 h-px bg-gray-200" />
+          <div className="relative grid grid-cols-4 gap-3">
+            {steps.map((step, index) => (
+              <div className="flex min-w-0 flex-col items-center text-center" key={step.label}>
+                <div className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${stepCircleClassName(step, index)}`}>
                   {step.skipped ? (
                     <Minus className="h-4 w-4" />
                   ) : step.completed ? (
@@ -292,14 +518,18 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className={`truncate text-xs font-semibold ${labelClassName}`}>{step.label}</p>
-                  <p className="mt-0.5 truncate text-xs text-gray-500">{step.description}</p>
+                  <p className={`truncate text-xs font-semibold ${stepLabelClassName(step, index)}`}>{step.label}</p>
+                  <div className="mt-0.5 space-y-0.5">
+                    {step.descriptionLines.map((descriptionLine) => (
+                      <p className="whitespace-nowrap text-xs text-gray-500" key={descriptionLine}>{descriptionLine}</p>
+                    ))}
+                  </div>
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -316,9 +546,69 @@ function NoDamageClosureStatus() {
   );
 }
 
+function OnSiteRepairStatus({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
+  const onSiteItems = (vehicleCheck.items ?? []).filter(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.executionMode === "ON_SITE",
+  );
+  const onSiteCount = onSiteItems.length;
+  const doneCount = onSiteItems.filter((item) => Boolean(item.executionCompletedAt)).length;
+  const isCompleted = vehicleCheck.status === "COMPLETED";
+  const allDone = doneCount === onSiteCount;
+
+  if (isCompleted || allDone) {
+    return (
+      <div className="rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+        <p className="font-semibold">Réparations sur place terminées</p>
+        <p className="mt-0.5">
+          {onSiteCount} réparation{onSiteCount > 1 ? "s" : ""} sur place, toutes marquées terminées
+          {isCompleted ? ". Le dossier est terminé." : "."}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-md border border-amber-100 bg-amber-50/80 p-3 text-sm text-amber-900">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="font-semibold leading-5">Réparations sur place en cours</p>
+          <p className="mt-1 leading-5 text-amber-800">
+            {doneCount}/{onSiteCount} réparation{onSiteCount > 1 ? "s" : ""} sur place marquée{doneCount > 1 ? "s" : ""} terminée{doneCount > 1 ? "s" : ""}. Le dossier se clôture automatiquement une fois toutes les réparations terminées.
+          </p>
+        </div>
+        <Button
+          className="w-full shrink-0 border-amber-200 bg-white text-amber-800 hover:bg-amber-100 sm:w-auto"
+          size="sm"
+          type="button"
+          variant="outline"
+          onClick={() => document.getElementById("summary-selection")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        >
+          <Wrench className="h-4 w-4" />
+          Voir la liste
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function RepairRequestStatus({ onSendRepairRequest, vehicleCheck }: { onSendRepairRequest: () => void; vehicleCheck: VehicleCheck }) {
   const share = vehicleCheck.publicShare;
   const providerLabel = share?.externalRepairContact ? externalRepairContactLabel(share.externalRepairContact) : null;
+  const externalRepairCount = (vehicleCheck.items ?? []).filter(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.executionMode === "EXTERNAL_PROVIDER",
+  ).length;
+  const onSiteRepairCount = (vehicleCheck.items ?? []).filter(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.executionMode === "ON_SITE",
+  ).length;
 
   if (share?.vehicleRecoveredAt) {
     return (
@@ -351,6 +641,10 @@ function RepairRequestStatus({ onSendRepairRequest, vehicleCheck }: { onSendRepa
               {providerLabel
                 ? `Le dépôt chez ${providerLabel} n'est pas encore confirmé. Le dossier lui sera envoyé par email lors de la confirmation.`
                 : "Confirmez le prestataire chez lequel le véhicule est déposé. Le dossier lui sera envoyé par email."}
+            </p>
+            <p className="mt-1 text-xs text-teal-700">
+              {externalRepairCount} réparation{externalRepairCount > 1 ? "s" : ""} à transmettre
+              {onSiteRepairCount ? ` · ${onSiteRepairCount} prévue${onSiteRepairCount > 1 ? "s" : ""} sur place` : ""}
             </p>
           </div>
         </div>

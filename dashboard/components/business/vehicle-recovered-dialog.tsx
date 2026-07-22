@@ -51,7 +51,11 @@ export function VehicleRecoveredDialog({
     setIsSaving(true);
     try {
       const updated = await businessService.markVehicleRecovered(selectedVehicleCheck.id);
-      toast.success("Vehicule recupere. Le dossier est termine.");
+      toast.success(
+        updated.status === "COMPLETED"
+          ? "Vehicule recupere. Le dossier est termine."
+          : "Vehicule recupere. Les reparations sur place restent a terminer.",
+      );
       onRecovered?.(updated);
       onOpenChange(false);
     } catch (error) {

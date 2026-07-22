@@ -416,6 +416,13 @@ export type EnumVehicleCheckItemOperationalStatusFilter<$PrismaModel = never> = 
   not?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel> | $Enums.VehicleCheckItemOperationalStatus
 }
 
+export type EnumRepairExecutionModeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairExecutionMode | Prisma.EnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairExecutionModeNullableFilter<$PrismaModel> | $Enums.RepairExecutionMode | null
+}
+
 export type EnumPartOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
@@ -441,6 +448,16 @@ export type EnumVehicleCheckItemOperationalStatusWithAggregatesFilter<$PrismaMod
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
+}
+
+export type EnumRepairExecutionModeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairExecutionMode | Prisma.EnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairExecutionModeNullableWithAggregatesFilter<$PrismaModel> | $Enums.RepairExecutionMode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRepairExecutionModeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRepairExecutionModeNullableFilter<$PrismaModel>
 }
 
 export type EnumPartOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -857,6 +874,13 @@ export type NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel = nev
   not?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel> | $Enums.VehicleCheckItemOperationalStatus
 }
 
+export type NestedEnumRepairExecutionModeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairExecutionMode | Prisma.EnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairExecutionModeNullableFilter<$PrismaModel> | $Enums.RepairExecutionMode | null
+}
+
 export type NestedEnumPartOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.PartOrderStatus | Prisma.EnumPartOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PartOrderStatus[] | Prisma.ListEnumPartOrderStatusFieldRefInput<$PrismaModel>
@@ -882,6 +906,16 @@ export type NestedEnumVehicleCheckItemOperationalStatusWithAggregatesFilter<$Pri
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumVehicleCheckItemOperationalStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumRepairExecutionModeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RepairExecutionMode | Prisma.EnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.RepairExecutionMode[] | Prisma.ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumRepairExecutionModeNullableWithAggregatesFilter<$PrismaModel> | $Enums.RepairExecutionMode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRepairExecutionModeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRepairExecutionModeNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumPartOrderStatusWithAggregatesFilter<$PrismaModel = never> = {

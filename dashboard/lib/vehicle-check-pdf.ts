@@ -16,6 +16,11 @@ const operationalStatusLabels = {
   CANCELLED: "Annulee",
 } as const;
 
+const executionModeLabels = {
+  EXTERNAL_PROVIDER: "Chez un prestataire",
+  ON_SITE: "Sur place",
+} as const;
+
 export async function createVehicleCheckPdfFile(vehicleCheck: VehicleCheck) {
   if (
     vehicleCheck.status !== "SUMMARY_READY" &&
@@ -144,7 +149,7 @@ export async function createVehicleCheckPdfFile(vehicleCheck: VehicleCheck) {
   addSectionTitle("Travaux selectionnes");
   addWrappedText(
     summaryItems.length
-      ? `${summaryItems.length} reparation(s) retenue(s) pour la demande de devis.`
+      ? `${summaryItems.length} reparation(s) retenue(s), avec leur lieu d'intervention.`
       : "Aucune reparation retenue.",
   );
 
@@ -154,6 +159,12 @@ export async function createVehicleCheckPdfFile(vehicleCheck: VehicleCheck) {
   } else {
     summaryItems.forEach((item, index) => {
       const detailLines = [
+        item.executionMode
+          ? `Lieu d'intervention : ${executionModeLabels[item.executionMode]}`
+          : null,
+        item.executionMode === "ON_SITE"
+          ? `Avancement sur place : ${item.executionCompletedAt ? "terminee" : "a realiser"}`
+          : null,
         item.decisionMessage?.trim() || null,
         item.comment?.trim() ? `Commentaire : ${item.comment}` : null,
         item.operationalComment?.trim() ? `Suivi : ${item.operationalComment}` : null,

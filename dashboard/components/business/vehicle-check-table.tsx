@@ -122,13 +122,14 @@ export function VehicleCheckTable({
             header: "Statut",
             cell: (check) => (
               <VehicleCheckStatusBadge
+                items={check.items}
                 publicShare={check.publicShare}
                 status={check.status}
                 workflowStage
               />
             ),
-            sortValue: (check) => check.status,
-            searchValue: (check) => check.status,
+            sortValue: (check) => workflowStatusText(check),
+            searchValue: (check) => workflowStatusText(check),
           },
           {
             id: "partOrders",
@@ -168,7 +169,7 @@ export function VehicleCheckTable({
             className: "px-4 py-3",
             cell: (check) => (
               <div className="flex flex-nowrap gap-1.5">
-                {check.status === "SUMMARY_READY" && check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt ? (
+                {check.status === "SUMMARY_READY" && hasExternalProviderRepairs(check) && check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt ? (
                   <Button
                     aria-label={`Marquer le vehicule ${formatLicensePlate(
                       check.licensePlate,
@@ -257,6 +258,7 @@ function VehicleCheckMobileCard({
 }) {
   const canRecover = Boolean(
     check.status === "SUMMARY_READY" &&
+      hasExternalProviderRepairs(check) &&
       check.publicShare &&
       check.publicShare.takenInChargeAt &&
       !check.publicShare.vehicleRecoveredAt,
@@ -280,6 +282,7 @@ function VehicleCheckMobileCard({
           <p className="mt-1 text-xs font-semibold text-gray-500">{check.checkNumber}</p>
         </div>
         <VehicleCheckStatusBadge
+          items={check.items}
           publicShare={check.publicShare}
           status={check.status}
           workflowStage
@@ -511,8 +514,12 @@ function PartOrderSummaryBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck })
 
 function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
   const share = vehicleCheck.publicShare;
+  const hasExternalRepairs = hasExternalProviderRepairs(vehicleCheck);
 
-  if (vehicleCheck.status === "CLOSED_NO_DAMAGE") {
+  if (
+    vehicleCheck.status === "CLOSED_NO_DAMAGE" ||
+    ((vehicleCheck.status === "SUMMARY_READY" || vehicleCheck.status === "COMPLETED") && !hasExternalRepairs)
+  ) {
     return <Badge variant="outline">Non requis</Badge>;
   }
 
@@ -560,6 +567,48 @@ function PublicShareStatusBadge({ vehicleCheck }: { vehicleCheck: VehicleCheck }
       ) : null}
     </div>
   );
+}
+
+function hasExternalProviderRepairs(vehicleCheck: VehicleCheck) {
+  return (vehicleCheck.items ?? []).some(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.executionMode === "EXTERNAL_PROVIDER",
+  );
+}
+
+function workflowStatusText(vehicleCheck: VehicleCheck) {
+  if (vehicleCheck.status !== "SUMMARY_READY") {
+    return vehicleCheck.status;
+  }
+
+  const selectedItems = (vehicleCheck.items ?? []).filter(
+    (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE",
+  );
+  const onSiteItems = selectedItems.filter((item) => item.executionMode === "ON_SITE");
+  const hasExternalRepairs = selectedItems.some((item) => item.executionMode === "EXTERNAL_PROVIDER");
+  const labels: string[] = [];
+
+  if (onSiteItems.length) {
+    labels.push(
+      onSiteItems.every((item) => Boolean(item.executionCompletedAt))
+        ? "Sur place terminee"
+        : "Reparation sur place",
+    );
+  }
+
+  if (hasExternalRepairs) {
+    labels.push(
+      vehicleCheck.publicShare?.vehicleRecoveredAt
+        ? "Recupere"
+        : vehicleCheck.publicShare?.takenInChargeAt
+          ? "Chez prestataire"
+          : "Depot a confirmer",
+    );
+  }
+
+  return labels.join(" ") || vehicleCheck.status;
 }
 
 function partOrderSummary(vehicleCheck: VehicleCheck) {

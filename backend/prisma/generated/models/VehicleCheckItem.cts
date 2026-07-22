@@ -60,6 +60,8 @@ export type VehicleCheckItemMinAggregateOutputType = {
   operationalStatus: $Enums.VehicleCheckItemOperationalStatus | null
   operationalComment: string | null
   selectedForSummary: boolean | null
+  executionMode: $Enums.RepairExecutionMode | null
+  executionCompletedAt: Date | null
   partOrderRequired: boolean | null
   partOrderStatus: $Enums.PartOrderStatus | null
   partOrderPrice: runtime.Decimal | null
@@ -85,6 +87,8 @@ export type VehicleCheckItemMaxAggregateOutputType = {
   operationalStatus: $Enums.VehicleCheckItemOperationalStatus | null
   operationalComment: string | null
   selectedForSummary: boolean | null
+  executionMode: $Enums.RepairExecutionMode | null
+  executionCompletedAt: Date | null
   partOrderRequired: boolean | null
   partOrderStatus: $Enums.PartOrderStatus | null
   partOrderPrice: runtime.Decimal | null
@@ -110,6 +114,8 @@ export type VehicleCheckItemCountAggregateOutputType = {
   operationalStatus: number
   operationalComment: number
   selectedForSummary: number
+  executionMode: number
+  executionCompletedAt: number
   partOrderRequired: number
   partOrderStatus: number
   partOrderPrice: number
@@ -155,6 +161,8 @@ export type VehicleCheckItemMinAggregateInputType = {
   operationalStatus?: true
   operationalComment?: true
   selectedForSummary?: true
+  executionMode?: true
+  executionCompletedAt?: true
   partOrderRequired?: true
   partOrderStatus?: true
   partOrderPrice?: true
@@ -180,6 +188,8 @@ export type VehicleCheckItemMaxAggregateInputType = {
   operationalStatus?: true
   operationalComment?: true
   selectedForSummary?: true
+  executionMode?: true
+  executionCompletedAt?: true
   partOrderRequired?: true
   partOrderStatus?: true
   partOrderPrice?: true
@@ -205,6 +215,8 @@ export type VehicleCheckItemCountAggregateInputType = {
   operationalStatus?: true
   operationalComment?: true
   selectedForSummary?: true
+  executionMode?: true
+  executionCompletedAt?: true
   partOrderRequired?: true
   partOrderStatus?: true
   partOrderPrice?: true
@@ -317,6 +329,8 @@ export type VehicleCheckItemGroupByOutputType = {
   operationalStatus: $Enums.VehicleCheckItemOperationalStatus
   operationalComment: string | null
   selectedForSummary: boolean
+  executionMode: $Enums.RepairExecutionMode | null
+  executionCompletedAt: Date | null
   partOrderRequired: boolean
   partOrderStatus: $Enums.PartOrderStatus
   partOrderPrice: runtime.Decimal | null
@@ -365,6 +379,8 @@ export type VehicleCheckItemWhereInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFilter<"VehicleCheckItem"> | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.StringNullableFilter<"VehicleCheckItem"> | string | null
   selectedForSummary?: Prisma.BoolFilter<"VehicleCheckItem"> | boolean
+  executionMode?: Prisma.EnumRepairExecutionModeNullableFilter<"VehicleCheckItem"> | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheckItem"> | Date | string | null
   partOrderRequired?: Prisma.BoolFilter<"VehicleCheckItem"> | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFilter<"VehicleCheckItem"> | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.DecimalNullableFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -396,6 +412,8 @@ export type VehicleCheckItemOrderByWithRelationInput = {
   operationalStatus?: Prisma.SortOrder
   operationalComment?: Prisma.SortOrderInput | Prisma.SortOrder
   selectedForSummary?: Prisma.SortOrder
+  executionMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   partOrderRequired?: Prisma.SortOrder
   partOrderStatus?: Prisma.SortOrder
   partOrderPrice?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -430,6 +448,8 @@ export type VehicleCheckItemWhereUniqueInput = Prisma.AtLeast<{
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFilter<"VehicleCheckItem"> | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.StringNullableFilter<"VehicleCheckItem"> | string | null
   selectedForSummary?: Prisma.BoolFilter<"VehicleCheckItem"> | boolean
+  executionMode?: Prisma.EnumRepairExecutionModeNullableFilter<"VehicleCheckItem"> | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheckItem"> | Date | string | null
   partOrderRequired?: Prisma.BoolFilter<"VehicleCheckItem"> | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFilter<"VehicleCheckItem"> | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.DecimalNullableFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -461,6 +481,8 @@ export type VehicleCheckItemOrderByWithAggregationInput = {
   operationalStatus?: Prisma.SortOrder
   operationalComment?: Prisma.SortOrderInput | Prisma.SortOrder
   selectedForSummary?: Prisma.SortOrder
+  executionMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   partOrderRequired?: Prisma.SortOrder
   partOrderStatus?: Prisma.SortOrder
   partOrderPrice?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -494,6 +516,8 @@ export type VehicleCheckItemScalarWhereWithAggregatesInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusWithAggregatesFilter<"VehicleCheckItem"> | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.StringNullableWithAggregatesFilter<"VehicleCheckItem"> | string | null
   selectedForSummary?: Prisma.BoolWithAggregatesFilter<"VehicleCheckItem"> | boolean
+  executionMode?: Prisma.EnumRepairExecutionModeNullableWithAggregatesFilter<"VehicleCheckItem"> | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"VehicleCheckItem"> | Date | string | null
   partOrderRequired?: Prisma.BoolWithAggregatesFilter<"VehicleCheckItem"> | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusWithAggregatesFilter<"VehicleCheckItem"> | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.DecimalNullableWithAggregatesFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -516,6 +540,8 @@ export type VehicleCheckItemCreateInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -547,6 +573,8 @@ export type VehicleCheckItemUncheckedCreateInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -572,6 +600,8 @@ export type VehicleCheckItemUpdateInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -603,6 +633,8 @@ export type VehicleCheckItemUncheckedUpdateInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -631,6 +663,8 @@ export type VehicleCheckItemCreateManyInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -653,6 +687,8 @@ export type VehicleCheckItemUpdateManyMutationInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -678,6 +714,8 @@ export type VehicleCheckItemUncheckedUpdateManyInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -718,6 +756,8 @@ export type VehicleCheckItemCountOrderByAggregateInput = {
   operationalStatus?: Prisma.SortOrder
   operationalComment?: Prisma.SortOrder
   selectedForSummary?: Prisma.SortOrder
+  executionMode?: Prisma.SortOrder
+  executionCompletedAt?: Prisma.SortOrder
   partOrderRequired?: Prisma.SortOrder
   partOrderStatus?: Prisma.SortOrder
   partOrderPrice?: Prisma.SortOrder
@@ -752,6 +792,8 @@ export type VehicleCheckItemMaxOrderByAggregateInput = {
   operationalStatus?: Prisma.SortOrder
   operationalComment?: Prisma.SortOrder
   selectedForSummary?: Prisma.SortOrder
+  executionMode?: Prisma.SortOrder
+  executionCompletedAt?: Prisma.SortOrder
   partOrderRequired?: Prisma.SortOrder
   partOrderStatus?: Prisma.SortOrder
   partOrderPrice?: Prisma.SortOrder
@@ -777,6 +819,8 @@ export type VehicleCheckItemMinOrderByAggregateInput = {
   operationalStatus?: Prisma.SortOrder
   operationalComment?: Prisma.SortOrder
   selectedForSummary?: Prisma.SortOrder
+  executionMode?: Prisma.SortOrder
+  executionCompletedAt?: Prisma.SortOrder
   partOrderRequired?: Prisma.SortOrder
   partOrderStatus?: Prisma.SortOrder
   partOrderPrice?: Prisma.SortOrder
@@ -943,6 +987,10 @@ export type EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput = {
   set?: $Enums.VehicleCheckItemOperationalStatus
 }
 
+export type NullableEnumRepairExecutionModeFieldUpdateOperationsInput = {
+  set?: $Enums.RepairExecutionMode | null
+}
+
 export type EnumPartOrderStatusFieldUpdateOperationsInput = {
   set?: $Enums.PartOrderStatus
 }
@@ -988,6 +1036,8 @@ export type VehicleCheckItemCreateWithoutRepairTypeInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1017,6 +1067,8 @@ export type VehicleCheckItemUncheckedCreateWithoutRepairTypeInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1074,6 +1126,8 @@ export type VehicleCheckItemScalarWhereInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFilter<"VehicleCheckItem"> | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.StringNullableFilter<"VehicleCheckItem"> | string | null
   selectedForSummary?: Prisma.BoolFilter<"VehicleCheckItem"> | boolean
+  executionMode?: Prisma.EnumRepairExecutionModeNullableFilter<"VehicleCheckItem"> | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheckItem"> | Date | string | null
   partOrderRequired?: Prisma.BoolFilter<"VehicleCheckItem"> | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFilter<"VehicleCheckItem"> | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.DecimalNullableFilter<"VehicleCheckItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1096,6 +1150,8 @@ export type VehicleCheckItemCreateWithoutVehiclePartInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1125,6 +1181,8 @@ export type VehicleCheckItemUncheckedCreateWithoutVehiclePartInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1176,6 +1234,8 @@ export type VehicleCheckItemCreateWithoutVehicleCheckInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1205,6 +1265,8 @@ export type VehicleCheckItemUncheckedCreateWithoutVehicleCheckInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1256,6 +1318,8 @@ export type VehicleCheckItemCreateWithoutMessageMentionsInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1286,6 +1350,8 @@ export type VehicleCheckItemUncheckedCreateWithoutMessageMentionsInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1326,6 +1392,8 @@ export type VehicleCheckItemUpdateWithoutMessageMentionsInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1356,6 +1424,8 @@ export type VehicleCheckItemUncheckedUpdateWithoutMessageMentionsInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1380,6 +1450,8 @@ export type VehicleCheckItemCreateWithoutPhotosInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1410,6 +1482,8 @@ export type VehicleCheckItemUncheckedCreateWithoutPhotosInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1450,6 +1524,8 @@ export type VehicleCheckItemUpdateWithoutPhotosInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1480,6 +1556,8 @@ export type VehicleCheckItemUncheckedUpdateWithoutPhotosInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1504,6 +1582,8 @@ export type VehicleCheckItemCreateWithoutStatusHistoriesInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1534,6 +1614,8 @@ export type VehicleCheckItemUncheckedCreateWithoutStatusHistoriesInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1574,6 +1656,8 @@ export type VehicleCheckItemUpdateWithoutStatusHistoriesInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1604,6 +1688,8 @@ export type VehicleCheckItemUncheckedUpdateWithoutStatusHistoriesInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1630,6 +1716,8 @@ export type VehicleCheckItemCreateManyRepairTypeInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1652,6 +1740,8 @@ export type VehicleCheckItemUpdateWithoutRepairTypeInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1681,6 +1771,8 @@ export type VehicleCheckItemUncheckedUpdateWithoutRepairTypeInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1708,6 +1800,8 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutRepairTypeInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1732,6 +1826,8 @@ export type VehicleCheckItemCreateManyVehiclePartInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1754,6 +1850,8 @@ export type VehicleCheckItemUpdateWithoutVehiclePartInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1783,6 +1881,8 @@ export type VehicleCheckItemUncheckedUpdateWithoutVehiclePartInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1810,6 +1910,8 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutVehiclePartInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1834,6 +1936,8 @@ export type VehicleCheckItemCreateManyVehicleCheckInput = {
   operationalStatus?: $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: string | null
   selectedForSummary?: boolean
+  executionMode?: $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Date | string | null
   partOrderRequired?: boolean
   partOrderStatus?: $Enums.PartOrderStatus
   partOrderPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1856,6 +1960,8 @@ export type VehicleCheckItemUpdateWithoutVehicleCheckInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1885,6 +1991,8 @@ export type VehicleCheckItemUncheckedUpdateWithoutVehicleCheckInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1912,6 +2020,8 @@ export type VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckInput = {
   operationalStatus?: Prisma.EnumVehicleCheckItemOperationalStatusFieldUpdateOperationsInput | $Enums.VehicleCheckItemOperationalStatus
   operationalComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selectedForSummary?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionMode?: Prisma.NullableEnumRepairExecutionModeFieldUpdateOperationsInput | $Enums.RepairExecutionMode | null
+  executionCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   partOrderRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   partOrderStatus?: Prisma.EnumPartOrderStatusFieldUpdateOperationsInput | $Enums.PartOrderStatus
   partOrderPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1986,6 +2096,8 @@ export type VehicleCheckItemSelect<ExtArgs extends runtime.Types.Extensions.Inte
   operationalStatus?: boolean
   operationalComment?: boolean
   selectedForSummary?: boolean
+  executionMode?: boolean
+  executionCompletedAt?: boolean
   partOrderRequired?: boolean
   partOrderStatus?: boolean
   partOrderPrice?: boolean
@@ -2018,6 +2130,8 @@ export type VehicleCheckItemSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   operationalStatus?: boolean
   operationalComment?: boolean
   selectedForSummary?: boolean
+  executionMode?: boolean
+  executionCompletedAt?: boolean
   partOrderRequired?: boolean
   partOrderStatus?: boolean
   partOrderPrice?: boolean
@@ -2046,6 +2160,8 @@ export type VehicleCheckItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   operationalStatus?: boolean
   operationalComment?: boolean
   selectedForSummary?: boolean
+  executionMode?: boolean
+  executionCompletedAt?: boolean
   partOrderRequired?: boolean
   partOrderStatus?: boolean
   partOrderPrice?: boolean
@@ -2074,6 +2190,8 @@ export type VehicleCheckItemSelectScalar = {
   operationalStatus?: boolean
   operationalComment?: boolean
   selectedForSummary?: boolean
+  executionMode?: boolean
+  executionCompletedAt?: boolean
   partOrderRequired?: boolean
   partOrderStatus?: boolean
   partOrderPrice?: boolean
@@ -2083,7 +2201,7 @@ export type VehicleCheckItemSelectScalar = {
   updatedAt?: boolean
 }
 
-export type VehicleCheckItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vehicleCheckId" | "repairTypeId" | "vehiclePartId" | "quantity" | "unitInternalSavingAmount" | "totalInternalSavingAmount" | "unitInternalCost" | "totalInternalCost" | "decisionStatus" | "decisionMessage" | "comment" | "operationalStatus" | "operationalComment" | "selectedForSummary" | "partOrderRequired" | "partOrderStatus" | "partOrderPrice" | "partOrderReference" | "partOrderedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheckItem"]>
+export type VehicleCheckItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vehicleCheckId" | "repairTypeId" | "vehiclePartId" | "quantity" | "unitInternalSavingAmount" | "totalInternalSavingAmount" | "unitInternalCost" | "totalInternalCost" | "decisionStatus" | "decisionMessage" | "comment" | "operationalStatus" | "operationalComment" | "selectedForSummary" | "executionMode" | "executionCompletedAt" | "partOrderRequired" | "partOrderStatus" | "partOrderPrice" | "partOrderReference" | "partOrderedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheckItem"]>
 export type VehicleCheckItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleCheck?: boolean | Prisma.VehicleCheckDefaultArgs<ExtArgs>
   repairType?: boolean | Prisma.RepairTypeDefaultArgs<ExtArgs>
@@ -2130,6 +2248,8 @@ export type $VehicleCheckItemPayload<ExtArgs extends runtime.Types.Extensions.In
     operationalStatus: $Enums.VehicleCheckItemOperationalStatus
     operationalComment: string | null
     selectedForSummary: boolean
+    executionMode: $Enums.RepairExecutionMode | null
+    executionCompletedAt: Date | null
     partOrderRequired: boolean
     partOrderStatus: $Enums.PartOrderStatus
     partOrderPrice: runtime.Decimal | null
@@ -2581,6 +2701,8 @@ export interface VehicleCheckItemFieldRefs {
   readonly operationalStatus: Prisma.FieldRef<"VehicleCheckItem", 'VehicleCheckItemOperationalStatus'>
   readonly operationalComment: Prisma.FieldRef<"VehicleCheckItem", 'String'>
   readonly selectedForSummary: Prisma.FieldRef<"VehicleCheckItem", 'Boolean'>
+  readonly executionMode: Prisma.FieldRef<"VehicleCheckItem", 'RepairExecutionMode'>
+  readonly executionCompletedAt: Prisma.FieldRef<"VehicleCheckItem", 'DateTime'>
   readonly partOrderRequired: Prisma.FieldRef<"VehicleCheckItem", 'Boolean'>
   readonly partOrderStatus: Prisma.FieldRef<"VehicleCheckItem", 'PartOrderStatus'>
   readonly partOrderPrice: Prisma.FieldRef<"VehicleCheckItem", 'Decimal'>

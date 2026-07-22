@@ -20,6 +20,7 @@ import { GtmotiveModule } from './gtmotive/gtmotive.module';
 import { ExternalRepairContactsModule } from './external-repair-contacts/external-repair-contacts.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { VehicleCheckConversationsModule } from './vehicle-check-conversations/vehicle-check-conversations.module';
+import { SalvageEvaluationsModule } from './salvage-evaluations/salvage-evaluations.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { VehicleCheckConversationsModule } from './vehicle-check-conversations/v
     ExternalRepairContactsModule,
     NotificationsModule,
     VehicleCheckConversationsModule,
+    SalvageEvaluationsModule,
   ],
 })
 export class AppModule {}

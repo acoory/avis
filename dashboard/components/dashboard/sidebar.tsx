@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, Gauge, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
+import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, FileSpreadsheet, Gauge, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -30,6 +30,7 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
     label: "Activite",
     items: [
       { label: "Controles", sublabel: "(Buy Back)", href: "/dashboard/vehicle-checks", icon: ClipboardList },
+      { label: "Salvage Evaluation", href: "/dashboard/salvage-evaluation", icon: FileSpreadsheet },
       { label: "Pièces & Main-d'œuvre", sublabel: "(Estimation)", href: "/dashboard/estimation", icon: Calculator, comingSoon: true },
     ],
   },

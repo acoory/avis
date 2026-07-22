@@ -71,6 +71,14 @@ export const VehicleCheckItemOperationalStatus = {
 export type VehicleCheckItemOperationalStatus = (typeof VehicleCheckItemOperationalStatus)[keyof typeof VehicleCheckItemOperationalStatus]
 
 
+export const RepairExecutionMode = {
+  ON_SITE: 'ON_SITE',
+  EXTERNAL_PROVIDER: 'EXTERNAL_PROVIDER'
+} as const
+
+export type RepairExecutionMode = (typeof RepairExecutionMode)[keyof typeof RepairExecutionMode]
+
+
 export const VehicleCheckConversationStatus = {
   OPEN: 'OPEN',
   RESOLVED: 'RESOLVED',

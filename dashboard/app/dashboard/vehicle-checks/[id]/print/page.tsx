@@ -126,6 +126,7 @@ export default function VehicleCheckPrintPage() {
             <div className="space-y-1 text-sm">
               <div className="flex justify-end">
                 <VehicleCheckStatusBadge
+                  items={vehicleCheck.items}
                   publicShare={vehicleCheck.publicShare}
                   status={vehicleCheck.status}
                   workflowStage
@@ -176,7 +177,7 @@ export default function VehicleCheckPrintPage() {
           <SectionTitle title="Travaux selectionnes" />
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
             {summaryItems.length
-              ? `${summaryItems.length} reparation(s) retenue(s) pour la demande de devis.`
+              ? `${summaryItems.length} reparation(s) retenue(s), avec leur lieu d'intervention.`
               : "Aucune reparation retenue."}
           </div>
         </section>
@@ -215,6 +216,13 @@ export default function VehicleCheckPrintPage() {
                         <p className="text-xs text-gray-500">
                           Commentaire : {item.comment?.trim() ? item.comment : "Aucun"}
                         </p>
+                        <Badge variant="outline">
+                          {item.executionMode === "ON_SITE"
+                            ? item.executionCompletedAt
+                              ? "Sur place · terminee"
+                              : "Sur place · a realiser"
+                            : "Chez un prestataire"}
+                        </Badge>
                         <PartOrderBadge item={item} />
                       </td>
                     </tr>

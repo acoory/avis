@@ -467,6 +467,8 @@ export const VehicleCheckItemScalarFieldEnum = {
   operationalStatus: 'operationalStatus',
   operationalComment: 'operationalComment',
   selectedForSummary: 'selectedForSummary',
+  executionMode: 'executionMode',
+  executionCompletedAt: 'executionCompletedAt',
   partOrderRequired: 'partOrderRequired',
   partOrderStatus: 'partOrderStatus',
   partOrderPrice: 'partOrderPrice',

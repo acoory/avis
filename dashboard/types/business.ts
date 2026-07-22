@@ -14,6 +14,7 @@ export type RepairDecisionStatus =
   | "WARNING";
 export type PartOrderStatus = "NOT_REQUIRED" | "TO_ORDER" | "ORDERED";
 export type VehicleCheckItemOperationalStatus = "ACTIVE" | "IMPOSSIBLE" | "CANCELLED";
+export type RepairExecutionMode = "ON_SITE" | "EXTERNAL_PROVIDER";
 export type ManufacturerRepairRuleStatus =
   | "ALLOWED"
   | "FORBIDDEN"
@@ -174,6 +175,8 @@ export type VehicleCheck = {
     operationalStatus: VehicleCheckItemOperationalStatus;
     operationalComment?: string | null;
     selectedForSummary: boolean;
+    executionMode?: RepairExecutionMode | null;
+    executionCompletedAt?: string | null;
     statusHistories?: Array<{
       id: string;
       fromStatus: VehicleCheckItemOperationalStatus;

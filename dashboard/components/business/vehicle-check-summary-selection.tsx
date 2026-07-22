@@ -1,7 +1,7 @@
 "use client";
 
-import { CheckSquare2, Download, Mail, Maximize2, RefreshCw, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { CarFront, CheckCircle2, CheckSquare2, Clock, Download, Mail, Maximize2, Pencil, RefreshCw, Wrench, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DamagePhotoGallery } from "@/components/business/damage-photo-gallery";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
-import { PartOrderStatus, VehicleCheck, VehicleCheckItem } from "@/types/business";
+import { PartOrderStatus, RepairExecutionMode, VehicleCheck, VehicleCheckItem } from "@/types/business";
 
 type VehicleCheckSummarySelectionProps = {
   vehicleCheck: VehicleCheck;
@@ -18,17 +18,22 @@ type VehicleCheckSummarySelectionProps = {
 };
 
 export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: VehicleCheckSummarySelectionProps) {
-  const items = vehicleCheck.items ?? [];
+  const items = useMemo(() => vehicleCheck.items ?? [], [vehicleCheck.items]);
   const isClosedWithoutDamage = vehicleCheck.status === "CLOSED_NO_DAMAGE";
   const isCompleted = vehicleCheck.status === "COMPLETED";
   const isSummaryPending = vehicleCheck.status === "TO_ANALYZE" && !vehicleCheck.summaryFinalizedAt;
   const isSummaryReady = vehicleCheck.status === "SUMMARY_READY" || isClosedWithoutDamage || isCompleted || Boolean(vehicleCheck.summaryFinalizedAt);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(() => new Set(items.filter((item) => item.selectedForSummary).map((item) => item.id)));
+  const [executionModes, setExecutionModes] = useState<Record<string, RepairExecutionMode | null>>(() =>
+    Object.fromEntries(items.map((item) => [item.id, item.executionMode ?? null])),
+  );
+  const [editingExecutionModeItemIds, setEditingExecutionModeItemIds] = useState<Set<string>>(() => new Set());
   const [isSaving, setIsSaving] = useState(false);
   const [isPostValidationOpen, setIsPostValidationOpen] = useState(false);
   const [finalizedVehicleCheck, setFinalizedVehicleCheck] = useState<VehicleCheck | null>(null);
   const [isPreparingDocument, setIsPreparingDocument] = useState(false);
   const [partOrderSavingId, setPartOrderSavingId] = useState<string | null>(null);
+  const [executionSavingId, setExecutionSavingId] = useState<string | null>(null);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const finalizedWithoutDamage = finalizedVehicleCheck?.status === "CLOSED_NO_DAMAGE";
   const [photoGallery, setPhotoGallery] = useState<{
@@ -37,13 +42,28 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
     title: string;
   } | null>(null);
 
-  useEffect(() => {
-    setSelectedItemIds(new Set(items.filter((item) => item.selectedForSummary).map((item) => item.id)));
-  }, [vehicleCheck.id, vehicleCheck.summaryFinalizedAt, items]);
-
   const selectedForbiddenCount = useMemo(
     () => items.filter((item) => selectedItemIds.has(item.id) && item.operationalStatus === "ACTIVE" && item.decisionStatus === "FORBIDDEN").length,
     [items, selectedItemIds],
+  );
+  const isSelectionChanged = useMemo(() => {
+    const savedItemIds = new Set(
+      items.filter((item) => item.selectedForSummary).map((item) => item.id),
+    );
+    const hasExecutionModeChange = items.some(
+      (item) =>
+        selectedItemIds.has(item.id) &&
+        (item.executionMode ?? null) !== (executionModes[item.id] ?? null),
+    );
+    return (
+      savedItemIds.size !== selectedItemIds.size ||
+      [...selectedItemIds].some((itemId) => !savedItemIds.has(itemId)) ||
+      hasExecutionModeChange
+    );
+  }, [executionModes, items, selectedItemIds]);
+  const selectedWithoutExecutionModeCount = useMemo(
+    () => [...selectedItemIds].filter((itemId) => !executionModes[itemId]).length,
+    [executionModes, selectedItemIds],
   );
 
   function toggleItem(itemId: string) {
@@ -58,6 +78,19 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
     });
   }
 
+  function selectExecutionMode(itemId: string, executionMode: RepairExecutionMode) {
+    setExecutionModes((current) => ({ ...current, [itemId]: executionMode }));
+    setEditingExecutionModeItemIds((current) => {
+      const next = new Set(current);
+      next.delete(itemId);
+      return next;
+    });
+  }
+
+  function editExecutionMode(itemId: string) {
+    setEditingExecutionModeItemIds((current) => new Set(current).add(itemId));
+  }
+
   async function updatePartOrder(item: VehicleCheckItem, partOrderStatus: Extract<PartOrderStatus, "TO_ORDER" | "ORDERED">) {
     setPartOrderSavingId(item.id);
     try {
@@ -65,11 +98,25 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
         partOrderRequired: true,
         partOrderStatus,
       });
-      onUpdated({
-        ...vehicleCheck,
-        items: items.map((currentItem) => (currentItem.id === updatedItem.id ? { ...currentItem, ...updatedItem } : currentItem)),
-      });
-      toast.success(partOrderStatus === "ORDERED" ? "Pièce marquée comme commandée." : "Pièce remise à commander.");
+      const updatedVehicleCheck =
+        partOrderStatus === "ORDERED"
+          ? await businessService.vehicleCheck(vehicleCheck.id)
+          : {
+              ...vehicleCheck,
+              items: items.map((currentItem) =>
+                currentItem.id === updatedItem.id
+                  ? { ...currentItem, ...updatedItem }
+                  : currentItem,
+              ),
+            };
+      onUpdated(updatedVehicleCheck);
+      toast.success(
+        updatedVehicleCheck.status === "COMPLETED"
+          ? "Pièce commandée. Toutes les interventions sont terminées."
+          : partOrderStatus === "ORDERED"
+            ? "Pièce marquée comme commandée."
+            : "Pièce remise à commander.",
+      );
     } catch {
       toast.error("Impossible de mettre à jour la commande pièce.");
     } finally {
@@ -77,10 +124,37 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
     }
   }
 
+  async function updateExecutionStatus(item: VehicleCheckItem) {
+    setExecutionSavingId(item.id);
+    const completed = !item.executionCompletedAt;
+    try {
+      await businessService.updateVehicleCheckItemExecutionStatus(item.id, completed);
+      const updatedVehicleCheck = await businessService.vehicleCheck(vehicleCheck.id);
+      onUpdated(updatedVehicleCheck);
+      toast.success(
+        updatedVehicleCheck.status === "COMPLETED"
+          ? "Toutes les interventions sont terminées. Le dossier est clôturé."
+          : completed
+            ? "Réparation sur place marquée comme terminée."
+            : "Réparation sur place remise à faire.",
+      );
+    } catch {
+      toast.error("Impossible de mettre à jour la réparation sur place.");
+    } finally {
+      setExecutionSavingId(null);
+    }
+  }
+
   async function saveSelection() {
     setIsSaving(true);
     try {
-      const updated = await businessService.finalizeVehicleCheckSummary(vehicleCheck.id, [...selectedItemIds]);
+      const updated = await businessService.finalizeVehicleCheckSummary(
+        vehicleCheck.id,
+        [...selectedItemIds].map((itemId) => ({
+          executionMode: executionModes[itemId] as RepairExecutionMode,
+          id: itemId,
+        })),
+      );
       onUpdated(updated);
       setFinalizedVehicleCheck(updated);
       setIsPostValidationOpen(updated.status === "CLOSED_NO_DAMAGE");
@@ -127,8 +201,8 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
                   : isCompleted
                     ? "Dossier termine. La synthese est conservee en lecture seule."
                     : isSummaryPending
-                      ? "Cochez les réparations à inclure dans le PDF et à transmettre au prestataire, puis validez."
-                      : "Seules les réparations cochées seront incluses dans le PDF et transmises au prestataire lors du dépôt."}
+                      ? "Cochez les réparations retenues et choisissez pour chacune si elle sera effectuée sur place ou chez un prestataire."
+                      : "Chaque réparation retenue indique maintenant son lieu d’intervention. Seules celles destinées au prestataire lui seront transmises."}
               </p>
             </div>
           </div>
@@ -156,17 +230,21 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
           <div className="divide-y divide-gray-200">
             {items.map((item) => {
               const checked = selectedItemIds.has(item.id);
+              const executionMode = executionModes[item.id];
+              const isEditingExecutionMode = editingExecutionModeItemIds.has(item.id);
+              const showsOnSiteStatus = checked && executionMode === "ON_SITE" && isSummaryReady;
+              const showsPartOrderStatus = item.partOrderRequired && item.operationalStatus === "ACTIVE";
 
               return (
-                <label
+                <div
                   className={[
                     "flex gap-3 px-4 py-3 transition-colors",
-                    isCompleted ? "cursor-default" : "cursor-pointer",
                     checked ? "bg-teal-50/70" : "bg-white hover:bg-gray-50",
                   ].join(" ")}
                   key={item.id}
                 >
                   <input
+                    aria-label={`Retenir ${item.vehiclePart.name}`}
                     checked={checked}
                     className="mt-1 h-4 w-4 shrink-0 accent-teal-700"
                     disabled={isCompleted}
@@ -208,35 +286,122 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
                     {item.decisionStatus === "FORBIDDEN" ? (
                       <span className="mt-1 block text-xs font-medium text-red-700">Reparation interdite : elle doit etre decochee pour finaliser.</span>
                     ) : null}
-                    {checked && item.partOrderRequired && item.operationalStatus === "ACTIVE" && isSummaryReady ? (
-                      <span className="mt-2 flex flex-wrap items-center gap-2">
-                        <span
-                          className={[
-                            "inline-flex rounded-md px-2 py-1 text-xs font-medium",
-                            item.partOrderStatus === "ORDERED" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900",
-                          ].join(" ")}
-                        >
-                          {item.partOrderStatus === "ORDERED" ? "Pièce commandée" : "Pièce à commander"}
+                    {checked ? (
+                      !executionMode || isEditingExecutionMode ? (
+                        <span className="mt-2 block">
+                          <span className="mb-1.5 block text-xs font-medium text-gray-600">Lieu de l’intervention</span>
+                          <span className="inline-flex flex-wrap gap-2" role="group" aria-label={`Lieu de l'intervention pour ${item.vehiclePart.name}`}>
+                            <Button
+                              aria-pressed={executionMode === "ON_SITE"}
+                              className={executionMode === "ON_SITE" ? "border-teal-700 bg-teal-700 text-white hover:bg-teal-800" : ""}
+                              disabled={isCompleted}
+                              size="sm"
+                              type="button"
+                              variant="outline"
+                              onClick={() => selectExecutionMode(item.id, "ON_SITE")}
+                            >
+                              <Wrench className="h-4 w-4" />
+                              Sur place
+                            </Button>
+                            <Button
+                              aria-pressed={executionMode === "EXTERNAL_PROVIDER"}
+                              className={executionMode === "EXTERNAL_PROVIDER" ? "border-teal-700 bg-teal-700 text-white hover:bg-teal-800" : ""}
+                              disabled={isCompleted}
+                              size="sm"
+                              type="button"
+                              variant="outline"
+                              onClick={() => selectExecutionMode(item.id, "EXTERNAL_PROVIDER")}
+                            >
+                              <CarFront className="h-4 w-4" />
+                              Chez un prestataire
+                            </Button>
+                          </span>
+                          {!executionMode ? (
+                            <span className="mt-1.5 block text-xs font-medium text-amber-700">Choisis un lieu avant de valider.</span>
+                          ) : null}
                         </span>
-                        {!isCompleted ? (
-                          <Button
-                            disabled={partOrderSavingId === item.id}
-                            size="sm"
-                            type="button"
-                            variant="outline"
-                            onClick={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              void updatePartOrder(item, item.partOrderStatus === "ORDERED" ? "TO_ORDER" : "ORDERED");
-                            }}
-                          >
-                            {partOrderSavingId === item.id ? "Mise à jour..." : item.partOrderStatus === "ORDERED" ? "Remettre à commander" : "Marquer commandée"}
-                          </Button>
+                      ) : (
+                        <span className="mt-2 flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 rounded-md border border-teal-200 bg-white px-2.5 py-1.5 text-sm font-medium text-teal-800">
+                            {executionMode === "ON_SITE" ? <Wrench className="h-4 w-4" /> : <CarFront className="h-4 w-4" />}
+                            {executionMode === "ON_SITE" ? "Sur place" : "Chez un prestataire"}
+                          </span>
+                          {!isCompleted ? (
+                            <Button className="h-8 px-2 text-xs text-gray-600" size="sm" type="button" variant="ghost" onClick={() => editExecutionMode(item.id)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                              Modifier
+                            </Button>
+                          ) : null}
+                        </span>
+                      )
+                    ) : null}
+                    {showsOnSiteStatus || showsPartOrderStatus ? (
+                      <span className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+                        {showsOnSiteStatus ? (
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={[
+                                "inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium",
+                                item.executionCompletedAt
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : "bg-amber-100 text-amber-900",
+                              ].join(" ")}
+                            >
+                              {item.executionCompletedAt ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                              {item.executionCompletedAt ? "Réparation terminée" : "À réparer sur place"}
+                            </span>
+                            {!isCompleted ? (
+                              <Button
+                                disabled={executionSavingId === item.id || isSelectionChanged}
+                                size="sm"
+                                type="button"
+                                variant={item.executionCompletedAt ? "outline" : "default"}
+                                onClick={() => void updateExecutionStatus(item)}
+                              >
+                                {executionSavingId === item.id
+                                  ? "Mise à jour..."
+                                  : item.executionCompletedAt
+                                    ? "Remettre à faire"
+                                    : "Marquer terminée"}
+                              </Button>
+                            ) : null}
+                          </span>
+                        ) : null}
+                        {showsPartOrderStatus ? (
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={[
+                                "inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium",
+                                item.partOrderStatus === "ORDERED" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900",
+                              ].join(" ")}
+                            >
+                              {item.partOrderStatus === "ORDERED" ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                              {item.partOrderStatus === "ORDERED" ? "Pièce commandée" : "Pièce à commander"}
+                            </span>
+                            {!isCompleted ? (
+                              <Button
+                                disabled={partOrderSavingId === item.id}
+                                size="sm"
+                                type="button"
+                                variant={item.partOrderStatus === "ORDERED" ? "outline" : "default"}
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  void updatePartOrder(item, item.partOrderStatus === "ORDERED" ? "TO_ORDER" : "ORDERED");
+                                }}
+                              >
+                                {partOrderSavingId === item.id ? "Mise à jour..." : item.partOrderStatus === "ORDERED" ? "Remettre à commander" : "Marquer commandée"}
+                              </Button>
+                            ) : null}
+                          </span>
                         ) : null}
                       </span>
                     ) : null}
+                    {showsOnSiteStatus && isSelectionChanged ? (
+                      <span className="mt-1.5 block text-xs text-amber-700">Enregistre la sélection avant de mettre à jour la réparation.</span>
+                    ) : null}
                   </span>
-                </label>
+                </div>
               );
             })}
           </div>
@@ -255,11 +420,11 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
               : isCompleted
                 ? "Le vehicule a ete recupere. Le dossier ne peut plus etre modifie."
                 : items.length
-                  ? "Les réparations décochées restent enregistrées dans le contrôle, mais ne sont ni ajoutées au PDF ni transmises au prestataire."
+                  ? "Les réparations décochées restent enregistrées. Le prestataire ne recevra que les réparations qui lui sont attribuées."
                   : "Aucune demande prestataire ni recuperation ne sera creee."}
           </p>
-          {!isClosedWithoutDamage && !isCompleted ? (
-            <Button className="w-full sm:w-auto" disabled={isSaving || selectedForbiddenCount > 0} size="sm" type="button" onClick={saveSelection}>
+          {!isClosedWithoutDamage && !isCompleted && (isSummaryPending || isSelectionChanged) ? (
+            <Button className="w-full sm:w-auto" disabled={isSaving || selectedForbiddenCount > 0 || selectedWithoutExecutionModeCount > 0} size="sm" type="button" onClick={saveSelection}>
               {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CheckSquare2 className="h-4 w-4" />}
               {!items.length ? "Valider et terminer" : vehicleCheck.status === "SUMMARY_READY" ? "Enregistrer la selection" : "Valider la synthese"}
             </Button>

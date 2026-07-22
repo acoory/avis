@@ -88,16 +88,25 @@ const zonesByView: Record<VehicleView, Zone[]> = {
   ],
 };
 
-const wheelCodes = [
-  "FRONT_LEFT_TIRE",
-  "FRONT_RIGHT_TIRE",
-  "REAR_LEFT_TIRE",
-  "REAR_RIGHT_TIRE",
-  "FRONT_LEFT_RIM",
-  "FRONT_RIGHT_RIM",
-  "REAR_LEFT_RIM",
-  "REAR_RIGHT_RIM",
-];
+const wheelGroups = [
+  {
+    id: "tires",
+    label: "Pneus",
+    suffix: "TIRE",
+  },
+  {
+    id: "rims",
+    label: "Jantes",
+    suffix: "RIM",
+  },
+] as const;
+
+const wheelPositionsByView: Record<VehicleView, string[]> = {
+  FRONT: ["FRONT_LEFT", "FRONT_RIGHT"],
+  LEFT: ["FRONT_LEFT", "REAR_LEFT"],
+  RIGHT: ["FRONT_RIGHT", "REAR_RIGHT"],
+  REAR: ["REAR_LEFT", "REAR_RIGHT"],
+};
 
 const interiorZones: Zone[] = [
   { code: "PASSENGER_SEAT", label: "Siege passager", x: 220, y: 62, width: 126, height: 96 },
@@ -343,36 +352,41 @@ export function VehicleExteriorSelector({
         </div>
 
         {activeArea === "EXTERIOR" ? (
-          <div className="mt-3">
-          <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase text-gray-500">
-            <CircleDot className="h-3.5 w-3.5" />
-            Pneus et jantes
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {wheelCodes.map((code) => {
-              const part = partsByCode.get(code);
-              if (!part) return null;
-              const selectedCount = selectedPartCounts[part.id] ?? 0;
-              return (
-                <Button
-                  className={selectedCount ? "shrink-0 border-teal-300 bg-teal-50 text-teal-900" : "shrink-0"}
-                  key={part.id}
-                  size="sm"
-                  type="button"
-                  variant="outline"
-                  onClick={() => onSelect(part)}
-                >
-                  <ListPlus className="h-3.5 w-3.5" />
-                  {part.name}
-                  {selectedCount ? (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-teal-700 px-1 text-[11px] font-semibold text-white">
-                      {selectedCount}
-                    </span>
-                  ) : null}
-                </Button>
-              );
-            })}
-          </div>
+          <div className="mt-3 space-y-3">
+            {wheelGroups.map((group) => (
+              <div key={group.id}>
+                <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase text-gray-500">
+                  <CircleDot className="h-3.5 w-3.5" />
+                  {group.label}
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {wheelPositionsByView[activeView].map((position) => {
+                    const code = `${position}_${group.suffix}`;
+                    const part = partsByCode.get(code);
+                    if (!part) return null;
+                    const selectedCount = selectedPartCounts[part.id] ?? 0;
+                    return (
+                      <Button
+                        className={selectedCount ? "shrink-0 border-teal-300 bg-teal-50 text-teal-900" : "shrink-0"}
+                        key={part.id}
+                        size="sm"
+                        type="button"
+                        variant="outline"
+                        onClick={() => onSelect(part)}
+                      >
+                        <ListPlus className="h-3.5 w-3.5" />
+                        {part.name}
+                        {selectedCount ? (
+                          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-teal-700 px-1 text-[11px] font-semibold text-white">
+                            {selectedCount}
+                          </span>
+                        ) : null}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="mt-3">

@@ -2838,6 +2838,8 @@ export const VehicleCheckItemScalarFieldEnum = {
   operationalStatus: 'operationalStatus',
   operationalComment: 'operationalComment',
   selectedForSummary: 'selectedForSummary',
+  executionMode: 'executionMode',
+  executionCompletedAt: 'executionCompletedAt',
   partOrderRequired: 'partOrderRequired',
   partOrderStatus: 'partOrderStatus',
   partOrderPrice: 'partOrderPrice',
@@ -3143,6 +3145,20 @@ export type ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
 
 
 /**
+ * Reference to a field of type 'RepairExecutionMode'
+ */
+export type EnumRepairExecutionModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RepairExecutionMode'>
+
+
+
+/**
+ * Reference to a field of type 'RepairExecutionMode[]'
+ */
+export type ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RepairExecutionMode[]'>
+
+
+
+/**
  * Reference to a field of type 'PartOrderStatus'
  */
 export type EnumPartOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartOrderStatus'>
@@ -3354,4 +3370,3 @@ export type PrismaAction =
  * `PrismaClient` proxy available in interactive transactions.
  */
 export type TransactionClient = Omit<DefaultPrismaClient, runtime.ITXClientDenyList>
-

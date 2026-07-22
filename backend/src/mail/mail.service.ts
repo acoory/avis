@@ -3,6 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import nodemailer, { type Transporter } from 'nodemailer';
 
 type SendMailInput = {
+  attachments?: Array<{
+    content: Buffer;
+    contentType?: string;
+    filename: string;
+  }>;
   html?: string;
   replyTo?: string;
   subject: string;
@@ -23,6 +28,7 @@ export class MailService {
 
     try {
       return await transporter.sendMail({
+        attachments: input.attachments,
         from,
         html: input.html,
         replyTo: input.replyTo,

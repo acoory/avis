@@ -1035,6 +1035,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                     </span>
 
                     <span className="flex shrink-0 items-center gap-3">
+                      {line.partOrderRequired ? <PartOrderDraftBadge inline /> : null}
                       {previewLine ? (
                         <DecisionBadge status={previewLine.decisionStatus} />
                       ) : null}
@@ -1954,9 +1955,9 @@ function Summary({ label, value }: { label: string; value: string }) {
   );
 }
 
-function PartOrderDraftBadge() {
+function PartOrderDraftBadge({ inline = false }: { inline?: boolean }) {
   return (
-    <span className="mt-2 inline-flex rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+    <span className={`${inline ? "" : "mt-2"} inline-flex rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800`}>
       Pièce à commander
     </span>
   );

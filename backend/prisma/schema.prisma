@@ -54,6 +54,11 @@ enum VehicleCheckItemOperationalStatus {
   CANCELLED
 }
 
+enum RepairExecutionMode {
+  ON_SITE
+  EXTERNAL_PROVIDER
+}
+
 enum VehicleCheckConversationStatus {
   OPEN
   RESOLVED
@@ -583,6 +588,8 @@ model VehicleCheckItem {
   operationalStatus         VehicleCheckItemOperationalStatus @default(ACTIVE)
   operationalComment        String?
   selectedForSummary        Boolean                           @default(true)
+  executionMode             RepairExecutionMode?
+  executionCompletedAt      DateTime?
   partOrderRequired         Boolean                           @default(false)
   partOrderStatus           PartOrderStatus                   @default(NOT_REQUIRED)
   partOrderPrice            Decimal?                          @db.Decimal(12, 2)
@@ -603,6 +610,7 @@ model VehicleCheckItem {
   @@index([vehiclePartId])
   @@index([decisionStatus])
   @@index([operationalStatus])
+  @@index([executionMode])
   @@index([partOrderStatus])
 }
 

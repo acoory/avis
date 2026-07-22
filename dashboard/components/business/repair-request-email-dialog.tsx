@@ -50,7 +50,13 @@ export function RepairRequestEmailDialog({
   const [isSending, setIsSending] = useState(false);
   const [publicUrl, setPublicUrl] = useState("");
   const selectedItemsCount = useMemo(
-    () => (vehicleCheck.items ?? []).filter((item) => item.selectedForSummary).length,
+    () =>
+      (vehicleCheck.items ?? []).filter(
+        (item) =>
+          item.selectedForSummary &&
+          item.operationalStatus === "ACTIVE" &&
+          item.executionMode === "EXTERNAL_PROVIDER",
+      ).length,
     [vehicleCheck.items],
   );
   const selectedCompany = companies.find((company) => company.id === selectedCompanyId);

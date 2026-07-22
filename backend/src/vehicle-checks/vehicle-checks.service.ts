@@ -10,6 +10,7 @@ import {
   NotificationType,
   PartOrderStatus,
   Prisma,
+  RepairExecutionMode,
   RepairDecisionStatus,
   Role,
   VehicleCheckConversationParticipantRole,
@@ -130,6 +131,7 @@ const publicVehicleCheckInclude = {
   items: {
     where: {
       selectedForSummary: true,
+      executionMode: RepairExecutionMode.EXTERNAL_PROVIDER,
       operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
     },
     include: {
@@ -315,6 +317,18 @@ export class VehicleChecksService {
       );
     }
 
+    const hasExternalProviderRepair = vehicleCheck.items.some(
+      (item) =>
+        item.selectedForSummary &&
+        item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
+        item.executionMode === RepairExecutionMode.EXTERNAL_PROVIDER,
+    );
+    if (!hasExternalProviderRepair) {
+      throw new BadRequestException(
+        'No repair assigned to an external provider was selected',
+      );
+    }
+
     const existingShare = await this.prisma.vehicleCheckPublicShare.findUnique({
       where: { vehicleCheckId: id },
     });
@@ -359,15 +373,23 @@ export class VehicleChecksService {
     user: CurrentUserPayload,
     dto: SendRepairRequestEmailDto,
   ) {
+    const vehicleCheck = await this.findOne(id, user);
+    const selectedItemsCount = (vehicleCheck.items ?? []).filter(
+      (item) =>
+        item.selectedForSummary &&
+        item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
+        item.executionMode === RepairExecutionMode.EXTERNAL_PROVIDER,
+    ).length;
+    if (!selectedItemsCount) {
+      throw new BadRequestException(
+        'No repair assigned to an external provider was selected',
+      );
+    }
     const recipients = await this.resolveRepairRequestRecipients(dto, user);
     const primaryContact = recipients[0];
     const share = await this.createPublicShare(id, user, {
       externalRepairContactId: primaryContact.id,
     });
-    const vehicleCheck = await this.findOne(id, user);
-    const selectedItemsCount = (vehicleCheck.items ?? []).filter(
-      (item) => item.selectedForSummary,
-    ).length;
     const publicUrl = this.publicRepairRequestUrl(share.token);
     const subject = this.repairRequestSubject(vehicleCheck);
     const text = this.repairRequestText(
@@ -712,6 +734,18 @@ export class VehicleChecksService {
       );
     }
 
+    const hasExternalProviderRepair = vehicleCheck.items.some(
+      (item) =>
+        item.selectedForSummary &&
+        item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
+        item.executionMode === RepairExecutionMode.EXTERNAL_PROVIDER,
+    );
+    if (!hasExternalProviderRepair) {
+      throw new BadRequestException(
+        'No repair assigned to an external provider was selected',
+      );
+    }
+
     const shouldMarkAsRecovered = !vehicleCheck.publicShare.vehicleRecoveredAt;
     const pendingPartOrders = (vehicleCheck.items ?? []).filter(
       (item) =>
@@ -729,6 +763,13 @@ export class VehicleChecksService {
         pendingPartOrdersCount: pendingPartOrders.length,
       });
     }
+    const hasPendingOnSiteRepair = vehicleCheck.items.some(
+      (item) =>
+        item.selectedForSummary &&
+        item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE &&
+        item.executionMode === RepairExecutionMode.ON_SITE &&
+        !item.executionCompletedAt,
+    );
 
     const recoveredAt = new Date();
     let vehicleWasMarkedAsRecovered = false;
@@ -747,7 +788,10 @@ export class VehicleChecksService {
         vehicleWasMarkedAsRecovered = updateResult.count > 0;
       }
 
-      if (vehicleCheck.status !== VehicleCheckStatus.COMPLETED) {
+      if (
+        vehicleCheck.status !== VehicleCheckStatus.COMPLETED &&
+        !hasPendingOnSiteRepair
+      ) {
         await transaction.vehicleCheck.update({
           where: { id },
           data: { status: VehicleCheckStatus.COMPLETED },
@@ -1084,16 +1128,26 @@ export class VehicleChecksService {
     }
 
     const itemIds = new Set(vehicleCheck.items.map((item) => item.id));
-    const unknownItemId = dto.selectedItemIds.find(
-      (itemId) => !itemIds.has(itemId),
-    );
+    const unknownItemId = dto.items.find((item) => !itemIds.has(item.id));
     if (unknownItemId) {
       throw new BadRequestException(
         'One or more selected repairs do not belong to this check',
       );
     }
 
-    const selectedItemIds = new Set(dto.selectedItemIds);
+    const selectedItemIds = new Set(dto.items.map((item) => item.id));
+    const executionModeByItemId = new Map(
+      dto.items.map((item) => [item.id, item.executionMode]),
+    );
+    const executionCompletedAtByItemId = new Map(
+      vehicleCheck.items.map((item) => [
+        item.id,
+        executionModeByItemId.get(item.id) === RepairExecutionMode.ON_SITE &&
+        item.executionMode === RepairExecutionMode.ON_SITE
+          ? item.executionCompletedAt
+          : null,
+      ]),
+    );
     const selectedItems = vehicleCheck.items.filter((item) =>
       selectedItemIds.has(item.id),
     );
@@ -1113,6 +1167,11 @@ export class VehicleChecksService {
       (item) =>
         item.operationalStatus === VehicleCheckItemOperationalStatus.ACTIVE,
     );
+    const hasExternalSelectedItems = activeSelectedItems.some(
+      (item) =>
+        executionModeByItemId.get(item.id) ===
+        RepairExecutionMode.EXTERNAL_PROVIDER,
+    );
     const closesWithoutDamage =
       activeSelectedItems.length === 0 &&
       !vehicleCheck.publicShare?.takenInChargeAt;
@@ -1128,20 +1187,25 @@ export class VehicleChecksService {
     return this.prisma.$transaction(async (tx) => {
       await tx.vehicleCheckItem.updateMany({
         where: { vehicleCheckId: id },
-        data: { selectedForSummary: false },
+        data: {
+          executionCompletedAt: null,
+          executionMode: null,
+          selectedForSummary: false,
+        },
       });
 
-      if (dto.selectedItemIds.length) {
-        await tx.vehicleCheckItem.updateMany({
-          where: {
-            vehicleCheckId: id,
-            id: { in: dto.selectedItemIds },
+      for (const item of dto.items) {
+        await tx.vehicleCheckItem.update({
+          where: { id: item.id },
+          data: {
+            executionCompletedAt: executionCompletedAtByItemId.get(item.id),
+            executionMode: executionModeByItemId.get(item.id),
+            selectedForSummary: true,
           },
-          data: { selectedForSummary: true },
         });
       }
 
-      if (closesWithoutDamage) {
+      if (closesWithoutDamage || !hasExternalSelectedItems) {
         await tx.vehicleCheckPublicShare.updateMany({
           where: { vehicleCheckId: id },
           data: { isEnabled: false },

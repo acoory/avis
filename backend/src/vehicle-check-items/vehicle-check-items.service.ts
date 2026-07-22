@@ -6,11 +6,13 @@ import {
 import {
   PartOrderStatus,
   Prisma,
+  RepairExecutionMode,
   VehicleCheckItemOperationalStatus,
   VehicleCheckStatus,
 } from '../../prisma/generated/client.cjs';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
+import { UpdateExecutionStatusDto } from './dto/update-execution-status.dto';
 import { UpdateOperationalStatusDto } from './dto/update-operational-status.dto';
 import { UpdatePartOrderDto } from './dto/update-part-order.dto';
 
@@ -18,12 +20,56 @@ import { UpdatePartOrderDto } from './dto/update-part-order.dto';
 export class VehicleCheckItemsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async updateExecutionStatus(id: string, dto: UpdateExecutionStatusDto) {
+    const item = await this.prisma.vehicleCheckItem.findUnique({
+      where: { id },
+      select: {
+        executionMode: true,
+        id: true,
+        operationalStatus: true,
+        selectedForSummary: true,
+        vehicleCheckId: true,
+        vehicleCheck: { select: { status: true } },
+      },
+    });
+
+    if (!item) {
+      throw new NotFoundException('Vehicle check item not found');
+    }
+
+    if (
+      item.vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY ||
+      !item.selectedForSummary ||
+      item.operationalStatus !== VehicleCheckItemOperationalStatus.ACTIVE ||
+      item.executionMode !== RepairExecutionMode.ON_SITE
+    ) {
+      throw new BadRequestException(
+        'Only an active on-site repair from a ready summary can be completed',
+      );
+    }
+
+    const updated = await this.prisma.vehicleCheckItem.update({
+      where: { id },
+      data: { executionCompletedAt: dto.completed ? new Date() : null },
+      include: this.vehicleCheckItemInclude(),
+    });
+
+    if (dto.completed) {
+      await this.completeVehicleCheckWhenAllInterventionsAreDone(
+        item.vehicleCheckId,
+      );
+    }
+
+    return updated;
+  }
+
   async updatePartOrder(id: string, dto: UpdatePartOrderDto) {
     const item = await this.prisma.vehicleCheckItem.findUnique({
       where: { id },
       select: {
         id: true,
         operationalStatus: true,
+        vehicleCheckId: true,
         vehicleCheck: { select: { status: true } },
       },
     });
@@ -46,7 +92,7 @@ export class VehicleCheckItemsService {
 
     const status = dto.partOrderStatus;
 
-    return this.prisma.vehicleCheckItem.update({
+    const updated = await this.prisma.vehicleCheckItem.update({
       where: { id },
       data: {
         partOrderRequired:
@@ -64,6 +110,14 @@ export class VehicleCheckItemsService {
       },
       include: { repairType: true, vehiclePart: true },
     });
+
+    if (status === PartOrderStatus.ORDERED) {
+      await this.completeVehicleCheckWhenAllInterventionsAreDone(
+        item.vehicleCheckId,
+      );
+    }
+
+    return updated;
   }
 
   async updateOperationalStatus(
@@ -104,6 +158,7 @@ export class VehicleCheckItemsService {
           operationalComment,
           ...(dto.operationalStatus !== VehicleCheckItemOperationalStatus.ACTIVE
             ? {
+                executionCompletedAt: null,
                 partOrderRequired: false,
                 partOrderStatus: PartOrderStatus.NOT_REQUIRED,
                 partOrderPrice: null,
@@ -159,6 +214,65 @@ export class VehicleCheckItemsService {
         orderBy: { createdAt: 'asc' as const },
       },
     };
+  }
+
+  private async completeVehicleCheckWhenAllInterventionsAreDone(
+    vehicleCheckId: string,
+  ) {
+    const vehicleCheck = await this.prisma.vehicleCheck.findUnique({
+      where: { id: vehicleCheckId },
+      select: {
+        items: {
+          where: {
+            operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+            selectedForSummary: true,
+          },
+          select: {
+            executionCompletedAt: true,
+            executionMode: true,
+            partOrderRequired: true,
+            partOrderStatus: true,
+          },
+        },
+        publicShare: { select: { vehicleRecoveredAt: true } },
+        status: true,
+      },
+    });
+
+    if (
+      !vehicleCheck ||
+      vehicleCheck.status !== VehicleCheckStatus.SUMMARY_READY
+    ) {
+      return;
+    }
+
+    const hasPendingPartOrder = vehicleCheck.items.some(
+      (currentItem) =>
+        currentItem.partOrderRequired &&
+        currentItem.partOrderStatus === PartOrderStatus.TO_ORDER,
+    );
+    const hasPendingOnSiteRepair = vehicleCheck.items.some(
+      (currentItem) =>
+        currentItem.executionMode === RepairExecutionMode.ON_SITE &&
+        !currentItem.executionCompletedAt,
+    );
+    const hasExternalRepair = vehicleCheck.items.some(
+      (currentItem) =>
+        currentItem.executionMode === RepairExecutionMode.EXTERNAL_PROVIDER,
+    );
+    const hasPendingExternalRepair =
+      hasExternalRepair && !vehicleCheck.publicShare?.vehicleRecoveredAt;
+
+    if (
+      !hasPendingPartOrder &&
+      !hasPendingOnSiteRepair &&
+      !hasPendingExternalRepair
+    ) {
+      await this.prisma.vehicleCheck.update({
+        where: { id: vehicleCheckId },
+        data: { status: VehicleCheckStatus.COMPLETED },
+      });
+    }
   }
 
   private async refreshVehicleCheckTotals(

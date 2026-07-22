@@ -46,10 +46,18 @@ export function VehicleCheckActions({
     vehicleCheck.status === "SUMMARY_READY" ||
     vehicleCheck.status === "CLOSED_NO_DAMAGE" ||
     vehicleCheck.status === "COMPLETED";
-  const canConfirmDeposit = vehicleCheck.status === "SUMMARY_READY";
+  const hasExternalProviderRepairs = (vehicleCheck.items ?? []).some(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.executionMode === "EXTERNAL_PROVIDER",
+  );
+  const canConfirmDeposit =
+    vehicleCheck.status === "SUMMARY_READY" && hasExternalProviderRepairs;
   const canEdit = vehicleCheck.status !== "COMPLETED";
   const canMarkRecovered = Boolean(
     vehicleCheck.status === "SUMMARY_READY" &&
+      hasExternalProviderRepairs &&
       vehicleCheck.publicShare &&
       vehicleCheck.publicShare.takenInChargeAt &&
       !vehicleCheck.publicShare.vehicleRecoveredAt,

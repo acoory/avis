@@ -2,6 +2,7 @@ import { Body, Controller, Param, Patch, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { UpdateExecutionStatusDto } from './dto/update-execution-status.dto';
 import { UpdateOperationalStatusDto } from './dto/update-operational-status.dto';
 import { UpdatePartOrderDto } from './dto/update-part-order.dto';
 import { VehicleCheckItemsService } from './vehicle-check-items.service';
@@ -9,7 +10,17 @@ import { VehicleCheckItemsService } from './vehicle-check-items.service';
 @UseGuards(JwtAuthGuard)
 @Controller('vehicle-check-items')
 export class VehicleCheckItemsController {
-  constructor(private readonly vehicleCheckItemsService: VehicleCheckItemsService) {}
+  constructor(
+    private readonly vehicleCheckItemsService: VehicleCheckItemsService,
+  ) {}
+
+  @Patch(':id/execution-status')
+  updateExecutionStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateExecutionStatusDto,
+  ) {
+    return this.vehicleCheckItemsService.updateExecutionStatus(id, dto);
+  }
 
   @Patch(':id/part-order')
   updatePartOrder(@Param('id') id: string, @Body() dto: UpdatePartOrderDto) {
