@@ -2648,6 +2648,7 @@ export const VehicleCheckScalarFieldEnum = {
   notes: 'notes',
   fieldCompletedAt: 'fieldCompletedAt',
   summaryFinalizedAt: 'summaryFinalizedAt',
+  completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

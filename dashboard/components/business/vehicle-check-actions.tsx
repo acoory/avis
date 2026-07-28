@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  CarFront,
   CheckCircle2,
   Download,
   MessageSquareText,
@@ -14,7 +13,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ManagerDecisionRequestDialog } from "@/components/business/manager-decision-request-dialog";
 import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
-import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-dialog";
 import { Button } from "@/components/ui/button";
 import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
@@ -22,13 +20,11 @@ import { VehicleCheck } from "@/types/business";
 
 type VehicleCheckActionsProps = {
   vehicleCheck: VehicleCheck;
-  onSendRepairRequest: () => void;
   onUpdated: (vehicleCheck: VehicleCheck) => void;
 };
 
 export function VehicleCheckActions({
   vehicleCheck,
-  onSendRepairRequest,
   onUpdated,
 }: VehicleCheckActionsProps) {
   const router = useRouter();
@@ -36,7 +32,6 @@ export function VehicleCheckActions({
   const [isDownloading, setIsDownloading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [decisionDialogOpen, setDecisionDialogOpen] = useState(false);
-  const [recoveredDialogOpen, setRecoveredDialogOpen] = useState(false);
   const canComplete = vehicleCheck.status === "DRAFT";
   const canRequestDecision =
     vehicleCheck.status !== "DRAFT" &&
@@ -46,22 +41,7 @@ export function VehicleCheckActions({
     vehicleCheck.status === "SUMMARY_READY" ||
     vehicleCheck.status === "CLOSED_NO_DAMAGE" ||
     vehicleCheck.status === "COMPLETED";
-  const hasExternalProviderRepairs = (vehicleCheck.items ?? []).some(
-    (item) =>
-      item.selectedForSummary &&
-      item.operationalStatus === "ACTIVE" &&
-      item.executionMode === "EXTERNAL_PROVIDER",
-  );
-  const canConfirmDeposit =
-    vehicleCheck.status === "SUMMARY_READY" && hasExternalProviderRepairs;
   const canEdit = vehicleCheck.status !== "COMPLETED";
-  const canMarkRecovered = Boolean(
-    vehicleCheck.status === "SUMMARY_READY" &&
-      hasExternalProviderRepairs &&
-      vehicleCheck.publicShare &&
-      vehicleCheck.publicShare.takenInChargeAt &&
-      !vehicleCheck.publicShare.vehicleRecoveredAt,
-  );
   const canDelete = true;
   const latestDecisionShare = (vehicleCheck.decisionShares ?? []).reduce<
     NonNullable<VehicleCheck["decisionShares"]>[number] | null
@@ -117,17 +97,6 @@ export function VehicleCheckActions({
               {isDownloading ? "Generation..." : "PDF"}
             </Button>
           ) : null}
-          {canConfirmDeposit ? (
-            <Button
-              className="w-full sm:w-auto"
-              size="sm"
-              type="button"
-              onClick={onSendRepairRequest}
-            >
-              <CarFront className="h-4 w-4" />
-              Confirmer le dépôt
-            </Button>
-          ) : null}
           {latestDecisionShare ? (
               <Button
                 asChild
@@ -151,18 +120,6 @@ export function VehicleCheckActions({
                 <MessageSquareText className="h-4 w-4" />
                 Avis manager
               </Button>
-          ) : null}
-          {canMarkRecovered ? (
-            <Button
-              className="w-full sm:w-auto"
-              size="sm"
-              type="button"
-              variant="outline"
-              onClick={() => setRecoveredDialogOpen(true)}
-            >
-              <CheckCircle2 className="h-4 w-4" />
-              Marquer recupere
-            </Button>
           ) : null}
           {canEdit || canDelete ? (
             <div className="col-span-2 flex items-center justify-end gap-1 sm:col-auto">
@@ -219,12 +176,6 @@ export function VehicleCheckActions({
         vehicleCheck={vehicleCheck}
         onOpenChange={setDecisionDialogOpen}
         onSent={onUpdated}
-      />
-      <VehicleRecoveredDialog
-        open={recoveredDialogOpen}
-        vehicleCheck={vehicleCheck}
-        onOpenChange={setRecoveredDialogOpen}
-        onRecovered={onUpdated}
       />
     </>
   );

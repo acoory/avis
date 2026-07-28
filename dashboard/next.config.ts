@@ -1,11 +1,41 @@
 import type { NextConfig } from "next";
 
+const appVersion =
+  process.env.APP_VERSION ??
+  process.env.VERCEL_GIT_COMMIT_SHA ??
+  `${Date.now()}`;
+
 const nextConfig: NextConfig = {
   /* config options here */
   output: "standalone",
   allowedDevOrigins: ["192.168.1.69"],
+  env: {
+    NEXT_PUBLIC_APP_VERSION: appVersion,
+  },
   async headers() {
     return [
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+          {
+            key: "Service-Worker-Allowed",
+            value: "/",
+          },
+        ],
+      },
+      {
+        source: "/manifest.webmanifest",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, must-revalidate",
+          },
+        ],
+      },
       {
         source: "/cloudinary/:path*",
         headers: [

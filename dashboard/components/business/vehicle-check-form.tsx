@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DecisionBadge } from "@/components/business/decision-badge";
 import { LicensePlateScanner } from "@/components/business/license-plate-scanner";
@@ -68,6 +68,13 @@ type DuplicateVehicleCheck = {
   status: string;
 };
 
+type QueuedDamagePhoto = {
+  file: File;
+  id: string;
+  previewUrl: string;
+  status: "queued" | "optimizing" | "uploading" | "cancelling" | "error";
+};
+
 const formSteps = [
   { title: "Vehicule", description: "Scanner ou saisir la plaque d'immatriculation." },
   { title: "Informations", description: "Agence, date et identification du vehicule." },
@@ -77,6 +84,29 @@ const formSteps = [
 
 const repairTypeCodesWithoutVehiclePart = new Set(["SERVICING"]);
 const lastSelectedAgencyStorageKey = "vehicle-control:last-selected-agency-id";
+const maximumDamagePhotos = 3;
+const maximumConcurrentPhotoUploads = 2;
+let activeDamagePhotoUploads = 0;
+const damagePhotoUploadWaiters: Array<() => void> = [];
+
+function acquireDamagePhotoUploadSlot() {
+  if (activeDamagePhotoUploads < maximumConcurrentPhotoUploads) {
+    activeDamagePhotoUploads += 1;
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve) => {
+    damagePhotoUploadWaiters.push(() => {
+      activeDamagePhotoUploads += 1;
+      resolve();
+    });
+  });
+}
+
+function releaseDamagePhotoUploadSlot() {
+  activeDamagePhotoUploads = Math.max(0, activeDamagePhotoUploads - 1);
+  damagePhotoUploadWaiters.shift()?.();
+}
 
 function createDraftId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -149,6 +179,26 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   const [hasDuplicateVehicleCheck, setHasDuplicateVehicleCheck] = useState(false);
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [photoUploadCounts, setPhotoUploadCounts] = useState<Record<string, number>>({});
+
+  const pendingPhotoUploadCount = useMemo(
+    () => Object.values(photoUploadCounts).reduce((total, count) => total + count, 0),
+    [photoUploadCounts],
+  );
+  const hasPendingPhotoUploads = pendingPhotoUploadCount > 0;
+  const handlePhotoUploadCountChange = useCallback((key: string, count: number) => {
+    setPhotoUploadCounts((current) => {
+      if ((current[key] ?? 0) === count) return current;
+
+      const next = { ...current };
+      if (count > 0) {
+        next[key] = count;
+      } else {
+        delete next[key];
+      }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     void Promise.all([
@@ -392,12 +442,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   async function uploadDamagePhoto(file: File) {
-    if (!file.type.startsWith("image/")) {
-      throw new Error("Le fichier selectionne n'est pas une image.");
-    }
-
-    const optimized = await optimizeDamagePhoto(file);
-    return businessService.uploadDamagePhoto(optimized);
+    return businessService.uploadDamagePhoto(file);
   }
 
   async function deleteUploadedPhoto(photo: DamagePhoto) {
@@ -416,16 +461,25 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
     const photo = await uploadDamagePhoto(file);
     setLines((current) =>
       current.map((line) =>
-        line.id === id ? { ...line, photos: [...line.photos, photo].slice(0, 3) } : line,
+        line.id === id
+          ? { ...line, photos: [...line.photos, photo].slice(0, maximumDamagePhotos) }
+          : line,
       ),
     );
+    return photo;
   }
 
   async function addPhotoToRepairSheet(file: File) {
     const photo = await uploadDamagePhoto(file);
     setRepairSheetLine((current) =>
-      current ? { ...current, photos: [...current.photos, photo].slice(0, 3) } : current,
+      current
+        ? {
+            ...current,
+            photos: [...current.photos, photo].slice(0, maximumDamagePhotos),
+          }
+        : current,
     );
+    return photo;
   }
 
   async function removePhotoFromRepairLine(id: string, photo: DamagePhoto) {
@@ -534,6 +588,11 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   function removeLine(id: string) {
+    if ((photoUploadCounts[`line:${id}`] ?? 0) > 0) {
+      toast.error("Attends la fin de l'envoi des photos avant de supprimer cette reparation.");
+      return;
+    }
+
     const removedLine = lines.find((line) => line.id === id);
     if (removedLine) void removeUnpersistedPhotos(removedLine.photos);
     setLines((current) => current.filter((line) => line.id !== id));
@@ -577,6 +636,15 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   async function saveVehicleCheck(shouldComplete: boolean) {
+    if (hasPendingPhotoUploads) {
+      toast.error(
+        pendingPhotoUploadCount > 1
+          ? `${pendingPhotoUploadCount} photos doivent encore etre envoyees ou retirees.`
+          : "Une photo doit encore etre envoyee ou retiree.",
+      );
+      return;
+    }
+
     if (!validateRequiredFields()) {
       return;
     }
@@ -627,6 +695,15 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   function openValidationRecap() {
+    if (hasPendingPhotoUploads) {
+      toast.error(
+        pendingPhotoUploadCount > 1
+          ? `${pendingPhotoUploadCount} photos doivent encore etre envoyees ou retirees.`
+          : "Une photo doit encore etre envoyee ou retiree.",
+      );
+      return;
+    }
+
     if (!validateRequiredFields()) {
       return;
     }
@@ -635,6 +712,11 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   async function goToNextStep() {
+    if (hasPendingPhotoUploads) {
+      toast.error("Attends la fin de l'envoi des photos avant de continuer.");
+      return;
+    }
+
     if (isCheckingDuplicate) {
       return;
     }
@@ -672,10 +754,20 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
   }
 
   function goToPreviousStep() {
+    if (hasPendingPhotoUploads) {
+      toast.error("Attends la fin de l'envoi des photos avant de changer d'etape.");
+      return;
+    }
+
     setActiveStep((current) => Math.max(current - 1, 0));
   }
 
   function goToStep(step: number) {
+    if (hasPendingPhotoUploads && step !== activeStep) {
+      toast.error("Attends la fin de l'envoi des photos avant de changer d'etape.");
+      return;
+    }
+
     if (step <= activeStep) {
       setActiveStep(step);
       return;
@@ -1065,6 +1157,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                     </div>
 
                     <RepairEditorFields
+                      photoUploadKey={`line:${line.id}`}
                       line={line}
                       repairTypes={repairTypes}
                       vehicleParts={vehicleParts}
@@ -1072,6 +1165,7 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
                       onPatch={(patch) => updateLine(line.id, patch)}
                       onAddPhoto={(file) => addPhotoToRepairLine(line.id, file)}
                       onRemovePhoto={(photo) => removePhotoFromRepairLine(line.id, photo)}
+                      onPhotoUploadCountChange={handlePhotoUploadCountChange}
                       onVehiclePartChange={(vehiclePartId) => changeVehiclePart(line.id, vehiclePartId)}
                       onRepairTypeChange={(repairTypeId) => changeRepairType(line.id, repairTypeId)}
                     />
@@ -1172,6 +1266,9 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
       {repairSheetLine ? (
         <RepairBottomSheet
+          isPhotoUploading={
+            (photoUploadCounts[`repair-sheet:${repairSheetLine.id}`] ?? 0) > 0
+          }
           isEditing={Boolean(repairSheetEditingId)}
           line={repairSheetLine}
           preview={repairSheetPreview}
@@ -1183,6 +1280,8 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
           onPatch={patchRepairSheetLine}
           onAddPhoto={addPhotoToRepairSheet}
           onRemovePhoto={removePhotoFromRepairSheet}
+          onPhotoUploadCountChange={handlePhotoUploadCountChange}
+          photoUploadKey={`repair-sheet:${repairSheetLine.id}`}
           onVehiclePartChange={changeRepairSheetVehiclePart}
           onRepairTypeChange={changeRepairSheetType}
         />
@@ -1348,30 +1447,36 @@ function StepActions({
 
 function RepairBottomSheet({
   isEditing,
+  isPhotoUploading,
   line,
   preview,
   repairTypes,
   vehicleParts,
+  photoUploadKey,
   isVehiclePartOptional,
   onCancel,
   onConfirm,
   onPatch,
   onAddPhoto,
   onRemovePhoto,
+  onPhotoUploadCountChange,
   onVehiclePartChange,
   onRepairTypeChange,
 }: {
   isEditing: boolean;
+  isPhotoUploading: boolean;
   line: DraftRepairLine;
   preview: RepairDecisionPreview | null;
   repairTypes: RepairType[];
   vehicleParts: VehiclePart[];
+  photoUploadKey: string;
   isVehiclePartOptional: (repairTypeId: string) => boolean;
   onCancel: () => void;
   onConfirm: () => void;
   onPatch: (patch: Partial<DraftRepairLine>) => void;
-  onAddPhoto: (file: File) => Promise<void>;
+  onAddPhoto: (file: File) => Promise<DamagePhoto>;
   onRemovePhoto: (photo: DamagePhoto) => Promise<void>;
+  onPhotoUploadCountChange: (key: string, count: number) => void;
   onVehiclePartChange: (vehiclePartId: string) => void;
   onRepairTypeChange: (repairTypeId: string) => void;
 }) {
@@ -1388,7 +1493,8 @@ function RepairBottomSheet({
           </div>
           <button
             aria-label="Fermer la fiche reparation"
-            className="rounded-md p-2 text-gray-500 hover:bg-gray-100"
+            className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={isPhotoUploading}
             type="button"
             onClick={onCancel}
           >
@@ -1417,23 +1523,29 @@ function RepairBottomSheet({
           <RepairEditorFields
             layout="sheet"
             line={line}
+            photoUploadKey={photoUploadKey}
             repairTypes={repairTypes}
             vehicleParts={vehicleParts}
             isVehiclePartOptional={isVehiclePartOptional}
             onPatch={onPatch}
             onAddPhoto={onAddPhoto}
             onRemovePhoto={onRemovePhoto}
+            onPhotoUploadCountChange={onPhotoUploadCountChange}
             onVehiclePartChange={onVehiclePartChange}
             onRepairTypeChange={onRepairTypeChange}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-2 border-t border-gray-100 bg-white p-3">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button disabled={isPhotoUploading} type="button" variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button type="button" onClick={onConfirm}>
-            {isEditing ? "Enregistrer" : "Ajouter"}
+          <Button disabled={isPhotoUploading} type="button" onClick={onConfirm}>
+            {isPhotoUploading
+              ? "Photos en cours..."
+              : isEditing
+                ? "Enregistrer"
+                : "Ajouter"}
           </Button>
         </div>
       </div>
@@ -1444,23 +1556,27 @@ function RepairBottomSheet({
 function RepairEditorFields({
   layout = "default",
   line,
+  photoUploadKey,
   repairTypes,
   vehicleParts,
   isVehiclePartOptional,
   onPatch,
   onAddPhoto,
   onRemovePhoto,
+  onPhotoUploadCountChange,
   onVehiclePartChange,
   onRepairTypeChange,
 }: {
   layout?: "default" | "sheet";
   line: DraftRepairLine;
+  photoUploadKey: string;
   repairTypes: RepairType[];
   vehicleParts: VehiclePart[];
   isVehiclePartOptional: (repairTypeId: string) => boolean;
   onPatch: (patch: Partial<DraftRepairLine>) => void;
-  onAddPhoto: (file: File) => Promise<void>;
+  onAddPhoto: (file: File) => Promise<DamagePhoto>;
   onRemovePhoto: (photo: DamagePhoto) => Promise<void>;
+  onPhotoUploadCountChange: (key: string, count: number) => void;
   onVehiclePartChange: (vehiclePartId: string) => void;
   onRepairTypeChange: (repairTypeId: string) => void;
 }) {
@@ -1553,9 +1669,11 @@ function RepairEditorFields({
 
       <RepairPhotoField
         compact={layout === "sheet"}
+        photoUploadKey={photoUploadKey}
         photos={line.photos}
         onAdd={onAddPhoto}
         onRemove={onRemovePhoto}
+        onUploadCountChange={onPhotoUploadCountChange}
       />
 
       <label className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-700">
@@ -1573,44 +1691,204 @@ function RepairEditorFields({
 
 function RepairPhotoField({
   compact = false,
+  photoUploadKey,
   photos,
   onAdd,
   onRemove,
+  onUploadCountChange,
 }: {
   compact?: boolean;
+  photoUploadKey: string;
   photos: DamagePhoto[];
-  onAdd: (file: File) => Promise<void>;
+  onAdd: (file: File) => Promise<DamagePhoto>;
   onRemove: (photo: DamagePhoto) => Promise<void>;
+  onUploadCountChange: (key: string, count: number) => void;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const processingIdsRef = useRef(new Set<string>());
+  const cancelledIdsRef = useRef(new Set<string>());
+  const queueRef = useRef<QueuedDamagePhoto[]>([]);
+  const [queue, setQueue] = useState<QueuedDamagePhoto[]>([]);
 
-  async function handleFile(file: File | undefined) {
-    if (!file || photos.length >= 3) return;
-    setIsUploading(true);
-    try {
-      await onAdd(file);
-    } catch {
-      toast.error("Impossible d'ajouter la photo. Verifie la configuration Cloudinary.");
-    } finally {
-      setIsUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
+  useEffect(() => {
+    queueRef.current = queue;
+    onUploadCountChange(photoUploadKey, queue.length);
+  }, [onUploadCountChange, photoUploadKey, queue]);
+
+  useEffect(
+    () => () => {
+      queueRef.current.forEach((item) => {
+        cancelledIdsRef.current.add(item.id);
+        URL.revokeObjectURL(item.previewUrl);
+      });
+      onUploadCountChange(photoUploadKey, 0);
+    },
+    [onUploadCountChange, photoUploadKey],
+  );
+
+  const processQueuedPhoto = useCallback(
+    async (item: QueuedDamagePhoto) => {
+      if (processingIdsRef.current.has(item.id)) return;
+
+      let hasUploadSlot = false;
+      processingIdsRef.current.add(item.id);
+      setQueue((current) =>
+        current.map((queued) =>
+          queued.id === item.id ? { ...queued, status: "optimizing" } : queued,
+        ),
+      );
+
+      try {
+        const optimized = await optimizeDamagePhoto(item.file);
+        if (cancelledIdsRef.current.has(item.id)) {
+          URL.revokeObjectURL(item.previewUrl);
+          setQueue((current) => current.filter((queued) => queued.id !== item.id));
+          return;
+        }
+
+        setQueue((current) =>
+          current.map((queued) =>
+            queued.id === item.id ? { ...queued, status: "queued" } : queued,
+          ),
+        );
+        await acquireDamagePhotoUploadSlot();
+        hasUploadSlot = true;
+
+        if (cancelledIdsRef.current.has(item.id)) {
+          URL.revokeObjectURL(item.previewUrl);
+          setQueue((current) => current.filter((queued) => queued.id !== item.id));
+          return;
+        }
+
+        setQueue((current) =>
+          current.map((queued) =>
+            queued.id === item.id ? { ...queued, status: "uploading" } : queued,
+          ),
+        );
+        const uploadedPhoto = await onAdd(optimized);
+
+        if (cancelledIdsRef.current.has(item.id)) {
+          await onRemove(uploadedPhoto);
+        }
+
+        URL.revokeObjectURL(item.previewUrl);
+        setQueue((current) => current.filter((queued) => queued.id !== item.id));
+      } catch {
+        if (cancelledIdsRef.current.has(item.id)) {
+          URL.revokeObjectURL(item.previewUrl);
+          setQueue((current) => current.filter((queued) => queued.id !== item.id));
+        } else {
+          toast.error("L'envoi d'une photo a echoue. Tu peux la reessayer.");
+          setQueue((current) =>
+            current.map((queued) =>
+              queued.id === item.id ? { ...queued, status: "error" } : queued,
+            ),
+          );
+        }
+      } finally {
+        if (hasUploadSlot) {
+          releaseDamagePhotoUploadSlot();
+        }
+        processingIdsRef.current.delete(item.id);
+        cancelledIdsRef.current.delete(item.id);
+      }
+    },
+    [onAdd, onRemove],
+  );
+
+  useEffect(() => {
+    const availableSlots =
+      maximumConcurrentPhotoUploads - processingIdsRef.current.size;
+    if (availableSlots <= 0) return;
+
+    queue
+      .filter(
+        (item) =>
+          item.status === "queued" && !processingIdsRef.current.has(item.id),
+      )
+      .slice(0, availableSlots)
+      .forEach((item) => void processQueuedPhoto(item));
+  }, [processQueuedPhoto, queue]);
+
+  function handleFiles(files: FileList | null) {
+    if (!files?.length) return;
+
+    const remainingSlots = Math.max(
+      0,
+      maximumDamagePhotos - photos.length - queue.length,
+    );
+    const selectedFiles = Array.from(files);
+    const validFiles = selectedFiles
+      .filter((file) => file.type.startsWith("image/"))
+      .slice(0, remainingSlots);
+
+    if (validFiles.length < selectedFiles.length) {
+      toast.error(
+        remainingSlots === 0
+          ? "Trois photos maximum par reparation."
+          : "Certaines photos n'ont pas ete ajoutees.",
+      );
     }
+
+    if (validFiles.length) {
+      setQueue((current) => [
+        ...current,
+        ...validFiles.map((file) => ({
+          file,
+          id: createDraftId(),
+          previewUrl: URL.createObjectURL(file),
+          status: "queued" as const,
+        })),
+      ]);
+    }
+
+    if (inputRef.current) inputRef.current.value = "";
   }
+
+  function retryPhoto(id: string) {
+    setQueue((current) =>
+      current.map((item) =>
+        item.id === id ? { ...item, status: "queued" } : item,
+      ),
+    );
+  }
+
+  function cancelQueuedPhoto(item: QueuedDamagePhoto) {
+    if (processingIdsRef.current.has(item.id)) {
+      cancelledIdsRef.current.add(item.id);
+      setQueue((current) =>
+        current.map((queued) =>
+          queued.id === item.id ? { ...queued, status: "cancelling" } : queued,
+        ),
+      );
+      return;
+    }
+
+    URL.revokeObjectURL(item.previewUrl);
+    setQueue((current) => current.filter((queued) => queued.id !== item.id));
+  }
+
+  const displayedPhotoCount = photos.length + queue.length;
+  const activeUploadCount = queue.filter((item) =>
+    ["optimizing", "uploading", "cancelling"].includes(item.status),
+  ).length;
 
   return (
     <div className={compact ? "space-y-1.5" : "space-y-2"}>
       <div className="flex items-center justify-between gap-3">
         <Label>{compact ? "Photos" : "Photos du degat"}</Label>
-        <span className="text-xs text-gray-500">{photos.length}/3 · Facultatif</span>
+        <span className="text-xs text-gray-500">
+          {displayedPhotoCount}/{maximumDamagePhotos} · Facultatif
+        </span>
       </div>
       <input
         accept="image/*"
         capture="environment"
         className="hidden"
+        multiple
         ref={inputRef}
         type="file"
-        onChange={(event) => void handleFile(event.target.files?.[0])}
+        onChange={(event) => handleFiles(event.target.files)}
       />
       <div
         className={
@@ -1645,7 +1923,71 @@ function RepairPhotoField({
             </button>
           </div>
         ))}
-        {photos.length < 3 ? (
+        {queue.map((item) => {
+          const isError = item.status === "error";
+          const statusLabel =
+            item.status === "queued"
+              ? "En attente"
+              : item.status === "optimizing"
+                ? "Optimisation"
+                : item.status === "uploading"
+                  ? "Envoi"
+                  : item.status === "cancelling"
+                    ? "Annulation"
+                    : "Echec";
+
+          return (
+            <div
+              className={[
+                "relative shrink-0 overflow-hidden rounded-md border bg-gray-100",
+                isError ? "border-red-300" : "border-teal-200",
+                compact ? "h-16 w-16" : "h-28 w-28",
+              ].join(" ")}
+              key={item.id}
+            >
+              <img
+                alt="Photo en cours d'envoi"
+                className="h-full w-full object-cover"
+                src={item.previewUrl}
+              />
+              <div
+                className={[
+                  "absolute inset-0 flex flex-col items-center justify-center gap-1 text-center text-white",
+                  isError ? "bg-red-950/65" : "bg-black/55",
+                ].join(" ")}
+              >
+                {isError ? (
+                  <AlertTriangle className="h-5 w-5" />
+                ) : (
+                  <LoaderCircle className="h-5 w-5 animate-spin" />
+                )}
+                <span className="px-1 text-[10px] font-semibold">{statusLabel}</span>
+                {isError ? (
+                  <button
+                    className="rounded bg-white/95 px-2 py-1 text-[10px] font-semibold text-red-700"
+                    type="button"
+                    onClick={() => retryPhoto(item.id)}
+                  >
+                    Reessayer
+                  </button>
+                ) : null}
+              </div>
+              <button
+                aria-label="Annuler cette photo"
+                className={[
+                  "absolute right-1 top-1 flex cursor-pointer items-center justify-center rounded-full bg-black/70 text-white",
+                  compact ? "h-7 w-7" : "h-8 w-8",
+                ].join(" ")}
+                disabled={item.status === "cancelling"}
+                type="button"
+                onClick={() => cancelQueuedPhoto(item)}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        })}
+        {displayedPhotoCount < maximumDamagePhotos ? (
           <button
             className={[
               "flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 font-medium text-gray-600 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800",
@@ -1653,22 +1995,26 @@ function RepairPhotoField({
                 ? "h-16 w-16 shrink-0 gap-1 text-xs"
                 : "h-28 w-28 shrink-0 gap-1.5 text-xs",
             ].join(" ")}
-            disabled={isUploading}
             type="button"
             onClick={() => inputRef.current?.click()}
           >
-            {isUploading ? (
-              <LoaderCircle className="h-5 w-5 animate-spin" />
-            ) : (
-              <ImagePlus className={compact ? "h-4 w-4" : "h-5 w-5"} />
-            )}
-            <span>{isUploading ? "Envoi..." : compact ? "Photo" : "Ajouter"}</span>
+            <ImagePlus className={compact ? "h-4 w-4" : "h-5 w-5"} />
+            <span>{compact ? "Photo" : "Ajouter"}</span>
           </button>
         ) : null}
       </div>
+      {activeUploadCount > 0 ? (
+        <p className="flex items-center gap-1.5 text-xs font-medium text-teal-700">
+          <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+          {activeUploadCount} photo{activeUploadCount > 1 ? "s" : ""} en cours
+          {displayedPhotoCount < maximumDamagePhotos
+            ? " d'envoi. Tu peux en ajouter une autre sans attendre."
+            : " d'envoi en arriere-plan."}
+        </p>
+      ) : null}
       {!compact ? (
         <p className="text-xs text-gray-500">
-          Image compressee automatiquement avant l'envoi.
+          {"Image compressee automatiquement avant l'envoi."}
         </p>
       ) : null}
     </div>

@@ -7,6 +7,7 @@ import { Menu } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { NotificationsButton } from "@/components/dashboard/notifications-button";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import { VehicleSearch } from "@/components/dashboard/vehicle-search";
 import { Button } from "@/components/ui/button";
 
 export function DashboardLayout({ children }: PropsWithChildren) {
@@ -32,7 +33,10 @@ export function DashboardLayout({ children }: PropsWithChildren) {
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <NotificationsButton />
+              <div className="flex items-center gap-2">
+                <VehicleSearch />
+                <NotificationsButton />
+              </div>
             </header>
             <main className="min-w-0 flex-1 overflow-x-clip p-4 md:p-6">{children}</main>
           </div>

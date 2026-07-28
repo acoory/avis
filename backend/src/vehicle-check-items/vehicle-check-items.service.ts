@@ -270,7 +270,10 @@ export class VehicleCheckItemsService {
     ) {
       await this.prisma.vehicleCheck.update({
         where: { id: vehicleCheckId },
-        data: { status: VehicleCheckStatus.COMPLETED },
+        data: {
+          completedAt: new Date(),
+          status: VehicleCheckStatus.COMPLETED,
+        },
       });
     }
   }

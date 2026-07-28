@@ -73,6 +73,7 @@ export type VehicleCheckMinAggregateOutputType = {
   notes: string | null
   fieldCompletedAt: Date | null
   summaryFinalizedAt: Date | null
+  completedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -102,6 +103,7 @@ export type VehicleCheckMaxAggregateOutputType = {
   notes: string | null
   fieldCompletedAt: Date | null
   summaryFinalizedAt: Date | null
+  completedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -131,6 +133,7 @@ export type VehicleCheckCountAggregateOutputType = {
   notes: number
   fieldCompletedAt: number
   summaryFinalizedAt: number
+  completedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -184,6 +187,7 @@ export type VehicleCheckMinAggregateInputType = {
   notes?: true
   fieldCompletedAt?: true
   summaryFinalizedAt?: true
+  completedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -213,6 +217,7 @@ export type VehicleCheckMaxAggregateInputType = {
   notes?: true
   fieldCompletedAt?: true
   summaryFinalizedAt?: true
+  completedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -242,6 +247,7 @@ export type VehicleCheckCountAggregateInputType = {
   notes?: true
   fieldCompletedAt?: true
   summaryFinalizedAt?: true
+  completedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -358,6 +364,7 @@ export type VehicleCheckGroupByOutputType = {
   notes: string | null
   fieldCompletedAt: Date | null
   summaryFinalizedAt: Date | null
+  completedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: VehicleCheckCountAggregateOutputType | null
@@ -410,6 +417,7 @@ export type VehicleCheckWhereInput = {
   notes?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   fieldCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   summaryFinalizedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   collaborator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -449,6 +457,7 @@ export type VehicleCheckOrderByWithRelationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   fieldCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryFinalizedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   collaborator?: Prisma.UserOrderByWithRelationInput
@@ -492,6 +501,7 @@ export type VehicleCheckWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   fieldCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   summaryFinalizedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   collaborator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -531,6 +541,7 @@ export type VehicleCheckOrderByWithAggregationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   fieldCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryFinalizedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VehicleCheckCountOrderByAggregateInput
@@ -568,6 +579,7 @@ export type VehicleCheckScalarWhereWithAggregatesInput = {
   notes?: Prisma.StringNullableWithAggregatesFilter<"VehicleCheck"> | string | null
   fieldCompletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"VehicleCheck"> | Date | string | null
   summaryFinalizedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"VehicleCheck"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"VehicleCheck"> | Date | string
 }
@@ -593,6 +605,7 @@ export type VehicleCheckCreateInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -632,6 +645,7 @@ export type VehicleCheckUncheckedCreateInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -663,6 +677,7 @@ export type VehicleCheckUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -702,6 +717,7 @@ export type VehicleCheckUncheckedUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -737,6 +753,7 @@ export type VehicleCheckCreateManyInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -762,6 +779,7 @@ export type VehicleCheckUpdateManyMutationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -791,6 +809,7 @@ export type VehicleCheckUncheckedUpdateManyInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -835,6 +854,7 @@ export type VehicleCheckCountOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   fieldCompletedAt?: Prisma.SortOrder
   summaryFinalizedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -875,6 +895,7 @@ export type VehicleCheckMaxOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   fieldCompletedAt?: Prisma.SortOrder
   summaryFinalizedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -904,6 +925,7 @@ export type VehicleCheckMinOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   fieldCompletedAt?: Prisma.SortOrder
   summaryFinalizedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1224,6 +1246,7 @@ export type VehicleCheckCreateWithoutCollaboratorInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   agency: Prisma.AgencyCreateNestedOneWithoutVehicleChecksInput
@@ -1261,6 +1284,7 @@ export type VehicleCheckUncheckedCreateWithoutCollaboratorInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1325,6 +1349,7 @@ export type VehicleCheckScalarWhereInput = {
   notes?: Prisma.StringNullableFilter<"VehicleCheck"> | string | null
   fieldCompletedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   summaryFinalizedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"VehicleCheck"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VehicleCheck"> | Date | string
 }
@@ -1350,6 +1375,7 @@ export type VehicleCheckCreateWithoutAgencyInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1387,6 +1413,7 @@ export type VehicleCheckUncheckedCreateWithoutAgencyInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1444,6 +1471,7 @@ export type VehicleCheckCreateWithoutManufacturerInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1481,6 +1509,7 @@ export type VehicleCheckUncheckedCreateWithoutManufacturerInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1538,6 +1567,7 @@ export type VehicleCheckCreateWithoutVehicleModelInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1575,6 +1605,7 @@ export type VehicleCheckUncheckedCreateWithoutVehicleModelInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1632,6 +1663,7 @@ export type VehicleCheckCreateWithoutPublicShareInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1670,6 +1702,7 @@ export type VehicleCheckUncheckedCreateWithoutPublicShareInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1716,6 +1749,7 @@ export type VehicleCheckUpdateWithoutPublicShareInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -1754,6 +1788,7 @@ export type VehicleCheckUncheckedUpdateWithoutPublicShareInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -1784,6 +1819,7 @@ export type VehicleCheckCreateWithoutDecisionSharesInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1822,6 +1858,7 @@ export type VehicleCheckUncheckedCreateWithoutDecisionSharesInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -1868,6 +1905,7 @@ export type VehicleCheckUpdateWithoutDecisionSharesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -1906,6 +1944,7 @@ export type VehicleCheckUncheckedUpdateWithoutDecisionSharesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -1936,6 +1975,7 @@ export type VehicleCheckCreateWithoutConversationInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -1974,6 +2014,7 @@ export type VehicleCheckUncheckedCreateWithoutConversationInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -2020,6 +2061,7 @@ export type VehicleCheckUpdateWithoutConversationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2058,6 +2100,7 @@ export type VehicleCheckUncheckedUpdateWithoutConversationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2088,6 +2131,7 @@ export type VehicleCheckCreateWithoutNotificationsInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -2126,6 +2170,7 @@ export type VehicleCheckUncheckedCreateWithoutNotificationsInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -2172,6 +2217,7 @@ export type VehicleCheckUpdateWithoutNotificationsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2210,6 +2256,7 @@ export type VehicleCheckUncheckedUpdateWithoutNotificationsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2240,6 +2287,7 @@ export type VehicleCheckCreateWithoutItemsInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -2278,6 +2326,7 @@ export type VehicleCheckUncheckedCreateWithoutItemsInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   externalQuotes?: Prisma.ExternalQuoteUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -2324,6 +2373,7 @@ export type VehicleCheckUpdateWithoutItemsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2362,6 +2412,7 @@ export type VehicleCheckUncheckedUpdateWithoutItemsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   externalQuotes?: Prisma.ExternalQuoteUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2392,6 +2443,7 @@ export type VehicleCheckCreateWithoutExternalQuotesInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collaborator: Prisma.UserCreateNestedOneWithoutVehicleChecksInput
@@ -2430,6 +2482,7 @@ export type VehicleCheckUncheckedCreateWithoutExternalQuotesInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.VehicleCheckItemUncheckedCreateNestedManyWithoutVehicleCheckInput
@@ -2476,6 +2529,7 @@ export type VehicleCheckUpdateWithoutExternalQuotesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2514,6 +2568,7 @@ export type VehicleCheckUncheckedUpdateWithoutExternalQuotesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2547,6 +2602,7 @@ export type VehicleCheckCreateManyCollaboratorInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2572,6 +2628,7 @@ export type VehicleCheckUpdateWithoutCollaboratorInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   agency?: Prisma.AgencyUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2609,6 +2666,7 @@ export type VehicleCheckUncheckedUpdateWithoutCollaboratorInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2643,6 +2701,7 @@ export type VehicleCheckUncheckedUpdateManyWithoutCollaboratorInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2671,6 +2730,7 @@ export type VehicleCheckCreateManyAgencyInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2696,6 +2756,7 @@ export type VehicleCheckUpdateWithoutAgencyInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2733,6 +2794,7 @@ export type VehicleCheckUncheckedUpdateWithoutAgencyInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2767,6 +2829,7 @@ export type VehicleCheckUncheckedUpdateManyWithoutAgencyInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2795,6 +2858,7 @@ export type VehicleCheckCreateManyManufacturerInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2820,6 +2884,7 @@ export type VehicleCheckUpdateWithoutManufacturerInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2857,6 +2922,7 @@ export type VehicleCheckUncheckedUpdateWithoutManufacturerInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -2891,6 +2957,7 @@ export type VehicleCheckUncheckedUpdateManyWithoutManufacturerInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2919,6 +2986,7 @@ export type VehicleCheckCreateManyVehicleModelInput = {
   notes?: string | null
   fieldCompletedAt?: Date | string | null
   summaryFinalizedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2944,6 +3012,7 @@ export type VehicleCheckUpdateWithoutVehicleModelInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collaborator?: Prisma.UserUpdateOneRequiredWithoutVehicleChecksNestedInput
@@ -2981,6 +3050,7 @@ export type VehicleCheckUncheckedUpdateWithoutVehicleModelInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.VehicleCheckItemUncheckedUpdateManyWithoutVehicleCheckNestedInput
@@ -3015,6 +3085,7 @@ export type VehicleCheckUncheckedUpdateManyWithoutVehicleModelInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fieldCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summaryFinalizedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3102,6 +3173,7 @@ export type VehicleCheckSelect<ExtArgs extends runtime.Types.Extensions.Internal
   notes?: boolean
   fieldCompletedAt?: boolean
   summaryFinalizedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -3142,6 +3214,7 @@ export type VehicleCheckSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   notes?: boolean
   fieldCompletedAt?: boolean
   summaryFinalizedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -3175,6 +3248,7 @@ export type VehicleCheckSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   notes?: boolean
   fieldCompletedAt?: boolean
   summaryFinalizedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -3208,11 +3282,12 @@ export type VehicleCheckSelectScalar = {
   notes?: boolean
   fieldCompletedAt?: boolean
   summaryFinalizedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VehicleCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "checkNumber" | "collaboratorId" | "agencyId" | "manufacturerId" | "vehicleModelId" | "licensePlate" | "licensePlateRaw" | "licensePlateCountry" | "licensePlateRecognitionConfidence" | "mileage" | "checkDate" | "city" | "status" | "totalInternalSavingAmount" | "totalInternalCost" | "totalExternalCost" | "totalDifferenceAmount" | "constructorAllowanceAmount" | "allowanceDifferenceAmount" | "decisionSummary" | "notes" | "fieldCompletedAt" | "summaryFinalizedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheck"]>
+export type VehicleCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "checkNumber" | "collaboratorId" | "agencyId" | "manufacturerId" | "vehicleModelId" | "licensePlate" | "licensePlateRaw" | "licensePlateCountry" | "licensePlateRecognitionConfidence" | "mileage" | "checkDate" | "city" | "status" | "totalInternalSavingAmount" | "totalInternalCost" | "totalExternalCost" | "totalDifferenceAmount" | "constructorAllowanceAmount" | "allowanceDifferenceAmount" | "decisionSummary" | "notes" | "fieldCompletedAt" | "summaryFinalizedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCheck"]>
 export type VehicleCheckInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   collaborator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   agency?: boolean | Prisma.AgencyDefaultArgs<ExtArgs>
@@ -3278,6 +3353,7 @@ export type $VehicleCheckPayload<ExtArgs extends runtime.Types.Extensions.Intern
     notes: string | null
     fieldCompletedAt: Date | null
     summaryFinalizedAt: Date | null
+    completedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["vehicleCheck"]>
@@ -3737,6 +3813,7 @@ export interface VehicleCheckFieldRefs {
   readonly notes: Prisma.FieldRef<"VehicleCheck", 'String'>
   readonly fieldCompletedAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
   readonly summaryFinalizedAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"VehicleCheck", 'DateTime'>
 }

@@ -40,6 +40,13 @@ export function VehicleRecoveredDialog({
       item.partOrderRequired &&
       item.partOrderStatus === "TO_ORDER",
   ).length;
+  const pendingOnSiteRepairsCount = (selectedVehicleCheck.items ?? []).filter(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.executionMode === "ON_SITE" &&
+      !item.executionCompletedAt,
+  ).length;
 
   function closeDialog() {
     if (!isSaving) {
@@ -88,11 +95,13 @@ export function VehicleRecoveredDialog({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-950" id="recover-vehicle-check-title">
-                Marquer le vehicule comme recupere ?
+                Marquer le véhicule comme récupéré ?
               </h2>
               <p className="mt-2 text-sm leading-6 text-gray-600">
-                Le vehicule <span className="font-medium text-gray-950">{vehicleLabel}</span> passera au statut{" "}
-                <span className="font-medium text-gray-950">Terminé</span>. Cette action cloture le suivi prestataire.
+                Le véhicule <span className="font-medium text-gray-950">{vehicleLabel}</span> sera marqué comme récupéré et le suivi prestataire sera terminé.
+                {pendingOnSiteRepairsCount > 0
+                  ? " Le dossier restera ouvert jusqu’à la fin des réparations sur place."
+                  : " Le dossier sera alors terminé."}
               </p>
             </div>
           </div>
@@ -105,7 +114,7 @@ export function VehicleRecoveredDialog({
           <div className="mt-4 flex gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <p>
-              {pendingPartOrdersCount} piece{pendingPartOrdersCount > 1 ? "s" : ""} reste{pendingPartOrdersCount > 1 ? "nt" : ""} a commander. Finalisez {pendingPartOrdersCount > 1 ? "ces commandes" : "cette commande"} avant la recuperation.
+              {pendingPartOrdersCount} pièce{pendingPartOrdersCount > 1 ? "s" : ""} reste{pendingPartOrdersCount > 1 ? "nt" : ""} à commander. Finalisez {pendingPartOrdersCount > 1 ? "ces commandes" : "cette commande"} avant la récupération.
             </p>
           </div>
         ) : null}
@@ -116,7 +125,7 @@ export function VehicleRecoveredDialog({
           </Button>
           <Button disabled={isSaving || pendingPartOrdersCount > 0} type="button" onClick={confirmRecovered}>
             <CheckCircle2 className="h-4 w-4" />
-            {isSaving ? "Validation..." : "Confirmer et terminer"}
+            {isSaving ? "Validation..." : "Confirmer la récupération"}
           </Button>
         </div>
       </div>

@@ -1,14 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, CalendarDays, Car, CarFront, CheckCircle2, CheckSquare2, ChevronDown, ChevronLeft, MapPin, Minus, UserRound, Wrench } from "lucide-react";
+import { Building2, CalendarDays, Car, CarFront, CheckCircle2, CheckSquare2, ChevronDown, ChevronLeft, ChevronRight, MapPin, Minus, Package, UserRound, Wrench } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { VehicleCheckActions } from "@/components/business/vehicle-check-actions";
+import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-dialog";
 import { VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { RepairItemsTable } from "@/components/business/vehicle-check-table";
-import { VehicleCheckSummarySelection } from "@/components/business/vehicle-check-summary-selection";
+import {
+  VehicleCheckSummarySelection,
+  VehicleCheckTimingSummary,
+} from "@/components/business/vehicle-check-summary-selection";
 import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
@@ -20,6 +24,7 @@ export default function VehicleCheckDetailsPage() {
   const params = useParams<{ id: string }>();
   const [vehicleCheck, setVehicleCheck] = useState<VehicleCheck | null>(null);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [recoveredDialogOpen, setRecoveredDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -69,11 +74,41 @@ export default function VehicleCheckDetailsPage() {
   const externalRepairCount = (vehicleCheck.items ?? []).filter(
     (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE" && item.executionMode === "EXTERNAL_PROVIDER",
   ).length;
-  const onSiteRepairCount = (vehicleCheck.items ?? []).filter(
-    (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE" && item.executionMode === "ON_SITE",
+  const pendingOnSiteRepairCount = (vehicleCheck.items ?? []).filter(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.executionMode === "ON_SITE" &&
+      !item.executionCompletedAt,
   ).length;
+  const pendingPartOrderCount = (vehicleCheck.items ?? []).filter(
+    (item) =>
+      item.selectedForSummary &&
+      item.operationalStatus === "ACTIVE" &&
+      item.partOrderRequired &&
+      item.partOrderStatus === "TO_ORDER",
+  ).length;
+  const hasPendingProviderDeposit =
+    externalRepairCount > 0 && !vehicleCheck.publicShare?.takenInChargeAt;
+  const hasPendingVehicleRecovery =
+    externalRepairCount > 0 &&
+    Boolean(vehicleCheck.publicShare?.takenInChargeAt) &&
+    !vehicleCheck.publicShare?.vehicleRecoveredAt;
+  const hasPendingInterventionActions =
+    pendingPartOrderCount > 0 ||
+    pendingOnSiteRepairCount > 0 ||
+    hasPendingProviderDeposit ||
+    hasPendingVehicleRecovery;
   const hasDetailsComment = Boolean(vehicleCheck.notes?.trim());
   const hasSummaryToPrepare = vehicleCheck.status === "TO_ANALYZE" && !vehicleCheck.summaryFinalizedAt;
+  const hasPendingActions =
+    hasSummaryToPrepare ||
+    (vehicleCheck.status === "SUMMARY_READY" && hasPendingInterventionActions);
+  const pendingActionCount = hasSummaryToPrepare
+    ? 1
+    : Number(pendingPartOrderCount > 0) +
+      Number(pendingOnSiteRepairCount > 0) +
+      Number(hasPendingProviderDeposit || hasPendingVehicleRecovery);
   const isClosedWithoutDamage = vehicleCheck.status === "CLOSED_NO_DAMAGE";
   const isCompleted = vehicleCheck.status === "COMPLETED";
   const displaysSummary =
@@ -117,24 +152,52 @@ export default function VehicleCheckDetailsPage() {
               <QuickInfo label="Agence" value={agencyName} />
             </div>
           </div>
-          <VehicleCheckActions vehicleCheck={vehicleCheck} onSendRepairRequest={() => setEmailDialogOpen(true)} onUpdated={setVehicleCheck} />
+          <VehicleCheckActions vehicleCheck={vehicleCheck} onUpdated={setVehicleCheck} />
         </div>
 
         <VehicleProgressStepper vehicleCheck={vehicleCheck} />
+        <VehicleCheckTimingSummary vehicleCheck={vehicleCheck} />
 
-        {hasSummaryToPrepare ? (
-          <div className="border-t border-gray-200 px-5 py-4">
-            <SummaryPendingStatus />
-          </div>
-        ) : null}
-
-        {vehicleCheck.status === "SUMMARY_READY" || isCompleted ? (
-          <div className="space-y-3 border-t border-gray-200 px-5 py-4">
-            {onSiteRepairCount ? <OnSiteRepairStatus vehicleCheck={vehicleCheck} /> : null}
-            {externalRepairCount ? (
-              <RepairRequestStatus vehicleCheck={vehicleCheck} onSendRepairRequest={() => setEmailDialogOpen(true)} />
-            ) : null}
-          </div>
+        {hasPendingActions ? (
+          <section className="border-y border-teal-900/10 bg-gray-50">
+            <div className="flex flex-col gap-3 bg-gradient-to-r from-teal-900 to-teal-800 px-5 py-2.5 text-white sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/60 bg-white/10 text-white shadow-sm">
+                  <CheckSquare2 className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold">Actions à effectuer</h2>
+                  <p className="text-xs text-teal-50/90">Suivez les prochaines étapes du dossier</p>
+                </div>
+              </div>
+              <p className="w-fit shrink-0 rounded-md bg-white/10 px-2.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/10">
+                {pendingActionCount} action{pendingActionCount > 1 ? "s" : ""} restante{pendingActionCount > 1 ? "s" : ""}
+              </p>
+            </div>
+            <div className="relative divide-y divide-gray-200">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute bottom-7 left-[2.375rem] top-7 z-10 border-l border-dashed border-gray-300"
+              />
+              {hasSummaryToPrepare ? <SummaryPendingStatus /> : null}
+              {vehicleCheck.status === "SUMMARY_READY" ? (
+                <>
+                  {pendingPartOrderCount ? <PartOrderStatus count={pendingPartOrderCount} /> : null}
+                  {pendingOnSiteRepairCount ? (
+                    <OnSiteRepairStatus vehicleCheck={vehicleCheck} />
+                  ) : null}
+                  {hasPendingProviderDeposit || hasPendingVehicleRecovery ? (
+                    <RepairRequestStatus
+                      pendingPartOrderCount={pendingPartOrderCount}
+                      vehicleCheck={vehicleCheck}
+                      onRecoverVehicle={() => setRecoveredDialogOpen(true)}
+                      onSendRepairRequest={() => setEmailDialogOpen(true)}
+                    />
+                  ) : null}
+                </>
+              ) : null}
+            </div>
+          </section>
         ) : null}
 
         {isClosedWithoutDamage ? (
@@ -144,9 +207,13 @@ export default function VehicleCheckDetailsPage() {
         ) : null}
 
         <details className="group border-t border-gray-200">
-          <summary className="bg-[#e2e2e2] flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-sm font-semibold text-gray-900">
-            Informations du dossier
-            <ChevronDown className="h-4 w-4 text-gray-400" />
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-500">
+            <span>Informations du dossier</span>
+            <span className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 shadow-sm transition group-hover:border-gray-400 group-hover:text-gray-950">
+              <span className="group-open:hidden">Afficher</span>
+              <span className="hidden group-open:inline">Masquer</span>
+              <ChevronDown className="h-4 w-4 transition-transform duration-200 group-open:rotate-180" />
+            </span>
           </summary>
           <div className="grid border-t border-gray-200 sm:grid-cols-2 lg:grid-cols-4">
             <DetailItem icon={CalendarDays} label="Date du controle" value={formatDate(vehicleCheck.checkDate)} />
@@ -191,6 +258,12 @@ export default function VehicleCheckDetailsPage() {
       {vehicleCheck.status === "SUMMARY_READY" && externalRepairCount > 0 ? (
         <RepairRequestEmailDialog open={emailDialogOpen} vehicleCheck={vehicleCheck} onOpenChange={setEmailDialogOpen} onSent={setVehicleCheck} />
       ) : null}
+      <VehicleRecoveredDialog
+        open={recoveredDialogOpen}
+        vehicleCheck={vehicleCheck}
+        onOpenChange={setRecoveredDialogOpen}
+        onRecovered={setVehicleCheck}
+      />
     </>
   );
 }
@@ -560,27 +633,40 @@ function OnSiteRepairStatus({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
 
   if (isCompleted || allDone) {
     return (
-      <div className="rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-        <p className="font-semibold">Réparations sur place terminées</p>
-        <p className="mt-0.5">
-          {onSiteCount} réparation{onSiteCount > 1 ? "s" : ""} sur place, toutes marquées terminées
-          {isCompleted ? ". Le dossier est terminé." : "."}
-        </p>
+      <div className={`${actionCardClassName} flex items-center gap-3`}>
+        <span className={actionStepIconClassName("bg-emerald-50 text-emerald-700")}>
+          <Wrench className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <p className="font-semibold text-gray-950">Sur place</p>
+          <p className="text-xs text-gray-600">Interventions réalisées sur place</p>
+          <p className={actionStatusClassName("emerald")}>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            {onSiteCount}/{onSiteCount} terminée{onSiteCount > 1 ? "s" : ""}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-md border border-amber-100 bg-amber-50/80 p-3 text-sm text-amber-900">
+    <div className={actionCardClassName}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <p className="font-semibold leading-5">Réparations sur place en cours</p>
-          <p className="mt-1 leading-5 text-amber-800">
-            {doneCount}/{onSiteCount} réparation{onSiteCount > 1 ? "s" : ""} sur place marquée{doneCount > 1 ? "s" : ""} terminée{doneCount > 1 ? "s" : ""}. Le dossier se clôture automatiquement une fois toutes les réparations terminées.
-          </p>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className={actionStepIconClassName("bg-amber-50 text-amber-700")}>
+            <Wrench className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-semibold text-gray-950">Sur place</p>
+            <p className="text-xs text-gray-600">Interventions à réaliser sur place</p>
+            <p className={actionStatusClassName("amber")}>
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              {doneCount}/{onSiteCount} terminée{onSiteCount > 1 ? "s" : ""}
+            </p>
+          </div>
         </div>
         <Button
-          className="w-full shrink-0 border-amber-200 bg-white text-amber-800 hover:bg-amber-100 sm:w-auto"
+          className="h-8 w-full shrink-0 px-3 sm:w-auto"
           size="sm"
           type="button"
           variant="outline"
@@ -588,13 +674,57 @@ function OnSiteRepairStatus({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
         >
           <Wrench className="h-4 w-4" />
           Voir la liste
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
     </div>
   );
 }
 
-function RepairRequestStatus({ onSendRepairRequest, vehicleCheck }: { onSendRepairRequest: () => void; vehicleCheck: VehicleCheck }) {
+function PartOrderStatus({ count }: { count: number }) {
+  return (
+    <div className={actionCardClassName}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className={actionStepIconClassName("bg-orange-50 text-orange-600")}>
+            <Package className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-semibold text-gray-950">Pièces</p>
+            <p className="text-xs text-gray-600">Commander les pièces nécessaires</p>
+            <p className={actionStatusClassName("orange")}>
+              <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+              {count} pièce{count > 1 ? "s" : ""} à commander
+            </p>
+          </div>
+        </div>
+        <Button
+          className="h-8 w-full shrink-0 px-3 sm:w-auto"
+          size="sm"
+          type="button"
+          variant="outline"
+          onClick={() => document.getElementById("summary-selection")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        >
+          <Package className="h-4 w-4" />
+          Voir la liste
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function RepairRequestStatus({
+  onRecoverVehicle,
+  onSendRepairRequest,
+  pendingPartOrderCount,
+  vehicleCheck,
+}: {
+  onRecoverVehicle: () => void;
+  onSendRepairRequest: () => void;
+  pendingPartOrderCount: number;
+  vehicleCheck: VehicleCheck;
+}) {
   const share = vehicleCheck.publicShare;
   const providerLabel = share?.externalRepairContact ? externalRepairContactLabel(share.externalRepairContact) : null;
   const externalRepairCount = (vehicleCheck.items ?? []).filter(
@@ -603,54 +733,68 @@ function RepairRequestStatus({ onSendRepairRequest, vehicleCheck }: { onSendRepa
       item.operationalStatus === "ACTIVE" &&
       item.executionMode === "EXTERNAL_PROVIDER",
   ).length;
-  const onSiteRepairCount = (vehicleCheck.items ?? []).filter(
-    (item) =>
-      item.selectedForSummary &&
-      item.operationalStatus === "ACTIVE" &&
-      item.executionMode === "ON_SITE",
-  ).length;
-
-  if (share?.vehicleRecoveredAt) {
-    return (
-      <div className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-800">
-        <p className="font-semibold">Vehicule recupere</p>
-        <p className="mt-0.5">{providerLabel ? `Le vehicule a ete recupere chez ${providerLabel}.` : "Le vehicule a ete recupere."}</p>
-      </div>
-    );
-  }
 
   if (share?.takenInChargeAt) {
     return (
-      <div className="rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-        <p className="font-semibold">{providerLabel ? `Vehicule chez ${providerLabel}` : "Vehicule chez le prestataire"}</p>
-        <p className="mt-0.5">La demande de devis a ete envoyee au prestataire.</p>
+      <div className={actionCardClassName}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className={actionStepIconClassName("bg-blue-50 text-blue-700")}>
+              <CarFront className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <p className="font-semibold text-gray-950">Récupération</p>
+              <p className="text-xs text-gray-600">
+                {providerLabel ? `Récupérer le véhicule chez ${providerLabel}` : "Récupérer le véhicule chez le prestataire"}
+              </p>
+              <p className={actionStatusClassName(pendingPartOrderCount ? "amber" : "blue")}>
+                <span className={`h-1.5 w-1.5 rounded-full ${pendingPartOrderCount ? "bg-amber-500" : "bg-blue-500"}`} />
+                {pendingPartOrderCount
+                  ? `${pendingPartOrderCount} pièce${pendingPartOrderCount > 1 ? "s" : ""} à commander avant la récupération`
+                  : providerLabel
+                    ? `Véhicule déposé chez ${providerLabel}`
+                    : "Véhicule déposé chez le prestataire"}
+              </p>
+            </div>
+          </div>
+          <Button
+            className="h-8 w-full shrink-0 px-3 sm:w-auto"
+            disabled={pendingPartOrderCount > 0}
+            size="sm"
+            type="button"
+            variant="outline"
+            onClick={onRecoverVehicle}
+          >
+            <CheckCircle2 className="h-4 w-4" />
+            Marquer récupéré
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-md border border-teal-100 bg-teal-50/80 p-3 text-sm text-teal-900">
+    <div className={actionCardClassName}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 gap-3">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-teal-700 shadow-sm ring-1 ring-teal-100">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className={actionStepIconClassName("bg-teal-50 text-teal-700")}>
             <CarFront className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold leading-5">Dépôt chez le prestataire</p>
-            <p className="mt-1 leading-5 text-teal-800">
-              {providerLabel
-                ? `Le dépôt chez ${providerLabel} n'est pas encore confirmé. Le dossier lui sera envoyé par email lors de la confirmation.`
-                : "Confirmez le prestataire chez lequel le véhicule est déposé. Le dossier lui sera envoyé par email."}
-            </p>
-            <p className="mt-1 text-xs text-teal-700">
-              {externalRepairCount} réparation{externalRepairCount > 1 ? "s" : ""} à transmettre
-              {onSiteRepairCount ? ` · ${onSiteRepairCount} prévue${onSiteRepairCount > 1 ? "s" : ""} sur place` : ""}
+            <p className="font-semibold text-gray-950">Prestataire</p>
+            <p className="text-xs text-gray-600">Coordonner le dépôt avec le prestataire</p>
+            <p className={actionStatusClassName("teal")}>
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-600" />
+              Dépôt à confirmer · {externalRepairCount} réparation
+              {externalRepairCount > 1 ? "s" : ""}
             </p>
           </div>
         </div>
-        <Button className="w-full shrink-0 bg-teal-700 text-white hover:bg-teal-800 sm:w-auto" size="sm" type="button" onClick={onSendRepairRequest}>
+        <Button className="h-8 w-full shrink-0 px-3 sm:w-auto" size="sm" type="button" onClick={onSendRepairRequest}>
           <CarFront className="h-4 w-4" />
           Confirmer le dépôt
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -659,30 +803,56 @@ function RepairRequestStatus({ onSendRepairRequest, vehicleCheck }: { onSendRepa
 
 function SummaryPendingStatus() {
   return (
-    <div className="rounded-md border border-amber-100 bg-amber-50/80 p-3 text-sm text-amber-900">
+    <div className={actionCardClassName}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 gap-3">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-amber-700 shadow-sm ring-1 ring-amber-100">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className={actionStepIconClassName("bg-amber-50 text-amber-700")}>
             <CheckSquare2 className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold leading-5">Synthese a realiser</p>
-            <p className="mt-1 leading-5 text-amber-800">Les reparations sont preselectionnees. Verifiez la selection, puis validez la synthese.</p>
+            <p className="font-semibold text-gray-950">Synthèse</p>
+            <p className="text-xs text-gray-600">Vérifier et valider la sélection des réparations</p>
+            <p className={actionStatusClassName("amber")}>
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              Synthèse à préparer
+            </p>
           </div>
         </div>
         <Button
-          className="w-full shrink-0 border-amber-200 bg-white text-amber-800 hover:bg-amber-100 sm:w-auto"
+          className="h-8 w-full shrink-0 px-3 sm:w-auto"
           size="sm"
           type="button"
           variant="outline"
           onClick={() => document.getElementById("summary-selection")?.scrollIntoView({ behavior: "smooth", block: "start" })}
         >
           <CheckSquare2 className="h-4 w-4" />
-          Preparer
+          Préparer
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
     </div>
   );
+}
+
+function actionStepIconClassName(toneClassName: string) {
+  return `relative z-40 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${toneClassName}`;
+}
+
+const actionCardClassName =
+  "relative bg-white px-5 py-2.5 text-sm";
+
+function actionStatusClassName(
+  tone: "amber" | "blue" | "emerald" | "orange" | "teal",
+) {
+  const toneClassName = {
+    amber: "bg-amber-50 text-amber-800",
+    blue: "bg-blue-50 text-blue-800",
+    emerald: "bg-emerald-50 text-emerald-800",
+    orange: "bg-orange-50 text-orange-700",
+    teal: "bg-teal-50 text-teal-800",
+  }[tone];
+
+  return `mt-1 flex w-fit items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${toneClassName}`;
 }
 
 function QuickInfo({ label, value }: { label: string; value: string }) {

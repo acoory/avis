@@ -123,6 +123,7 @@ export type VehicleCheck = {
   notes?: string | null;
   fieldCompletedAt?: string | null;
   summaryFinalizedAt?: string | null;
+  completedAt?: string | null;
   collaborator?: {
     firstName: string;
     lastName: string;

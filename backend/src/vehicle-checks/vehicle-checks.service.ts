@@ -794,7 +794,10 @@ export class VehicleChecksService {
       ) {
         await transaction.vehicleCheck.update({
           where: { id },
-          data: { status: VehicleCheckStatus.COMPLETED },
+          data: {
+            completedAt: recoveredAt,
+            status: VehicleCheckStatus.COMPLETED,
+          },
         });
       }
     });
@@ -1103,6 +1106,7 @@ export class VehicleChecksService {
     return this.prisma.vehicleCheck.update({
       where: { id },
       data: {
+        completedAt: null,
         status: VehicleCheckStatus.TO_ANALYZE,
         fieldCompletedAt: new Date(),
         summaryFinalizedAt: null,
@@ -1183,6 +1187,8 @@ export class VehicleChecksService {
       (total, item) => total.plus(item.totalInternalCost),
       new Prisma.Decimal(0),
     );
+    const now = new Date();
+    const summaryFinalizedAt = vehicleCheck.summaryFinalizedAt ?? now;
 
     return this.prisma.$transaction(async (tx) => {
       await tx.vehicleCheckItem.updateMany({
@@ -1215,10 +1221,11 @@ export class VehicleChecksService {
       return tx.vehicleCheck.update({
         where: { id },
         data: {
+          completedAt: closesWithoutDamage ? now : null,
           status: closesWithoutDamage
             ? VehicleCheckStatus.CLOSED_NO_DAMAGE
             : VehicleCheckStatus.SUMMARY_READY,
-          summaryFinalizedAt: new Date(),
+          summaryFinalizedAt,
           totalInternalSavingAmount,
           totalInternalCost,
         },
