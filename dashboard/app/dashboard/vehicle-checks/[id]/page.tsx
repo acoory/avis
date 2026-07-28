@@ -666,7 +666,7 @@ function OnSiteRepairStatus({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
           </div>
         </div>
         <Button
-          className="h-8 w-full shrink-0 px-3 sm:w-auto"
+          className={actionButtonClassName}
           size="sm"
           type="button"
           variant="outline"
@@ -699,7 +699,7 @@ function PartOrderStatus({ count }: { count: number }) {
           </div>
         </div>
         <Button
-          className="h-8 w-full shrink-0 px-3 sm:w-auto"
+          className={actionButtonClassName}
           size="sm"
           type="button"
           variant="outline"
@@ -758,7 +758,7 @@ function RepairRequestStatus({
             </div>
           </div>
           <Button
-            className="h-8 w-full shrink-0 px-3 sm:w-auto"
+            className={actionButtonClassName}
             disabled={pendingPartOrderCount > 0}
             size="sm"
             type="button"
@@ -791,7 +791,7 @@ function RepairRequestStatus({
             </p>
           </div>
         </div>
-        <Button className="h-8 w-full shrink-0 px-3 sm:w-auto" size="sm" type="button" onClick={onSendRepairRequest}>
+        <Button className={actionButtonClassName} size="sm" type="button" onClick={onSendRepairRequest}>
           <CarFront className="h-4 w-4" />
           Confirmer le dépôt
           <ChevronRight className="h-4 w-4" />
@@ -819,7 +819,7 @@ function SummaryPendingStatus() {
           </div>
         </div>
         <Button
-          className="h-8 w-full shrink-0 px-3 sm:w-auto"
+          className={actionButtonClassName}
           size="sm"
           type="button"
           variant="outline"
@@ -840,6 +840,9 @@ function actionStepIconClassName(toneClassName: string) {
 
 const actionCardClassName =
   "relative bg-white px-5 py-2.5 text-sm";
+
+const actionButtonClassName =
+  "ml-12 h-8 w-[calc(100%-3rem)] shrink-0 px-3 sm:ml-0 sm:w-auto";
 
 function actionStatusClassName(
   tone: "amber" | "blue" | "emerald" | "orange" | "teal",

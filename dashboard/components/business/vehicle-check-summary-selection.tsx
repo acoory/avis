@@ -224,7 +224,7 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
           <div className="relative divide-y divide-gray-200">
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute bottom-6 left-9 top-6 z-0 border-l border-dashed border-gray-300"
+              className="pointer-events-none absolute bottom-6 left-9 top-6 z-10 border-l border-dashed border-gray-300"
             />
             {items.map((item) => {
               const checked = selectedItemIds.has(item.id);
@@ -247,7 +247,7 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
                 >
                   <span
                     className={[
-                      "relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+                      "relative z-20 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
                       checked
                         ? showsPartOrderStatus && item.partOrderStatus === "TO_ORDER"
                           ? "bg-orange-50 text-orange-700"
