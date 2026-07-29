@@ -27,7 +27,7 @@ async def lifespan(_: FastAPI):
     alpr = None
 
 
-app = FastAPI(title="Vehicle Control FastALPR", lifespan=lifespan)
+app = FastAPI(title="Readyline FastALPR", lifespan=lifespan)
 
 
 @app.get("/health")

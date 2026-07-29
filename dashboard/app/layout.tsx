@@ -4,14 +4,14 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vehicle Control",
+  title: "Readyline",
   description: "Gestion des contrôles, réparations et dossiers véhicules.",
-  applicationName: "Vehicle Control",
+  applicationName: "Readyline",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Vehicle Control",
+    title: "Readyline",
   },
   formatDetection: {
     telephone: false,

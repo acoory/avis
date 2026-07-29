@@ -24,7 +24,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Menu className="h-5 w-5" />
         </Button>
         <Link className="text-sm font-semibold text-gray-950 md:hidden" href="/dashboard">
-          Vehicle Control
+          Readyline
         </Link>
         <div className="hidden md:block">
           <p className="text-sm font-medium text-gray-950">Dashboard operationnel</p>

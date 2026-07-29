@@ -17,7 +17,7 @@ function serviceWorkerSource(version: string) {
 
   return `
 const APP_VERSION = ${serializedVersion};
-const CACHE_PREFIX = "vehicle-control-";
+const CACHE_PREFIXES = ["readyline-", "vehicle-control-"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(self.skipWaiting());
@@ -30,7 +30,9 @@ self.addEventListener("activate", (event) => {
       caches.keys().then((cacheNames) =>
         Promise.all(
           cacheNames
-            .filter((cacheName) => cacheName.startsWith(CACHE_PREFIX))
+            .filter((cacheName) =>
+              CACHE_PREFIXES.some((prefix) => cacheName.startsWith(prefix)),
+            )
             .map((cacheName) => caches.delete(cacheName)),
         ),
       ),
@@ -63,7 +65,7 @@ self.addEventListener("fetch", (event) => {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#115e59" />
-    <title>Vehicle Control — Hors connexion</title>
+    <title>Readyline — Hors connexion</title>
     <style>
       * { box-sizing: border-box; }
       body {

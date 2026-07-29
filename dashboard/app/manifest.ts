@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/dashboard",
-    name: "Vehicle Control",
-    short_name: "Vehicle Control",
+    name: "Readyline",
+    short_name: "Readyline",
     description: "Gestion des contrôles, réparations et dossiers véhicules.",
     start_url: "/dashboard",
     scope: "/",

@@ -117,7 +117,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       >
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 md:px-6">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Vehicle Control</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Readyline</p>
             <p className="text-xs text-gray-500">Operations internes</p>
           </div>
           <Button aria-label="Fermer la navigation" className="md:hidden" size="icon" type="button" variant="ghost" onClick={onClose}>

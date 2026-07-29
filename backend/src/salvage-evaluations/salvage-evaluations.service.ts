@@ -126,7 +126,7 @@ export class SalvageEvaluationsService {
       `Durée estimée : ${dto.estimatedRepairDays} jour(s)`,
       '',
       'Cordialement,',
-      'Vehicle Control',
+      'Readyline',
     ].join('\n');
   }
 
@@ -157,7 +157,7 @@ export class SalvageEvaluationsService {
             )
             .join('')}
         </table>
-        <p>Cordialement,<br>Vehicle Control</p>
+        <p>Cordialement,<br>Readyline</p>
       </div>`;
   }
 

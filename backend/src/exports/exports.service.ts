@@ -58,7 +58,7 @@ export class ExportsService {
 
     const orderedRepairTypes = this.orderRepairTypes(repairTypes);
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'Vehicle Control';
+    workbook.creator = 'Readyline';
     workbook.created = new Date();
     workbook.modified = new Date();
 
