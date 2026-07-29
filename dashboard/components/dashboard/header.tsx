@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import { ReadylineBrand } from "@/components/branding/readyline-brand";
 import { UserDropdown } from "@/components/dashboard/user-dropdown";
 import { Button } from "@/components/ui/button";
 
@@ -23,12 +24,12 @@ export function Header({ onMenuClick }: HeaderProps) {
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <Link className="text-sm font-semibold text-gray-950 md:hidden" href="/dashboard">
-          Readyline
+        <Link className="md:hidden" href="/dashboard">
+          <ReadylineBrand showTagline={false} size="compact" />
         </Link>
         <div className="hidden md:block">
-          <p className="text-sm font-medium text-gray-950">Dashboard operationnel</p>
-          <p className="text-xs text-gray-500">Socle pret pour les modules metier</p>
+          <p className="text-sm font-medium text-gray-950">Tableau de bord</p>
+          <p className="text-xs text-gray-500">Contrôler, décider, suivre.</p>
         </div>
       </div>
       <UserDropdown />

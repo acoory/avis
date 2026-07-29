@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, FileSpreadsheet, Gauge, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
+import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, FileSpreadsheet, Gauge, Info, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
 import { useState } from "react";
+import { ReadylineBrand } from "@/components/branding/readyline-brand";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -48,6 +49,7 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
         label: "Paramètres",
         icon: Settings,
         subItems: [
+          { label: "À propos", href: "/dashboard/settings", icon: Info },
           { label: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["ADMIN", "MANAGER"] },
           { label: "Agences", href: "/dashboard/agencies", icon: MapPin, roles: ["ADMIN"] },
         ],
@@ -115,11 +117,8 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 md:px-6">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Readyline</p>
-            <p className="text-xs text-gray-500">Operations internes</p>
-          </div>
+        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 md:px-5">
+          <ReadylineBrand size="compact" />
           <Button aria-label="Fermer la navigation" className="md:hidden" size="icon" type="button" variant="ghost" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>

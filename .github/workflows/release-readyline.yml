@@ -1,0 +1,48 @@
+name: Versionner Readyline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "dashboard/**"
+      - "backend/**"
+      - "fastalpr/**"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: readyline-production-version
+  cancel-in-progress: false
+
+jobs:
+  version:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Synchroniser la branche principale
+        run: git pull --rebase origin main
+
+      - name: Incrémenter la version patch
+        id: version
+        working-directory: dashboard
+        run: |
+          npm version patch --no-git-tag-version
+          echo "number=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Enregistrer la nouvelle version
+        env:
+          VERSION: ${{ steps.version.outputs.number }}
+        run: |
+          git config user.name "Readyline Release"
+          git config user.email "readyline-release@users.noreply.github.com"
+          git add dashboard/package.json
+          git commit -m "chore(readyline): publication v${VERSION} [skip ci]"
+          git push origin HEAD:main
