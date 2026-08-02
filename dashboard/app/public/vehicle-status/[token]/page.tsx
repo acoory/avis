@@ -174,6 +174,13 @@ export default function PublicVehicleStatusPage() {
                   </div>
                   <div className="shrink-0 text-right">
                     <PublicStatusBadge status={vehicle.publicStatus} />
+                    <p
+                      className={`mt-1 text-[11px] font-semibold ${
+                        vehicle.location === "AT_PROVIDER" ? "text-blue-700" : "text-slate-500"
+                      }`}
+                    >
+                      {vehicle.location === "AT_PROVIDER" ? "Chez prestataire" : "Sur parc"}
+                    </p>
                     <p className="mt-1 text-[10px] text-slate-400">Mis à jour {formatRelativeUpdate(vehicle.updatedAt)}</p>
                   </div>
                 </article>

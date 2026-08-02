@@ -131,6 +131,12 @@ export class AgenciesService {
           licensePlateCountry: true,
           licensePlateRaw: true,
           manufacturer: { select: { name: true } },
+          publicShare: {
+            select: {
+              takenInChargeAt: true,
+              vehicleRecoveredAt: true,
+            },
+          },
           status: true,
           updatedAt: true,
           vehicleModel: { select: { name: true } },
@@ -158,6 +164,10 @@ export class AgenciesService {
         licensePlateCountry: item.licensePlateCountry,
         licensePlateRaw: item.licensePlateRaw,
         manufacturer: item.manufacturer,
+        location:
+          item.publicShare?.takenInChargeAt && !item.publicShare.vehicleRecoveredAt
+            ? 'AT_PROVIDER'
+            : 'ON_SITE',
         publicStatus: inProgressStatuses.includes(item.status) ? 'IN_PROGRESS' : 'COMPLETED',
         updatedAt: item.updatedAt,
         vehicleModel: item.vehicleModel,

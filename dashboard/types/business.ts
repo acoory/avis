@@ -48,6 +48,7 @@ export type PublicAgencyVehicleStatusResponse = {
     licensePlate: string;
     licensePlateCountry: string;
     licensePlateRaw?: string | null;
+    location: "ON_SITE" | "AT_PROVIDER";
     manufacturer?: { name: string } | null;
     publicStatus: PublicAgencyVehicleStatus;
     updatedAt: string;
