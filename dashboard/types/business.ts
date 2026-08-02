@@ -31,6 +31,38 @@ export type Agency = {
   isActive: boolean;
 };
 
+export type AgencyVehicleStatusShare = {
+  agencyId: string;
+  createdAt: string;
+  isEnabled: boolean;
+  token: string;
+  updatedAt: string;
+};
+
+export type PublicAgencyVehicleStatus = "IN_PROGRESS" | "COMPLETED";
+
+export type PublicAgencyVehicleStatusResponse = {
+  agency: Pick<Agency, "code" | "city" | "id" | "name">;
+  items: Array<{
+    id: string;
+    licensePlate: string;
+    licensePlateCountry: string;
+    licensePlateRaw?: string | null;
+    manufacturer?: { name: string } | null;
+    publicStatus: PublicAgencyVehicleStatus;
+    updatedAt: string;
+    vehicleModel?: { name: string } | null;
+  }>;
+  page: number;
+  pageSize: number;
+  stats: {
+    completedCount: number;
+    inProgressCount: number;
+  };
+  total: number;
+  totalPages: number;
+};
+
 export type Manufacturer = {
   id: string;
   name: string;

@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import {
   Agency,
+  AgencyVehicleStatusShare,
   DashboardSummary,
   DashboardTimelinePoint,
   DamagePhoto,
@@ -32,6 +33,7 @@ import {
   VehiclePart,
   PublicVehicleCheckDecisionShare,
   PublicVehicleCheckShare,
+  PublicAgencyVehicleStatusResponse,
 } from "@/types/business";
 import {
   ConversationAttachment,
@@ -774,6 +776,44 @@ export const businessService = {
 
   async agencies() {
     const { data } = await api.get<Agency[]>("/agencies");
+    return data;
+  },
+
+  async agencyVehicleStatusShares() {
+    const { data } = await api.get<AgencyVehicleStatusShare[]>(
+      "/agencies/vehicle-status-shares",
+    );
+    return data;
+  },
+
+  async renewAgencyVehicleStatusShare(agencyId: string) {
+    const { data } = await api.post<AgencyVehicleStatusShare>(
+      `/agencies/${agencyId}/vehicle-status-share`,
+      {},
+    );
+    return data;
+  },
+
+  async disableAgencyVehicleStatusShare(agencyId: string) {
+    const { data } = await api.delete<{ success: true }>(
+      `/agencies/${agencyId}/vehicle-status-share`,
+    );
+    return data;
+  },
+
+  async publicAgencyVehicleStatuses(
+    token: string,
+    params: {
+      page?: number;
+      pageSize?: number;
+      search?: string;
+      status?: "IN_PROGRESS" | "COMPLETED" | "ALL";
+    },
+  ) {
+    const { data } = await api.get<PublicAgencyVehicleStatusResponse>(
+      `/public/vehicle-status/${token}`,
+      { params },
+    );
     return data;
   },
 

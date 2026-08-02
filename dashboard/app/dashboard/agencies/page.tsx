@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Copy, ExternalLink, EyeOff, Link2, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { businessService } from "@/services/business.service";
 import { useAuthStore } from "@/stores/auth.store";
-import { Agency } from "@/types/business";
+import { Agency, AgencyVehicleStatusShare } from "@/types/business";
 
 type EditableAgency = {
   id: string;
@@ -41,6 +41,8 @@ export default function AgenciesPage() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [sharingId, setSharingId] = useState<string | null>(null);
+  const [statusShares, setStatusShares] = useState<Record<string, AgencyVehicleStatusShare>>({});
 
   const cityOptions = useMemo(() => uniqueSorted(agencies.map((agency) => agency.city)), [agencies]);
   const regionOptions = useMemo(() => uniqueSorted(agencies.map((agency) => agency.region)), [agencies]);
@@ -50,6 +52,58 @@ export default function AgenciesPage() {
       setAgencies(data.map(toEditableAgency));
     });
   }, []);
+
+  useEffect(() => {
+    if (!canEdit) return;
+    void businessService.agencyVehicleStatusShares().then((shares) => {
+      setStatusShares(Object.fromEntries(shares.map((share) => [share.agencyId, share])));
+    });
+  }, [canEdit]);
+
+  async function renewStatusShare(agency: EditableAgency) {
+    const existingShare = statusShares[agency.id];
+    if (
+      existingShare?.isEnabled &&
+      !window.confirm(`Renouveler le lien Airport de ${agency.city} - ${agency.name} ? L'ancien lien ne fonctionnera plus.`)
+    ) {
+      return;
+    }
+
+    setSharingId(agency.id);
+    try {
+      const share = await businessService.renewAgencyVehicleStatusShare(agency.id);
+      setStatusShares((current) => ({ ...current, [agency.id]: share }));
+      await navigator.clipboard.writeText(publicStatusShareUrl(share.token));
+      toast.success("Lien Airport créé et copié.");
+    } catch {
+      toast.error("Impossible de créer le lien Airport.");
+    } finally {
+      setSharingId(null);
+    }
+  }
+
+  async function copyStatusShare(share: AgencyVehicleStatusShare) {
+    await navigator.clipboard.writeText(publicStatusShareUrl(share.token));
+    toast.success("Lien Airport copié.");
+  }
+
+  async function disableStatusShare(agency: EditableAgency) {
+    if (!window.confirm(`Désactiver le lien Airport de ${agency.city} - ${agency.name} ?`)) return;
+
+    setSharingId(agency.id);
+    try {
+      await businessService.disableAgencyVehicleStatusShare(agency.id);
+      setStatusShares((current) => ({
+        ...current,
+        [agency.id]: { ...current[agency.id], isEnabled: false },
+      }));
+      toast.success("Lien Airport désactivé.");
+    } catch {
+      toast.error("Impossible de désactiver le lien Airport.");
+    } finally {
+      setSharingId(null);
+    }
+  }
 
   async function createAgency() {
     if (!isAgencyValid(newAgency)) {
@@ -168,7 +222,7 @@ export default function AgenciesPage() {
           </datalist>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[980px] border-collapse text-left text-sm">
+            <table className="w-full min-w-[1160px] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
                   <th className="px-3 py-3 font-medium">Code</th>
@@ -176,12 +230,14 @@ export default function AgenciesPage() {
                   <th className="px-3 py-3 font-medium">Ville</th>
                   <th className="px-3 py-3 font-medium">Region</th>
                   <th className="px-3 py-3 font-medium">Libelle</th>
+                  <th className="px-3 py-3 font-medium">Lien Airport</th>
                   <th className="px-3 py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {agencies.map((agency) => {
-                  const isBusy = savingId === agency.id || deletingId === agency.id;
+                  const isBusy = savingId === agency.id || deletingId === agency.id || sharingId === agency.id;
+                  const statusShare = statusShares[agency.id];
 
                   return (
                     <tr key={agency.id}>
@@ -227,6 +283,69 @@ export default function AgenciesPage() {
                       <td className="px-3 py-3 text-gray-600">{agency.city} - {agency.name}</td>
                       <td className="px-3 py-3">
                         {canEdit ? (
+                          statusShare?.isEnabled ? (
+                            <div className="flex items-center gap-1.5">
+                              <span className="mr-1 inline-flex rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+                                Actif
+                              </span>
+                              <Button
+                                aria-label="Copier le lien Airport"
+                                disabled={isBusy}
+                                size="icon"
+                                title="Copier le lien"
+                                type="button"
+                                variant="outline"
+                                onClick={() => void copyStatusShare(statusShare)}
+                              >
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                              <Button asChild disabled={isBusy} size="icon" title="Ouvrir le lien" variant="outline">
+                                <a href={`/public/vehicle-status/${statusShare.token}`} rel="noreferrer" target="_blank">
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </Button>
+                              <Button
+                                aria-label="Renouveler le lien Airport"
+                                disabled={isBusy}
+                                size="icon"
+                                title="Renouveler le lien"
+                                type="button"
+                                variant="outline"
+                                onClick={() => void renewStatusShare(agency)}
+                              >
+                                <RefreshCw className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                aria-label="Désactiver le lien Airport"
+                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                disabled={isBusy}
+                                size="icon"
+                                title="Désactiver le lien"
+                                type="button"
+                                variant="outline"
+                                onClick={() => void disableStatusShare(agency)}
+                              >
+                                <EyeOff className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              disabled={isBusy}
+                              size="sm"
+                              type="button"
+                              variant="outline"
+                              onClick={() => void renewStatusShare(agency)}
+                            >
+                              <Link2 className="h-4 w-4" />
+                              Créer le lien
+                            </Button>
+                          )
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-3">
+                        {canEdit ? (
                           <div className="flex justify-end gap-2">
                             <Button
                               disabled={isBusy}
@@ -259,7 +378,7 @@ export default function AgenciesPage() {
                 })}
                 {!agencies.length ? (
                   <tr>
-                    <td className="px-3 py-6 text-center text-gray-500" colSpan={6}>
+                    <td className="px-3 py-6 text-center text-gray-500" colSpan={7}>
                       Aucune agence pour le moment.
                     </td>
                   </tr>
@@ -271,6 +390,10 @@ export default function AgenciesPage() {
       </Card>
     </>
   );
+}
+
+function publicStatusShareUrl(token: string) {
+  return new URL(`/public/vehicle-status/${token}`, window.location.origin).toString();
 }
 
 function toEditableAgency(agency: Agency): EditableAgency {

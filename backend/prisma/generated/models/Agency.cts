@@ -207,6 +207,7 @@ export type AgencyWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   vehicleChecks?: Prisma.VehicleCheckListRelationFilter
+  vehicleStatusShare?: Prisma.XOR<Prisma.AgencyVehicleStatusShareNullableScalarRelationFilter, Prisma.AgencyVehicleStatusShareWhereInput> | null
 }
 
 export type AgencyOrderByWithRelationInput = {
@@ -219,6 +220,7 @@ export type AgencyOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   vehicleChecks?: Prisma.VehicleCheckOrderByRelationAggregateInput
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareOrderByWithRelationInput
 }
 
 export type AgencyWhereUniqueInput = Prisma.AtLeast<{
@@ -235,6 +237,7 @@ export type AgencyWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   vehicleChecks?: Prisma.VehicleCheckListRelationFilter
+  vehicleStatusShare?: Prisma.XOR<Prisma.AgencyVehicleStatusShareNullableScalarRelationFilter, Prisma.AgencyVehicleStatusShareWhereInput> | null
 }, "id" | "code" | "name_city">
 
 export type AgencyOrderByWithAggregationInput = {
@@ -275,6 +278,7 @@ export type AgencyCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutAgencyInput
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateInput = {
@@ -287,6 +291,7 @@ export type AgencyUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutAgencyInput
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUpdateInput = {
@@ -299,6 +304,7 @@ export type AgencyUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutAgencyNestedInput
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateInput = {
@@ -311,6 +317,7 @@ export type AgencyUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutAgencyNestedInput
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyCreateManyInput = {
@@ -389,6 +396,20 @@ export type AgencyScalarRelationFilter = {
   isNot?: Prisma.AgencyWhereInput
 }
 
+export type AgencyCreateNestedOneWithoutVehicleStatusShareInput = {
+  create?: Prisma.XOR<Prisma.AgencyCreateWithoutVehicleStatusShareInput, Prisma.AgencyUncheckedCreateWithoutVehicleStatusShareInput>
+  connectOrCreate?: Prisma.AgencyCreateOrConnectWithoutVehicleStatusShareInput
+  connect?: Prisma.AgencyWhereUniqueInput
+}
+
+export type AgencyUpdateOneRequiredWithoutVehicleStatusShareNestedInput = {
+  create?: Prisma.XOR<Prisma.AgencyCreateWithoutVehicleStatusShareInput, Prisma.AgencyUncheckedCreateWithoutVehicleStatusShareInput>
+  connectOrCreate?: Prisma.AgencyCreateOrConnectWithoutVehicleStatusShareInput
+  upsert?: Prisma.AgencyUpsertWithoutVehicleStatusShareInput
+  connect?: Prisma.AgencyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgencyUpdateToOneWithWhereWithoutVehicleStatusShareInput, Prisma.AgencyUpdateWithoutVehicleStatusShareInput>, Prisma.AgencyUncheckedUpdateWithoutVehicleStatusShareInput>
+}
+
 export type AgencyCreateNestedOneWithoutVehicleChecksInput = {
   create?: Prisma.XOR<Prisma.AgencyCreateWithoutVehicleChecksInput, Prisma.AgencyUncheckedCreateWithoutVehicleChecksInput>
   connectOrCreate?: Prisma.AgencyCreateOrConnectWithoutVehicleChecksInput
@@ -403,6 +424,70 @@ export type AgencyUpdateOneRequiredWithoutVehicleChecksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AgencyUpdateToOneWithWhereWithoutVehicleChecksInput, Prisma.AgencyUpdateWithoutVehicleChecksInput>, Prisma.AgencyUncheckedUpdateWithoutVehicleChecksInput>
 }
 
+export type AgencyCreateWithoutVehicleStatusShareInput = {
+  id?: string
+  code: string
+  name: string
+  city: string
+  region: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutAgencyInput
+}
+
+export type AgencyUncheckedCreateWithoutVehicleStatusShareInput = {
+  id?: string
+  code: string
+  name: string
+  city: string
+  region: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutAgencyInput
+}
+
+export type AgencyCreateOrConnectWithoutVehicleStatusShareInput = {
+  where: Prisma.AgencyWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgencyCreateWithoutVehicleStatusShareInput, Prisma.AgencyUncheckedCreateWithoutVehicleStatusShareInput>
+}
+
+export type AgencyUpsertWithoutVehicleStatusShareInput = {
+  update: Prisma.XOR<Prisma.AgencyUpdateWithoutVehicleStatusShareInput, Prisma.AgencyUncheckedUpdateWithoutVehicleStatusShareInput>
+  create: Prisma.XOR<Prisma.AgencyCreateWithoutVehicleStatusShareInput, Prisma.AgencyUncheckedCreateWithoutVehicleStatusShareInput>
+  where?: Prisma.AgencyWhereInput
+}
+
+export type AgencyUpdateToOneWithWhereWithoutVehicleStatusShareInput = {
+  where?: Prisma.AgencyWhereInput
+  data: Prisma.XOR<Prisma.AgencyUpdateWithoutVehicleStatusShareInput, Prisma.AgencyUncheckedUpdateWithoutVehicleStatusShareInput>
+}
+
+export type AgencyUpdateWithoutVehicleStatusShareInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutAgencyNestedInput
+}
+
+export type AgencyUncheckedUpdateWithoutVehicleStatusShareInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutAgencyNestedInput
+}
+
 export type AgencyCreateWithoutVehicleChecksInput = {
   id?: string
   code: string
@@ -412,6 +497,7 @@ export type AgencyCreateWithoutVehicleChecksInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateWithoutVehicleChecksInput = {
@@ -423,6 +509,7 @@ export type AgencyUncheckedCreateWithoutVehicleChecksInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyCreateOrConnectWithoutVehicleChecksInput = {
@@ -450,6 +537,7 @@ export type AgencyUpdateWithoutVehicleChecksInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateWithoutVehicleChecksInput = {
@@ -461,6 +549,7 @@ export type AgencyUncheckedUpdateWithoutVehicleChecksInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleStatusShare?: Prisma.AgencyVehicleStatusShareUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 
@@ -504,6 +593,7 @@ export type AgencySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   createdAt?: boolean
   updatedAt?: boolean
   vehicleChecks?: boolean | Prisma.Agency$vehicleChecksArgs<ExtArgs>
+  vehicleStatusShare?: boolean | Prisma.Agency$vehicleStatusShareArgs<ExtArgs>
   _count?: boolean | Prisma.AgencyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agency"]>
 
@@ -543,6 +633,7 @@ export type AgencySelectScalar = {
 export type AgencyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "city" | "region" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agency"]>
 export type AgencyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicleChecks?: boolean | Prisma.Agency$vehicleChecksArgs<ExtArgs>
+  vehicleStatusShare?: boolean | Prisma.Agency$vehicleStatusShareArgs<ExtArgs>
   _count?: boolean | Prisma.AgencyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgencyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -552,6 +643,7 @@ export type $AgencyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Agency"
   objects: {
     vehicleChecks: Prisma.$VehicleCheckPayload<ExtArgs>[]
+    vehicleStatusShare: Prisma.$AgencyVehicleStatusSharePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -957,6 +1049,7 @@ readonly fields: AgencyFieldRefs;
 export interface Prisma__AgencyClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   vehicleChecks<T extends Prisma.Agency$vehicleChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agency$vehicleChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleStatusShare<T extends Prisma.Agency$vehicleStatusShareArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agency$vehicleStatusShareArgs<ExtArgs>>): Prisma.Prisma__AgencyVehicleStatusShareClient<runtime.Types.Result.GetResult<Prisma.$AgencyVehicleStatusSharePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1408,6 +1501,25 @@ export type Agency$vehicleChecksArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.VehicleCheckScalarFieldEnum | Prisma.VehicleCheckScalarFieldEnum[]
+}
+
+/**
+ * Agency.vehicleStatusShare
+ */
+export type Agency$vehicleStatusShareArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyVehicleStatusShare
+   */
+  select?: Prisma.AgencyVehicleStatusShareSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyVehicleStatusShare
+   */
+  omit?: Prisma.AgencyVehicleStatusShareOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyVehicleStatusShareInclude<ExtArgs> | null
+  where?: Prisma.AgencyVehicleStatusShareWhereInput
 }
 
 /**

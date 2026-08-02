@@ -180,11 +180,26 @@ model Agency {
   updatedAt DateTime @updatedAt
 
   vehicleChecks VehicleCheck[]
+  vehicleStatusShare AgencyVehicleStatusShare?
 
   @@unique([name, city])
   @@index([city])
   @@index([region])
   @@index([isActive])
+}
+
+model AgencyVehicleStatusShare {
+  id        String   @id @default(uuid())
+  agencyId  String   @unique
+  token     String   @unique
+  isEnabled Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([isEnabled])
 }
 
 model Manufacturer {

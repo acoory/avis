@@ -18,6 +18,24 @@ export class AgenciesController {
   }
 
   @Roles(Role.ADMIN)
+  @Get('vehicle-status-shares')
+  findVehicleStatusShares() {
+    return this.agenciesService.findVehicleStatusShares();
+  }
+
+  @Roles(Role.ADMIN)
+  @Post(':id/vehicle-status-share')
+  renewVehicleStatusShare(@Param('id') id: string) {
+    return this.agenciesService.renewVehicleStatusShare(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Delete(':id/vehicle-status-share')
+  disableVehicleStatusShare(@Param('id') id: string) {
+    return this.agenciesService.disableVehicleStatusShare(id);
+  }
+
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() dto: CreateAgencyDto) {
     return this.agenciesService.create(dto);

@@ -55,6 +55,7 @@ export const ModelName = {
   PublicAccessSession: 'PublicAccessSession',
   UserManagerAssignment: 'UserManagerAssignment',
   Agency: 'Agency',
+  AgencyVehicleStatusShare: 'AgencyVehicleStatusShare',
   Manufacturer: 'Manufacturer',
   VehicleModel: 'VehicleModel',
   RepairType: 'RepairType',
@@ -164,6 +165,18 @@ export const AgencyScalarFieldEnum = {
 } as const
 
 export type AgencyScalarFieldEnum = (typeof AgencyScalarFieldEnum)[keyof typeof AgencyScalarFieldEnum]
+
+
+export const AgencyVehicleStatusShareScalarFieldEnum = {
+  id: 'id',
+  agencyId: 'agencyId',
+  token: 'token',
+  isEnabled: 'isEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyVehicleStatusShareScalarFieldEnum = (typeof AgencyVehicleStatusShareScalarFieldEnum)[keyof typeof AgencyVehicleStatusShareScalarFieldEnum]
 
 
 export const ManufacturerScalarFieldEnum = {

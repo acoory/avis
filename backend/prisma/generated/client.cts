@@ -60,6 +60,11 @@ export type UserManagerAssignment = Prisma.UserManagerAssignmentModel
  */
 export type Agency = Prisma.AgencyModel
 /**
+ * Model AgencyVehicleStatusShare
+ * 
+ */
+export type AgencyVehicleStatusShare = Prisma.AgencyVehicleStatusShareModel
+/**
  * Model Manufacturer
  * 
  */

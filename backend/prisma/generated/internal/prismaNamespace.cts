@@ -388,6 +388,7 @@ export const ModelName = {
   PublicAccessSession: 'PublicAccessSession',
   UserManagerAssignment: 'UserManagerAssignment',
   Agency: 'Agency',
+  AgencyVehicleStatusShare: 'AgencyVehicleStatusShare',
   Manufacturer: 'Manufacturer',
   VehicleModel: 'VehicleModel',
   RepairType: 'RepairType',
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "publicAccessSession" | "userManagerAssignment" | "agency" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "externalRepairCompany" | "externalRepairContact" | "vehicleCheckPublicShare" | "vehicleCheckDecisionShare" | "vehicleCheckConversation" | "vehicleCheckConversationParticipant" | "vehicleCheckMessage" | "vehicleCheckMessageAttachment" | "vehicleCheckMessageMention" | "notification" | "notificationEmail" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
+    modelProps: "user" | "publicAccessSession" | "userManagerAssignment" | "agency" | "agencyVehicleStatusShare" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "externalRepairCompany" | "externalRepairContact" | "vehicleCheckPublicShare" | "vehicleCheckDecisionShare" | "vehicleCheckConversation" | "vehicleCheckConversationParticipant" | "vehicleCheckMessage" | "vehicleCheckMessageAttachment" | "vehicleCheckMessageMention" | "notification" | "notificationEmail" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -723,6 +724,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AgencyCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AgencyCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgencyVehicleStatusShare: {
+      payload: Prisma.$AgencyVehicleStatusSharePayload<ExtArgs>
+      fields: Prisma.AgencyVehicleStatusShareFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgencyVehicleStatusShareFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgencyVehicleStatusShareFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>
+        }
+        findFirst: {
+          args: Prisma.AgencyVehicleStatusShareFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgencyVehicleStatusShareFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>
+        }
+        findMany: {
+          args: Prisma.AgencyVehicleStatusShareFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>[]
+        }
+        create: {
+          args: Prisma.AgencyVehicleStatusShareCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>
+        }
+        createMany: {
+          args: Prisma.AgencyVehicleStatusShareCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgencyVehicleStatusShareCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>[]
+        }
+        delete: {
+          args: Prisma.AgencyVehicleStatusShareDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>
+        }
+        update: {
+          args: Prisma.AgencyVehicleStatusShareUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>
+        }
+        deleteMany: {
+          args: Prisma.AgencyVehicleStatusShareDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgencyVehicleStatusShareUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgencyVehicleStatusShareUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>[]
+        }
+        upsert: {
+          args: Prisma.AgencyVehicleStatusShareUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyVehicleStatusSharePayload>
+        }
+        aggregate: {
+          args: Prisma.AgencyVehicleStatusShareAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgencyVehicleStatusShare>
+        }
+        groupBy: {
+          args: Prisma.AgencyVehicleStatusShareGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyVehicleStatusShareGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgencyVehicleStatusShareCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyVehicleStatusShareCountAggregateOutputType> | number
         }
       }
     }
@@ -2537,6 +2612,18 @@ export const AgencyScalarFieldEnum = {
 export type AgencyScalarFieldEnum = (typeof AgencyScalarFieldEnum)[keyof typeof AgencyScalarFieldEnum]
 
 
+export const AgencyVehicleStatusShareScalarFieldEnum = {
+  id: 'id',
+  agencyId: 'agencyId',
+  token: 'token',
+  isEnabled: 'isEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyVehicleStatusShareScalarFieldEnum = (typeof AgencyVehicleStatusShareScalarFieldEnum)[keyof typeof AgencyVehicleStatusShareScalarFieldEnum]
+
+
 export const ManufacturerScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -3149,14 +3236,14 @@ export type ListEnumVehicleCheckItemOperationalStatusFieldRefInput<$PrismaModel>
  * Reference to a field of type 'RepairExecutionMode'
  */
 export type EnumRepairExecutionModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RepairExecutionMode'>
-
+    
 
 
 /**
  * Reference to a field of type 'RepairExecutionMode[]'
  */
 export type ListEnumRepairExecutionModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RepairExecutionMode[]'>
-
+    
 
 
 /**
@@ -3286,6 +3373,7 @@ export type GlobalOmitConfig = {
   publicAccessSession?: Prisma.PublicAccessSessionOmit
   userManagerAssignment?: Prisma.UserManagerAssignmentOmit
   agency?: Prisma.AgencyOmit
+  agencyVehicleStatusShare?: Prisma.AgencyVehicleStatusShareOmit
   manufacturer?: Prisma.ManufacturerOmit
   vehicleModel?: Prisma.VehicleModelOmit
   repairType?: Prisma.RepairTypeOmit
@@ -3371,3 +3459,4 @@ export type PrismaAction =
  * `PrismaClient` proxy available in interactive transactions.
  */
 export type TransactionClient = Omit<DefaultPrismaClient, runtime.ITXClientDenyList>
+
