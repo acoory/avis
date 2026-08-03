@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CarFront, CheckCircle2, CheckSquare2, ChevronDown, ChevronLeft, ChevronRight, Info, Minus, Package, Wrench } from "lucide-react";
+import { CarFront, Check, CheckCircle2, CheckSquare2, ChevronDown, ChevronLeft, ChevronRight, Copy, Info, Minus, Package, Wrench } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
@@ -15,7 +15,7 @@ import {
 import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
-import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
+import { formatDate, formatLicensePlate, formatMoney, normalizeLicensePlate } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck, VehicleCheckItem } from "@/types/business";
 
@@ -122,7 +122,6 @@ export default function VehicleCheckDetailsPage() {
 
       <section className="relative isolate z-0 rounded-lg border border-gray-200 bg-white">
         <VehicleProgressStepper vehicleCheck={vehicleCheck} />
-        <VehicleCheckTimingSummary vehicleCheck={vehicleCheck} />
 
         {hasPendingActions ? (
           <section className="border-y border-teal-900/10 bg-gray-50">
@@ -216,6 +215,13 @@ function VehicleStickyHeader({
   onUpdated: (vehicleCheck: VehicleCheck) => void;
 }) {
   const [isInformationOpen, setIsInformationOpen] = useState(false);
+  const [isPlateCopied, setIsPlateCopied] = useState(false);
+
+  async function copyLicensePlate() {
+    await navigator.clipboard.writeText(normalizeLicensePlate(formattedLicensePlate));
+    setIsPlateCopied(true);
+    window.setTimeout(() => setIsPlateCopied(false), 1500);
+  }
 
   return (
     <div className="sticky top-14 z-20 -mx-4 -mt-4 mb-4 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur md:top-16 md:-mx-6 md:-mt-6">
@@ -240,6 +246,19 @@ function VehicleStickyHeader({
             <p className="truncate text-base font-semibold text-gray-950">
               {formattedLicensePlate}
             </p>
+            <button
+              aria-label={`Copier l'immatriculation ${formattedLicensePlate}`}
+              className="hidden h-6 w-6 shrink-0 items-center justify-center rounded text-gray-400 transition-colors hover:bg-gray-100 hover:text-teal-700 md:inline-flex"
+              title={isPlateCopied ? "Immatriculation copiée" : "Copier l'immatriculation"}
+              type="button"
+              onClick={() => void copyLicensePlate()}
+            >
+              {isPlateCopied ? (
+                <Check className="h-3.5 w-3.5 text-emerald-600" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+            </button>
             <span className="hidden shrink-0 text-xs font-medium text-gray-400 lg:inline">
               {vehicleCheck.checkNumber}
             </span>
@@ -388,17 +407,14 @@ function VehicleInformationPanel({ vehicleCheck }: { vehicleCheck: VehicleCheck 
 
   return (
     <div
-      className="max-h-[calc(100dvh-7.5rem)] overflow-y-auto border-t border-gray-200 bg-gray-50 px-4 py-3 md:px-6"
+      className="max-h-[calc(100dvh-7.5rem)] overflow-y-auto border-t border-gray-200 bg-gray-50 px-3 py-2 md:px-5"
       id="vehicle-sticky-information"
     >
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7">
         <CompactInformation label="Date" value={formatDate(vehicleCheck.checkDate)} />
         <CompactInformation label="Agence" value={agencyName} />
         <CompactInformation label="Ville" value={vehicleCheck.city || "-"} />
         <CompactInformation label="Contrôlé par" value={collaboratorName} />
-      </div>
-
-      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
         <CompactInformation
           accent
           label="Économie référence"
@@ -414,8 +430,14 @@ function VehicleInformationPanel({ vehicleCheck }: { vehicleCheck: VehicleCheck 
         />
       </div>
 
+      {vehicleCheck.fieldCompletedAt ? (
+        <div className="mt-1.5 overflow-hidden rounded-md border border-gray-200 bg-white [&>details]:border-0">
+          <VehicleCheckTimingSummary vehicleCheck={vehicleCheck} />
+        </div>
+      ) : null}
+
       {vehicleCheck.notes?.trim() ? (
-        <div className="mt-2 rounded-md border border-gray-200 bg-white px-3 py-2">
+        <div className="mt-1.5 rounded-md border border-gray-200 bg-white px-2.5 py-1.5">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
             Commentaire du contrôle
           </p>
@@ -438,12 +460,12 @@ function CompactInformation({
   value: string;
 }) {
   return (
-    <div className="min-w-0 rounded-md border border-gray-200 bg-white px-3 py-2">
-      <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+    <div className="min-w-0 rounded-md border border-gray-200 bg-white px-2.5 py-1.5">
+      <p className="truncate text-[9px] font-semibold uppercase tracking-wide text-gray-400">
         {label}
       </p>
       <p
-        className={`mt-0.5 truncate text-xs font-semibold ${accent ? "text-teal-700" : "text-gray-900"}`}
+        className={`truncate text-[11px] font-semibold leading-4 ${accent ? "text-teal-700" : "text-gray-900"}`}
         title={value}
       >
         {value}
@@ -588,8 +610,8 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
   const desktopStepPositions = ["8%", "35%", "50%", "92%"];
 
   return (
-    <div className="border-t border-gray-200 px-5 py-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+    <div className="border-t border-gray-200 px-5 py-3">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-sm font-semibold text-gray-950">Avancement du dossier</p>
           <p className="text-xs text-gray-500">
@@ -668,30 +690,30 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
       </div>
 
       {interventionBranches?.length ? (
-        <div className="relative hidden min-h-36 lg:block">
+        <div className="relative hidden min-h-28 lg:block">
           <svg
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 h-32 w-full overflow-visible"
+            className="pointer-events-none absolute inset-0 h-28 w-full overflow-visible"
             preserveAspectRatio="none"
-            viewBox="0 0 100 128"
+            viewBox="0 0 100 112"
           >
-            <path d="M 2 60 H 58" fill="none" stroke="#0f766e" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+            <path d="M 2 52 H 58" fill="none" stroke="#0f766e" strokeWidth="2" vectorEffect="non-scaling-stroke" />
             <path
-              d="M 58 60 V 28 H 80 V 60"
+              d="M 58 52 V 22 H 80 V 52"
               fill="none"
               stroke={onSiteCount ? (onSiteDoneCount === onSiteCount ? "#0f766e" : "#f59e0b") : "#d1d5db"}
               strokeWidth="2"
               vectorEffect="non-scaling-stroke"
             />
             <path
-              d="M 58 60 V 92 H 80 V 60"
+              d="M 58 52 V 82 H 80 V 52"
               fill="none"
               stroke={externalCount ? (isWithProvider ? "#0f766e" : "#f59e0b") : "#d1d5db"}
               strokeWidth="2"
               vectorEffect="non-scaling-stroke"
             />
             <path
-              d="M 80 60 H 98"
+              d="M 80 52 H 98"
               fill="none"
               stroke={isRecovered ? "#0f766e" : isWithProvider ? "#f59e0b" : "#d1d5db"}
               strokeWidth="2"
@@ -700,25 +722,25 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
           </svg>
           {steps.map((step, index) => (
             <div
-              className="absolute top-11 z-10 flex -translate-x-1/2 flex-col items-center text-center"
+              className="absolute top-9 z-10 flex -translate-x-1/2 flex-col items-center text-center"
               key={step.label}
               style={{ left: desktopStepPositions[index] }}
             >
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold ${stepCircleClassName(step, index)}`}>
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-semibold ${stepCircleClassName(step, index)}`}>
                 {step.skipped ? (
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3.5 w-3.5" />
                 ) : step.completed ? (
-                  <CheckCircle2 className="h-4 w-4" />
+                  <CheckCircle2 className="h-3.5 w-3.5" />
                 ) : (
                   index + 1
                 )}
               </div>
               <div className="mt-1 min-w-0">
-                <p className={`whitespace-nowrap text-xs font-semibold ${stepLabelClassName(step, index)}`}>{step.label}</p>
+                <p className={`whitespace-nowrap text-[11px] font-semibold ${stepLabelClassName(step, index)}`}>{step.label}</p>
                 {index !== 2 ? (
                   <div className="mt-0.5">
                     {step.descriptionLines.map((descriptionLine) => (
-                      <p className="whitespace-nowrap text-xs text-gray-500" key={descriptionLine}>{descriptionLine}</p>
+                      <p className="whitespace-nowrap text-[11px] text-gray-500" key={descriptionLine}>{descriptionLine}</p>
                     ))}
                   </div>
                 ) : null}
@@ -728,7 +750,7 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
           {interventionBranches.map((branch, branchIndex) => (
             <div
               className={[
-                "absolute left-[69%] z-20 min-w-40 max-w-56 -translate-x-1/2 -translate-y-1/2 rounded-md border px-3 py-1.5 text-left shadow-sm",
+                "absolute left-[69%] z-20 min-w-36 max-w-48 -translate-x-1/2 -translate-y-1/2 rounded-md border px-2 py-1 text-left shadow-sm",
                 branch.tone === "success"
                   ? "border-emerald-300 bg-emerald-50 shadow-emerald-100"
                   : branch.tone === "warning"
@@ -738,13 +760,13 @@ function VehicleProgressStepper({ vehicleCheck }: { vehicleCheck: VehicleCheck }
                       : "border-gray-200 bg-white",
               ].join(" ")}
               key={branch.label}
-              style={{ top: branchIndex === 0 ? 28 : 92 }}
+              style={{ top: branchIndex === 0 ? 22 : 82 }}
             >
-              <p className="whitespace-nowrap text-xs font-semibold text-gray-800">{branch.label}</p>
-              {branch.detail ? <p className="truncate text-[11px] text-gray-500">{branch.detail}</p> : null}
+              <p className="whitespace-nowrap text-[11px] font-semibold text-gray-800">{branch.label}</p>
+              {branch.detail ? <p className="truncate text-[10px] text-gray-500">{branch.detail}</p> : null}
               <p
                 className={[
-                  "mt-0.5 text-[11px] font-medium",
+                  "mt-0.5 text-[10px] font-medium",
                   branch.tone === "success"
                     ? "text-emerald-800"
                     : branch.tone === "warning"
