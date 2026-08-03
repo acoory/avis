@@ -98,17 +98,30 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
         partOrderRequired: true,
         partOrderStatus,
       });
-      const updatedVehicleCheck =
-        partOrderStatus === "ORDERED"
-          ? await businessService.vehicleCheck(vehicleCheck.id)
-          : {
-              ...vehicleCheck,
-              items: items.map((currentItem) =>
-                currentItem.id === updatedItem.id
-                  ? { ...currentItem, ...updatedItem }
-                  : currentItem,
-              ),
-            };
+      let updatedVehicleCheck: VehicleCheck;
+      if (partOrderStatus === "ORDERED") {
+        const refreshedVehicleCheck = await businessService.vehicleCheck(vehicleCheck.id);
+        const refreshedItems = refreshedVehicleCheck.items ?? [];
+        const refreshedItemsById = new Map(refreshedItems.map((refreshedItem) => [refreshedItem.id, refreshedItem]));
+        const currentItemIds = new Set(items.map((currentItem) => currentItem.id));
+
+        updatedVehicleCheck = {
+          ...refreshedVehicleCheck,
+          items: [
+            ...items.map((currentItem) => refreshedItemsById.get(currentItem.id) ?? currentItem),
+            ...refreshedItems.filter((refreshedItem) => !currentItemIds.has(refreshedItem.id)),
+          ],
+        };
+      } else {
+        updatedVehicleCheck = {
+          ...vehicleCheck,
+          items: items.map((currentItem) =>
+            currentItem.id === updatedItem.id
+              ? { ...currentItem, ...updatedItem }
+              : currentItem,
+          ),
+        };
+      }
       onUpdated(updatedVehicleCheck);
       toast.success(
         updatedVehicleCheck.status === "COMPLETED"
