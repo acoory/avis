@@ -16,18 +16,31 @@ import { VehicleCheck, VehicleCheckItem, VehicleCheckItemOperationalStatus } fro
 
 type VehicleCheckTableProps = {
   dateRange?: { dateFrom?: string; dateTo?: string };
+  isLoading?: boolean;
   vehicleChecks: VehicleCheck[];
   onDateFilterChange?: (range: { dateFrom?: string; dateTo?: string }) => void;
   onDeleted?: (vehicleCheck: VehicleCheck) => void;
   onUpdated?: (vehicleCheck: VehicleCheck) => void;
+  serverPagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+    onPageSizeChange: (pageSize: number) => void;
+    onSearchChange: (search: string) => void;
+    onSortChange: (column: string, direction: "asc" | "desc") => void;
+  };
 };
 
 export function VehicleCheckTable({
   dateRange,
+  isLoading = false,
   vehicleChecks,
   onDateFilterChange,
   onDeleted,
   onUpdated,
+  serverPagination,
 }: VehicleCheckTableProps) {
   const [vehicleCheckToDelete, setVehicleCheckToDelete] = useState<VehicleCheck | null>(null);
   const [vehicleCheckToRecover, setVehicleCheckToRecover] = useState<VehicleCheck | null>(null);
@@ -46,6 +59,9 @@ export function VehicleCheckTable({
         }}
         emptyMessage="Aucun controle pour le moment."
         minWidth={880}
+        isLoading={isLoading}
+        showSearch={false}
+        serverPagination={serverPagination}
         mobileCard={(check) => (
           <VehicleCheckMobileCard
             check={check}
@@ -135,23 +151,27 @@ export function VehicleCheckTable({
             id: "partOrders",
             header: "Commandes",
             cell: (check) => <PartOrderSummaryBadge vehicleCheck={check} />,
-            sortValue: (check) => partOrderSummary(check).toOrder,
+            sortValue: serverPagination
+              ? undefined
+              : (check) => partOrderSummary(check).toOrder,
             searchValue: (check) => partOrderSummaryText(check),
           },
           {
             id: "publicShare",
             header: "Prestataire",
             cell: (check) => <PublicShareStatusBadge vehicleCheck={check} />,
-            sortValue: (check) =>
-              check.status === "CLOSED_NO_DAMAGE"
-                ? 4
-                : check.publicShare?.vehicleRecoveredAt
-                  ? 3
-                  : check.publicShare?.takenInChargeAt
-                    ? 2
-                    : check.publicShare
-                      ? 1
-                    : 0,
+            sortValue: serverPagination
+              ? undefined
+              : (check) =>
+                  check.status === "CLOSED_NO_DAMAGE"
+                    ? 4
+                    : check.publicShare?.vehicleRecoveredAt
+                      ? 3
+                      : check.publicShare?.takenInChargeAt
+                        ? 2
+                        : check.publicShare
+                          ? 1
+                          : 0,
             searchValue: (check) =>
               check.status === "CLOSED_NO_DAMAGE"
                 ? "Non requis"

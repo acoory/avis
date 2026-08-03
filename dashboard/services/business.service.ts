@@ -22,6 +22,7 @@ import {
   RepairDecisionInputItem,
   RepairDecisionPreview,
   VehicleCheck,
+  VehicleCheckListResponse,
   VehicleCheckSearchResult,
   VehicleCheckDecisionShare,
   VehicleCheckItem,
@@ -45,6 +46,14 @@ type PeriodParams = {
   collaboratorId?: string;
   dateFrom?: string;
   dateTo?: string;
+};
+
+export type VehicleCheckListParams = PeriodParams & {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: string;
+  sortDirection?: "asc" | "desc";
 };
 
 export const businessService = {
@@ -399,8 +408,8 @@ export const businessService = {
     });
   },
 
-  async vehicleChecks(params?: PeriodParams) {
-    const { data } = await api.get<VehicleCheck[]>("/vehicle-checks", {
+  async vehicleChecks(params?: VehicleCheckListParams) {
+    const { data } = await api.get<VehicleCheckListResponse>("/vehicle-checks", {
       params,
     });
     return data;

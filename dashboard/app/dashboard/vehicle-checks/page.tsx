@@ -2,33 +2,67 @@
 
 import Link from "next/link";
 import { CheckCircle2, ClipboardList, Euro, ListChecks, PackageCheck, Plus, Wrench, type LucideIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { ExportButton } from "@/components/business/export-button";
 import { VehicleCheckTable } from "@/components/business/vehicle-check-table";
 import { LoadingScreen } from "@/components/dashboard/loading-screen";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { businessService } from "@/services/business.service";
-import { VehicleCheck } from "@/types/business";
+import { businessService, VehicleCheckListParams } from "@/services/business.service";
+import { VehicleCheck, VehicleCheckListStats } from "@/types/business";
+
+const initialStats: VehicleCheckListStats = {
+  completedCount: 0,
+  draftCount: 0,
+  recoveredCount: 0,
+  takenInChargeCount: 0,
+  toAnalyzeCount: 0,
+  totalCount: 0,
+  totalSavingAmount: 0,
+  toOrderCount: 0,
+};
 
 export default function VehicleChecksPage() {
+  return (
+    <Suspense fallback={<LoadingScreen fullScreen={false} />}>
+      <VehicleChecksContent />
+    </Suspense>
+  );
+}
+
+function VehicleChecksContent() {
+  const searchParams = useSearchParams();
   const [vehicleChecks, setVehicleChecks] = useState<VehicleCheck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState<{ dateFrom?: string; dateTo?: string }>({});
-  const stats = useMemo(() => vehicleCheckStats(vehicleChecks), [vehicleChecks]);
+  const [stats, setStats] = useState<VehicleCheckListStats>(initialStats);
+  const [listParams, setListParams] = useState<VehicleCheckListParams>(() => getListParams(searchParams));
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     void loadVehicleChecks();
   }, []);
 
-  async function loadVehicleChecks(range?: { dateFrom?: string; dateTo?: string }) {
-    const nextRange = range ?? dateRange;
-    setDateRange(nextRange);
+  async function loadVehicleChecks(params: VehicleCheckListParams = listParams) {
+    const nextParams = { ...listParams, ...params };
+    setListParams(nextParams);
+    setDateRange({ dateFrom: nextParams.dateFrom, dateTo: nextParams.dateTo });
+    saveListParamsInUrl(nextParams);
     setIsLoading(true);
     try {
-      const data = await businessService.vehicleChecks(nextRange);
-      setVehicleChecks(data);
+      const data = await businessService.vehicleChecks(nextParams);
+      setVehicleChecks(data.items);
+      setStats(data.stats);
+      setTotal(data.total);
+      setTotalPages(data.totalPages);
+      setListParams((current) => ({
+        ...current,
+        page: data.page,
+        pageSize: data.pageSize,
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +70,7 @@ export default function VehicleChecksPage() {
 
   function handleVehicleCheckDeleted(deletedVehicleCheck: VehicleCheck) {
     setVehicleChecks((current) => current.filter((check) => check.id !== deletedVehicleCheck.id));
-    void loadVehicleChecks(dateRange);
+    void loadVehicleChecks(listParams);
   }
 
   function handleVehicleCheckUpdated(updatedVehicleCheck: VehicleCheck) {
@@ -57,15 +91,41 @@ export default function VehicleChecksPage() {
           </Button>
         </div>
       </div>
-      {vehicleChecks.length ? <VehicleChecksStats stats={stats} /> : null}
+      {stats.totalCount ? <VehicleChecksStats stats={stats} /> : null}
       {isLoading && vehicleChecks.length === 0 ? (
         <LoadingScreen fullScreen={false} />
       ) : (
         <VehicleCheckTable
           dateRange={dateRange}
+          isLoading={isLoading}
           vehicleChecks={vehicleChecks}
           onDeleted={handleVehicleCheckDeleted}
-          onDateFilterChange={loadVehicleChecks}
+          onDateFilterChange={(range) =>
+            void loadVehicleChecks({ ...listParams, ...range, page: 1 })
+          }
+          serverPagination={{
+            page: listParams.page ?? 1,
+            pageSize: listParams.pageSize ?? 10,
+            total,
+            totalPages,
+            onPageChange: (page) =>
+              void loadVehicleChecks({ ...listParams, page }),
+            onPageSizeChange: (pageSize) =>
+              void loadVehicleChecks({ ...listParams, page: 1, pageSize }),
+            onSearchChange: (search) =>
+              void loadVehicleChecks({
+                ...listParams,
+                page: 1,
+                search: search.trim() || undefined,
+              }),
+            onSortChange: (sortBy, sortDirection) =>
+              void loadVehicleChecks({
+                ...listParams,
+                page: 1,
+                sortBy,
+                sortDirection,
+              }),
+          }}
           onUpdated={handleVehicleCheckUpdated}
         />
       )}
@@ -73,18 +133,48 @@ export default function VehicleChecksPage() {
   );
 }
 
-type VehicleCheckStats = {
-  completedCount: number;
-  draftCount: number;
-  recoveredCount: number;
-  takenInChargeCount: number;
-  toAnalyzeCount: number;
-  totalCount: number;
-  totalSavingAmount: number;
-  toOrderCount: number;
-};
+const vehicleCheckSortFields = new Set([
+  "checkDate",
+  "checkNumber",
+  "city",
+  "licensePlate",
+  "status",
+  "totalInternalSavingAmount",
+]);
 
-function VehicleChecksStats({ stats }: { stats: VehicleCheckStats }) {
+function getListParams(searchParams: Pick<URLSearchParams, "get">): VehicleCheckListParams {
+  const page = Number(searchParams.get("page"));
+  const pageSize = Number(searchParams.get("pageSize"));
+  const sortBy = searchParams.get("sortBy");
+  const sortDirection = searchParams.get("sortDirection");
+  const dateFrom = searchParams.get("dateFrom");
+  const dateTo = searchParams.get("dateTo");
+
+  return {
+    page: Number.isInteger(page) && page > 0 ? page : 1,
+    pageSize: [10, 25, 50, 100].includes(pageSize) ? pageSize : 10,
+    sortBy: sortBy && vehicleCheckSortFields.has(sortBy) ? sortBy : "checkDate",
+    sortDirection: sortDirection === "asc" ? "asc" : "desc",
+    dateFrom: dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom) ? dateFrom : undefined,
+    dateTo: dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo) ? dateTo : undefined,
+  };
+}
+
+function saveListParamsInUrl(params: VehicleCheckListParams) {
+  const searchParams = new URLSearchParams();
+
+  if ((params.page ?? 1) > 1) searchParams.set("page", String(params.page));
+  if ((params.pageSize ?? 10) !== 10) searchParams.set("pageSize", String(params.pageSize));
+  if (params.sortBy && params.sortBy !== "checkDate") searchParams.set("sortBy", params.sortBy);
+  if (params.sortDirection && params.sortDirection !== "desc") searchParams.set("sortDirection", params.sortDirection);
+  if (params.dateFrom) searchParams.set("dateFrom", params.dateFrom);
+  if (params.dateTo) searchParams.set("dateTo", params.dateTo);
+
+  const query = searchParams.toString();
+  window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+}
+
+function VehicleChecksStats({ stats }: { stats: VehicleCheckListStats }) {
   const cards = [
     {
       description: "Brouillons en cours",
@@ -172,44 +262,6 @@ function StatCard({ description, icon: Icon, title, tone, value }: { description
       </CardContent>
     </Card>
   );
-}
-
-function vehicleCheckStats(vehicleChecks: VehicleCheck[]): VehicleCheckStats {
-  return vehicleChecks.reduce<VehicleCheckStats>(
-    (stats, check) => {
-      const activeItems = check.items?.filter((item) => item.operationalStatus === "ACTIVE") ?? [];
-
-      stats.totalCount += 1;
-      stats.totalSavingAmount += numberValue(check.totalInternalSavingAmount);
-      if (
-        check.status === "CLOSED_NO_DAMAGE" ||
-        check.status === "COMPLETED"
-      )
-        stats.completedCount += 1;
-      if (check.status === "TO_ANALYZE") stats.toAnalyzeCount += 1;
-      if (check.status === "DRAFT") stats.draftCount += 1;
-      if (check.publicShare?.takenInChargeAt && !check.publicShare.vehicleRecoveredAt) stats.takenInChargeCount += 1;
-      if (check.publicShare?.vehicleRecoveredAt) stats.recoveredCount += 1;
-      stats.toOrderCount += activeItems.filter((item) => item.partOrderStatus === "TO_ORDER").length;
-
-      return stats;
-    },
-    {
-      completedCount: 0,
-      draftCount: 0,
-      recoveredCount: 0,
-      takenInChargeCount: 0,
-      toAnalyzeCount: 0,
-      totalCount: 0,
-      totalSavingAmount: 0,
-      toOrderCount: 0,
-    },
-  );
-}
-
-function numberValue(value: string | number | null | undefined) {
-  const parsed = Number(value ?? 0);
-  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function formatInteger(value: number) {

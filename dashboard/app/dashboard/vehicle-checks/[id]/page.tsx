@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { CarFront, Check, CheckCircle2, CheckSquare2, ChevronDown, ChevronLeft, ChevronRight, Copy, Info, Minus, Package, Wrench } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { VehicleCheckActions } from "@/components/business/vehicle-check-actions";
@@ -214,8 +213,18 @@ function VehicleStickyHeader({
   vehicleCheck: VehicleCheck;
   onUpdated: (vehicleCheck: VehicleCheck) => void;
 }) {
+  const router = useRouter();
   const [isInformationOpen, setIsInformationOpen] = useState(false);
   const [isPlateCopied, setIsPlateCopied] = useState(false);
+
+  function goBack() {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/dashboard/vehicle-checks");
+  }
 
   async function copyLicensePlate() {
     await navigator.clipboard.writeText(normalizeLicensePlate(formattedLicensePlate));
@@ -227,18 +236,15 @@ function VehicleStickyHeader({
     <div className="sticky top-14 z-20 -mx-4 -mt-4 mb-4 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur md:top-16 md:-mx-6 md:-mt-6">
       <div className="flex h-16 min-w-0 items-center gap-2 px-4 md:gap-3 md:px-6">
         <Button
-          asChild
+          aria-label="Retour à la page précédente"
           className="h-9 w-9 shrink-0"
           size="icon"
+          title="Retour à la page précédente"
+          type="button"
           variant="outline"
+          onClick={goBack}
         >
-          <Link
-            aria-label="Retour aux contrôles"
-            href="/dashboard/vehicle-checks"
-            title="Retour aux contrôles"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Link>
+          <ChevronLeft className="h-4 w-4" />
         </Button>
 
         <div className="min-w-0 flex-1">

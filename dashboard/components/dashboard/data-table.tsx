@@ -1,7 +1,7 @@
 "use client";
 
-import { ReactNode, useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ReactNode, useMemo, useRef, useState } from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,12 +27,24 @@ type DataTableProps<T> = {
     column: string;
     direction: SortDirection;
   };
+  isLoading?: boolean;
+  showSearch?: boolean;
   dateFilter?: {
     label: string;
     getValue: (row: T) => string | Date | null | undefined;
     mode?: "client" | "server";
     value?: { dateFrom?: string; dateTo?: string };
     onChange?: (range: { dateFrom?: string; dateTo?: string }) => void;
+  };
+  serverPagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+    onPageSizeChange: (pageSize: number) => void;
+    onSearchChange: (search: string) => void;
+    onSortChange: (column: string, direction: SortDirection) => void;
   };
 };
 
@@ -45,7 +57,10 @@ export function DataTable<T>({
   mobileCard,
   minWidth = 760,
   initialSort,
+  isLoading = false,
+  showSearch = true,
   dateFilter,
+  serverPagination,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
   const [sortColumn, setSortColumn] = useState<string | null>(initialSort?.column ?? null);
@@ -54,10 +69,13 @@ export function DataTable<T>({
   const [pageSize, setPageSize] = useState(10);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const searchTimerRef = useRef<number | null>(null);
   const selectedDateFrom = dateFilter?.value?.dateFrom ?? dateFrom;
   const selectedDateTo = dateFilter?.value?.dateTo ?? dateTo;
 
   const filteredData = useMemo(() => {
+    if (serverPagination) return data;
+
     const normalizedSearch = search.trim().toLowerCase();
     const fromTime = selectedDateFrom ? startOfDay(selectedDateFrom) : null;
     const toTime = selectedDateTo ? endOfDay(selectedDateTo) : null;
@@ -86,9 +104,11 @@ export function DataTable<T>({
 
       return (!fromTime || rowTime >= fromTime) && (!toTime || rowTime <= toTime);
     });
-  }, [columns, data, dateFilter, selectedDateFrom, selectedDateTo, search]);
+  }, [columns, data, dateFilter, selectedDateFrom, selectedDateTo, search, serverPagination]);
 
   const sortedData = useMemo(() => {
+    if (serverPagination) return filteredData;
+
     const column = columns.find((item) => item.id === sortColumn);
     if (!sortColumn || !column?.sortValue) {
       return filteredData;
@@ -101,13 +121,18 @@ export function DataTable<T>({
 
       return sortDirection === "asc" ? result : -result;
     });
-  }, [columns, filteredData, sortColumn, sortDirection]);
+  }, [columns, filteredData, serverPagination, sortColumn, sortDirection]);
 
-  const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const visibleRows = sortedData.slice((safePage - 1) * pageSize, safePage * pageSize);
-  const rangeStart = sortedData.length ? (safePage - 1) * pageSize + 1 : 0;
-  const rangeEnd = Math.min(safePage * pageSize, sortedData.length);
+  const effectivePageSize = serverPagination?.pageSize ?? pageSize;
+  const totalRows = serverPagination?.total ?? sortedData.length;
+  const totalPages = serverPagination?.totalPages ?? Math.max(1, Math.ceil(sortedData.length / pageSize));
+  const safePage = serverPagination?.page ?? Math.min(page, totalPages);
+  const visibleRows = serverPagination
+    ? data
+    : sortedData.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const rangeStart = totalRows ? (safePage - 1) * effectivePageSize + 1 : 0;
+  const rangeEnd = Math.min(safePage * effectivePageSize, totalRows);
+  const placeholderRowCount = Math.min(effectivePageSize, 10);
 
   function toggleSort(column: DataTableColumn<T>) {
     if (!column.sortValue) {
@@ -116,35 +141,50 @@ export function DataTable<T>({
 
     setPage(1);
     if (sortColumn === column.id) {
-      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+      const nextDirection = sortDirection === "asc" ? "desc" : "asc";
+      setSortDirection(nextDirection);
+      serverPagination?.onSortChange(column.id, nextDirection);
       return;
     }
 
     setSortColumn(column.id);
     setSortDirection("asc");
+    serverPagination?.onSortChange(column.id, "asc");
   }
 
   function updatePageSize(value: string) {
-    setPageSize(Number(value));
+    const nextPageSize = Number(value);
+    setPageSize(nextPageSize);
     setPage(1);
+    serverPagination?.onPageSizeChange(nextPageSize);
+  }
+
+  function updateSearch(value: string) {
+    setSearch(value);
+    setPage(1);
+
+    if (!serverPagination) return;
+    if (searchTimerRef.current !== null) window.clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = window.setTimeout(() => {
+      serverPagination.onSearchChange(value);
+    }, 300);
   }
 
   return (
     <Card className="min-w-0">
       <CardContent className="p-0">
         <div className="flex flex-col gap-3 border-b border-gray-100 p-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="relative w-full lg:max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              className="pl-9"
-              placeholder="Rechercher"
-              value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
+          {showSearch ? (
+            <div className="relative w-full lg:max-w-sm">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                className="pl-9"
+                placeholder="Rechercher"
+                value={search}
+                onChange={(event) => updateSearch(event.target.value)}
+              />
+            </div>
+          ) : null}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {dateFilter ? (
@@ -188,31 +228,27 @@ export function DataTable<T>({
               </div>
             ) : null}
 
-            <div>
-              <label className="mb-1 block text-xs font-medium uppercase text-gray-500">Lignes</label>
-              <select
-                className="h-10 rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 shadow-sm"
-                value={pageSize}
-                onChange={(event) => updatePageSize(event.target.value)}
-              >
-                {pageSizeOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
         </div>
 
         {mobileCard ? (
           <div className="divide-y divide-gray-100 md:hidden">
-            {visibleRows.map((row, rowIndex) => (
-              <div className="p-3" key={rowIndex}>
-                {mobileCard(row)}
-              </div>
-            ))}
-            {!visibleRows.length ? (
+            {isLoading
+              ? Array.from({ length: placeholderRowCount }, (_, rowIndex) => (
+                  <div className="p-3" key={`mobile-placeholder-${rowIndex}`}>
+                    <div className="animate-pulse rounded-lg border border-gray-200 bg-white p-3">
+                      <div className="h-4 w-2/5 rounded bg-gray-200" />
+                      <div className="mt-3 h-3 w-3/5 rounded bg-gray-100" />
+                      <div className="mt-4 h-7 w-1/3 rounded bg-gray-100" />
+                    </div>
+                  </div>
+                ))
+              : visibleRows.map((row, rowIndex) => (
+                  <div className="p-3" key={rowIndex}>
+                    {mobileCard(row)}
+                  </div>
+                ))}
+            {!isLoading && !visibleRows.length ? (
               <div className="px-4 py-8 text-center text-sm text-gray-500">{emptyMessage}</div>
             ) : null}
           </div>
@@ -253,16 +289,30 @@ export function DataTable<T>({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {visibleRows.map((row, rowIndex) => (
-                <tr className="transition-colors hover:bg-teal-50/40" key={rowIndex}>
-                  {columns.map((column) => (
-                    <td className={column.className ?? "px-4 py-3 text-gray-600"} key={column.id}>
-                      {column.cell(row)}
-                    </td>
+              {isLoading
+                ? Array.from({ length: placeholderRowCount }, (_, rowIndex) => (
+                    <tr className="animate-pulse" key={`placeholder-${rowIndex}`}>
+                      {columns.map((column, columnIndex) => (
+                        <td className="px-4 py-4" key={column.id}>
+                          <div
+                            className="h-4 rounded bg-gray-200"
+                            style={{ width: `${45 + ((rowIndex + columnIndex) % 4) * 12}%` }}
+                          />
+                          {columnIndex < 2 ? <div className="mt-2 h-3 w-2/5 rounded bg-gray-100" /> : null}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                : visibleRows.map((row, rowIndex) => (
+                    <tr className="transition-colors hover:bg-teal-50/40" key={rowIndex}>
+                      {columns.map((column) => (
+                        <td className={column.className ?? "px-4 py-3 text-gray-600"} key={column.id}>
+                          {column.cell(row)}
+                        </td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-              {!visibleRows.length ? (
+              {!isLoading && !visibleRows.length ? (
                 <tr>
                   <td className="px-4 py-8 text-center text-gray-500" colSpan={columns.length}>
                     {emptyMessage}
@@ -274,16 +324,44 @@ export function DataTable<T>({
         </div>
 
         <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            {rangeStart}-{rangeEnd} sur {sortedData.length}
-          </span>
+          <div className="flex items-center gap-3">
+            <span>
+              {rangeStart}-{rangeEnd} sur {totalRows}
+            </span>
+            {isLoading ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-700">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Chargement...
+              </span>
+            ) : null}
+            <label className="flex items-center gap-2 text-xs font-medium text-gray-500">
+              Afficher
+              <select
+                className="h-8 rounded-md border border-gray-200 bg-white px-2 text-sm text-gray-900 shadow-sm"
+                disabled={isLoading}
+                value={effectivePageSize}
+                onChange={(event) => updatePageSize(event.target.value)}
+              >
+                {pageSizeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              lignes
+            </label>
+          </div>
           <div className="flex items-center gap-2">
             <Button
-              disabled={safePage <= 1}
+              disabled={isLoading || safePage <= 1}
               size="sm"
               type="button"
               variant="outline"
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              onClick={() => {
+                const nextPage = Math.max(1, safePage - 1);
+                setPage(nextPage);
+                serverPagination?.onPageChange(nextPage);
+              }}
             >
               <ChevronLeft className="h-4 w-4" />
               Precedent
@@ -292,11 +370,15 @@ export function DataTable<T>({
               Page {safePage} / {totalPages}
             </span>
             <Button
-              disabled={safePage >= totalPages}
+              disabled={isLoading || safePage >= totalPages}
               size="sm"
               type="button"
               variant="outline"
-              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+              onClick={() => {
+                const nextPage = Math.min(totalPages, safePage + 1);
+                setPage(nextPage);
+                serverPagination?.onPageChange(nextPage);
+              }}
             >
               Suivant
               <ChevronRight className="h-4 w-4" />

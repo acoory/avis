@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, FileSpreadsheet, Gauge, Info, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
+import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, Gauge, Info, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { ReadylineBrand } from "@/components/branding/readyline-brand";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,6 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
     label: "Activite",
     items: [
       { label: "Controles", sublabel: "(Buy Back)", href: "/dashboard/vehicle-checks", icon: ClipboardList },
-      { label: "Salvage Evaluation", href: "/dashboard/salvage-evaluation", icon: FileSpreadsheet },
       { label: "Pièces & Main-d'œuvre", sublabel: "(Estimation)", href: "/dashboard/estimation", icon: Calculator, comingSoon: true },
     ],
   },

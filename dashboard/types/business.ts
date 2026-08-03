@@ -213,6 +213,26 @@ export type VehicleCheckSearchResult = Pick<
   vehicleModel?: Pick<VehicleModel, "id" | "name"> | null;
 };
 
+export type VehicleCheckListStats = {
+  completedCount: number;
+  draftCount: number;
+  recoveredCount: number;
+  takenInChargeCount: number;
+  toAnalyzeCount: number;
+  totalCount: number;
+  totalSavingAmount: number;
+  toOrderCount: number;
+};
+
+export type VehicleCheckListResponse = {
+  items: VehicleCheck[];
+  page: number;
+  pageSize: number;
+  stats: VehicleCheckListStats;
+  total: number;
+  totalPages: number;
+};
+
 export type RepairDecisionInputItem = {
   repairTypeId: string;
   vehiclePartId?: string;

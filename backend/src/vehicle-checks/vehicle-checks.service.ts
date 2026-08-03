@@ -182,7 +182,7 @@ export class VehicleChecksService {
     private readonly publicAccessCodeService: PublicAccessCodeService,
   ) {}
 
-  findAll(query: ListVehicleChecksQueryDto = {}, user: CurrentUserPayload) {
+  async findAll(query: ListVehicleChecksQueryDto, user: CurrentUserPayload) {
     const where: Prisma.VehicleCheckWhereInput = {
       ...this.scopeWhere(user),
     };
@@ -194,53 +194,109 @@ export class VehicleChecksService {
       };
     }
 
-    return this.prisma.vehicleCheck.findMany({
-      where,
-      include: vehicleCheckInclude,
-      orderBy: [{ checkDate: 'desc' }, { createdAt: 'desc' }],
-    });
+    const searchTerms = query.search?.trim().split(/\s+/).filter(Boolean) ?? [];
+    if (searchTerms.length) {
+      where.AND = this.vehicleSearchConditions(searchTerms);
+    }
+
+    const orderBy: Prisma.VehicleCheckOrderByWithRelationInput[] = [
+      {
+        [query.sortBy]: query.sortDirection,
+      } as Prisma.VehicleCheckOrderByWithRelationInput,
+      ...(query.sortBy === 'createdAt'
+        ? []
+        : [{ createdAt: 'desc' as const }]),
+    ];
+
+    const skip = (query.page - 1) * query.pageSize;
+    const [
+      items,
+      total,
+      saving,
+      draftCount,
+      toAnalyzeCount,
+      completedCount,
+      closedNoDamageCount,
+      takenInChargeCount,
+      recoveredCount,
+      toOrderCount,
+    ] = await this.prisma.$transaction([
+        this.prisma.vehicleCheck.findMany({
+          where,
+          include: vehicleCheckInclude,
+          orderBy,
+          skip,
+          take: query.pageSize,
+        }),
+        this.prisma.vehicleCheck.count({ where }),
+        this.prisma.vehicleCheck.aggregate({
+          where,
+          _sum: { totalInternalSavingAmount: true },
+        }),
+        this.prisma.vehicleCheck.count({
+          where: { ...where, status: VehicleCheckStatus.DRAFT },
+        }),
+        this.prisma.vehicleCheck.count({
+          where: { ...where, status: VehicleCheckStatus.TO_ANALYZE },
+        }),
+        this.prisma.vehicleCheck.count({
+          where: { ...where, status: VehicleCheckStatus.COMPLETED },
+        }),
+        this.prisma.vehicleCheck.count({
+          where: { ...where, status: VehicleCheckStatus.CLOSED_NO_DAMAGE },
+        }),
+        this.prisma.vehicleCheck.count({
+          where: {
+            ...where,
+            publicShare: {
+              is: {
+                takenInChargeAt: { not: null },
+                vehicleRecoveredAt: null,
+              },
+            },
+          },
+        }),
+        this.prisma.vehicleCheck.count({
+          where: {
+            ...where,
+            publicShare: { is: { vehicleRecoveredAt: { not: null } } },
+          },
+        }),
+        this.prisma.vehicleCheckItem.count({
+          where: {
+            operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+            partOrderStatus: PartOrderStatus.TO_ORDER,
+            vehicleCheck: where,
+          },
+        }),
+      ]);
+
+    return {
+      items,
+      page: query.page,
+      pageSize: query.pageSize,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / query.pageSize)),
+      stats: {
+        completedCount: completedCount + closedNoDamageCount,
+        draftCount,
+        recoveredCount,
+        takenInChargeCount,
+        toAnalyzeCount,
+        totalCount: total,
+        totalSavingAmount: Number(saving._sum.totalInternalSavingAmount ?? 0),
+        toOrderCount,
+      },
+    };
   }
 
   search(query: SearchVehicleChecksQueryDto, user: CurrentUserPayload) {
     const terms = query.q.trim().split(/\s+/).filter(Boolean);
-    const insensitive = 'insensitive' as const;
 
     return this.prisma.vehicleCheck.findMany({
       where: {
         ...this.scopeWhere(user),
-        AND: terms.map((term) => {
-          const normalizedTerm = normalizeLicensePlate(term);
-
-          return {
-            OR: [
-              ...(normalizedTerm
-                ? [
-                    {
-                      licensePlate: {
-                        contains: normalizedTerm,
-                        mode: insensitive,
-                      },
-                    },
-                  ]
-                : []),
-              {
-                licensePlateRaw: { contains: term, mode: insensitive },
-              },
-              { checkNumber: { contains: term, mode: insensitive } },
-              { city: { contains: term, mode: insensitive } },
-              {
-                manufacturer: {
-                  name: { contains: term, mode: insensitive },
-                },
-              },
-              {
-                vehicleModel: {
-                  name: { contains: term, mode: insensitive },
-                },
-              },
-            ],
-          };
-        }),
+        AND: this.vehicleSearchConditions(terms),
       },
       orderBy: [{ checkDate: 'desc' }, { createdAt: 'desc' }],
       take: query.limit,
@@ -1330,6 +1386,44 @@ export class VehicleChecksService {
     return {
       collaboratorId: user.sub,
     };
+  }
+
+  private vehicleSearchConditions(
+    terms: string[],
+  ): Prisma.VehicleCheckWhereInput[] {
+    const insensitive = 'insensitive' as const;
+
+    return terms.map((term) => {
+      const normalizedTerm = normalizeLicensePlate(term);
+
+      return {
+        OR: [
+          ...(normalizedTerm
+            ? [
+                {
+                  licensePlate: {
+                    contains: normalizedTerm,
+                    mode: insensitive,
+                  },
+                },
+              ]
+            : []),
+          { licensePlateRaw: { contains: term, mode: insensitive } },
+          { checkNumber: { contains: term, mode: insensitive } },
+          { city: { contains: term, mode: insensitive } },
+          {
+            manufacturer: {
+              name: { contains: term, mode: insensitive },
+            },
+          },
+          {
+            vehicleModel: {
+              name: { contains: term, mode: insensitive },
+            },
+          },
+        ],
+      };
+    });
   }
 
   private async ensureReferences(
