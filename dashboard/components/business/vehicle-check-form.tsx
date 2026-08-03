@@ -782,7 +782,21 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
   return (
     <form className="scroll-mt-16 space-y-4 pb-24 md:space-y-6 md:pb-0" ref={formRef} onSubmit={handleSubmit}>
-      <StepHeader activeStep={activeStep} onStepClick={goToStep} />
+      <StepHeader
+        activeStep={activeStep}
+        manufacturerName={selectedManufacturer?.name}
+        vehiclePlate={
+          licensePlate
+            ? formatLicensePlate(
+                normalizeLicensePlate(licensePlate),
+                licensePlateCountry,
+                licensePlate,
+              )
+            : ""
+        }
+        onEditVehicle={() => goToStep(0)}
+        onStepClick={goToStep}
+      />
 
       {activeStep === 0 ? (
         <Card className="relative z-0">
@@ -1322,24 +1336,73 @@ export function VehicleCheckForm({ initialVehicleCheck }: VehicleCheckFormProps)
 
 function StepHeader({
   activeStep,
+  manufacturerName,
+  vehiclePlate,
+  onEditVehicle,
   onStepClick,
 }: {
   activeStep: number;
+  manufacturerName?: string;
+  vehiclePlate: string;
+  onEditVehicle: () => void;
   onStepClick: (step: number) => void;
 }) {
+  const showsVehicleContext = activeStep > 0 && Boolean(vehiclePlate);
+
   return (
-    <Card className="sticky top-16 z-20 -mx-4 -mt-4 mb-2 rounded-none border-x-0 bg-white shadow-sm md:static md:mx-0 md:mt-0 md:mb-0 md:rounded-lg md:border-x">
-      <CardContent className="space-y-2 p-3 md:space-y-4 md:p-5">
-        <div>
-          <p className="text-xs font-medium uppercase text-gray-500">
-            Etape {activeStep + 1} sur {formSteps.length}
-          </p>
-          <h2 className="mt-0.5 text-base font-semibold text-gray-950 md:mt-1 md:text-lg">
-            {formSteps[activeStep].title}
-          </h2>
-          <p className="mt-1 hidden text-sm text-gray-500 md:block">{formSteps[activeStep].description}</p>
+    <Card className="sticky top-14 z-20 -mx-4 -mt-4 mb-2 rounded-none border-x-0 bg-white shadow-sm md:static md:mx-0 md:mt-0 md:mb-0 md:rounded-lg md:border-x">
+      <CardContent className="space-y-1.5 p-2.5 md:space-y-4 md:p-5">
+        <div className="flex flex-col gap-1.5 md:flex-row md:items-center md:justify-between md:gap-4">
+          <div className="min-w-0">
+            <div className="flex items-baseline gap-2 md:hidden">
+              <p className="shrink-0 text-[10px] font-semibold uppercase text-gray-500">
+                {activeStep + 1}/{formSteps.length}
+              </p>
+              <h2 className="truncate text-sm font-semibold text-gray-950">
+                {formSteps[activeStep].title}
+              </h2>
+            </div>
+            <div className="hidden md:block">
+              <p className="text-xs font-medium uppercase text-gray-500">
+                Etape {activeStep + 1} sur {formSteps.length}
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-gray-950">
+                {formSteps[activeStep].title}
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">{formSteps[activeStep].description}</p>
+            </div>
+          </div>
+
+          {showsVehicleContext ? (
+            <div className="flex min-w-0 items-center gap-2 rounded-md border border-teal-200 bg-teal-50 px-2.5 py-1.5 md:min-w-72 md:gap-3 md:px-3 md:py-2">
+              <div className="min-w-0 flex-1">
+                <p className="hidden text-[9px] font-semibold uppercase tracking-wide text-teal-700 md:block">
+                  Véhicule en cours
+                </p>
+                <div className="flex min-w-0 items-baseline gap-2">
+                  <p className="shrink-0 text-[13px] font-semibold text-gray-950 md:text-sm">
+                    {vehiclePlate}
+                  </p>
+                  {manufacturerName ? (
+                    <p className="truncate text-[10px] text-gray-500 md:text-[11px]">
+                      {manufacturerName}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              <button
+                className="inline-flex h-7 shrink-0 items-center gap-1 rounded-md px-2 text-[11px] font-semibold text-teal-800 hover:bg-white/70"
+                title="Modifier le véhicule"
+                type="button"
+                onClick={onEditVehicle}
+              >
+                <Pencil className="h-3 w-3" />
+                <span className="hidden sm:inline">Modifier</span>
+              </button>
+            </div>
+          ) : null}
         </div>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1.5 md:gap-2">
           {formSteps.map((step, index) => {
             const isActive = index === activeStep;
             const isDone = index < activeStep;
@@ -1353,13 +1416,13 @@ function StepHeader({
               >
                 <span
                   className={[
-                    "mb-1 block h-1 rounded-full md:mb-2 md:h-1.5",
+                    "mb-0.5 block h-1 rounded-full md:mb-2 md:h-1.5",
                     isActive || isDone ? "bg-teal-700" : "bg-gray-200",
                   ].join(" ")}
                 />
                 <span
                   className={[
-                    "block truncate text-xs font-medium",
+                    "block truncate text-[10px] font-medium md:text-xs",
                     isActive ? "text-teal-800" : "text-gray-500",
                   ].join(" ")}
                 >
