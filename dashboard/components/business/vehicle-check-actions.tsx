@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   Download,
   MessageSquareText,
+  MoreHorizontal,
   Pencil,
   Trash2,
 } from "lucide-react";
@@ -14,16 +15,25 @@ import { toast } from "sonner";
 import { ManagerDecisionRequestDialog } from "@/components/business/manager-decision-request-dialog";
 import { VehicleCheckDeleteDialog } from "@/components/business/vehicle-check-delete-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
 import { VehicleCheck } from "@/types/business";
 
 type VehicleCheckActionsProps = {
+  compact?: boolean;
   vehicleCheck: VehicleCheck;
   onUpdated: (vehicleCheck: VehicleCheck) => void;
 };
 
 export function VehicleCheckActions({
+  compact = false,
   vehicleCheck,
   onUpdated,
 }: VehicleCheckActionsProps) {
@@ -83,46 +93,135 @@ export function VehicleCheckActions({
 
   return (
     <>
-      <div className="flex flex-col gap-2 sm:items-end">
-        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:max-w-xl sm:flex-wrap sm:justify-end">
+      <div className={compact ? "flex shrink-0" : "flex flex-col gap-2 sm:items-end"}>
+        {compact ? (
+          <div className="sm:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  aria-label="Actions du contrôle"
+                  className="h-9 w-9 p-0"
+                  size="icon"
+                  title="Actions"
+                  type="button"
+                  variant="outline"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {canDownloadSummary ? (
+                  <DropdownMenuItem
+                    disabled={isDownloading}
+                    onSelect={() => void handleDownload()}
+                  >
+                    <Download className="h-4 w-4" />
+                    {isDownloading ? "Génération du PDF..." : "Télécharger le PDF"}
+                  </DropdownMenuItem>
+                ) : null}
+                {latestDecisionShare ? (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/public/decision/${latestDecisionShare.token}`}>
+                      <MessageSquareText className="h-4 w-4" />
+                      Consulter l&apos;avis
+                    </Link>
+                  </DropdownMenuItem>
+                ) : canRequestDecision ? (
+                  <DropdownMenuItem onSelect={() => setDecisionDialogOpen(true)}>
+                    <MessageSquareText className="h-4 w-4" />
+                    Avis manager
+                  </DropdownMenuItem>
+                ) : null}
+                {canComplete ? (
+                  <DropdownMenuItem
+                    disabled={isCompleting}
+                    onSelect={() => void handleComplete()}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    {isCompleting ? "Finalisation..." : "Terminer le contrôle"}
+                  </DropdownMenuItem>
+                ) : null}
+                {canEdit || canDelete ? <DropdownMenuSeparator /> : null}
+                {canEdit ? (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/dashboard/vehicle-checks/${vehicleCheck.id}/edit`}>
+                      <Pencil className="h-4 w-4" />
+                      Modifier
+                    </Link>
+                  </DropdownMenuItem>
+                ) : null}
+                {canDelete ? (
+                  <DropdownMenuItem
+                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                    onSelect={() => setDeleteDialogOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Supprimer
+                  </DropdownMenuItem>
+                ) : null}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : null}
+        <div
+          className={
+            compact
+              ? "hidden items-center justify-end gap-1 sm:flex"
+              : "grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:max-w-xl sm:flex-wrap sm:justify-end"
+          }
+        >
           {canDownloadSummary ? (
             <Button
-              className="w-full sm:w-auto"
+              aria-label="Télécharger le PDF"
+              className={compact ? "h-9 w-9 p-0" : "w-full sm:w-auto"}
               disabled={isDownloading}
               size="sm"
+              title={compact ? "Télécharger le PDF" : undefined}
               variant="outline"
               onClick={handleDownload}
             >
               <Download className="h-4 w-4" />
-              {isDownloading ? "Generation..." : "PDF"}
+              {compact ? (
+                <span className="sr-only">{isDownloading ? "Génération..." : "PDF"}</span>
+              ) : isDownloading ? (
+                "Generation..."
+              ) : (
+                "PDF"
+              )}
             </Button>
           ) : null}
           {latestDecisionShare ? (
               <Button
                 asChild
-                className="w-full sm:w-auto"
+                className={compact ? "h-9 w-9 p-0" : "w-full sm:w-auto"}
                 size="sm"
                 variant="outline"
               >
-                <Link href={`/public/decision/${latestDecisionShare.token}`}>
+                <Link
+                  aria-label="Consulter l'avis"
+                  href={`/public/decision/${latestDecisionShare.token}`}
+                  title={compact ? "Consulter l'avis" : undefined}
+                >
                   <MessageSquareText className="h-4 w-4" />
-                  Consulter l&apos;avis
+                  {compact ? <span className="sr-only">Consulter l&apos;avis</span> : "Consulter l'avis"}
                 </Link>
               </Button>
           ) : canRequestDecision ? (
               <Button
-                className="w-full sm:w-auto"
+                aria-label="Demander un avis manager"
+                className={compact ? "h-9 w-9 p-0" : "w-full sm:w-auto"}
                 size="sm"
+                title={compact ? "Avis manager" : undefined}
                 type="button"
                 variant="outline"
                 onClick={() => setDecisionDialogOpen(true)}
               >
                 <MessageSquareText className="h-4 w-4" />
-                Avis manager
+                {compact ? <span className="sr-only">Avis manager</span> : "Avis manager"}
               </Button>
           ) : null}
           {canEdit || canDelete ? (
-            <div className="col-span-2 flex items-center justify-end gap-1 sm:col-auto">
+            <div className={compact ? "flex items-center gap-1" : "col-span-2 flex items-center justify-end gap-1 sm:col-auto"}>
               {canEdit ? (
                 <Button asChild className="h-8 w-8" size="icon" variant="ghost">
                   <Link
@@ -151,13 +250,21 @@ export function VehicleCheckActions({
           ) : null}
           {canComplete ? (
             <Button
-              className="w-full sm:w-auto"
+              aria-label="Terminer le contrôle"
+              className={compact ? "h-9 w-9 p-0" : "w-full sm:w-auto"}
               disabled={isCompleting}
               size="sm"
+              title={compact ? "Terminer le contrôle" : undefined}
               onClick={handleComplete}
             >
               <CheckCircle2 className="h-4 w-4" />
-              {isCompleting ? "Finalisation..." : "Terminer le controle"}
+              {compact ? (
+                <span className="sr-only">Terminer le contrôle</span>
+              ) : isCompleting ? (
+                "Finalisation..."
+              ) : (
+                "Terminer le controle"
+              )}
             </Button>
           ) : null}
         </div>

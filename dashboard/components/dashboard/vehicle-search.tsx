@@ -1,14 +1,15 @@
 "use client";
 
-import { CarFront, ChevronRight, Loader2, Search, X } from "lucide-react";
+import { Camera, CarFront, ChevronRight, Loader2, Search, X } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { LicensePlateScanner } from "@/components/business/license-plate-scanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate, formatLicensePlate } from "@/lib/format";
 import { businessService } from "@/services/business.service";
-import { VehicleCheck } from "@/types/business";
+import { VehicleCheckSearchResult } from "@/types/business";
 
 type ViewportMetrics = {
   dialogMaxHeight: number;
@@ -18,60 +19,31 @@ type ViewportMetrics = {
 
 export function VehicleSearch() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-  const [vehicleChecks, setVehicleChecks] = useState<VehicleCheck[]>([]);
+  const [results, setResults] = useState<VehicleCheckSearchResult[]>([]);
   const [query, setQuery] = useState("");
   const [hasError, setHasError] = useState(false);
   const [viewportMetrics, setViewportMetrics] =
     useState<ViewportMetrics | null>(null);
-
-  const results = useMemo(() => {
-    const normalizedQuery = normalizeSearchText(query);
-    if (normalizedQuery.length < 2) return [];
-
-    return vehicleChecks
-      .filter((vehicleCheck) =>
-        normalizeSearchText(
-          [
-            vehicleCheck.licensePlate,
-            vehicleCheck.licensePlateRaw,
-            vehicleCheck.checkNumber,
-            vehicleCheck.manufacturer?.name,
-            vehicleCheck.vehicleModel?.name,
-            vehicleCheck.city,
-          ]
-            .filter(Boolean)
-            .join(" "),
-        ).includes(normalizedQuery),
-      )
-      .sort(
-        (first, second) =>
-          new Date(second.checkDate).getTime() - new Date(first.checkDate).getTime(),
-      )
-      .slice(0, 8);
-  }, [query, vehicleChecks]);
+  const canSearch = normalizeSearchText(query).length >= 2;
 
   const closeSearch = useCallback(() => {
     setIsOpen(false);
+    setIsScannerOpen(false);
     setQuery("");
+    setResults([]);
+    setIsLoading(false);
+    setHasError(false);
   }, []);
 
-  const loadVehicles = useCallback(async () => {
-    if (hasLoaded || isLoading) return;
-
-    setIsLoading(true);
+  function updateQuery(value: string) {
+    const isSearchable = normalizeSearchText(value).length >= 2;
+    setQuery(value);
+    setResults([]);
+    setIsLoading(isSearchable);
     setHasError(false);
-    try {
-      const data = await businessService.vehicleChecks();
-      setVehicleChecks(data);
-      setHasLoaded(true);
-    } catch {
-      setHasError(true);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [hasLoaded, isLoading]);
+  }
 
   const updateViewportMetrics = useCallback(() => {
     const visualViewport = window.visualViewport;
@@ -88,8 +60,35 @@ export function VehicleSearch() {
   const openSearch = useCallback(() => {
     updateViewportMetrics();
     setIsOpen(true);
-    void loadVehicles();
-  }, [loadVehicles, updateViewportMetrics]);
+  }, [updateViewportMetrics]);
+
+  useEffect(() => {
+    if (!isOpen || !canSearch) return;
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      setIsLoading(true);
+      void businessService
+        .searchVehicleChecks(query.trim(), 8, controller.signal)
+        .then((data) => {
+          if (!controller.signal.aborted) setResults(data);
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) {
+            setResults([]);
+            setHasError(true);
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setIsLoading(false);
+        });
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [canSearch, isOpen, query]);
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
@@ -110,7 +109,7 @@ export function VehicleSearch() {
     document.body.style.overflow = "hidden";
 
     function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") closeSearch();
+      if (event.key === "Escape" && !isScannerOpen) closeSearch();
     }
 
     window.addEventListener("keydown", handleEscape);
@@ -118,7 +117,7 @@ export function VehicleSearch() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [closeSearch, isOpen]);
+  }, [closeSearch, isOpen, isScannerOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -181,21 +180,34 @@ export function VehicleSearch() {
                 }}
               >
                 <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
-                  <Search className="h-5 w-5 shrink-0 text-teal-700" />
+                  {isLoading ? (
+                    <Loader2 className="h-5 w-5 shrink-0 animate-spin text-teal-700" />
+                  ) : (
+                    <Search className="h-5 w-5 shrink-0 text-teal-700" />
+                  )}
                   <Input
                     autoFocus
                     aria-label="Immatriculation, numéro de contrôle, marque ou modèle"
                     className="h-11 border-0 bg-transparent px-0 text-base shadow-none outline-none focus:border-0 focus:ring-0"
                     placeholder="Immatriculation, numéro de contrôle, marque ou modèle…"
                     value={query}
-                    onChange={(event) => setQuery(event.target.value)}
+                    onChange={(event) => updateQuery(event.target.value)}
                   />
+                  <button
+                    aria-label="Scanner une plaque"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:bg-teal-50 hover:text-teal-700"
+                    title="Scanner une plaque"
+                    type="button"
+                    onClick={() => setIsScannerOpen(true)}
+                  >
+                    <Camera className="h-4 w-4" />
+                  </button>
                   {query ? (
                     <button
                       aria-label="Effacer la recherche"
                       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                       type="button"
-                      onClick={() => setQuery("")}
+                      onClick={() => updateQuery("")}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -211,14 +223,14 @@ export function VehicleSearch() {
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2">
-                  {isLoading ? (
+                  {isLoading && !results.length ? (
                     <SearchMessage icon={Loader2} iconClassName="animate-spin" message="Chargement des véhicules…" />
                   ) : hasError ? (
                     <SearchMessage
                       icon={Search}
-                      message="Impossible de charger les véhicules. Fermez puis réessayez."
+                      message="Impossible d’effectuer la recherche. Réessayez dans un instant."
                     />
-                  ) : query.trim().length < 2 ? (
+                  ) : !canSearch ? (
                     <SearchMessage
                       icon={Search}
                       message="Saisissez au moins deux caractères pour lancer la recherche."
@@ -276,6 +288,19 @@ export function VehicleSearch() {
                   <span>Échap pour fermer</span>
                 </div>
               </div>
+              {isScannerOpen ? (
+                <LicensePlateScanner
+                  country="FR"
+                  overlayClassName="z-[110]"
+                  onClose={() => setIsScannerOpen(false)}
+                  onConfirm={(result) => {
+                    updateQuery(
+                      formatLicensePlate(result.value, result.country, result.value),
+                    );
+                    setIsScannerOpen(false);
+                  }}
+                />
+              ) : null}
             </div>,
             document.body,
           )

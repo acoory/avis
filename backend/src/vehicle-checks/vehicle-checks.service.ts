@@ -37,6 +37,7 @@ import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
+import { SearchVehicleChecksQueryDto } from './dto/search-vehicle-checks-query.dto';
 import { SendDecisionRequestEmailDto } from './dto/send-decision-request-email.dto';
 import { SendRepairRequestEmailDto } from './dto/send-repair-request-email.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
@@ -197,6 +198,63 @@ export class VehicleChecksService {
       where,
       include: vehicleCheckInclude,
       orderBy: [{ checkDate: 'desc' }, { createdAt: 'desc' }],
+    });
+  }
+
+  search(query: SearchVehicleChecksQueryDto, user: CurrentUserPayload) {
+    const terms = query.q.trim().split(/\s+/).filter(Boolean);
+    const insensitive = 'insensitive' as const;
+
+    return this.prisma.vehicleCheck.findMany({
+      where: {
+        ...this.scopeWhere(user),
+        AND: terms.map((term) => {
+          const normalizedTerm = normalizeLicensePlate(term);
+
+          return {
+            OR: [
+              ...(normalizedTerm
+                ? [
+                    {
+                      licensePlate: {
+                        contains: normalizedTerm,
+                        mode: insensitive,
+                      },
+                    },
+                  ]
+                : []),
+              {
+                licensePlateRaw: { contains: term, mode: insensitive },
+              },
+              { checkNumber: { contains: term, mode: insensitive } },
+              { city: { contains: term, mode: insensitive } },
+              {
+                manufacturer: {
+                  name: { contains: term, mode: insensitive },
+                },
+              },
+              {
+                vehicleModel: {
+                  name: { contains: term, mode: insensitive },
+                },
+              },
+            ],
+          };
+        }),
+      },
+      orderBy: [{ checkDate: 'desc' }, { createdAt: 'desc' }],
+      take: query.limit,
+      select: {
+        id: true,
+        licensePlate: true,
+        licensePlateRaw: true,
+        licensePlateCountry: true,
+        checkNumber: true,
+        checkDate: true,
+        city: true,
+        manufacturer: { select: { id: true, name: true } },
+        vehicleModel: { select: { id: true, name: true } },
+      },
     });
   }
 

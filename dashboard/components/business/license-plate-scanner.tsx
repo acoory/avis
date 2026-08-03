@@ -27,6 +27,7 @@ type ScanResult = {
 
 type LicensePlateScannerProps = {
   country: string;
+  overlayClassName?: string;
   onClose: () => void;
   onConfirm: (result: ScanResult) => void;
 };
@@ -36,7 +37,12 @@ type CameraErrorReason = "INSECURE_CONTEXT" | "PERMISSION_DENIED" | "NOT_FOUND" 
 
 const automaticScanDelay = 900;
 
-export function LicensePlateScanner({ country, onClose, onConfirm }: LicensePlateScannerProps) {
+export function LicensePlateScanner({
+  country,
+  overlayClassName = "z-[70]",
+  onClose,
+  onConfirm,
+}: LicensePlateScannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -257,7 +263,9 @@ export function LicensePlateScanner({ country, onClose, onConfirm }: LicensePlat
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end bg-black/70 md:items-center md:justify-center">
+    <div
+      className={`fixed inset-0 flex items-end bg-black/70 md:items-center md:justify-center ${overlayClassName}`}
+    >
       <div className="max-h-[100dvh] w-full overflow-y-auto rounded-t-lg bg-white shadow-xl md:max-h-[92dvh] md:max-w-lg md:rounded-lg">
         <div className="sticky top-0 z-10 flex items-start justify-between border-b border-gray-200 bg-white p-4">
           <div>
@@ -340,7 +348,7 @@ export function LicensePlateScanner({ country, onClose, onConfirm }: LicensePlat
                 <span>Confiance : {result.confidence}%</span>
               </div>
               <p className="mt-3 text-sm text-gray-600">
-                Verifie les caracteres avant d'utiliser cette plaque.
+                Verifie les caracteres avant d&apos;utiliser cette plaque.
               </p>
             </div>
           ) : null}

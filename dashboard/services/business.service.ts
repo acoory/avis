@@ -22,6 +22,7 @@ import {
   RepairDecisionInputItem,
   RepairDecisionPreview,
   VehicleCheck,
+  VehicleCheckSearchResult,
   VehicleCheckDecisionShare,
   VehicleCheckItem,
   VehicleCheckItemOperationalStatus,
@@ -402,6 +403,17 @@ export const businessService = {
     const { data } = await api.get<VehicleCheck[]>("/vehicle-checks", {
       params,
     });
+    return data;
+  },
+
+  async searchVehicleChecks(query: string, limit = 8, signal?: AbortSignal) {
+    const { data } = await api.get<VehicleCheckSearchResult[]>(
+      "/vehicle-checks/search",
+      {
+        params: { q: query, limit },
+        signal,
+      },
+    );
     return data;
   },
 

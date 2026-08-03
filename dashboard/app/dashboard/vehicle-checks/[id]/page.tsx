@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, CalendarDays, Car, CarFront, CheckCircle2, CheckSquare2, ChevronDown, ChevronLeft, ChevronRight, MapPin, Minus, Package, UserRound, Wrench } from "lucide-react";
+import { CarFront, CheckCircle2, CheckSquare2, ChevronDown, ChevronLeft, ChevronRight, Info, Minus, Package, Wrench } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { VehicleCheckActions } from "@/components/business/vehicle-check-actions";
 import { VehicleRecoveredDialog } from "@/components/business/vehicle-recovered-dialog";
-import { VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { RepairItemsTable } from "@/components/business/vehicle-check-table";
 import {
   VehicleCheckSummarySelection,
@@ -67,10 +66,7 @@ export default function VehicleCheckDetailsPage() {
   }
 
   const formattedLicensePlate = formatLicensePlate(vehicleCheck.licensePlate, vehicleCheck.licensePlateCountry, vehicleCheck.licensePlateRaw);
-  const collaboratorName = vehicleCheck.collaborator ? `${vehicleCheck.collaborator.firstName} ${vehicleCheck.collaborator.lastName}` : "-";
-  const agencyName = formatAgencyName(vehicleCheck.agency?.name);
   const repairCount = vehicleCheck.items?.length ?? 0;
-  const selectedRepairCount = (vehicleCheck.items ?? []).filter((item) => item.selectedForSummary).length;
   const externalRepairCount = (vehicleCheck.items ?? []).filter(
     (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE" && item.executionMode === "EXTERNAL_PROVIDER",
   ).length;
@@ -99,7 +95,6 @@ export default function VehicleCheckDetailsPage() {
     pendingOnSiteRepairCount > 0 ||
     hasPendingProviderDeposit ||
     hasPendingVehicleRecovery;
-  const hasDetailsComment = Boolean(vehicleCheck.notes?.trim());
   const hasSummaryToPrepare = vehicleCheck.status === "TO_ANALYZE" && !vehicleCheck.summaryFinalizedAt;
   const hasPendingActions =
     hasSummaryToPrepare ||
@@ -119,42 +114,13 @@ export default function VehicleCheckDetailsPage() {
 
   return (
     <>
-      <div className="mb-4 flex items-center justify-between">
-        <Button asChild size="sm" variant="outline">
-          <Link href="/dashboard/vehicle-checks">
-            <ChevronLeft className="h-4 w-4" />
-            Retour aux controles
-          </Link>
-        </Button>
-      </div>
+      <VehicleStickyHeader
+        formattedLicensePlate={formattedLicensePlate}
+        vehicleCheck={vehicleCheck}
+        onUpdated={setVehicleCheck}
+      />
 
-      <section className="rounded-lg border border-gray-200 bg-white">
-        <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-sm font-medium text-gray-500">{vehicleCheck.checkNumber}</p>
-              <VehicleCheckStatusBadge
-                items={vehicleCheck.items}
-                publicShare={vehicleCheck.publicShare}
-                status={vehicleCheck.status}
-                workflowStage
-              />
-            </div>
-            <div className="mt-3 flex flex-col gap-1">
-              <h1 className="text-3xl font-semibold tracking-normal text-gray-950">{formattedLicensePlate}</h1>
-              <p className="text-base text-gray-600">
-                {vehicleCheck.manufacturer?.name ?? "Constructeur non precise"}
-                {vehicleCheck.vehicleModel?.name ? ` · ${vehicleCheck.vehicleModel.name}` : ""}
-              </p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <QuickInfo label="Date" value={formatDate(vehicleCheck.checkDate)} />
-              <QuickInfo label="Agence" value={agencyName} />
-            </div>
-          </div>
-          <VehicleCheckActions vehicleCheck={vehicleCheck} onUpdated={setVehicleCheck} />
-        </div>
-
+      <section className="relative isolate z-0 rounded-lg border border-gray-200 bg-white">
         <VehicleProgressStepper vehicleCheck={vehicleCheck} />
         <VehicleCheckTimingSummary vehicleCheck={vehicleCheck} />
 
@@ -206,34 +172,6 @@ export default function VehicleCheckDetailsPage() {
           </div>
         ) : null}
 
-        <details className="group border-t border-gray-200">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-500">
-            <span>Informations du dossier</span>
-            <span className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 shadow-sm transition group-hover:border-gray-400 group-hover:text-gray-950">
-              <span className="group-open:hidden">Afficher</span>
-              <span className="hidden group-open:inline">Masquer</span>
-              <ChevronDown className="h-4 w-4 transition-transform duration-200 group-open:rotate-180" />
-            </span>
-          </summary>
-          <div className="grid border-t border-gray-200 sm:grid-cols-2 lg:grid-cols-4">
-            <DetailItem icon={CalendarDays} label="Date du controle" value={formatDate(vehicleCheck.checkDate)} />
-            <DetailItem icon={Building2} label="Agence" value={agencyName} />
-            <DetailItem icon={MapPin} label="Ville" value={vehicleCheck.city || "-"} />
-            <DetailItem icon={UserRound} label="Controle par" value={collaboratorName} />
-          </div>
-
-          <div className="grid border-t border-gray-200 sm:grid-cols-3">
-            <Metric className="text-teal-700" label="Economie reference" value={formatMoney(vehicleCheck.totalInternalSavingAmount)} />
-            <Metric label="Franchise constructeur" value={formatMoney(vehicleCheck.constructorAllowanceAmount)} />
-            <Metric label="Reparations retenues" value={`${selectedRepairCount}/${repairCount}`} />
-          </div>
-
-          {hasDetailsComment ? (
-            <div className="space-y-4 border-t border-gray-200 px-5 py-4">
-              {vehicleCheck.notes?.trim() ? <CommentBlock label="Commentaire du controle" value={vehicleCheck.notes} /> : null}
-            </div>
-          ) : null}
-        </details>
       </section>
 
       {displaysSummary ? <VehicleCheckSummarySelection key={vehicleCheck.id} vehicleCheck={vehicleCheck} onUpdated={setVehicleCheck} /> : null}
@@ -265,6 +203,252 @@ export default function VehicleCheckDetailsPage() {
         onRecovered={setVehicleCheck}
       />
     </>
+  );
+}
+
+function VehicleStickyHeader({
+  formattedLicensePlate,
+  vehicleCheck,
+  onUpdated,
+}: {
+  formattedLicensePlate: string;
+  vehicleCheck: VehicleCheck;
+  onUpdated: (vehicleCheck: VehicleCheck) => void;
+}) {
+  const [isInformationOpen, setIsInformationOpen] = useState(false);
+
+  return (
+    <div className="sticky top-14 z-20 -mx-4 -mt-4 mb-4 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur md:top-16 md:-mx-6 md:-mt-6">
+      <div className="flex h-16 min-w-0 items-center gap-2 px-4 md:gap-3 md:px-6">
+        <Button
+          asChild
+          className="h-9 w-9 shrink-0"
+          size="icon"
+          variant="outline"
+        >
+          <Link
+            aria-label="Retour aux contrôles"
+            href="/dashboard/vehicle-checks"
+            title="Retour aux contrôles"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-2">
+            <p className="truncate text-base font-semibold text-gray-950">
+              {formattedLicensePlate}
+            </p>
+            <span className="hidden shrink-0 text-xs font-medium text-gray-400 lg:inline">
+              {vehicleCheck.checkNumber}
+            </span>
+          </div>
+          <p className="truncate text-[10px] leading-3 text-gray-500 sm:text-xs sm:leading-4">
+            {vehicleCheck.manufacturer?.name ?? "Constructeur non précisé"}
+            {vehicleCheck.vehicleModel?.name ? (
+              <span className="hidden sm:inline">
+                {` · ${vehicleCheck.vehicleModel.name}`}
+              </span>
+            ) : null}
+          </p>
+        </div>
+
+        <div className="hidden shrink-0 md:block">
+          <VehicleStickyProgress vehicleCheck={vehicleCheck} />
+        </div>
+
+        <VehicleCheckActions
+          compact
+          vehicleCheck={vehicleCheck}
+          onUpdated={onUpdated}
+        />
+
+        <Button
+          aria-controls="vehicle-sticky-information"
+          aria-expanded={isInformationOpen}
+          aria-label="Informations du dossier"
+          className="h-9 shrink-0 gap-1 px-2"
+          size="sm"
+          title="Informations du dossier"
+          type="button"
+          variant="outline"
+          onClick={() => setIsInformationOpen((isOpen) => !isOpen)}
+        >
+          <Info className="h-4 w-4" />
+          <span className="hidden text-xs font-semibold lg:inline">Informations</span>
+          <ChevronDown
+            className={`hidden h-3.5 w-3.5 transition-transform lg:block ${isInformationOpen ? "rotate-180" : ""}`}
+          />
+        </Button>
+      </div>
+
+      {isInformationOpen ? (
+        <VehicleInformationPanel vehicleCheck={vehicleCheck} />
+      ) : null}
+    </div>
+  );
+}
+
+type StickyProgressState = "completed" | "current" | "pending";
+
+function VehicleStickyProgress({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
+  const selectedItems = (vehicleCheck.items ?? []).filter(
+    (item) => item.selectedForSummary && item.operationalStatus === "ACTIVE",
+  );
+  const onSiteItems = selectedItems.filter(
+    (item) => item.executionMode === "ON_SITE",
+  );
+  const externalItems = selectedItems.filter(
+    (item) => item.executionMode === "EXTERNAL_PROVIDER",
+  );
+  const onSiteCompletedCount = onSiteItems.filter((item) =>
+    Boolean(item.executionCompletedAt),
+  ).length;
+  const steps: Array<{ label: string; state: StickyProgressState }> = [];
+
+  if (onSiteItems.length) {
+    const isCompleted = onSiteCompletedCount === onSiteItems.length;
+    steps.push({
+      label: isCompleted
+        ? "Sur place terminée"
+        : `Sur place ${onSiteCompletedCount}/${onSiteItems.length}`,
+      state: isCompleted ? "completed" : "current",
+    });
+  }
+
+  if (externalItems.length) {
+    const isRecovered = Boolean(vehicleCheck.publicShare?.vehicleRecoveredAt);
+    const isWithProvider = Boolean(vehicleCheck.publicShare?.takenInChargeAt);
+    steps.push({
+      label: isRecovered
+        ? "Véhicule récupéré"
+        : isWithProvider
+          ? "Chez prestataire"
+          : "Dépôt à confirmer",
+      state: isRecovered
+        ? "completed"
+        : isWithProvider
+          ? "current"
+          : "pending",
+    });
+  }
+
+  if (!steps.length) {
+    const fallback = {
+      CANCELLED: { label: "Annulé", state: "pending" as const },
+      CLOSED_NO_DAMAGE: { label: "Terminé", state: "completed" as const },
+      COMPLETED: { label: "Terminé", state: "completed" as const },
+      DRAFT: { label: "Contrôle en cours", state: "current" as const },
+      SUMMARY_READY: { label: "Synthèse prête", state: "completed" as const },
+      TO_ANALYZE: { label: "À analyser", state: "current" as const },
+    }[vehicleCheck.status];
+    steps.push(fallback);
+  }
+
+  return (
+    <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-1">
+      {steps.map((step, index) => (
+        <div className="flex items-center" key={`${step.label}-${index}`}>
+          {index ? <span className="mx-1 h-px w-3 bg-gray-300" /> : null}
+          <span
+            className={[
+              "inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-md px-2 text-xs font-semibold",
+              step.state === "completed"
+                ? "bg-emerald-100 text-emerald-800"
+                : step.state === "current"
+                  ? "bg-teal-700 text-white"
+                  : "bg-amber-100 text-amber-800",
+            ].join(" ")}
+          >
+            {step.state === "completed" ? (
+              <CheckCircle2 className="h-3.5 w-3.5" />
+            ) : (
+              <span
+                className={`h-2 w-2 rounded-full ${step.state === "current" ? "bg-white" : "bg-amber-500"}`}
+              />
+            )}
+            {step.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function VehicleInformationPanel({ vehicleCheck }: { vehicleCheck: VehicleCheck }) {
+  const collaboratorName = vehicleCheck.collaborator
+    ? `${vehicleCheck.collaborator.firstName} ${vehicleCheck.collaborator.lastName}`
+    : "-";
+  const agencyName = formatAgencyName(vehicleCheck.agency?.name);
+  const repairCount = vehicleCheck.items?.length ?? 0;
+  const selectedRepairCount = (vehicleCheck.items ?? []).filter(
+    (item) => item.selectedForSummary,
+  ).length;
+
+  return (
+    <div
+      className="max-h-[calc(100dvh-7.5rem)] overflow-y-auto border-t border-gray-200 bg-gray-50 px-4 py-3 md:px-6"
+      id="vehicle-sticky-information"
+    >
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+        <CompactInformation label="Date" value={formatDate(vehicleCheck.checkDate)} />
+        <CompactInformation label="Agence" value={agencyName} />
+        <CompactInformation label="Ville" value={vehicleCheck.city || "-"} />
+        <CompactInformation label="Contrôlé par" value={collaboratorName} />
+      </div>
+
+      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <CompactInformation
+          accent
+          label="Économie référence"
+          value={formatMoney(vehicleCheck.totalInternalSavingAmount)}
+        />
+        <CompactInformation
+          label="Franchise constructeur"
+          value={formatMoney(vehicleCheck.constructorAllowanceAmount)}
+        />
+        <CompactInformation
+          label="Réparations retenues"
+          value={`${selectedRepairCount}/${repairCount}`}
+        />
+      </div>
+
+      {vehicleCheck.notes?.trim() ? (
+        <div className="mt-2 rounded-md border border-gray-200 bg-white px-3 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+            Commentaire du contrôle
+          </p>
+          <p className="mt-1 line-clamp-3 whitespace-pre-wrap text-xs leading-5 text-gray-700">
+            {vehicleCheck.notes}
+          </p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function CompactInformation({
+  accent = false,
+  label,
+  value,
+}: {
+  accent?: boolean;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="min-w-0 rounded-md border border-gray-200 bg-white px-3 py-2">
+      <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+        {label}
+      </p>
+      <p
+        className={`mt-0.5 truncate text-xs font-semibold ${accent ? "text-teal-700" : "text-gray-900"}`}
+        title={value}
+      >
+        {value}
+      </p>
+    </div>
   );
 }
 
@@ -858,15 +1042,6 @@ function actionStatusClassName(
   return `mt-1 flex w-fit items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${toneClassName}`;
 }
 
-function QuickInfo({ label, value }: { label: string; value: string }) {
-  return (
-    <span className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-600">
-      <span className="font-semibold text-gray-500">{label}</span>
-      <span className="truncate font-medium text-gray-900">{value}</span>
-    </span>
-  );
-}
-
 function formatAgencyName(name: string | null | undefined) {
   const trimmedName = name?.trim();
 
@@ -877,42 +1052,10 @@ function formatAgencyName(name: string | null | undefined) {
   return trimmedName.replace(/^agence\s+/i, "");
 }
 
-function CommentBlock({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase text-gray-500">{label}</p>
-      <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">{value}</p>
-    </div>
-  );
-}
-
 function externalRepairContactLabel(contact: NonNullable<VehicleCheck["publicShare"]>["externalRepairContact"]) {
   if (!contact) {
     return "";
   }
 
   return contact.company?.name?.trim() || contact.companyName?.trim() || contact.name;
-}
-
-function DetailItem({ icon: Icon, label, value }: { icon: typeof Car; label: string; value: string }) {
-  return (
-    <div className="flex min-w-0 gap-3 border-b border-gray-200 px-5 py-4 last:border-b-0 sm:[&:nth-child(2n)]:border-l lg:border-b-0 lg:border-l lg:first:border-l-0">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-      <div className="min-w-0">
-        <p className="text-xs font-semibold uppercase text-gray-500">{label}</p>
-        <p className="mt-1 truncate text-sm font-medium text-gray-950" title={value}>
-          {value}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function Metric({ className = "text-gray-950", label, value }: { className?: string; label: string; value: string }) {
-  return (
-    <div className="border-b border-gray-200 px-5 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
-      <p className="text-xs font-semibold uppercase text-gray-500">{label}</p>
-      <p className={`mt-1 text-lg font-semibold ${className}`}>{value}</p>
-    </div>
-  );
 }

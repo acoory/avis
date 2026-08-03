@@ -19,6 +19,7 @@ import { CreatePublicShareDto } from './dto/create-public-share.dto';
 import { CreateVehicleCheckDto } from './dto/create-vehicle-check.dto';
 import { FinalizeVehicleCheckSummaryDto } from './dto/finalize-vehicle-check-summary.dto';
 import { ListVehicleChecksQueryDto } from './dto/list-vehicle-checks-query.dto';
+import { SearchVehicleChecksQueryDto } from './dto/search-vehicle-checks-query.dto';
 import { SendDecisionRequestEmailDto } from './dto/send-decision-request-email.dto';
 import { SendRepairRequestEmailDto } from './dto/send-repair-request-email.dto';
 import { UpdateVehicleCheckDto } from './dto/update-vehicle-check.dto';
@@ -38,6 +39,14 @@ export class VehicleChecksController {
     @Query() query: ListVehicleChecksQueryDto,
   ) {
     return this.vehicleChecksService.findAll(query, user);
+  }
+
+  @Get('search')
+  search(
+    @CurrentUser() user: CurrentUserPayload,
+    @Query() query: SearchVehicleChecksQueryDto,
+  ) {
+    return this.vehicleChecksService.search(query, user);
   }
 
   @Get('decision-managers')

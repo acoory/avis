@@ -199,6 +199,20 @@ export type VehicleCheck = {
   }>;
 };
 
+export type VehicleCheckSearchResult = Pick<
+  VehicleCheck,
+  | "id"
+  | "checkNumber"
+  | "licensePlate"
+  | "licensePlateRaw"
+  | "licensePlateCountry"
+  | "checkDate"
+  | "city"
+> & {
+  manufacturer: Pick<Manufacturer, "id" | "name">;
+  vehicleModel?: Pick<VehicleModel, "id" | "name"> | null;
+};
+
 export type RepairDecisionInputItem = {
   repairTypeId: string;
   vehiclePartId?: string;
