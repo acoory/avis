@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Car, Check, CheckCircle2, MessageSquareText, UserRoundPlus } from "lucide-react";
+import {
+  Bell,
+  Car,
+  CarFront,
+  Check,
+  CheckCircle2,
+  MessageSquareText,
+  UserRoundPlus,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
   DropdownMenu,
@@ -51,15 +59,21 @@ export function NotificationsButton() {
     if (notification.readAt) return;
     const now = new Date().toISOString();
     setNotifications((current) =>
-      current.map((item) => (item.id === notification.id ? { ...item, readAt: now } : item)),
+      current.map((item) =>
+        item.id === notification.id ? { ...item, readAt: now } : item,
+      ),
     );
     setUnreadCount((current) => Math.max(0, current - 1));
-    void businessService.markNotificationRead(notification.id).catch(() => void load(true));
+    void businessService
+      .markNotificationRead(notification.id)
+      .catch(() => void load(true));
   }
 
   async function markAllRead() {
     const now = new Date().toISOString();
-    setNotifications((current) => current.map((item) => ({ ...item, readAt: item.readAt ?? now })));
+    setNotifications((current) =>
+      current.map((item) => ({ ...item, readAt: item.readAt ?? now })),
+    );
     setUnreadCount(0);
     try {
       await businessService.markAllNotificationsRead();
@@ -88,12 +102,19 @@ export function NotificationsButton() {
           ) : null}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] max-w-md p-0">
+      <DropdownMenuContent
+        align="end"
+        className="w-[calc(100vw-2rem)] max-w-md p-0"
+      >
         <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
           <div>
-            <p className="text-sm font-semibold text-slate-950">Notifications</p>
+            <p className="text-sm font-semibold text-slate-950">
+              Notifications
+            </p>
             <p className="mt-0.5 text-xs text-slate-500">
-              {unreadCount ? `${unreadCount} non lue${unreadCount > 1 ? "s" : ""}` : "Tout est a jour"}
+              {unreadCount
+                ? `${unreadCount} non lue${unreadCount > 1 ? "s" : ""}`
+                : "Tout est a jour"}
             </p>
           </div>
           {unreadCount ? (
@@ -122,7 +143,9 @@ export function NotificationsButton() {
               ))}
             </div>
           ) : (
-            <p className="px-3 py-5 text-sm text-slate-500">Aucune notification.</p>
+            <p className="px-3 py-5 text-sm text-slate-500">
+              Aucune notification.
+            </p>
           )}
         </div>
       </DropdownMenuContent>
@@ -130,7 +153,13 @@ export function NotificationsButton() {
   );
 }
 
-function NotificationLink({ notification, onOpen }: { notification: AppNotification; onOpen: () => void }) {
+function NotificationLink({
+  notification,
+  onOpen,
+}: {
+  notification: AppNotification;
+  onOpen: () => void;
+}) {
   return (
     <Link
       className={cn(
@@ -143,27 +172,59 @@ function NotificationLink({ notification, onOpen }: { notification: AppNotificat
       <span
         className={cn(
           "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
-          !notification.readAt ? "bg-teal-100 text-teal-700" : "bg-gray-100 text-gray-500",
+          !notification.readAt
+            ? "bg-teal-100 text-teal-700"
+            : "bg-gray-100 text-gray-500",
         )}
       >
         <NotificationIcon type={notification.type} />
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-start justify-between gap-2">
-          <span className="line-clamp-2 text-sm font-semibold text-slate-950">{notification.title}</span>
-          {!notification.readAt ? <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-600" /> : null}
+          <span className="line-clamp-2 text-sm font-semibold text-slate-950">
+            {notification.title}
+          </span>
+          {!notification.readAt ? (
+            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-600" />
+          ) : null}
         </span>
         {notification.vehicleCheck ? (
           <VehicleIdentity vehicleCheck={notification.vehicleCheck} />
         ) : null}
+        {notification.riskVehicle ? (
+          <RiskVehicleIdentity riskVehicle={notification.riskVehicle} />
+        ) : null}
         {notification.excerpt ? (
-          <span className="mt-0.5 line-clamp-2 text-xs leading-4 text-slate-500">{notification.excerpt}</span>
+          <span className="mt-0.5 line-clamp-2 text-xs leading-4 text-slate-500">
+            {notification.excerpt}
+          </span>
         ) : null}
         <span className="mt-1 block text-[11px] text-slate-400">
           {formatShortDateTime(notification.createdAt)}
         </span>
       </span>
     </Link>
+  );
+}
+
+function RiskVehicleIdentity({
+  riskVehicle,
+}: {
+  riskVehicle: NonNullable<AppNotification["riskVehicle"]>;
+}) {
+  const licensePlate = formatLicensePlate(
+    riskVehicle.licensePlate,
+    riskVehicle.licensePlateCountry,
+    riskVehicle.licensePlateRaw,
+  );
+  return (
+    <span className="mt-1 flex min-w-0 items-center gap-1.5 rounded-md bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-inset ring-slate-200">
+      <CarFront className="h-3.5 w-3.5 shrink-0 text-teal-700" />
+      <span className="shrink-0">{licensePlate}</span>
+      <span className="truncate font-medium text-slate-500">
+        · {riskVehicle.riskNumber}
+      </span>
+    </span>
   );
 }
 
@@ -198,10 +259,17 @@ function VehicleIdentity({
 }
 
 function NotificationIcon({ type }: { type: AppNotification["type"] }) {
-  if (type === "CONVERSATION_PARTICIPANT_ADDED") return <UserRoundPlus className="h-4 w-4" />;
-  if (type === "CONVERSATION_MESSAGE" || type === "CONVERSATION_STATUS_CHANGED") {
+  if (type === "CONVERSATION_PARTICIPANT_ADDED")
+    return <UserRoundPlus className="h-4 w-4" />;
+  if (
+    type === "CONVERSATION_MESSAGE" ||
+    type === "CONVERSATION_STATUS_CHANGED"
+  ) {
     return <MessageSquareText className="h-4 w-4" />;
   }
+  if (type === "RISK_MESSAGE") return <MessageSquareText className="h-4 w-4" />;
+  if (type === "RISK_CLOSED") return <CheckCircle2 className="h-4 w-4" />;
+  if (type === "RISK_SUBMITTED") return <CarFront className="h-4 w-4" />;
   if (type === "VEHICLE_RECOVERED") return <CheckCircle2 className="h-4 w-4" />;
   return <Car className="h-4 w-4" />;
 }

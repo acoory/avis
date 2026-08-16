@@ -1,8 +1,12 @@
 import { DamagePhoto } from "@/types/business";
 
-export async function optimizeDamagePhoto(file: File) {
+export async function optimizeDamagePhoto(
+  file: File,
+  options?: { maximumDimension?: number; quality?: number },
+) {
   const image = await loadImage(file);
-  const maximumDimension = 1600;
+  const maximumDimension = options?.maximumDimension ?? 1600;
+  const quality = options?.quality ?? 0.75;
   const scale = Math.min(
     1,
     maximumDimension / Math.max(image.naturalWidth, image.naturalHeight),
@@ -17,8 +21,10 @@ export async function optimizeDamagePhoto(file: File) {
   if (!context) throw new Error("Image compression unavailable");
   context.drawImage(image, 0, 0, width, height);
 
-  const webp = await canvasToBlob(canvas, "image/webp", 0.75);
-  const blob = webp ?? (await canvasToBlob(canvas, "image/jpeg", 0.78));
+  const webp = await canvasToBlob(canvas, "image/webp", quality);
+  const blob =
+    webp ??
+    (await canvasToBlob(canvas, "image/jpeg", Math.min(0.9, quality + 0.03)));
   if (!blob) throw new Error("Image compression failed");
 
   return new File(

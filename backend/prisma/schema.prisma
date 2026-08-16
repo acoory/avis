@@ -77,6 +77,37 @@ enum NotificationType {
   CONVERSATION_STATUS_CHANGED
   TAKEN_IN_CHARGE
   VEHICLE_RECOVERED
+  RISK_SUBMITTED
+  RISK_MESSAGE
+  RISK_CLOSED
+}
+
+enum RiskVehicleStatus {
+  DRAFT
+  SUBMITTED
+  CLOSED
+}
+
+enum RiskAssignmentRole {
+  PRIMARY
+  PARTICIPANT
+}
+
+enum RiskPhotoCategory {
+  EXTERIOR_FRONT_THREE_QUARTER
+  EXTERIOR_REAR_THREE_QUARTER
+  DASHBOARD
+  INTERIOR_FRONT
+  INTERIOR_REAR
+  TRUNK
+  WHEEL_FRONT_LEFT
+  WHEEL_FRONT_RIGHT
+  WHEEL_REAR_LEFT
+  WHEEL_REAR_RIGHT
+  TIRE_WEAR
+  TIRE_DAMAGE
+  DAMAGE_WIDE
+  DAMAGE_CLOSE_UP
 }
 
 enum NotificationEmailStatus {
@@ -127,6 +158,13 @@ model User {
   receivedNotifications                  Notification[]                        @relation("NotificationRecipient")
   actedNotifications                     Notification[]                        @relation("NotificationActor")
   publicAccessSessions                   PublicAccessSession[]
+  createdRiskVehicles                    RiskVehicle[]                         @relation("RiskVehicleCreator")
+  closedRiskVehicles                     RiskVehicle[]                         @relation("RiskVehicleClosedBy")
+  riskAssignments                        RiskVehicleAssignment[]               @relation("RiskVehicleAssignee")
+  createdRiskAssignments                 RiskVehicleAssignment[]               @relation("RiskVehicleAssignmentCreator")
+  riskMessages                           RiskMessage[]                         @relation("RiskMessageAuthor")
+  uploadedRiskMessageAttachments         RiskMessageAttachment[]               @relation("RiskMessageAttachmentUploadedBy")
+  riskStatusHistories                    RiskStatusHistory[]                   @relation("RiskStatusHistoryActor")
 
   @@index([role])
   @@index([isActive])
@@ -179,8 +217,9 @@ model Agency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  vehicleChecks VehicleCheck[]
+  vehicleChecks      VehicleCheck[]
   vehicleStatusShare AgencyVehicleStatusShare?
+  riskVehicles       RiskVehicle[]
 
   @@unique([name, city])
   @@index([city])
@@ -208,10 +247,11 @@ model Manufacturer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  models      VehicleModel[]
-  rule        ManufacturerRule?
-  repairRules ManufacturerRepairRule[]
-  checks      VehicleCheck[]
+  models       VehicleModel[]
+  rule         ManufacturerRule?
+  repairRules  ManufacturerRepairRule[]
+  checks       VehicleCheck[]
+  riskVehicles RiskVehicle[]
 }
 
 model VehicleModel {
@@ -539,6 +579,144 @@ model VehicleCheckMessageMention {
   @@index([vehicleCheckItemId])
 }
 
+model RiskVehicle {
+  id                                String            @id @default(uuid())
+  riskNumber                        String            @unique
+  creatorId                         String
+  agencyId                          String
+  manufacturerId                    String
+  licensePlate                      String
+  licensePlateRaw                   String?
+  licensePlateCountry               String            @default("FR")
+  licensePlateRecognitionConfidence Float?
+  status                            RiskVehicleStatus @default(DRAFT)
+  submittedAt                       DateTime?
+  closedAt                          DateTime?
+  closedById                        String?
+  createdAt                         DateTime          @default(now())
+  updatedAt                         DateTime          @updatedAt
+
+  creator       User                    @relation("RiskVehicleCreator", fields: [creatorId], references: [id], onDelete: Restrict)
+  closedBy      User?                   @relation("RiskVehicleClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  agency        Agency                  @relation(fields: [agencyId], references: [id], onDelete: Restrict)
+  manufacturer  Manufacturer            @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  assignments   RiskVehicleAssignment[]
+  photos        RiskPhoto[]
+  conversation  RiskConversation?
+  statusHistory RiskStatusHistory[]
+  notifications Notification[]
+
+  @@unique([licensePlateCountry, licensePlate])
+  @@index([creatorId])
+  @@index([agencyId])
+  @@index([manufacturerId])
+  @@index([status])
+  @@index([updatedAt])
+}
+
+model RiskVehicleAssignment {
+  id            String             @id @default(uuid())
+  riskVehicleId String
+  userId        String
+  role          RiskAssignmentRole @default(PARTICIPANT)
+  assignedById  String?
+  assignedAt    DateTime           @default(now())
+
+  riskVehicle RiskVehicle @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+  user        User        @relation("RiskVehicleAssignee", fields: [userId], references: [id], onDelete: Restrict)
+  assignedBy  User?       @relation("RiskVehicleAssignmentCreator", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  @@unique([riskVehicleId, userId])
+  @@index([userId, role])
+  @@index([assignedById])
+}
+
+model RiskPhoto {
+  id            String            @id @default(uuid())
+  riskVehicleId String
+  slotKey       String
+  category      RiskPhotoCategory
+  damageGroupId String?
+  publicId      String            @unique
+  assetId       String?
+  secureUrl     String
+  width         Int
+  height        Int
+  bytes         Int
+  format        String
+  sortOrder     Int               @default(0)
+  createdAt     DateTime          @default(now())
+
+  riskVehicle RiskVehicle @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([riskVehicleId, slotKey])
+  @@index([riskVehicleId, category])
+  @@index([damageGroupId])
+}
+
+model RiskConversation {
+  id            String   @id @default(uuid())
+  riskVehicleId String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  riskVehicle RiskVehicle   @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+  messages    RiskMessage[]
+
+  @@index([updatedAt])
+}
+
+model RiskMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  authorId       String?
+  body           String?
+  createdAt      DateTime @default(now())
+
+  conversation  RiskConversation        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  author        User?                   @relation("RiskMessageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  attachments   RiskMessageAttachment[]
+  notifications Notification[]
+
+  @@index([conversationId, createdAt])
+  @@index([authorId])
+}
+
+model RiskMessageAttachment {
+  id           String   @id @default(uuid())
+  messageId    String
+  uploadedById String?
+  publicId     String   @unique
+  resourceType String
+  secureUrl    String
+  originalName String
+  mimeType     String
+  bytes        Int
+  format       String?
+  createdAt    DateTime @default(now())
+
+  message    RiskMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  uploadedBy User?       @relation("RiskMessageAttachmentUploadedBy", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([messageId])
+  @@index([uploadedById])
+}
+
+model RiskStatusHistory {
+  id            String            @id @default(uuid())
+  riskVehicleId String
+  actorId       String?
+  fromStatus    RiskVehicleStatus
+  toStatus      RiskVehicleStatus
+  createdAt     DateTime          @default(now())
+
+  riskVehicle RiskVehicle @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+  actor       User?       @relation("RiskStatusHistoryActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([riskVehicleId, createdAt])
+  @@index([actorId])
+}
+
 model Notification {
   id             String           @id @default(uuid())
   recipientId    String
@@ -547,6 +725,8 @@ model Notification {
   vehicleCheckId String?
   conversationId String?
   messageId      String?
+  riskVehicleId  String?
+  riskMessageId  String?
   title          String
   excerpt        String?
   route          String
@@ -558,12 +738,16 @@ model Notification {
   vehicleCheck VehicleCheck?             @relation(fields: [vehicleCheckId], references: [id], onDelete: Cascade)
   conversation VehicleCheckConversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   message      VehicleCheckMessage?      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  riskVehicle  RiskVehicle?              @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+  riskMessage  RiskMessage?              @relation(fields: [riskMessageId], references: [id], onDelete: Cascade)
   email        NotificationEmail?
 
   @@index([recipientId, readAt, createdAt])
   @@index([vehicleCheckId])
   @@index([conversationId])
   @@index([messageId])
+  @@index([riskVehicleId])
+  @@index([riskMessageId])
 }
 
 model NotificationEmail {

@@ -368,6 +368,57 @@ export type EnumVehicleCheckConversationParticipantRoleWithAggregatesFilter<$Pri
   _max?: Prisma.NestedEnumVehicleCheckConversationParticipantRoleFilter<$PrismaModel>
 }
 
+export type EnumRiskVehicleStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskVehicleStatus | Prisma.EnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskVehicleStatusFilter<$PrismaModel> | $Enums.RiskVehicleStatus
+}
+
+export type EnumRiskVehicleStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskVehicleStatus | Prisma.EnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskVehicleStatusWithAggregatesFilter<$PrismaModel> | $Enums.RiskVehicleStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRiskVehicleStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRiskVehicleStatusFilter<$PrismaModel>
+}
+
+export type EnumRiskAssignmentRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskAssignmentRole | Prisma.EnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskAssignmentRoleFilter<$PrismaModel> | $Enums.RiskAssignmentRole
+}
+
+export type EnumRiskAssignmentRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskAssignmentRole | Prisma.EnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskAssignmentRoleWithAggregatesFilter<$PrismaModel> | $Enums.RiskAssignmentRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRiskAssignmentRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRiskAssignmentRoleFilter<$PrismaModel>
+}
+
+export type EnumRiskPhotoCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskPhotoCategory | Prisma.EnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskPhotoCategoryFilter<$PrismaModel> | $Enums.RiskPhotoCategory
+}
+
+export type EnumRiskPhotoCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskPhotoCategory | Prisma.EnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskPhotoCategoryWithAggregatesFilter<$PrismaModel> | $Enums.RiskPhotoCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRiskPhotoCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRiskPhotoCategoryFilter<$PrismaModel>
+}
+
 export type EnumNotificationTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.NotificationType | Prisma.EnumNotificationTypeFieldRefInput<$PrismaModel>
   in?: $Enums.NotificationType[] | Prisma.ListEnumNotificationTypeFieldRefInput<$PrismaModel>
@@ -824,6 +875,57 @@ export type NestedEnumVehicleCheckConversationParticipantRoleWithAggregatesFilte
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumVehicleCheckConversationParticipantRoleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumVehicleCheckConversationParticipantRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumRiskVehicleStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskVehicleStatus | Prisma.EnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskVehicleStatusFilter<$PrismaModel> | $Enums.RiskVehicleStatus
+}
+
+export type NestedEnumRiskVehicleStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskVehicleStatus | Prisma.EnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskVehicleStatus[] | Prisma.ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskVehicleStatusWithAggregatesFilter<$PrismaModel> | $Enums.RiskVehicleStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRiskVehicleStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRiskVehicleStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumRiskAssignmentRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskAssignmentRole | Prisma.EnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskAssignmentRoleFilter<$PrismaModel> | $Enums.RiskAssignmentRole
+}
+
+export type NestedEnumRiskAssignmentRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskAssignmentRole | Prisma.EnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskAssignmentRole[] | Prisma.ListEnumRiskAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskAssignmentRoleWithAggregatesFilter<$PrismaModel> | $Enums.RiskAssignmentRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRiskAssignmentRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRiskAssignmentRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumRiskPhotoCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskPhotoCategory | Prisma.EnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskPhotoCategoryFilter<$PrismaModel> | $Enums.RiskPhotoCategory
+}
+
+export type NestedEnumRiskPhotoCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RiskPhotoCategory | Prisma.EnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RiskPhotoCategory[] | Prisma.ListEnumRiskPhotoCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRiskPhotoCategoryWithAggregatesFilter<$PrismaModel> | $Enums.RiskPhotoCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRiskPhotoCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRiskPhotoCategoryFilter<$PrismaModel>
 }
 
 export type NestedEnumNotificationTypeFilter<$PrismaModel = never> = {

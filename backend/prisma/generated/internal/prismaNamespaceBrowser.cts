@@ -72,6 +72,13 @@ export const ModelName = {
   VehicleCheckMessage: 'VehicleCheckMessage',
   VehicleCheckMessageAttachment: 'VehicleCheckMessageAttachment',
   VehicleCheckMessageMention: 'VehicleCheckMessageMention',
+  RiskVehicle: 'RiskVehicle',
+  RiskVehicleAssignment: 'RiskVehicleAssignment',
+  RiskPhoto: 'RiskPhoto',
+  RiskConversation: 'RiskConversation',
+  RiskMessage: 'RiskMessage',
+  RiskMessageAttachment: 'RiskMessageAttachment',
+  RiskStatusHistory: 'RiskStatusHistory',
   Notification: 'Notification',
   NotificationEmail: 'NotificationEmail',
   VehicleCheckItem: 'VehicleCheckItem',
@@ -427,6 +434,109 @@ export const VehicleCheckMessageMentionScalarFieldEnum = {
 export type VehicleCheckMessageMentionScalarFieldEnum = (typeof VehicleCheckMessageMentionScalarFieldEnum)[keyof typeof VehicleCheckMessageMentionScalarFieldEnum]
 
 
+export const RiskVehicleScalarFieldEnum = {
+  id: 'id',
+  riskNumber: 'riskNumber',
+  creatorId: 'creatorId',
+  agencyId: 'agencyId',
+  manufacturerId: 'manufacturerId',
+  licensePlate: 'licensePlate',
+  licensePlateRaw: 'licensePlateRaw',
+  licensePlateCountry: 'licensePlateCountry',
+  licensePlateRecognitionConfidence: 'licensePlateRecognitionConfidence',
+  status: 'status',
+  submittedAt: 'submittedAt',
+  closedAt: 'closedAt',
+  closedById: 'closedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RiskVehicleScalarFieldEnum = (typeof RiskVehicleScalarFieldEnum)[keyof typeof RiskVehicleScalarFieldEnum]
+
+
+export const RiskVehicleAssignmentScalarFieldEnum = {
+  id: 'id',
+  riskVehicleId: 'riskVehicleId',
+  userId: 'userId',
+  role: 'role',
+  assignedById: 'assignedById',
+  assignedAt: 'assignedAt'
+} as const
+
+export type RiskVehicleAssignmentScalarFieldEnum = (typeof RiskVehicleAssignmentScalarFieldEnum)[keyof typeof RiskVehicleAssignmentScalarFieldEnum]
+
+
+export const RiskPhotoScalarFieldEnum = {
+  id: 'id',
+  riskVehicleId: 'riskVehicleId',
+  slotKey: 'slotKey',
+  category: 'category',
+  damageGroupId: 'damageGroupId',
+  publicId: 'publicId',
+  assetId: 'assetId',
+  secureUrl: 'secureUrl',
+  width: 'width',
+  height: 'height',
+  bytes: 'bytes',
+  format: 'format',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt'
+} as const
+
+export type RiskPhotoScalarFieldEnum = (typeof RiskPhotoScalarFieldEnum)[keyof typeof RiskPhotoScalarFieldEnum]
+
+
+export const RiskConversationScalarFieldEnum = {
+  id: 'id',
+  riskVehicleId: 'riskVehicleId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RiskConversationScalarFieldEnum = (typeof RiskConversationScalarFieldEnum)[keyof typeof RiskConversationScalarFieldEnum]
+
+
+export const RiskMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type RiskMessageScalarFieldEnum = (typeof RiskMessageScalarFieldEnum)[keyof typeof RiskMessageScalarFieldEnum]
+
+
+export const RiskMessageAttachmentScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  uploadedById: 'uploadedById',
+  publicId: 'publicId',
+  resourceType: 'resourceType',
+  secureUrl: 'secureUrl',
+  originalName: 'originalName',
+  mimeType: 'mimeType',
+  bytes: 'bytes',
+  format: 'format',
+  createdAt: 'createdAt'
+} as const
+
+export type RiskMessageAttachmentScalarFieldEnum = (typeof RiskMessageAttachmentScalarFieldEnum)[keyof typeof RiskMessageAttachmentScalarFieldEnum]
+
+
+export const RiskStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  riskVehicleId: 'riskVehicleId',
+  actorId: 'actorId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  createdAt: 'createdAt'
+} as const
+
+export type RiskStatusHistoryScalarFieldEnum = (typeof RiskStatusHistoryScalarFieldEnum)[keyof typeof RiskStatusHistoryScalarFieldEnum]
+
+
 export const NotificationScalarFieldEnum = {
   id: 'id',
   recipientId: 'recipientId',
@@ -435,6 +545,8 @@ export const NotificationScalarFieldEnum = {
   vehicleCheckId: 'vehicleCheckId',
   conversationId: 'conversationId',
   messageId: 'messageId',
+  riskVehicleId: 'riskVehicleId',
+  riskMessageId: 'riskMessageId',
   title: 'title',
   excerpt: 'excerpt',
   route: 'route',

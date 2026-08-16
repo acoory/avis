@@ -32,6 +32,8 @@ export type NotificationMinAggregateOutputType = {
   vehicleCheckId: string | null
   conversationId: string | null
   messageId: string | null
+  riskVehicleId: string | null
+  riskMessageId: string | null
   title: string | null
   excerpt: string | null
   route: string | null
@@ -47,6 +49,8 @@ export type NotificationMaxAggregateOutputType = {
   vehicleCheckId: string | null
   conversationId: string | null
   messageId: string | null
+  riskVehicleId: string | null
+  riskMessageId: string | null
   title: string | null
   excerpt: string | null
   route: string | null
@@ -62,6 +66,8 @@ export type NotificationCountAggregateOutputType = {
   vehicleCheckId: number
   conversationId: number
   messageId: number
+  riskVehicleId: number
+  riskMessageId: number
   title: number
   excerpt: number
   route: number
@@ -79,6 +85,8 @@ export type NotificationMinAggregateInputType = {
   vehicleCheckId?: true
   conversationId?: true
   messageId?: true
+  riskVehicleId?: true
+  riskMessageId?: true
   title?: true
   excerpt?: true
   route?: true
@@ -94,6 +102,8 @@ export type NotificationMaxAggregateInputType = {
   vehicleCheckId?: true
   conversationId?: true
   messageId?: true
+  riskVehicleId?: true
+  riskMessageId?: true
   title?: true
   excerpt?: true
   route?: true
@@ -109,6 +119,8 @@ export type NotificationCountAggregateInputType = {
   vehicleCheckId?: true
   conversationId?: true
   messageId?: true
+  riskVehicleId?: true
+  riskMessageId?: true
   title?: true
   excerpt?: true
   route?: true
@@ -197,6 +209,8 @@ export type NotificationGroupByOutputType = {
   vehicleCheckId: string | null
   conversationId: string | null
   messageId: string | null
+  riskVehicleId: string | null
+  riskMessageId: string | null
   title: string
   excerpt: string | null
   route: string
@@ -233,6 +247,8 @@ export type NotificationWhereInput = {
   vehicleCheckId?: Prisma.StringNullableFilter<"Notification"> | string | null
   conversationId?: Prisma.StringNullableFilter<"Notification"> | string | null
   messageId?: Prisma.StringNullableFilter<"Notification"> | string | null
+  riskVehicleId?: Prisma.StringNullableFilter<"Notification"> | string | null
+  riskMessageId?: Prisma.StringNullableFilter<"Notification"> | string | null
   title?: Prisma.StringFilter<"Notification"> | string
   excerpt?: Prisma.StringNullableFilter<"Notification"> | string | null
   route?: Prisma.StringFilter<"Notification"> | string
@@ -243,6 +259,8 @@ export type NotificationWhereInput = {
   vehicleCheck?: Prisma.XOR<Prisma.VehicleCheckNullableScalarRelationFilter, Prisma.VehicleCheckWhereInput> | null
   conversation?: Prisma.XOR<Prisma.VehicleCheckConversationNullableScalarRelationFilter, Prisma.VehicleCheckConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.VehicleCheckMessageNullableScalarRelationFilter, Prisma.VehicleCheckMessageWhereInput> | null
+  riskVehicle?: Prisma.XOR<Prisma.RiskVehicleNullableScalarRelationFilter, Prisma.RiskVehicleWhereInput> | null
+  riskMessage?: Prisma.XOR<Prisma.RiskMessageNullableScalarRelationFilter, Prisma.RiskMessageWhereInput> | null
   email?: Prisma.XOR<Prisma.NotificationEmailNullableScalarRelationFilter, Prisma.NotificationEmailWhereInput> | null
 }
 
@@ -254,6 +272,8 @@ export type NotificationOrderByWithRelationInput = {
   vehicleCheckId?: Prisma.SortOrderInput | Prisma.SortOrder
   conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  riskVehicleId?: Prisma.SortOrderInput | Prisma.SortOrder
+  riskMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   excerpt?: Prisma.SortOrderInput | Prisma.SortOrder
   route?: Prisma.SortOrder
@@ -264,6 +284,8 @@ export type NotificationOrderByWithRelationInput = {
   vehicleCheck?: Prisma.VehicleCheckOrderByWithRelationInput
   conversation?: Prisma.VehicleCheckConversationOrderByWithRelationInput
   message?: Prisma.VehicleCheckMessageOrderByWithRelationInput
+  riskVehicle?: Prisma.RiskVehicleOrderByWithRelationInput
+  riskMessage?: Prisma.RiskMessageOrderByWithRelationInput
   email?: Prisma.NotificationEmailOrderByWithRelationInput
 }
 
@@ -278,6 +300,8 @@ export type NotificationWhereUniqueInput = Prisma.AtLeast<{
   vehicleCheckId?: Prisma.StringNullableFilter<"Notification"> | string | null
   conversationId?: Prisma.StringNullableFilter<"Notification"> | string | null
   messageId?: Prisma.StringNullableFilter<"Notification"> | string | null
+  riskVehicleId?: Prisma.StringNullableFilter<"Notification"> | string | null
+  riskMessageId?: Prisma.StringNullableFilter<"Notification"> | string | null
   title?: Prisma.StringFilter<"Notification"> | string
   excerpt?: Prisma.StringNullableFilter<"Notification"> | string | null
   route?: Prisma.StringFilter<"Notification"> | string
@@ -288,6 +312,8 @@ export type NotificationWhereUniqueInput = Prisma.AtLeast<{
   vehicleCheck?: Prisma.XOR<Prisma.VehicleCheckNullableScalarRelationFilter, Prisma.VehicleCheckWhereInput> | null
   conversation?: Prisma.XOR<Prisma.VehicleCheckConversationNullableScalarRelationFilter, Prisma.VehicleCheckConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.VehicleCheckMessageNullableScalarRelationFilter, Prisma.VehicleCheckMessageWhereInput> | null
+  riskVehicle?: Prisma.XOR<Prisma.RiskVehicleNullableScalarRelationFilter, Prisma.RiskVehicleWhereInput> | null
+  riskMessage?: Prisma.XOR<Prisma.RiskMessageNullableScalarRelationFilter, Prisma.RiskMessageWhereInput> | null
   email?: Prisma.XOR<Prisma.NotificationEmailNullableScalarRelationFilter, Prisma.NotificationEmailWhereInput> | null
 }, "id">
 
@@ -299,6 +325,8 @@ export type NotificationOrderByWithAggregationInput = {
   vehicleCheckId?: Prisma.SortOrderInput | Prisma.SortOrder
   conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  riskVehicleId?: Prisma.SortOrderInput | Prisma.SortOrder
+  riskMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   excerpt?: Prisma.SortOrderInput | Prisma.SortOrder
   route?: Prisma.SortOrder
@@ -320,6 +348,8 @@ export type NotificationScalarWhereWithAggregatesInput = {
   vehicleCheckId?: Prisma.StringNullableWithAggregatesFilter<"Notification"> | string | null
   conversationId?: Prisma.StringNullableWithAggregatesFilter<"Notification"> | string | null
   messageId?: Prisma.StringNullableWithAggregatesFilter<"Notification"> | string | null
+  riskVehicleId?: Prisma.StringNullableWithAggregatesFilter<"Notification"> | string | null
+  riskMessageId?: Prisma.StringNullableWithAggregatesFilter<"Notification"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"Notification"> | string
   excerpt?: Prisma.StringNullableWithAggregatesFilter<"Notification"> | string | null
   route?: Prisma.StringWithAggregatesFilter<"Notification"> | string
@@ -340,6 +370,8 @@ export type NotificationCreateInput = {
   vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
   conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
   message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
   email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
 }
 
@@ -351,6 +383,8 @@ export type NotificationUncheckedCreateInput = {
   vehicleCheckId?: string | null
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -372,6 +406,8 @@ export type NotificationUpdateInput = {
   vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
   conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
   message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
   email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
 }
 
@@ -383,6 +419,8 @@ export type NotificationUncheckedUpdateInput = {
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -399,6 +437,8 @@ export type NotificationCreateManyInput = {
   vehicleCheckId?: string | null
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -424,6 +464,8 @@ export type NotificationUncheckedUpdateManyInput = {
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -449,6 +491,8 @@ export type NotificationCountOrderByAggregateInput = {
   vehicleCheckId?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  riskVehicleId?: Prisma.SortOrder
+  riskMessageId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   excerpt?: Prisma.SortOrder
   route?: Prisma.SortOrder
@@ -464,6 +508,8 @@ export type NotificationMaxOrderByAggregateInput = {
   vehicleCheckId?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  riskVehicleId?: Prisma.SortOrder
+  riskMessageId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   excerpt?: Prisma.SortOrder
   route?: Prisma.SortOrder
@@ -479,6 +525,8 @@ export type NotificationMinOrderByAggregateInput = {
   vehicleCheckId?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  riskVehicleId?: Prisma.SortOrder
+  riskMessageId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   excerpt?: Prisma.SortOrder
   route?: Prisma.SortOrder
@@ -701,6 +749,90 @@ export type NotificationUncheckedUpdateManyWithoutMessageNestedInput = {
   deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
 }
 
+export type NotificationCreateNestedManyWithoutRiskVehicleInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskVehicleInput, Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput> | Prisma.NotificationCreateWithoutRiskVehicleInput[] | Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput | Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput[]
+  createMany?: Prisma.NotificationCreateManyRiskVehicleInputEnvelope
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+}
+
+export type NotificationUncheckedCreateNestedManyWithoutRiskVehicleInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskVehicleInput, Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput> | Prisma.NotificationCreateWithoutRiskVehicleInput[] | Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput | Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput[]
+  createMany?: Prisma.NotificationCreateManyRiskVehicleInputEnvelope
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+}
+
+export type NotificationUpdateManyWithoutRiskVehicleNestedInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskVehicleInput, Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput> | Prisma.NotificationCreateWithoutRiskVehicleInput[] | Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput | Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput[]
+  upsert?: Prisma.NotificationUpsertWithWhereUniqueWithoutRiskVehicleInput | Prisma.NotificationUpsertWithWhereUniqueWithoutRiskVehicleInput[]
+  createMany?: Prisma.NotificationCreateManyRiskVehicleInputEnvelope
+  set?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  disconnect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  delete?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  update?: Prisma.NotificationUpdateWithWhereUniqueWithoutRiskVehicleInput | Prisma.NotificationUpdateWithWhereUniqueWithoutRiskVehicleInput[]
+  updateMany?: Prisma.NotificationUpdateManyWithWhereWithoutRiskVehicleInput | Prisma.NotificationUpdateManyWithWhereWithoutRiskVehicleInput[]
+  deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
+}
+
+export type NotificationUncheckedUpdateManyWithoutRiskVehicleNestedInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskVehicleInput, Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput> | Prisma.NotificationCreateWithoutRiskVehicleInput[] | Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput | Prisma.NotificationCreateOrConnectWithoutRiskVehicleInput[]
+  upsert?: Prisma.NotificationUpsertWithWhereUniqueWithoutRiskVehicleInput | Prisma.NotificationUpsertWithWhereUniqueWithoutRiskVehicleInput[]
+  createMany?: Prisma.NotificationCreateManyRiskVehicleInputEnvelope
+  set?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  disconnect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  delete?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  update?: Prisma.NotificationUpdateWithWhereUniqueWithoutRiskVehicleInput | Prisma.NotificationUpdateWithWhereUniqueWithoutRiskVehicleInput[]
+  updateMany?: Prisma.NotificationUpdateManyWithWhereWithoutRiskVehicleInput | Prisma.NotificationUpdateManyWithWhereWithoutRiskVehicleInput[]
+  deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
+}
+
+export type NotificationCreateNestedManyWithoutRiskMessageInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskMessageInput, Prisma.NotificationUncheckedCreateWithoutRiskMessageInput> | Prisma.NotificationCreateWithoutRiskMessageInput[] | Prisma.NotificationUncheckedCreateWithoutRiskMessageInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskMessageInput | Prisma.NotificationCreateOrConnectWithoutRiskMessageInput[]
+  createMany?: Prisma.NotificationCreateManyRiskMessageInputEnvelope
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+}
+
+export type NotificationUncheckedCreateNestedManyWithoutRiskMessageInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskMessageInput, Prisma.NotificationUncheckedCreateWithoutRiskMessageInput> | Prisma.NotificationCreateWithoutRiskMessageInput[] | Prisma.NotificationUncheckedCreateWithoutRiskMessageInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskMessageInput | Prisma.NotificationCreateOrConnectWithoutRiskMessageInput[]
+  createMany?: Prisma.NotificationCreateManyRiskMessageInputEnvelope
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+}
+
+export type NotificationUpdateManyWithoutRiskMessageNestedInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskMessageInput, Prisma.NotificationUncheckedCreateWithoutRiskMessageInput> | Prisma.NotificationCreateWithoutRiskMessageInput[] | Prisma.NotificationUncheckedCreateWithoutRiskMessageInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskMessageInput | Prisma.NotificationCreateOrConnectWithoutRiskMessageInput[]
+  upsert?: Prisma.NotificationUpsertWithWhereUniqueWithoutRiskMessageInput | Prisma.NotificationUpsertWithWhereUniqueWithoutRiskMessageInput[]
+  createMany?: Prisma.NotificationCreateManyRiskMessageInputEnvelope
+  set?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  disconnect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  delete?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  update?: Prisma.NotificationUpdateWithWhereUniqueWithoutRiskMessageInput | Prisma.NotificationUpdateWithWhereUniqueWithoutRiskMessageInput[]
+  updateMany?: Prisma.NotificationUpdateManyWithWhereWithoutRiskMessageInput | Prisma.NotificationUpdateManyWithWhereWithoutRiskMessageInput[]
+  deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
+}
+
+export type NotificationUncheckedUpdateManyWithoutRiskMessageNestedInput = {
+  create?: Prisma.XOR<Prisma.NotificationCreateWithoutRiskMessageInput, Prisma.NotificationUncheckedCreateWithoutRiskMessageInput> | Prisma.NotificationCreateWithoutRiskMessageInput[] | Prisma.NotificationUncheckedCreateWithoutRiskMessageInput[]
+  connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutRiskMessageInput | Prisma.NotificationCreateOrConnectWithoutRiskMessageInput[]
+  upsert?: Prisma.NotificationUpsertWithWhereUniqueWithoutRiskMessageInput | Prisma.NotificationUpsertWithWhereUniqueWithoutRiskMessageInput[]
+  createMany?: Prisma.NotificationCreateManyRiskMessageInputEnvelope
+  set?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  disconnect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  delete?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  connect?: Prisma.NotificationWhereUniqueInput | Prisma.NotificationWhereUniqueInput[]
+  update?: Prisma.NotificationUpdateWithWhereUniqueWithoutRiskMessageInput | Prisma.NotificationUpdateWithWhereUniqueWithoutRiskMessageInput[]
+  updateMany?: Prisma.NotificationUpdateManyWithWhereWithoutRiskMessageInput | Prisma.NotificationUpdateManyWithWhereWithoutRiskMessageInput[]
+  deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
+}
+
 export type EnumNotificationTypeFieldUpdateOperationsInput = {
   set?: $Enums.NotificationType
 }
@@ -731,6 +863,8 @@ export type NotificationCreateWithoutRecipientInput = {
   vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
   conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
   message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
   email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
 }
 
@@ -741,6 +875,8 @@ export type NotificationUncheckedCreateWithoutRecipientInput = {
   vehicleCheckId?: string | null
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -771,6 +907,8 @@ export type NotificationCreateWithoutActorInput = {
   vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
   conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
   message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
   email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
 }
 
@@ -781,6 +919,8 @@ export type NotificationUncheckedCreateWithoutActorInput = {
   vehicleCheckId?: string | null
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -826,6 +966,8 @@ export type NotificationScalarWhereInput = {
   vehicleCheckId?: Prisma.StringNullableFilter<"Notification"> | string | null
   conversationId?: Prisma.StringNullableFilter<"Notification"> | string | null
   messageId?: Prisma.StringNullableFilter<"Notification"> | string | null
+  riskVehicleId?: Prisma.StringNullableFilter<"Notification"> | string | null
+  riskMessageId?: Prisma.StringNullableFilter<"Notification"> | string | null
   title?: Prisma.StringFilter<"Notification"> | string
   excerpt?: Prisma.StringNullableFilter<"Notification"> | string | null
   route?: Prisma.StringFilter<"Notification"> | string
@@ -861,6 +1003,8 @@ export type NotificationCreateWithoutVehicleCheckInput = {
   actor?: Prisma.UserCreateNestedOneWithoutActedNotificationsInput
   conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
   message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
   email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
 }
 
@@ -871,6 +1015,8 @@ export type NotificationUncheckedCreateWithoutVehicleCheckInput = {
   type: $Enums.NotificationType
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -917,6 +1063,8 @@ export type NotificationCreateWithoutConversationInput = {
   actor?: Prisma.UserCreateNestedOneWithoutActedNotificationsInput
   vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
   message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
   email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
 }
 
@@ -927,6 +1075,8 @@ export type NotificationUncheckedCreateWithoutConversationInput = {
   type: $Enums.NotificationType
   vehicleCheckId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -973,6 +1123,8 @@ export type NotificationCreateWithoutMessageInput = {
   actor?: Prisma.UserCreateNestedOneWithoutActedNotificationsInput
   vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
   conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
   email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
 }
 
@@ -983,6 +1135,8 @@ export type NotificationUncheckedCreateWithoutMessageInput = {
   type: $Enums.NotificationType
   vehicleCheckId?: string | null
   conversationId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -1017,6 +1171,126 @@ export type NotificationUpdateManyWithWhereWithoutMessageInput = {
   data: Prisma.XOR<Prisma.NotificationUpdateManyMutationInput, Prisma.NotificationUncheckedUpdateManyWithoutMessageInput>
 }
 
+export type NotificationCreateWithoutRiskVehicleInput = {
+  id?: string
+  type: $Enums.NotificationType
+  title: string
+  excerpt?: string | null
+  route: string
+  createdAt?: Date | string
+  readAt?: Date | string | null
+  recipient: Prisma.UserCreateNestedOneWithoutReceivedNotificationsInput
+  actor?: Prisma.UserCreateNestedOneWithoutActedNotificationsInput
+  vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
+  conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
+  message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
+  email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
+}
+
+export type NotificationUncheckedCreateWithoutRiskVehicleInput = {
+  id?: string
+  recipientId: string
+  actorId?: string | null
+  type: $Enums.NotificationType
+  vehicleCheckId?: string | null
+  conversationId?: string | null
+  messageId?: string | null
+  riskMessageId?: string | null
+  title: string
+  excerpt?: string | null
+  route: string
+  createdAt?: Date | string
+  readAt?: Date | string | null
+  email?: Prisma.NotificationEmailUncheckedCreateNestedOneWithoutNotificationInput
+}
+
+export type NotificationCreateOrConnectWithoutRiskVehicleInput = {
+  where: Prisma.NotificationWhereUniqueInput
+  create: Prisma.XOR<Prisma.NotificationCreateWithoutRiskVehicleInput, Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput>
+}
+
+export type NotificationCreateManyRiskVehicleInputEnvelope = {
+  data: Prisma.NotificationCreateManyRiskVehicleInput | Prisma.NotificationCreateManyRiskVehicleInput[]
+  skipDuplicates?: boolean
+}
+
+export type NotificationUpsertWithWhereUniqueWithoutRiskVehicleInput = {
+  where: Prisma.NotificationWhereUniqueInput
+  update: Prisma.XOR<Prisma.NotificationUpdateWithoutRiskVehicleInput, Prisma.NotificationUncheckedUpdateWithoutRiskVehicleInput>
+  create: Prisma.XOR<Prisma.NotificationCreateWithoutRiskVehicleInput, Prisma.NotificationUncheckedCreateWithoutRiskVehicleInput>
+}
+
+export type NotificationUpdateWithWhereUniqueWithoutRiskVehicleInput = {
+  where: Prisma.NotificationWhereUniqueInput
+  data: Prisma.XOR<Prisma.NotificationUpdateWithoutRiskVehicleInput, Prisma.NotificationUncheckedUpdateWithoutRiskVehicleInput>
+}
+
+export type NotificationUpdateManyWithWhereWithoutRiskVehicleInput = {
+  where: Prisma.NotificationScalarWhereInput
+  data: Prisma.XOR<Prisma.NotificationUpdateManyMutationInput, Prisma.NotificationUncheckedUpdateManyWithoutRiskVehicleInput>
+}
+
+export type NotificationCreateWithoutRiskMessageInput = {
+  id?: string
+  type: $Enums.NotificationType
+  title: string
+  excerpt?: string | null
+  route: string
+  createdAt?: Date | string
+  readAt?: Date | string | null
+  recipient: Prisma.UserCreateNestedOneWithoutReceivedNotificationsInput
+  actor?: Prisma.UserCreateNestedOneWithoutActedNotificationsInput
+  vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
+  conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
+  message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  email?: Prisma.NotificationEmailCreateNestedOneWithoutNotificationInput
+}
+
+export type NotificationUncheckedCreateWithoutRiskMessageInput = {
+  id?: string
+  recipientId: string
+  actorId?: string | null
+  type: $Enums.NotificationType
+  vehicleCheckId?: string | null
+  conversationId?: string | null
+  messageId?: string | null
+  riskVehicleId?: string | null
+  title: string
+  excerpt?: string | null
+  route: string
+  createdAt?: Date | string
+  readAt?: Date | string | null
+  email?: Prisma.NotificationEmailUncheckedCreateNestedOneWithoutNotificationInput
+}
+
+export type NotificationCreateOrConnectWithoutRiskMessageInput = {
+  where: Prisma.NotificationWhereUniqueInput
+  create: Prisma.XOR<Prisma.NotificationCreateWithoutRiskMessageInput, Prisma.NotificationUncheckedCreateWithoutRiskMessageInput>
+}
+
+export type NotificationCreateManyRiskMessageInputEnvelope = {
+  data: Prisma.NotificationCreateManyRiskMessageInput | Prisma.NotificationCreateManyRiskMessageInput[]
+  skipDuplicates?: boolean
+}
+
+export type NotificationUpsertWithWhereUniqueWithoutRiskMessageInput = {
+  where: Prisma.NotificationWhereUniqueInput
+  update: Prisma.XOR<Prisma.NotificationUpdateWithoutRiskMessageInput, Prisma.NotificationUncheckedUpdateWithoutRiskMessageInput>
+  create: Prisma.XOR<Prisma.NotificationCreateWithoutRiskMessageInput, Prisma.NotificationUncheckedCreateWithoutRiskMessageInput>
+}
+
+export type NotificationUpdateWithWhereUniqueWithoutRiskMessageInput = {
+  where: Prisma.NotificationWhereUniqueInput
+  data: Prisma.XOR<Prisma.NotificationUpdateWithoutRiskMessageInput, Prisma.NotificationUncheckedUpdateWithoutRiskMessageInput>
+}
+
+export type NotificationUpdateManyWithWhereWithoutRiskMessageInput = {
+  where: Prisma.NotificationScalarWhereInput
+  data: Prisma.XOR<Prisma.NotificationUpdateManyMutationInput, Prisma.NotificationUncheckedUpdateManyWithoutRiskMessageInput>
+}
+
 export type NotificationCreateWithoutEmailInput = {
   id?: string
   type: $Enums.NotificationType
@@ -1030,6 +1304,8 @@ export type NotificationCreateWithoutEmailInput = {
   vehicleCheck?: Prisma.VehicleCheckCreateNestedOneWithoutNotificationsInput
   conversation?: Prisma.VehicleCheckConversationCreateNestedOneWithoutNotificationsInput
   message?: Prisma.VehicleCheckMessageCreateNestedOneWithoutNotificationsInput
+  riskVehicle?: Prisma.RiskVehicleCreateNestedOneWithoutNotificationsInput
+  riskMessage?: Prisma.RiskMessageCreateNestedOneWithoutNotificationsInput
 }
 
 export type NotificationUncheckedCreateWithoutEmailInput = {
@@ -1040,6 +1316,8 @@ export type NotificationUncheckedCreateWithoutEmailInput = {
   vehicleCheckId?: string | null
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -1076,6 +1354,8 @@ export type NotificationUpdateWithoutEmailInput = {
   vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
   conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
   message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
 }
 
 export type NotificationUncheckedUpdateWithoutEmailInput = {
@@ -1086,6 +1366,8 @@ export type NotificationUncheckedUpdateWithoutEmailInput = {
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1100,6 +1382,8 @@ export type NotificationCreateManyRecipientInput = {
   vehicleCheckId?: string | null
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -1114,6 +1398,8 @@ export type NotificationCreateManyActorInput = {
   vehicleCheckId?: string | null
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -1133,6 +1419,8 @@ export type NotificationUpdateWithoutRecipientInput = {
   vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
   conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
   message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
   email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
 }
 
@@ -1143,6 +1431,8 @@ export type NotificationUncheckedUpdateWithoutRecipientInput = {
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1158,6 +1448,8 @@ export type NotificationUncheckedUpdateManyWithoutRecipientInput = {
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1177,6 +1469,8 @@ export type NotificationUpdateWithoutActorInput = {
   vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
   conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
   message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
   email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
 }
 
@@ -1187,6 +1481,8 @@ export type NotificationUncheckedUpdateWithoutActorInput = {
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1202,6 +1498,8 @@ export type NotificationUncheckedUpdateManyWithoutActorInput = {
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1216,6 +1514,8 @@ export type NotificationCreateManyVehicleCheckInput = {
   type: $Enums.NotificationType
   conversationId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -1235,6 +1535,8 @@ export type NotificationUpdateWithoutVehicleCheckInput = {
   actor?: Prisma.UserUpdateOneWithoutActedNotificationsNestedInput
   conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
   message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
   email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
 }
 
@@ -1245,6 +1547,8 @@ export type NotificationUncheckedUpdateWithoutVehicleCheckInput = {
   type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1260,6 +1564,8 @@ export type NotificationUncheckedUpdateManyWithoutVehicleCheckInput = {
   type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1274,6 +1580,8 @@ export type NotificationCreateManyConversationInput = {
   type: $Enums.NotificationType
   vehicleCheckId?: string | null
   messageId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -1293,6 +1601,8 @@ export type NotificationUpdateWithoutConversationInput = {
   actor?: Prisma.UserUpdateOneWithoutActedNotificationsNestedInput
   vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
   message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
   email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
 }
 
@@ -1303,6 +1613,8 @@ export type NotificationUncheckedUpdateWithoutConversationInput = {
   type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1318,6 +1630,8 @@ export type NotificationUncheckedUpdateManyWithoutConversationInput = {
   type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1332,6 +1646,8 @@ export type NotificationCreateManyMessageInput = {
   type: $Enums.NotificationType
   vehicleCheckId?: string | null
   conversationId?: string | null
+  riskVehicleId?: string | null
+  riskMessageId?: string | null
   title: string
   excerpt?: string | null
   route: string
@@ -1351,6 +1667,8 @@ export type NotificationUpdateWithoutMessageInput = {
   actor?: Prisma.UserUpdateOneWithoutActedNotificationsNestedInput
   vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
   conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
   email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
 }
 
@@ -1361,6 +1679,8 @@ export type NotificationUncheckedUpdateWithoutMessageInput = {
   type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1376,6 +1696,140 @@ export type NotificationUncheckedUpdateManyWithoutMessageInput = {
   type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
   vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  route?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type NotificationCreateManyRiskVehicleInput = {
+  id?: string
+  recipientId: string
+  actorId?: string | null
+  type: $Enums.NotificationType
+  vehicleCheckId?: string | null
+  conversationId?: string | null
+  messageId?: string | null
+  riskMessageId?: string | null
+  title: string
+  excerpt?: string | null
+  route: string
+  createdAt?: Date | string
+  readAt?: Date | string | null
+}
+
+export type NotificationUpdateWithoutRiskVehicleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  route?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  recipient?: Prisma.UserUpdateOneRequiredWithoutReceivedNotificationsNestedInput
+  actor?: Prisma.UserUpdateOneWithoutActedNotificationsNestedInput
+  vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
+  conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
+  message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskMessage?: Prisma.RiskMessageUpdateOneWithoutNotificationsNestedInput
+  email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
+}
+
+export type NotificationUncheckedUpdateWithoutRiskVehicleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientId?: Prisma.StringFieldUpdateOperationsInput | string
+  actorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
+  vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  route?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  email?: Prisma.NotificationEmailUncheckedUpdateOneWithoutNotificationNestedInput
+}
+
+export type NotificationUncheckedUpdateManyWithoutRiskVehicleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientId?: Prisma.StringFieldUpdateOperationsInput | string
+  actorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
+  vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  route?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type NotificationCreateManyRiskMessageInput = {
+  id?: string
+  recipientId: string
+  actorId?: string | null
+  type: $Enums.NotificationType
+  vehicleCheckId?: string | null
+  conversationId?: string | null
+  messageId?: string | null
+  riskVehicleId?: string | null
+  title: string
+  excerpt?: string | null
+  route: string
+  createdAt?: Date | string
+  readAt?: Date | string | null
+}
+
+export type NotificationUpdateWithoutRiskMessageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  route?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  recipient?: Prisma.UserUpdateOneRequiredWithoutReceivedNotificationsNestedInput
+  actor?: Prisma.UserUpdateOneWithoutActedNotificationsNestedInput
+  vehicleCheck?: Prisma.VehicleCheckUpdateOneWithoutNotificationsNestedInput
+  conversation?: Prisma.VehicleCheckConversationUpdateOneWithoutNotificationsNestedInput
+  message?: Prisma.VehicleCheckMessageUpdateOneWithoutNotificationsNestedInput
+  riskVehicle?: Prisma.RiskVehicleUpdateOneWithoutNotificationsNestedInput
+  email?: Prisma.NotificationEmailUpdateOneWithoutNotificationNestedInput
+}
+
+export type NotificationUncheckedUpdateWithoutRiskMessageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientId?: Prisma.StringFieldUpdateOperationsInput | string
+  actorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
+  vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  route?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  email?: Prisma.NotificationEmailUncheckedUpdateOneWithoutNotificationNestedInput
+}
+
+export type NotificationUncheckedUpdateManyWithoutRiskMessageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientId?: Prisma.StringFieldUpdateOperationsInput | string
+  actorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
+  vehicleCheckId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskVehicleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   route?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1393,6 +1847,8 @@ export type NotificationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   vehicleCheckId?: boolean
   conversationId?: boolean
   messageId?: boolean
+  riskVehicleId?: boolean
+  riskMessageId?: boolean
   title?: boolean
   excerpt?: boolean
   route?: boolean
@@ -1403,6 +1859,8 @@ export type NotificationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   vehicleCheck?: boolean | Prisma.Notification$vehicleCheckArgs<ExtArgs>
   conversation?: boolean | Prisma.Notification$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Notification$messageArgs<ExtArgs>
+  riskVehicle?: boolean | Prisma.Notification$riskVehicleArgs<ExtArgs>
+  riskMessage?: boolean | Prisma.Notification$riskMessageArgs<ExtArgs>
   email?: boolean | Prisma.Notification$emailArgs<ExtArgs>
 }, ExtArgs["result"]["notification"]>
 
@@ -1414,6 +1872,8 @@ export type NotificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   vehicleCheckId?: boolean
   conversationId?: boolean
   messageId?: boolean
+  riskVehicleId?: boolean
+  riskMessageId?: boolean
   title?: boolean
   excerpt?: boolean
   route?: boolean
@@ -1424,6 +1884,8 @@ export type NotificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   vehicleCheck?: boolean | Prisma.Notification$vehicleCheckArgs<ExtArgs>
   conversation?: boolean | Prisma.Notification$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Notification$messageArgs<ExtArgs>
+  riskVehicle?: boolean | Prisma.Notification$riskVehicleArgs<ExtArgs>
+  riskMessage?: boolean | Prisma.Notification$riskMessageArgs<ExtArgs>
 }, ExtArgs["result"]["notification"]>
 
 export type NotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1434,6 +1896,8 @@ export type NotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   vehicleCheckId?: boolean
   conversationId?: boolean
   messageId?: boolean
+  riskVehicleId?: boolean
+  riskMessageId?: boolean
   title?: boolean
   excerpt?: boolean
   route?: boolean
@@ -1444,6 +1908,8 @@ export type NotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   vehicleCheck?: boolean | Prisma.Notification$vehicleCheckArgs<ExtArgs>
   conversation?: boolean | Prisma.Notification$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Notification$messageArgs<ExtArgs>
+  riskVehicle?: boolean | Prisma.Notification$riskVehicleArgs<ExtArgs>
+  riskMessage?: boolean | Prisma.Notification$riskMessageArgs<ExtArgs>
 }, ExtArgs["result"]["notification"]>
 
 export type NotificationSelectScalar = {
@@ -1454,6 +1920,8 @@ export type NotificationSelectScalar = {
   vehicleCheckId?: boolean
   conversationId?: boolean
   messageId?: boolean
+  riskVehicleId?: boolean
+  riskMessageId?: boolean
   title?: boolean
   excerpt?: boolean
   route?: boolean
@@ -1461,13 +1929,15 @@ export type NotificationSelectScalar = {
   readAt?: boolean
 }
 
-export type NotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientId" | "actorId" | "type" | "vehicleCheckId" | "conversationId" | "messageId" | "title" | "excerpt" | "route" | "createdAt" | "readAt", ExtArgs["result"]["notification"]>
+export type NotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientId" | "actorId" | "type" | "vehicleCheckId" | "conversationId" | "messageId" | "riskVehicleId" | "riskMessageId" | "title" | "excerpt" | "route" | "createdAt" | "readAt", ExtArgs["result"]["notification"]>
 export type NotificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   actor?: boolean | Prisma.Notification$actorArgs<ExtArgs>
   vehicleCheck?: boolean | Prisma.Notification$vehicleCheckArgs<ExtArgs>
   conversation?: boolean | Prisma.Notification$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Notification$messageArgs<ExtArgs>
+  riskVehicle?: boolean | Prisma.Notification$riskVehicleArgs<ExtArgs>
+  riskMessage?: boolean | Prisma.Notification$riskMessageArgs<ExtArgs>
   email?: boolean | Prisma.Notification$emailArgs<ExtArgs>
 }
 export type NotificationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1476,6 +1946,8 @@ export type NotificationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types
   vehicleCheck?: boolean | Prisma.Notification$vehicleCheckArgs<ExtArgs>
   conversation?: boolean | Prisma.Notification$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Notification$messageArgs<ExtArgs>
+  riskVehicle?: boolean | Prisma.Notification$riskVehicleArgs<ExtArgs>
+  riskMessage?: boolean | Prisma.Notification$riskMessageArgs<ExtArgs>
 }
 export type NotificationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1483,6 +1955,8 @@ export type NotificationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types
   vehicleCheck?: boolean | Prisma.Notification$vehicleCheckArgs<ExtArgs>
   conversation?: boolean | Prisma.Notification$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Notification$messageArgs<ExtArgs>
+  riskVehicle?: boolean | Prisma.Notification$riskVehicleArgs<ExtArgs>
+  riskMessage?: boolean | Prisma.Notification$riskMessageArgs<ExtArgs>
 }
 
 export type $NotificationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1493,6 +1967,8 @@ export type $NotificationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     vehicleCheck: Prisma.$VehicleCheckPayload<ExtArgs> | null
     conversation: Prisma.$VehicleCheckConversationPayload<ExtArgs> | null
     message: Prisma.$VehicleCheckMessagePayload<ExtArgs> | null
+    riskVehicle: Prisma.$RiskVehiclePayload<ExtArgs> | null
+    riskMessage: Prisma.$RiskMessagePayload<ExtArgs> | null
     email: Prisma.$NotificationEmailPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1503,6 +1979,8 @@ export type $NotificationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     vehicleCheckId: string | null
     conversationId: string | null
     messageId: string | null
+    riskVehicleId: string | null
+    riskMessageId: string | null
     title: string
     excerpt: string | null
     route: string
@@ -1907,6 +2385,8 @@ export interface Prisma__NotificationClient<T, Null = never, ExtArgs extends run
   vehicleCheck<T extends Prisma.Notification$vehicleCheckArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Notification$vehicleCheckArgs<ExtArgs>>): Prisma.Prisma__VehicleCheckClient<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   conversation<T extends Prisma.Notification$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Notification$conversationArgs<ExtArgs>>): Prisma.Prisma__VehicleCheckConversationClient<runtime.Types.Result.GetResult<Prisma.$VehicleCheckConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   message<T extends Prisma.Notification$messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Notification$messageArgs<ExtArgs>>): Prisma.Prisma__VehicleCheckMessageClient<runtime.Types.Result.GetResult<Prisma.$VehicleCheckMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  riskVehicle<T extends Prisma.Notification$riskVehicleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Notification$riskVehicleArgs<ExtArgs>>): Prisma.Prisma__RiskVehicleClient<runtime.Types.Result.GetResult<Prisma.$RiskVehiclePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  riskMessage<T extends Prisma.Notification$riskMessageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Notification$riskMessageArgs<ExtArgs>>): Prisma.Prisma__RiskMessageClient<runtime.Types.Result.GetResult<Prisma.$RiskMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   email<T extends Prisma.Notification$emailArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Notification$emailArgs<ExtArgs>>): Prisma.Prisma__NotificationEmailClient<runtime.Types.Result.GetResult<Prisma.$NotificationEmailPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1944,6 +2424,8 @@ export interface NotificationFieldRefs {
   readonly vehicleCheckId: Prisma.FieldRef<"Notification", 'String'>
   readonly conversationId: Prisma.FieldRef<"Notification", 'String'>
   readonly messageId: Prisma.FieldRef<"Notification", 'String'>
+  readonly riskVehicleId: Prisma.FieldRef<"Notification", 'String'>
+  readonly riskMessageId: Prisma.FieldRef<"Notification", 'String'>
   readonly title: Prisma.FieldRef<"Notification", 'String'>
   readonly excerpt: Prisma.FieldRef<"Notification", 'String'>
   readonly route: Prisma.FieldRef<"Notification", 'String'>
@@ -2423,6 +2905,44 @@ export type Notification$messageArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.VehicleCheckMessageInclude<ExtArgs> | null
   where?: Prisma.VehicleCheckMessageWhereInput
+}
+
+/**
+ * Notification.riskVehicle
+ */
+export type Notification$riskVehicleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RiskVehicle
+   */
+  select?: Prisma.RiskVehicleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RiskVehicle
+   */
+  omit?: Prisma.RiskVehicleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RiskVehicleInclude<ExtArgs> | null
+  where?: Prisma.RiskVehicleWhereInput
+}
+
+/**
+ * Notification.riskMessage
+ */
+export type Notification$riskMessageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RiskMessage
+   */
+  select?: Prisma.RiskMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RiskMessage
+   */
+  omit?: Prisma.RiskMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RiskMessageInclude<ExtArgs> | null
+  where?: Prisma.RiskMessageWhereInput
 }
 
 /**

@@ -21,6 +21,7 @@ import { ExternalRepairContactsModule } from './external-repair-contacts/externa
 import { NotificationsModule } from './notifications/notifications.module';
 import { VehicleCheckConversationsModule } from './vehicle-check-conversations/vehicle-check-conversations.module';
 import { SalvageEvaluationsModule } from './salvage-evaluations/salvage-evaluations.module';
+import { RiskVehiclesModule } from './risk-vehicles/risk-vehicles.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { SalvageEvaluationsModule } from './salvage-evaluations/salvage-evaluati
     NotificationsModule,
     VehicleCheckConversationsModule,
     SalvageEvaluationsModule,
+    RiskVehiclesModule,
   ],
 })
 export class AppModule {}

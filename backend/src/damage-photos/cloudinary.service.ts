@@ -13,6 +13,7 @@ export class CloudinaryService {
   private readonly apiSecret: string;
   private readonly folder: string;
   private readonly conversationFolder: string;
+  private readonly riskFolder: string;
 
   constructor(configService: ConfigService) {
     this.cloudName = configService.get<string>('CLOUDINARY_CLOUD_NAME') ?? '';
@@ -22,6 +23,7 @@ export class CloudinaryService {
     this.conversationFolder =
       configService.get<string>('CLOUDINARY_CONVERSATION_FOLDER') ??
       `${this.folder}/conversations`;
+    this.riskFolder = `${this.folder}/risk`;
   }
 
   createUploadSignature(userId: string) {
@@ -74,6 +76,57 @@ export class CloudinaryService {
     };
   }
 
+  createRiskPhotoUploadSignature(riskVehicleId: string, userId: string) {
+    this.ensureConfigured();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const publicId = randomUUID();
+    const folder = `${this.riskFolder}/${riskVehicleId}/photos/${userId}`;
+    const params = {
+      folder,
+      overwrite: 'false',
+      public_id: publicId,
+      timestamp: timestamp.toString(),
+    };
+
+    return {
+      apiKey: this.apiKey,
+      cloudName: this.cloudName,
+      folder,
+      publicId,
+      timestamp,
+      signature: this.sign(params),
+      uploadUrl: `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`,
+    };
+  }
+
+  createRiskConversationUploadSignature(riskVehicleId: string, userId: string) {
+    this.ensureConfigured();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const publicId = randomUUID();
+    const folder = `${this.riskFolder}/${riskVehicleId}/conversation/${userId}`;
+    const allowedFormats = 'jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx';
+    const maxFileSize = 10 * 1024 * 1024;
+    const params = {
+      allowed_formats: allowedFormats,
+      folder,
+      overwrite: 'false',
+      public_id: publicId,
+      timestamp: timestamp.toString(),
+    };
+
+    return {
+      allowedFormats: allowedFormats.split(','),
+      apiKey: this.apiKey,
+      cloudName: this.cloudName,
+      folder,
+      maxFileSize,
+      publicId,
+      timestamp,
+      signature: this.sign(params),
+      uploadUrl: `https://api.cloudinary.com/v1_1/${this.cloudName}/auto/upload`,
+    };
+  }
+
   isConversationAsset(
     publicId: string,
     vehicleCheckId: string,
@@ -81,6 +134,22 @@ export class CloudinaryService {
   ) {
     return publicId.startsWith(
       `${this.conversationFolder}/${vehicleCheckId}/${userId}/`,
+    );
+  }
+
+  isRiskPhotoAsset(publicId: string, riskVehicleId: string, userId: string) {
+    return publicId.startsWith(
+      `${this.riskFolder}/${riskVehicleId}/photos/${userId}/`,
+    );
+  }
+
+  isRiskConversationAsset(
+    publicId: string,
+    riskVehicleId: string,
+    userId: string,
+  ) {
+    return publicId.startsWith(
+      `${this.riskFolder}/${riskVehicleId}/conversation/${userId}/`,
     );
   }
 

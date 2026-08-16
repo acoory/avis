@@ -102,10 +102,50 @@ export const NotificationType = {
   CONVERSATION_PARTICIPANT_ADDED: 'CONVERSATION_PARTICIPANT_ADDED',
   CONVERSATION_STATUS_CHANGED: 'CONVERSATION_STATUS_CHANGED',
   TAKEN_IN_CHARGE: 'TAKEN_IN_CHARGE',
-  VEHICLE_RECOVERED: 'VEHICLE_RECOVERED'
+  VEHICLE_RECOVERED: 'VEHICLE_RECOVERED',
+  RISK_SUBMITTED: 'RISK_SUBMITTED',
+  RISK_MESSAGE: 'RISK_MESSAGE',
+  RISK_CLOSED: 'RISK_CLOSED'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const RiskVehicleStatus = {
+  DRAFT: 'DRAFT',
+  SUBMITTED: 'SUBMITTED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type RiskVehicleStatus = (typeof RiskVehicleStatus)[keyof typeof RiskVehicleStatus]
+
+
+export const RiskAssignmentRole = {
+  PRIMARY: 'PRIMARY',
+  PARTICIPANT: 'PARTICIPANT'
+} as const
+
+export type RiskAssignmentRole = (typeof RiskAssignmentRole)[keyof typeof RiskAssignmentRole]
+
+
+export const RiskPhotoCategory = {
+  EXTERIOR_FRONT_THREE_QUARTER: 'EXTERIOR_FRONT_THREE_QUARTER',
+  EXTERIOR_REAR_THREE_QUARTER: 'EXTERIOR_REAR_THREE_QUARTER',
+  DASHBOARD: 'DASHBOARD',
+  INTERIOR_FRONT: 'INTERIOR_FRONT',
+  INTERIOR_REAR: 'INTERIOR_REAR',
+  TRUNK: 'TRUNK',
+  WHEEL_FRONT_LEFT: 'WHEEL_FRONT_LEFT',
+  WHEEL_FRONT_RIGHT: 'WHEEL_FRONT_RIGHT',
+  WHEEL_REAR_LEFT: 'WHEEL_REAR_LEFT',
+  WHEEL_REAR_RIGHT: 'WHEEL_REAR_RIGHT',
+  TIRE_WEAR: 'TIRE_WEAR',
+  TIRE_DAMAGE: 'TIRE_DAMAGE',
+  DAMAGE_WIDE: 'DAMAGE_WIDE',
+  DAMAGE_CLOSE_UP: 'DAMAGE_CLOSE_UP'
+} as const
+
+export type RiskPhotoCategory = (typeof RiskPhotoCategory)[keyof typeof RiskPhotoCategory]
 
 
 export const NotificationEmailStatus = {

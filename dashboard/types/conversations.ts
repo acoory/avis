@@ -79,7 +79,10 @@ export type AppNotificationType =
   | "CONVERSATION_PARTICIPANT_ADDED"
   | "CONVERSATION_STATUS_CHANGED"
   | "TAKEN_IN_CHARGE"
-  | "VEHICLE_RECOVERED";
+  | "VEHICLE_RECOVERED"
+  | "RISK_SUBMITTED"
+  | "RISK_MESSAGE"
+  | "RISK_CLOSED";
 
 export type AppNotification = {
   actor?: Pick<ConversationUser, "firstName" | "id" | "lastName"> | null;
@@ -98,6 +101,14 @@ export type AppNotification = {
     vehicleModel?: { name: string } | null;
   } | null;
   vehicleCheckId?: string | null;
+  riskVehicle?: {
+    licensePlate: string;
+    licensePlateCountry: string;
+    licensePlateRaw?: string | null;
+    riskNumber: string;
+    manufacturer: { name: string };
+  } | null;
+  riskVehicleId?: string | null;
 };
 
 export type NotificationsResponse = {

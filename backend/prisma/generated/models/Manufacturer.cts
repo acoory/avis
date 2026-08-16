@@ -178,6 +178,7 @@ export type ManufacturerWhereInput = {
   rule?: Prisma.XOR<Prisma.ManufacturerRuleNullableScalarRelationFilter, Prisma.ManufacturerRuleWhereInput> | null
   repairRules?: Prisma.ManufacturerRepairRuleListRelationFilter
   checks?: Prisma.VehicleCheckListRelationFilter
+  riskVehicles?: Prisma.RiskVehicleListRelationFilter
 }
 
 export type ManufacturerOrderByWithRelationInput = {
@@ -189,6 +190,7 @@ export type ManufacturerOrderByWithRelationInput = {
   rule?: Prisma.ManufacturerRuleOrderByWithRelationInput
   repairRules?: Prisma.ManufacturerRepairRuleOrderByRelationAggregateInput
   checks?: Prisma.VehicleCheckOrderByRelationAggregateInput
+  riskVehicles?: Prisma.RiskVehicleOrderByRelationAggregateInput
 }
 
 export type ManufacturerWhereUniqueInput = Prisma.AtLeast<{
@@ -203,6 +205,7 @@ export type ManufacturerWhereUniqueInput = Prisma.AtLeast<{
   rule?: Prisma.XOR<Prisma.ManufacturerRuleNullableScalarRelationFilter, Prisma.ManufacturerRuleWhereInput> | null
   repairRules?: Prisma.ManufacturerRepairRuleListRelationFilter
   checks?: Prisma.VehicleCheckListRelationFilter
+  riskVehicles?: Prisma.RiskVehicleListRelationFilter
 }, "id" | "name">
 
 export type ManufacturerOrderByWithAggregationInput = {
@@ -234,6 +237,7 @@ export type ManufacturerCreateInput = {
   rule?: Prisma.ManufacturerRuleCreateNestedOneWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleCreateNestedManyWithoutManufacturerInput
   checks?: Prisma.VehicleCheckCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerUncheckedCreateInput = {
@@ -245,6 +249,7 @@ export type ManufacturerUncheckedCreateInput = {
   rule?: Prisma.ManufacturerRuleUncheckedCreateNestedOneWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedCreateNestedManyWithoutManufacturerInput
   checks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerUpdateInput = {
@@ -256,6 +261,7 @@ export type ManufacturerUpdateInput = {
   rule?: Prisma.ManufacturerRuleUpdateOneWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUpdateManyWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerUncheckedUpdateInput = {
@@ -267,6 +273,7 @@ export type ManufacturerUncheckedUpdateInput = {
   rule?: Prisma.ManufacturerRuleUncheckedUpdateOneWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedUpdateManyWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerCreateManyInput = {
@@ -372,6 +379,20 @@ export type ManufacturerUpdateOneRequiredWithoutChecksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ManufacturerUpdateToOneWithWhereWithoutChecksInput, Prisma.ManufacturerUpdateWithoutChecksInput>, Prisma.ManufacturerUncheckedUpdateWithoutChecksInput>
 }
 
+export type ManufacturerCreateNestedOneWithoutRiskVehiclesInput = {
+  create?: Prisma.XOR<Prisma.ManufacturerCreateWithoutRiskVehiclesInput, Prisma.ManufacturerUncheckedCreateWithoutRiskVehiclesInput>
+  connectOrCreate?: Prisma.ManufacturerCreateOrConnectWithoutRiskVehiclesInput
+  connect?: Prisma.ManufacturerWhereUniqueInput
+}
+
+export type ManufacturerUpdateOneRequiredWithoutRiskVehiclesNestedInput = {
+  create?: Prisma.XOR<Prisma.ManufacturerCreateWithoutRiskVehiclesInput, Prisma.ManufacturerUncheckedCreateWithoutRiskVehiclesInput>
+  connectOrCreate?: Prisma.ManufacturerCreateOrConnectWithoutRiskVehiclesInput
+  upsert?: Prisma.ManufacturerUpsertWithoutRiskVehiclesInput
+  connect?: Prisma.ManufacturerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ManufacturerUpdateToOneWithWhereWithoutRiskVehiclesInput, Prisma.ManufacturerUpdateWithoutRiskVehiclesInput>, Prisma.ManufacturerUncheckedUpdateWithoutRiskVehiclesInput>
+}
+
 export type ManufacturerCreateWithoutModelsInput = {
   id?: string
   name: string
@@ -380,6 +401,7 @@ export type ManufacturerCreateWithoutModelsInput = {
   rule?: Prisma.ManufacturerRuleCreateNestedOneWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleCreateNestedManyWithoutManufacturerInput
   checks?: Prisma.VehicleCheckCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerUncheckedCreateWithoutModelsInput = {
@@ -390,6 +412,7 @@ export type ManufacturerUncheckedCreateWithoutModelsInput = {
   rule?: Prisma.ManufacturerRuleUncheckedCreateNestedOneWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedCreateNestedManyWithoutManufacturerInput
   checks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerCreateOrConnectWithoutModelsInput = {
@@ -416,6 +439,7 @@ export type ManufacturerUpdateWithoutModelsInput = {
   rule?: Prisma.ManufacturerRuleUpdateOneWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUpdateManyWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerUncheckedUpdateWithoutModelsInput = {
@@ -426,6 +450,7 @@ export type ManufacturerUncheckedUpdateWithoutModelsInput = {
   rule?: Prisma.ManufacturerRuleUncheckedUpdateOneWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedUpdateManyWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerCreateWithoutRuleInput = {
@@ -436,6 +461,7 @@ export type ManufacturerCreateWithoutRuleInput = {
   models?: Prisma.VehicleModelCreateNestedManyWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleCreateNestedManyWithoutManufacturerInput
   checks?: Prisma.VehicleCheckCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerUncheckedCreateWithoutRuleInput = {
@@ -446,6 +472,7 @@ export type ManufacturerUncheckedCreateWithoutRuleInput = {
   models?: Prisma.VehicleModelUncheckedCreateNestedManyWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedCreateNestedManyWithoutManufacturerInput
   checks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerCreateOrConnectWithoutRuleInput = {
@@ -472,6 +499,7 @@ export type ManufacturerUpdateWithoutRuleInput = {
   models?: Prisma.VehicleModelUpdateManyWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUpdateManyWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerUncheckedUpdateWithoutRuleInput = {
@@ -482,6 +510,7 @@ export type ManufacturerUncheckedUpdateWithoutRuleInput = {
   models?: Prisma.VehicleModelUncheckedUpdateManyWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedUpdateManyWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerCreateWithoutRepairRulesInput = {
@@ -492,6 +521,7 @@ export type ManufacturerCreateWithoutRepairRulesInput = {
   models?: Prisma.VehicleModelCreateNestedManyWithoutManufacturerInput
   rule?: Prisma.ManufacturerRuleCreateNestedOneWithoutManufacturerInput
   checks?: Prisma.VehicleCheckCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerUncheckedCreateWithoutRepairRulesInput = {
@@ -502,6 +532,7 @@ export type ManufacturerUncheckedCreateWithoutRepairRulesInput = {
   models?: Prisma.VehicleModelUncheckedCreateNestedManyWithoutManufacturerInput
   rule?: Prisma.ManufacturerRuleUncheckedCreateNestedOneWithoutManufacturerInput
   checks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerCreateOrConnectWithoutRepairRulesInput = {
@@ -528,6 +559,7 @@ export type ManufacturerUpdateWithoutRepairRulesInput = {
   models?: Prisma.VehicleModelUpdateManyWithoutManufacturerNestedInput
   rule?: Prisma.ManufacturerRuleUpdateOneWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerUncheckedUpdateWithoutRepairRulesInput = {
@@ -538,6 +570,7 @@ export type ManufacturerUncheckedUpdateWithoutRepairRulesInput = {
   models?: Prisma.VehicleModelUncheckedUpdateManyWithoutManufacturerNestedInput
   rule?: Prisma.ManufacturerRuleUncheckedUpdateOneWithoutManufacturerNestedInput
   checks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerCreateWithoutChecksInput = {
@@ -548,6 +581,7 @@ export type ManufacturerCreateWithoutChecksInput = {
   models?: Prisma.VehicleModelCreateNestedManyWithoutManufacturerInput
   rule?: Prisma.ManufacturerRuleCreateNestedOneWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerUncheckedCreateWithoutChecksInput = {
@@ -558,6 +592,7 @@ export type ManufacturerUncheckedCreateWithoutChecksInput = {
   models?: Prisma.VehicleModelUncheckedCreateNestedManyWithoutManufacturerInput
   rule?: Prisma.ManufacturerRuleUncheckedCreateNestedOneWithoutManufacturerInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedCreateNestedManyWithoutManufacturerInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutManufacturerInput
 }
 
 export type ManufacturerCreateOrConnectWithoutChecksInput = {
@@ -584,6 +619,7 @@ export type ManufacturerUpdateWithoutChecksInput = {
   models?: Prisma.VehicleModelUpdateManyWithoutManufacturerNestedInput
   rule?: Prisma.ManufacturerRuleUpdateOneWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUpdateManyWithoutManufacturerNestedInput
 }
 
 export type ManufacturerUncheckedUpdateWithoutChecksInput = {
@@ -594,6 +630,67 @@ export type ManufacturerUncheckedUpdateWithoutChecksInput = {
   models?: Prisma.VehicleModelUncheckedUpdateManyWithoutManufacturerNestedInput
   rule?: Prisma.ManufacturerRuleUncheckedUpdateOneWithoutManufacturerNestedInput
   repairRules?: Prisma.ManufacturerRepairRuleUncheckedUpdateManyWithoutManufacturerNestedInput
+  riskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutManufacturerNestedInput
+}
+
+export type ManufacturerCreateWithoutRiskVehiclesInput = {
+  id?: string
+  name: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  models?: Prisma.VehicleModelCreateNestedManyWithoutManufacturerInput
+  rule?: Prisma.ManufacturerRuleCreateNestedOneWithoutManufacturerInput
+  repairRules?: Prisma.ManufacturerRepairRuleCreateNestedManyWithoutManufacturerInput
+  checks?: Prisma.VehicleCheckCreateNestedManyWithoutManufacturerInput
+}
+
+export type ManufacturerUncheckedCreateWithoutRiskVehiclesInput = {
+  id?: string
+  name: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  models?: Prisma.VehicleModelUncheckedCreateNestedManyWithoutManufacturerInput
+  rule?: Prisma.ManufacturerRuleUncheckedCreateNestedOneWithoutManufacturerInput
+  repairRules?: Prisma.ManufacturerRepairRuleUncheckedCreateNestedManyWithoutManufacturerInput
+  checks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutManufacturerInput
+}
+
+export type ManufacturerCreateOrConnectWithoutRiskVehiclesInput = {
+  where: Prisma.ManufacturerWhereUniqueInput
+  create: Prisma.XOR<Prisma.ManufacturerCreateWithoutRiskVehiclesInput, Prisma.ManufacturerUncheckedCreateWithoutRiskVehiclesInput>
+}
+
+export type ManufacturerUpsertWithoutRiskVehiclesInput = {
+  update: Prisma.XOR<Prisma.ManufacturerUpdateWithoutRiskVehiclesInput, Prisma.ManufacturerUncheckedUpdateWithoutRiskVehiclesInput>
+  create: Prisma.XOR<Prisma.ManufacturerCreateWithoutRiskVehiclesInput, Prisma.ManufacturerUncheckedCreateWithoutRiskVehiclesInput>
+  where?: Prisma.ManufacturerWhereInput
+}
+
+export type ManufacturerUpdateToOneWithWhereWithoutRiskVehiclesInput = {
+  where?: Prisma.ManufacturerWhereInput
+  data: Prisma.XOR<Prisma.ManufacturerUpdateWithoutRiskVehiclesInput, Prisma.ManufacturerUncheckedUpdateWithoutRiskVehiclesInput>
+}
+
+export type ManufacturerUpdateWithoutRiskVehiclesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  models?: Prisma.VehicleModelUpdateManyWithoutManufacturerNestedInput
+  rule?: Prisma.ManufacturerRuleUpdateOneWithoutManufacturerNestedInput
+  repairRules?: Prisma.ManufacturerRepairRuleUpdateManyWithoutManufacturerNestedInput
+  checks?: Prisma.VehicleCheckUpdateManyWithoutManufacturerNestedInput
+}
+
+export type ManufacturerUncheckedUpdateWithoutRiskVehiclesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  models?: Prisma.VehicleModelUncheckedUpdateManyWithoutManufacturerNestedInput
+  rule?: Prisma.ManufacturerRuleUncheckedUpdateOneWithoutManufacturerNestedInput
+  repairRules?: Prisma.ManufacturerRepairRuleUncheckedUpdateManyWithoutManufacturerNestedInput
+  checks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutManufacturerNestedInput
 }
 
 
@@ -605,12 +702,14 @@ export type ManufacturerCountOutputType = {
   models: number
   repairRules: number
   checks: number
+  riskVehicles: number
 }
 
 export type ManufacturerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   models?: boolean | ManufacturerCountOutputTypeCountModelsArgs
   repairRules?: boolean | ManufacturerCountOutputTypeCountRepairRulesArgs
   checks?: boolean | ManufacturerCountOutputTypeCountChecksArgs
+  riskVehicles?: boolean | ManufacturerCountOutputTypeCountRiskVehiclesArgs
 }
 
 /**
@@ -644,6 +743,13 @@ export type ManufacturerCountOutputTypeCountChecksArgs<ExtArgs extends runtime.T
   where?: Prisma.VehicleCheckWhereInput
 }
 
+/**
+ * ManufacturerCountOutputType without action
+ */
+export type ManufacturerCountOutputTypeCountRiskVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RiskVehicleWhereInput
+}
+
 
 export type ManufacturerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -654,6 +760,7 @@ export type ManufacturerSelect<ExtArgs extends runtime.Types.Extensions.Internal
   rule?: boolean | Prisma.Manufacturer$ruleArgs<ExtArgs>
   repairRules?: boolean | Prisma.Manufacturer$repairRulesArgs<ExtArgs>
   checks?: boolean | Prisma.Manufacturer$checksArgs<ExtArgs>
+  riskVehicles?: boolean | Prisma.Manufacturer$riskVehiclesArgs<ExtArgs>
   _count?: boolean | Prisma.ManufacturerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["manufacturer"]>
 
@@ -684,6 +791,7 @@ export type ManufacturerInclude<ExtArgs extends runtime.Types.Extensions.Interna
   rule?: boolean | Prisma.Manufacturer$ruleArgs<ExtArgs>
   repairRules?: boolean | Prisma.Manufacturer$repairRulesArgs<ExtArgs>
   checks?: boolean | Prisma.Manufacturer$checksArgs<ExtArgs>
+  riskVehicles?: boolean | Prisma.Manufacturer$riskVehiclesArgs<ExtArgs>
   _count?: boolean | Prisma.ManufacturerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ManufacturerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -696,6 +804,7 @@ export type $ManufacturerPayload<ExtArgs extends runtime.Types.Extensions.Intern
     rule: Prisma.$ManufacturerRulePayload<ExtArgs> | null
     repairRules: Prisma.$ManufacturerRepairRulePayload<ExtArgs>[]
     checks: Prisma.$VehicleCheckPayload<ExtArgs>[]
+    riskVehicles: Prisma.$RiskVehiclePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1100,6 +1209,7 @@ export interface Prisma__ManufacturerClient<T, Null = never, ExtArgs extends run
   rule<T extends Prisma.Manufacturer$ruleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Manufacturer$ruleArgs<ExtArgs>>): Prisma.Prisma__ManufacturerRuleClient<runtime.Types.Result.GetResult<Prisma.$ManufacturerRulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   repairRules<T extends Prisma.Manufacturer$repairRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Manufacturer$repairRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ManufacturerRepairRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   checks<T extends Prisma.Manufacturer$checksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Manufacturer$checksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  riskVehicles<T extends Prisma.Manufacturer$riskVehiclesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Manufacturer$riskVehiclesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RiskVehiclePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1614,6 +1724,30 @@ export type Manufacturer$checksArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.VehicleCheckScalarFieldEnum | Prisma.VehicleCheckScalarFieldEnum[]
+}
+
+/**
+ * Manufacturer.riskVehicles
+ */
+export type Manufacturer$riskVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RiskVehicle
+   */
+  select?: Prisma.RiskVehicleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RiskVehicle
+   */
+  omit?: Prisma.RiskVehicleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RiskVehicleInclude<ExtArgs> | null
+  where?: Prisma.RiskVehicleWhereInput
+  orderBy?: Prisma.RiskVehicleOrderByWithRelationInput | Prisma.RiskVehicleOrderByWithRelationInput[]
+  cursor?: Prisma.RiskVehicleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RiskVehicleScalarFieldEnum | Prisma.RiskVehicleScalarFieldEnum[]
 }
 
 /**

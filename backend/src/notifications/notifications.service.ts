@@ -29,6 +29,15 @@ export class NotificationsService {
               vehicleModel: { select: { name: true } },
             },
           },
+          riskVehicle: {
+            select: {
+              licensePlate: true,
+              licensePlateCountry: true,
+              licensePlateRaw: true,
+              riskNumber: true,
+              manufacturer: { select: { name: true } },
+            },
+          },
         },
       }),
       this.prisma.notification.count({

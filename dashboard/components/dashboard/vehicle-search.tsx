@@ -1,7 +1,16 @@
 "use client";
 
-import { Camera, CarFront, ChevronRight, Loader2, Search, X } from "lucide-react";
+import {
+  Camera,
+  CarFront,
+  ChevronRight,
+  Loader2,
+  Search,
+  ShieldAlert,
+  X,
+} from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { LicensePlateScanner } from "@/components/business/license-plate-scanner";
@@ -9,7 +18,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate, formatLicensePlate } from "@/lib/format";
 import { businessService } from "@/services/business.service";
+import { riskService } from "@/services/risk.service";
+import { useAuthStore } from "@/stores/auth.store";
 import { VehicleCheckSearchResult } from "@/types/business";
+import { RiskVehicleSearchResult } from "@/types/risk";
 
 type ViewportMetrics = {
   dialogMaxHeight: number;
@@ -18,10 +30,14 @@ type ViewportMetrics = {
 };
 
 export function VehicleSearch() {
+  const currentUserId = useAuthStore((state) => state.user?.id);
   const [isOpen, setIsOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<VehicleCheckSearchResult[]>([]);
+  const [buyBackResults, setBuyBackResults] = useState<
+    VehicleCheckSearchResult[]
+  >([]);
+  const [riskResults, setRiskResults] = useState<RiskVehicleSearchResult[]>([]);
   const [query, setQuery] = useState("");
   const [hasError, setHasError] = useState(false);
   const [viewportMetrics, setViewportMetrics] =
@@ -32,7 +48,8 @@ export function VehicleSearch() {
     setIsOpen(false);
     setIsScannerOpen(false);
     setQuery("");
-    setResults([]);
+    setBuyBackResults([]);
+    setRiskResults([]);
     setIsLoading(false);
     setHasError(false);
   }, []);
@@ -40,7 +57,8 @@ export function VehicleSearch() {
   function updateQuery(value: string) {
     const isSearchable = normalizeSearchText(value).length >= 2;
     setQuery(value);
-    setResults([]);
+    setBuyBackResults([]);
+    setRiskResults([]);
     setIsLoading(isSearchable);
     setHasError(false);
   }
@@ -68,14 +86,20 @@ export function VehicleSearch() {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => {
       setIsLoading(true);
-      void businessService
-        .searchVehicleChecks(query.trim(), 8, controller.signal)
-        .then((data) => {
-          if (!controller.signal.aborted) setResults(data);
+      void Promise.all([
+        businessService.searchVehicleChecks(query.trim(), 8, controller.signal),
+        riskService.search(query.trim(), 8, controller.signal),
+      ])
+        .then(([buyBack, risk]) => {
+          if (!controller.signal.aborted) {
+            setBuyBackResults(buyBack);
+            setRiskResults(risk);
+          }
         })
         .catch(() => {
           if (!controller.signal.aborted) {
-            setResults([]);
+            setBuyBackResults([]);
+            setRiskResults([]);
             setHasError(true);
           }
         })
@@ -163,9 +187,7 @@ export function VehicleSearch() {
                 height: viewportMetrics
                   ? `${viewportMetrics.height}px`
                   : "100dvh",
-                top: viewportMetrics
-                  ? `${viewportMetrics.offsetTop}px`
-                  : 0,
+                top: viewportMetrics ? `${viewportMetrics.offsetTop}px` : 0,
               }}
               onMouseDown={(event) => {
                 if (event.target === event.currentTarget) closeSearch();
@@ -187,9 +209,9 @@ export function VehicleSearch() {
                   )}
                   <Input
                     autoFocus
-                    aria-label="Immatriculation, numéro de contrôle, marque ou modèle"
+                    aria-label="Immatriculation, numéro de contrôle ou dossier Risk, marque ou modèle"
                     className="h-11 border-0 bg-transparent px-0 text-base shadow-none outline-none focus:border-0 focus:ring-0"
-                    placeholder="Immatriculation, numéro de contrôle, marque ou modèle…"
+                    placeholder="Plaque, contrôle ou dossier Risk, marque ou modèle…"
                     value={query}
                     onChange={(event) => updateQuery(event.target.value)}
                   />
@@ -223,8 +245,14 @@ export function VehicleSearch() {
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2">
-                  {isLoading && !results.length ? (
-                    <SearchMessage icon={Loader2} iconClassName="animate-spin" message="Chargement des véhicules…" />
+                  {isLoading &&
+                  !buyBackResults.length &&
+                  !riskResults.length ? (
+                    <SearchMessage
+                      icon={Loader2}
+                      iconClassName="animate-spin"
+                      message="Chargement des véhicules…"
+                    />
                   ) : hasError ? (
                     <SearchMessage
                       icon={Search}
@@ -235,51 +263,100 @@ export function VehicleSearch() {
                       icon={Search}
                       message="Saisissez au moins deux caractères pour lancer la recherche."
                     />
-                  ) : results.length ? (
-                    <div className="divide-y divide-gray-100">
-                      {results.map((vehicleCheck) => (
-                        <Link
-                          className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-teal-50"
-                          href={`/dashboard/vehicle-checks/${vehicleCheck.id}`}
-                          key={vehicleCheck.id}
-                          onClick={closeSearch}
-                        >
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700 ring-1 ring-teal-100 group-hover:bg-white">
-                            <CarFront className="h-4 w-4" />
-                          </span>
-                          <span className="min-w-0 flex-1">
-                            <span className="block text-sm font-semibold text-gray-950">
-                              {formatLicensePlate(
-                                vehicleCheck.licensePlate,
-                                vehicleCheck.licensePlateCountry,
-                                vehicleCheck.licensePlateRaw,
-                              )}
-                            </span>
-                            <span className="block truncate text-xs text-gray-500">
-                              {vehicleCheck.manufacturer?.name ?? "Constructeur non précisé"}
-                              {vehicleCheck.vehicleModel?.name
-                                ? ` · ${vehicleCheck.vehicleModel.name}`
-                                : ""}
-                              {vehicleCheck.city ? ` · ${vehicleCheck.city}` : ""}
-                            </span>
-                          </span>
-                          <span className="hidden shrink-0 text-right sm:block">
-                            <span className="block text-xs font-semibold text-gray-700">
-                              {vehicleCheck.checkNumber}
-                            </span>
-                            <span className="block text-[11px] text-gray-400">
-                              {formatDate(vehicleCheck.checkDate)}
-                            </span>
-                          </span>
-                          <ChevronRight className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-hover:translate-x-0.5 group-hover:text-teal-700" />
-                        </Link>
-                      ))}
-                    </div>
                   ) : (
-                    <SearchMessage
-                      icon={Search}
-                      message={`Aucun véhicule trouvé pour « ${query.trim()} ».`}
-                    />
+                    <div className="space-y-2">
+                      <SearchCategory
+                        count={buyBackResults.length}
+                        title="Buy Back"
+                      >
+                        {buyBackResults.length ? (
+                          buyBackResults.map((vehicleCheck) => (
+                            <Link
+                              className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-teal-50"
+                              href={`/dashboard/vehicle-checks/${vehicleCheck.id}`}
+                              key={vehicleCheck.id}
+                              onClick={closeSearch}
+                            >
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700 ring-1 ring-teal-100 group-hover:bg-white">
+                                <CarFront className="h-4 w-4" />
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-semibold text-gray-950">
+                                  {formatLicensePlate(
+                                    vehicleCheck.licensePlate,
+                                    vehicleCheck.licensePlateCountry,
+                                    vehicleCheck.licensePlateRaw,
+                                  )}
+                                </span>
+                                <span className="block truncate text-xs text-gray-500">
+                                  {vehicleCheck.manufacturer?.name ??
+                                    "Constructeur non précisé"}
+                                  {vehicleCheck.vehicleModel?.name
+                                    ? ` · ${vehicleCheck.vehicleModel.name}`
+                                    : ""}
+                                  {vehicleCheck.city
+                                    ? ` · ${vehicleCheck.city}`
+                                    : ""}
+                                </span>
+                              </span>
+                              <span className="hidden shrink-0 text-right sm:block">
+                                <span className="block text-xs font-semibold text-gray-700">
+                                  {vehicleCheck.checkNumber}
+                                </span>
+                                <span className="block text-[11px] text-gray-400">
+                                  {formatDate(vehicleCheck.checkDate)}
+                                </span>
+                              </span>
+                              <ChevronRight className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-hover:translate-x-0.5 group-hover:text-teal-700" />
+                            </Link>
+                          ))
+                        ) : (
+                          <EmptyCategory query={query} />
+                        )}
+                      </SearchCategory>
+
+                      <SearchCategory count={riskResults.length} title="Risk">
+                        {riskResults.length ? (
+                          riskResults.map((vehicle) => (
+                            <Link
+                              className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-amber-50"
+                              href={`/dashboard/risk/${vehicle.id}`}
+                              key={vehicle.id}
+                              onClick={closeSearch}
+                            >
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-100 group-hover:bg-white">
+                                <ShieldAlert className="h-4 w-4" />
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-semibold text-gray-950">
+                                  {formatLicensePlate(
+                                    vehicle.licensePlate,
+                                    vehicle.licensePlateCountry,
+                                    vehicle.licensePlateRaw,
+                                  )}
+                                </span>
+                                <span className="block truncate text-xs text-gray-500">
+                                  {vehicle.manufacturer.name} ·{" "}
+                                  {vehicle.agency.name}
+                                </span>
+                              </span>
+                              <span className="hidden shrink-0 text-right sm:block">
+                                <span className="block text-xs font-semibold text-gray-700">
+                                  {vehicle.riskNumber}
+                                </span>
+                                <span className="block text-[11px] text-gray-400">
+                                  {riskStatusLabel(vehicle, currentUserId)} ·{" "}
+                                  {formatDate(vehicle.updatedAt)}
+                                </span>
+                              </span>
+                              <ChevronRight className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-hover:translate-x-0.5 group-hover:text-amber-700" />
+                            </Link>
+                          ))
+                        ) : (
+                          <EmptyCategory query={query} />
+                        )}
+                      </SearchCategory>
+                    </div>
                   )}
                 </div>
 
@@ -295,7 +372,11 @@ export function VehicleSearch() {
                   onClose={() => setIsScannerOpen(false)}
                   onConfirm={(result) => {
                     updateQuery(
-                      formatLicensePlate(result.value, result.country, result.value),
+                      formatLicensePlate(
+                        result.value,
+                        result.country,
+                        result.value,
+                      ),
                     );
                     setIsScannerOpen(false);
                   }}
@@ -307,6 +388,47 @@ export function VehicleSearch() {
         : null}
     </>
   );
+}
+
+function SearchCategory({
+  children,
+  count,
+  title,
+}: {
+  children: ReactNode;
+  count: number;
+  title: string;
+}) {
+  return (
+    <section className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="flex items-center justify-between gap-3 bg-gray-50 px-3 py-2">
+        <h2 className="text-[11px] font-bold uppercase tracking-wide text-gray-600">
+          {title}
+        </h2>
+        <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-500 ring-1 ring-gray-200">
+          {count}
+        </span>
+      </div>
+      <div className="divide-y divide-gray-100">{children}</div>
+    </section>
+  );
+}
+
+function EmptyCategory({ query }: { query: string }) {
+  return (
+    <p className="px-3 py-4 text-center text-xs text-gray-400">
+      Aucun résultat pour « {query.trim()} ».
+    </p>
+  );
+}
+
+function riskStatusLabel(
+  vehicle: RiskVehicleSearchResult,
+  currentUserId?: string,
+) {
+  if (vehicle.status === "DRAFT") return "Brouillon";
+  if (vehicle.status === "CLOSED") return "Clos";
+  return vehicle.creatorId === currentUserId ? "Transmis" : "À analyser";
 }
 
 function SearchMessage({

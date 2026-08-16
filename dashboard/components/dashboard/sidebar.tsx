@@ -2,11 +2,33 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Building2, Calculator, ChevronDown, ChevronsUpDown, ClipboardList, Gauge, Info, LogOut, MapPin, Settings, Users, Wrench, X, type LucideIcon } from "lucide-react";
+import {
+  Building2,
+  Calculator,
+  CarFront,
+  ChevronDown,
+  ChevronsUpDown,
+  ClipboardList,
+  Gauge,
+  Info,
+  LogOut,
+  MapPin,
+  Settings,
+  Users,
+  Wrench,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { ReadylineBrand } from "@/components/branding/readyline-brand";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/stores/auth.store";
@@ -30,15 +52,42 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
   {
     label: "Activite",
     items: [
-      { label: "Controles", sublabel: "(Buy Back)", href: "/dashboard/vehicle-checks", icon: ClipboardList },
-      { label: "Pièces & Main-d'œuvre", sublabel: "(Estimation)", href: "/dashboard/estimation", icon: Calculator, comingSoon: true },
+      {
+        label: "Controles",
+        sublabel: "(Buy Back)",
+        href: "/dashboard/vehicle-checks",
+        icon: ClipboardList,
+      },
+      {
+        label: "Risk",
+        sublabel: "(Show room)",
+        href: "/dashboard/risk",
+        icon: CarFront,
+      },
+      {
+        label: "Pièces & Main-d'œuvre",
+        sublabel: "(Estimation)",
+        href: "/dashboard/estimation",
+        icon: Calculator,
+        comingSoon: true,
+      },
     ],
   },
   {
     label: "Referentiels",
     items: [
-      { label: "Types reparations", href: "/dashboard/repair-types", icon: Wrench, roles: ["ADMIN"] },
-      { label: "Constructeurs", href: "/dashboard/manufacturers", icon: Building2, roles: ["ADMIN"] },
+      {
+        label: "Types reparations",
+        href: "/dashboard/repair-types",
+        icon: Wrench,
+        roles: ["ADMIN"],
+      },
+      {
+        label: "Constructeurs",
+        href: "/dashboard/manufacturers",
+        icon: Building2,
+        roles: ["ADMIN"],
+      },
     ],
   },
   {
@@ -49,8 +98,18 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
         icon: Settings,
         subItems: [
           { label: "À propos", href: "/dashboard/settings", icon: Info },
-          { label: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["ADMIN", "MANAGER"] },
-          { label: "Agences", href: "/dashboard/agencies", icon: MapPin, roles: ["ADMIN"] },
+          {
+            label: "Utilisateurs",
+            href: "/dashboard/users",
+            icon: Users,
+            roles: ["ADMIN", "MANAGER"],
+          },
+          {
+            label: "Agences",
+            href: "/dashboard/agencies",
+            icon: MapPin,
+            roles: ["ADMIN"],
+          },
         ],
       },
     ],
@@ -76,10 +135,13 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       items: section.items
         .map((item) => ({
           ...item,
-          subItems: item.subItems?.filter((sub) => !sub.roles || (user && sub.roles.includes(user.role))),
+          subItems: item.subItems?.filter(
+            (sub) => !sub.roles || (user && sub.roles.includes(user.role)),
+          ),
         }))
         .filter((item) => {
-          if (item.subItems !== undefined) return (item.subItems?.length ?? 0) > 0;
+          if (item.subItems !== undefined)
+            return (item.subItems?.length ?? 0) > 0;
           return !item.roles || (user && item.roles.includes(user.role));
         }),
     }))
@@ -106,7 +168,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   return (
     <>
       <div
-        className={cn("fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden", isOpen ? "opacity-100" : "pointer-events-none opacity-0")}
+        className={cn(
+          "fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden",
+          isOpen ? "opacity-100" : "pointer-events-none opacity-0",
+        )}
         aria-hidden="true"
         onClick={onClose}
       />
@@ -118,7 +183,14 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       >
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 md:px-5">
           <ReadylineBrand size="compact" />
-          <Button aria-label="Fermer la navigation" className="md:hidden" size="icon" type="button" variant="ghost" onClick={onClose}>
+          <Button
+            aria-label="Fermer la navigation"
+            className="md:hidden"
+            size="icon"
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+          >
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -127,7 +199,9 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             {visibleSections.map((section) => (
               <div key={section.label}>
                 <div className="mb-2 flex items-center justify-between px-1">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{section.label}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                    {section.label}
+                  </p>
                   <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
                 </div>
                 <div className="space-y-1">
@@ -137,7 +211,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                     if (item.subItems !== undefined) {
                       const expanded = expandedItems.has(item.label);
                       const hasActiveChild = item.subItems.some(
-                        (sub) => sub.href && (pathname === sub.href || pathname.startsWith(sub.href)),
+                        (sub) =>
+                          sub.href &&
+                          (pathname === sub.href ||
+                            pathname.startsWith(sub.href)),
                       );
 
                       return (
@@ -154,7 +231,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                             <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
                               <span className="truncate">{item.label}</span>
                               <ChevronDown
-                                className={cn("h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform", expanded && "rotate-180")}
+                                className={cn(
+                                  "h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform",
+                                  expanded && "rotate-180",
+                                )}
                               />
                             </span>
                           </button>
@@ -162,8 +242,13 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                             <div className="mt-1 ml-4 space-y-1 border-l border-gray-200 pl-3">
                               {item.subItems.map((sub) => {
                                 const SubIcon = sub.icon;
-                                const active = sub.href ? pathname === sub.href || pathname.startsWith(sub.href) : false;
-                                const accessBadge = sub.roles?.length ? accessBadgeLabel(sub.roles) : null;
+                                const active = sub.href
+                                  ? pathname === sub.href ||
+                                    pathname.startsWith(sub.href)
+                                  : false;
+                                const accessBadge = sub.roles?.length
+                                  ? accessBadgeLabel(sub.roles)
+                                  : null;
 
                                 return (
                                   <Link
@@ -177,9 +262,17 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                                   >
                                     <SubIcon className="h-3.5 w-3.5" />
                                     <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
-                                      <span className="truncate">{sub.label}</span>
+                                      <span className="truncate">
+                                        {sub.label}
+                                      </span>
                                       {accessBadge ? (
-                                        <span className={cn("shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500", active && "bg-teal-100 text-teal-700")}>
+                                        <span
+                                          className={cn(
+                                            "shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500",
+                                            active &&
+                                              "bg-teal-100 text-teal-700",
+                                          )}
+                                        >
                                           {accessBadge}
                                         </span>
                                       ) : null}
@@ -193,8 +286,14 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                       );
                     }
 
-                    const active = item.href ? (pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))) : false;
-                    const accessBadge = item.roles?.length ? accessBadgeLabel(item.roles) : null;
+                    const active = item.href
+                      ? pathname === item.href ||
+                        (item.href !== "/dashboard" &&
+                          pathname.startsWith(item.href))
+                      : false;
+                    const accessBadge = item.roles?.length
+                      ? accessBadgeLabel(item.roles)
+                      : null;
 
                     if (item.comingSoon) {
                       return (
@@ -205,8 +304,14 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                           <Icon className="h-4 w-4" />
                           <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
                             <span className="min-w-0 leading-tight">
-                              <span className="block truncate">{item.label}</span>
-                              {item.sublabel ? <span className="block text-[11px] font-normal text-gray-300">{item.sublabel}</span> : null}
+                              <span className="block truncate">
+                                {item.label}
+                              </span>
+                              {item.sublabel ? (
+                                <span className="block text-[11px] font-normal text-gray-300">
+                                  {item.sublabel}
+                                </span>
+                              ) : null}
                             </span>
                             <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600">
                               Bientôt
@@ -230,10 +335,24 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                         <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
                           <span className="min-w-0 leading-tight">
                             <span className="block truncate">{item.label}</span>
-                            {item.sublabel ? <span className={cn("block text-[11px] font-normal text-gray-400", active && "text-teal-700/70")}>{item.sublabel}</span> : null}
+                            {item.sublabel ? (
+                              <span
+                                className={cn(
+                                  "block text-[11px] font-normal text-gray-400",
+                                  active && "text-teal-700/70",
+                                )}
+                              >
+                                {item.sublabel}
+                              </span>
+                            ) : null}
                           </span>
                           {accessBadge ? (
-                            <span className={cn("shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500", active && "bg-teal-100 text-teal-700")}>
+                            <span
+                              className={cn(
+                                "shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500",
+                                active && "bg-teal-100 text-teal-700",
+                              )}
+                            >
                               {accessBadge}
                             </span>
                           ) : null}
@@ -257,20 +376,47 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                   {userInitials(user?.firstName, user?.lastName, user?.email)}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-xs font-semibold text-gray-950">{userDisplayName(user?.firstName, user?.lastName, user?.email)}</span>
-                  <span className="mt-0.5 inline-flex rounded-full bg-teal-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-teal-700">{user?.role ?? "Utilisateur"}</span>
+                  <span className="block truncate text-xs font-semibold text-gray-950">
+                    {userDisplayName(
+                      user?.firstName,
+                      user?.lastName,
+                      user?.email,
+                    )}
+                  </span>
+                  <span className="mt-0.5 inline-flex rounded-full bg-teal-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-teal-700">
+                    {user?.role ?? "Utilisateur"}
+                  </span>
                 </span>
                 <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-gray-400" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="mb-2 w-60 p-1.5" side="top">
+            <DropdownMenuContent
+              align="start"
+              className="mb-2 w-60 p-1.5"
+              side="top"
+            >
               <div className="px-2 py-2">
-                <p className="truncate text-sm font-semibold text-gray-950">{userDisplayName(user?.firstName, user?.lastName, user?.email)}</p>
-                {user?.email ? <p className="mt-0.5 truncate text-xs text-gray-500">{user.email}</p> : null}
-                <p className="mt-1 text-[11px] font-bold uppercase text-teal-700">{user?.role ?? "Utilisateur"}</p>
+                <p className="truncate text-sm font-semibold text-gray-950">
+                  {userDisplayName(
+                    user?.firstName,
+                    user?.lastName,
+                    user?.email,
+                  )}
+                </p>
+                {user?.email ? (
+                  <p className="mt-0.5 truncate text-xs text-gray-500">
+                    {user.email}
+                  </p>
+                ) : null}
+                <p className="mt-1 text-[11px] font-bold uppercase text-teal-700">
+                  {user?.role ?? "Utilisateur"}
+                </p>
               </div>
               <DropdownMenuSeparator className="my-1 h-px bg-gray-200" />
-              <DropdownMenuItem className="text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700" onClick={handleLogout}>
+              <DropdownMenuItem
+                className="text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700"
+                onClick={handleLogout}
+              >
                 <LogOut className="h-3.5 w-3.5" />
                 Deconnexion
               </DropdownMenuItem>
@@ -282,18 +428,27 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   );
 }
 
-function userInitials(firstName?: string | null, lastName?: string | null, email?: string | null) {
+function userInitials(
+  firstName?: string | null,
+  lastName?: string | null,
+  email?: string | null,
+) {
   const initials = [firstName?.[0], lastName?.[0]].filter(Boolean).join("");
   if (initials) return initials.toUpperCase();
   return email?.[0]?.toUpperCase() ?? "U";
 }
 
-function userDisplayName(firstName?: string | null, lastName?: string | null, email?: string | null) {
+function userDisplayName(
+  firstName?: string | null,
+  lastName?: string | null,
+  email?: string | null,
+) {
   return [firstName, lastName].filter(Boolean).join(" ") || email || "Compte";
 }
 
 function accessBadgeLabel(roles: Role[]) {
-  if (roles.includes("ADMIN") && roles.includes("MANAGER")) return "Admin/Manager";
+  if (roles.includes("ADMIN") && roles.includes("MANAGER"))
+    return "Admin/Manager";
   if (roles.includes("ADMIN")) return "Admin";
   if (roles.includes("MANAGER")) return "Manager";
   return null;
