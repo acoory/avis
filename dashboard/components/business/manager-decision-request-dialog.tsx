@@ -2,6 +2,7 @@
 
 import { Copy, ExternalLink, Loader2, Send, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { businessService } from "@/services/business.service";
@@ -119,15 +120,20 @@ export function ManagerDecisionRequestDialog({
     window.open(decisionUrl, "_blank", "noopener,noreferrer");
   }
 
-  if (!open) {
+  if (!open || typeof document === "undefined") {
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4">
+  return createPortal(
+    <div
+      aria-labelledby="manager-decision-dialog-title"
+      aria-modal="true"
+      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-slate-950/45 p-2 sm:items-center sm:p-4"
+      role="dialog"
+    >
       <div
         aria-busy={isSending}
-        className="relative w-full max-w-lg overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl"
+        className="relative my-auto flex max-h-[calc(100dvh-1rem)] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl sm:max-h-[calc(100dvh-2rem)]"
       >
         {isSending ? (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/80 text-sm font-semibold text-slate-700 backdrop-blur-sm">
@@ -138,7 +144,10 @@ export function ManagerDecisionRequestDialog({
 
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
           <div>
-            <p className="text-base font-bold text-slate-950">
+            <p
+              className="text-base font-bold text-slate-950"
+              id="manager-decision-dialog-title"
+            >
               Demander l&apos;avis manager
             </p>
             <p className="mt-1 text-sm text-slate-500">
@@ -157,7 +166,10 @@ export function ManagerDecisionRequestDialog({
           </Button>
         </div>
 
-        <fieldset className="space-y-4 p-4" disabled={isSending}>
+        <fieldset
+          className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4"
+          disabled={isSending}
+        >
           <label className="grid gap-1.5">
             <span className="text-xs font-semibold uppercase text-slate-500">
               Manager
@@ -256,6 +268,7 @@ export function ManagerDecisionRequestDialog({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

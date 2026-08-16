@@ -2,6 +2,7 @@
 
 import { AlertTriangle, Trash2, X } from "lucide-react";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { formatLicensePlate } from "@/lib/format";
@@ -25,7 +26,7 @@ export function VehicleCheckDeleteDialog({
   const [errorMessage, setErrorMessage] = useState("");
   const [errorVehicleCheckId, setErrorVehicleCheckId] = useState<string | null>(null);
 
-  if (!open || !vehicleCheck) {
+  if (!open || !vehicleCheck || typeof document === "undefined") {
     return null;
   }
 
@@ -67,16 +68,16 @@ export function VehicleCheckDeleteDialog({
     }
   }
 
-  return (
+  return createPortal(
     <div
       aria-labelledby="delete-vehicle-check-title"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-end bg-black/40 p-0 sm:items-center sm:justify-center sm:p-4"
+      className="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-black/40 p-0 sm:items-center sm:p-4"
       role="dialog"
       onClick={closeDialog}
     >
       <div
-        className="w-full rounded-t-xl bg-white p-5 shadow-xl sm:max-w-md sm:rounded-xl"
+        className="max-h-[100dvh] w-full overflow-y-auto rounded-t-xl bg-white p-5 shadow-xl sm:my-auto sm:max-h-[calc(100dvh-2rem)] sm:max-w-md sm:rounded-xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
@@ -115,6 +116,7 @@ export function VehicleCheckDeleteDialog({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
