@@ -1,10 +1,11 @@
 "use client";
 
-import { CheckCircle2, ChevronLeft, ChevronRight, FileText, X } from "lucide-react";
+import { CheckCircle2, FileText } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { DamagePhotoGallery } from "@/components/business/damage-photo-gallery";
 import { Badge } from "@/components/ui/badge";
-import { cloudinaryPreviewUrl, cloudinaryThumbnailUrl } from "@/lib/damage-photo";
+import { cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { formatDate, formatLicensePlate } from "@/lib/format";
 import { businessService } from "@/services/business.service";
 import { PublicVehicleCheckShare, VehicleCheckItem } from "@/types/business";
@@ -34,32 +35,6 @@ export default function PublicRepairRequestPage() {
 
   const items = useMemo(() => share?.vehicleCheck.items ?? [], [share?.vehicleCheck.items]);
 
-  useEffect(() => {
-    if (!gallery) return;
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setGallery(null);
-      }
-
-      if (event.key === "ArrowLeft") {
-        setGallery((current) => (current ? { ...current, index: previousPhotoIndex(current) } : current));
-      }
-
-      if (event.key === "ArrowRight") {
-        setGallery((current) => (current ? { ...current, index: nextPhotoIndex(current) } : current));
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gallery]);
-
-  useEffect(() => {
-    if (!gallery?.photos.length) return;
-    preloadGalleryPhotos(gallery.photos, gallery.index);
-  }, [gallery?.index, gallery?.photos]);
-
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
@@ -73,7 +48,7 @@ export default function PublicRepairRequestPage() {
       <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
         <div className="max-w-md rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
           <p className="text-lg font-bold text-slate-950">Demande introuvable</p>
-          <p className="mt-2 text-sm text-slate-500">Ce lien public n'est pas disponible.</p>
+          <p className="mt-2 text-sm text-slate-500">Ce lien public n&apos;est pas disponible.</p>
         </div>
       </main>
     );
@@ -140,7 +115,17 @@ export default function PublicRepairRequestPage() {
           onConfirm={takeCharge}
         />
       ) : null}
-      {gallery ? <PhotoGalleryModal gallery={gallery} onClose={() => setGallery(null)} onChange={setGallery} /> : null}
+      {gallery ? (
+        <DamagePhotoGallery
+          index={gallery.index}
+          photos={gallery.photos}
+          title={gallery.title}
+          onClose={() => setGallery(null)}
+          onIndexChange={(index) =>
+            setGallery((current) => (current ? { ...current, index } : current))
+          }
+        />
+      ) : null}
     </main>
   );
 }
@@ -219,7 +204,7 @@ function TakeChargeConfirmDialog({
           <div>
             <h2 className="text-base font-bold text-slate-950">Confirmer la prise en charge ?</h2>
             <p className="mt-1 text-sm font-medium text-slate-500">
-              Cette action indique au donneur d'ordre que vous prenez en charge cette demande de devis.
+              Cette action indique au donneur d&apos;ordre que vous prenez en charge cette demande de devis.
             </p>
           </div>
         </div>
@@ -350,93 +335,6 @@ function PhotoCell({
       ) : null}
     </div>
   );
-}
-
-function PhotoGalleryModal({
-  gallery,
-  onChange,
-  onClose,
-}: {
-  gallery: PhotoGallery;
-  onChange: (gallery: PhotoGallery) => void;
-  onClose: () => void;
-}) {
-  const photo = gallery.photos[gallery.index];
-  const hasMultiplePhotos = gallery.photos.length > 1;
-
-  if (!photo) {
-    return null;
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-3" role="dialog" aria-modal="true" onClick={onClose}>
-      <div className="relative flex max-h-full w-full max-w-5xl flex-col gap-3" onClick={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-2 shadow">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-slate-950">{gallery.title}</p>
-            <p className="text-xs font-medium text-slate-500">
-              Photo {gallery.index + 1} / {gallery.photos.length}
-            </p>
-          </div>
-          <button className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100" type="button" onClick={onClose}>
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="relative flex min-h-0 items-center justify-center rounded-lg bg-black/30">
-          {hasMultiplePhotos ? (
-            <button
-              aria-label="Photo precedente"
-              className="absolute left-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow hover:bg-white"
-              type="button"
-              onClick={() => onChange({ ...gallery, index: previousPhotoIndex(gallery) })}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-          ) : null}
-          <img
-            alt="Degat constate"
-            className="max-h-[75vh] max-w-full rounded-lg object-contain shadow-2xl"
-            decoding="async"
-            src={cloudinaryPreviewUrl(photo)}
-          />
-          {hasMultiplePhotos ? (
-            <button
-              aria-label="Photo suivante"
-              className="absolute right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow hover:bg-white"
-              type="button"
-              onClick={() => onChange({ ...gallery, index: nextPhotoIndex(gallery) })}
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function previousPhotoIndex(gallery: PhotoGallery) {
-  return gallery.index === 0 ? gallery.photos.length - 1 : gallery.index - 1;
-}
-
-function nextPhotoIndex(gallery: PhotoGallery) {
-  return gallery.index === gallery.photos.length - 1 ? 0 : gallery.index + 1;
-}
-
-function preloadGalleryPhotos(photos: RepairPhoto[], index: number) {
-  const indexes = new Set([
-    index,
-    (index - 1 + photos.length) % photos.length,
-    (index + 1) % photos.length,
-  ]);
-
-  indexes.forEach((photoIndex) => {
-    const photo = photos[photoIndex];
-    if (!photo) return;
-    const image = new Image();
-    image.src = cloudinaryPreviewUrl(photo);
-  });
 }
 
 function PartOrderBadge({ item }: { item: VehicleCheckItem }) {

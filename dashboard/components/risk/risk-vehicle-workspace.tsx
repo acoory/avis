@@ -16,6 +16,7 @@ import {
   Lock,
   MessageSquareText,
   Paperclip,
+  RotateCw,
   Send,
   Trash2,
   UsersRound,
@@ -25,6 +26,11 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ManagerMultiSelect } from "@/components/business/manager-multi-select";
+import {
+  PhotoCarousel,
+  PhotoCarouselItem,
+} from "@/components/business/photo-carousel";
+import { RotatablePhoto } from "@/components/business/rotatable-photo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -283,6 +289,17 @@ export function RiskVehicleWorkspace({
   const galleryPhotos = useMemo(
     () => gallerySections.flatMap((section) => section.items),
     [gallerySections],
+  );
+  const galleryCarouselItems = useMemo<PhotoCarouselItem[]>(
+    () =>
+      galleryPhotos.map((item) => ({
+        id: item.photo.id,
+        label: item.label,
+        previewUrl: cloudinaryPreviewUrl(item.photo, 1800),
+        section: item.section,
+        thumbnailUrl: cloudinaryThumbnailUrl(item.photo, 200),
+      })),
+    [galleryPhotos],
   );
 
   async function reload() {
@@ -1100,10 +1117,10 @@ export function RiskVehicleWorkspace({
           </div>
         ) : null}
       </div>
-      {viewerPhotoIndex !== null && galleryPhotos[viewerPhotoIndex] ? (
-        <RiskPhotoViewer
+      {viewerPhotoIndex !== null && galleryCarouselItems[viewerPhotoIndex] ? (
+        <PhotoCarousel
           currentIndex={viewerPhotoIndex}
-          items={galleryPhotos}
+          items={galleryCarouselItems}
           onClose={() => setViewerPhotoIndex(null)}
           onIndexChange={setViewerPhotoIndex}
         />
@@ -1192,247 +1209,6 @@ function RiskPhotoGallery({
   );
 }
 
-function RiskPhotoViewer({
-  currentIndex,
-  items,
-  onClose,
-  onIndexChange,
-}: {
-  currentIndex: number;
-  items: GalleryPhoto[];
-  onClose: () => void;
-  onIndexChange: (index: number) => void;
-}) {
-  const current = items[currentIndex];
-  const previewUrls = useMemo(
-    () => items.map((item) => cloudinaryPreviewUrl(item.photo, 1800)),
-    [items],
-  );
-  const [preloadAttempt, setPreloadAttempt] = useState(0);
-  const [preloadState, setPreloadState] = useState({
-    complete: false,
-    failed: 0,
-    loaded: 0,
-    ready: false,
-    total: previewUrls.length,
-  });
-
-  useEffect(() => {
-    let cancelled = false;
-    let completed = 0;
-    let failed = 0;
-
-    for (const url of previewUrls) {
-      const image = new Image();
-      let settled = false;
-      const finish = (didFail: boolean) => {
-        if (cancelled || settled) return;
-        settled = true;
-        completed += 1;
-        if (didFail) failed += 1;
-        setPreloadState({
-          complete: completed === previewUrls.length,
-          failed,
-          loaded: completed - failed,
-          ready: completed === previewUrls.length && failed === 0,
-          total: previewUrls.length,
-        });
-      };
-      image.onload = () => {
-        if (typeof image.decode === "function") {
-          void image
-            .decode()
-            .then(() => finish(false))
-            .catch(() => finish(false));
-          return;
-        }
-        finish(false);
-      };
-      image.onerror = () => finish(true);
-      image.src = url;
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [preloadAttempt, previewUrls]);
-
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-      if (preloadState.ready && event.key === "ArrowLeft") {
-        onIndexChange(currentIndex === 0 ? items.length - 1 : currentIndex - 1);
-      }
-      if (preloadState.ready && event.key === "ArrowRight") {
-        onIndexChange((currentIndex + 1) % items.length);
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [currentIndex, items.length, onClose, onIndexChange, preloadState.ready]);
-
-  return (
-    <div
-      aria-label="Visionneuse des photos du contrôle"
-      aria-modal="true"
-      className="fixed inset-0 z-[80] flex flex-col bg-slate-950/95 p-3 text-white sm:p-5"
-      role="dialog"
-      onClick={onClose}
-    >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold sm:text-base">
-            {preloadState.ready ? current.label : "Chargement du carrousel"}
-          </p>
-          <p className="text-xs text-white/60">
-            {preloadState.ready
-              ? `${current.section} · ${currentIndex + 1}/${items.length}`
-              : `${preloadState.loaded}/${preloadState.total} photos chargées`}
-          </p>
-        </div>
-        <button
-          aria-label="Fermer la visionneuse"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-          type="button"
-          onClick={onClose}
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
-
-      {!preloadState.ready ? (
-        <div
-          className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-4 text-center"
-          onClick={(event) => event.stopPropagation()}
-        >
-          {!preloadState.complete ? (
-            <>
-              <LoaderCircle className="h-10 w-10 animate-spin text-teal-400" />
-              <div>
-                <p className="font-semibold">Préparation des photos…</p>
-                <p className="mt-1 text-sm text-white/60">
-                  Le carrousel s’ouvrira quand toutes les images seront prêtes.
-                </p>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/15">
-                <div
-                  className="h-full rounded-full bg-teal-400 transition-all"
-                  style={{
-                    width: `${
-                      ((preloadState.loaded + preloadState.failed) /
-                        Math.max(1, preloadState.total)) *
-                      100
-                    }%`,
-                  }}
-                />
-              </div>
-              <p className="text-xs text-white/50">
-                {preloadState.loaded + preloadState.failed}/{preloadState.total}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="font-semibold">
-                {preloadState.failed} photo
-                {preloadState.failed > 1 ? "s n’ont" : " n’a"} pas pu être
-                chargée{preloadState.failed > 1 ? "s" : ""}.
-              </p>
-              <p className="text-sm text-white/60">
-                Vérifiez la connexion puis relancez le chargement.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setPreloadState({
-                    complete: false,
-                    failed: 0,
-                    loaded: 0,
-                    ready: false,
-                    total: previewUrls.length,
-                  });
-                  setPreloadAttempt((attempt) => attempt + 1);
-                }}
-              >
-                Réessayer
-              </Button>
-            </>
-          )}
-        </div>
-      ) : (
-        <>
-          <div
-            className="relative mx-auto my-3 flex min-h-0 w-full max-w-6xl flex-1 items-center justify-center"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <img
-              alt={current.label}
-              className="max-h-full max-w-full rounded-lg object-contain"
-              src={previewUrls[currentIndex]}
-            />
-            {items.length > 1 ? (
-              <>
-                <button
-                  aria-label="Photo précédente"
-                  className="absolute left-1 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75 sm:left-3"
-                  type="button"
-                  onClick={() =>
-                    onIndexChange(
-                      currentIndex === 0 ? items.length - 1 : currentIndex - 1,
-                    )
-                  }
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-                <button
-                  aria-label="Photo suivante"
-                  className="absolute right-1 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75 sm:right-3"
-                  type="button"
-                  onClick={() =>
-                    onIndexChange((currentIndex + 1) % items.length)
-                  }
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-              </>
-            ) : null}
-          </div>
-
-          <div
-            className="mx-auto flex w-full max-w-6xl gap-2 overflow-x-auto pb-[max(0px,env(safe-area-inset-bottom))]"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {items.map((item, index) => (
-              <button
-                aria-label={`Afficher ${item.label}`}
-                className={cn(
-                  "h-14 w-20 shrink-0 overflow-hidden rounded-md border-2 bg-slate-900",
-                  index === currentIndex
-                    ? "border-teal-400"
-                    : "border-transparent opacity-60 hover:opacity-100",
-                )}
-                key={item.photo.id}
-                type="button"
-                onClick={() => onIndexChange(index)}
-              >
-                <img
-                  alt=""
-                  className="h-full w-full object-cover"
-                  src={cloudinaryThumbnailUrl(item.photo, 200)}
-                />
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
 function DamagePhotoCarousel({
   label,
@@ -1442,6 +1218,7 @@ function DamagePhotoCarousel({
   photos: RiskPhoto[];
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [rotation, setRotation] = useState(0);
   const safeIndex = photos.length
     ? Math.min(currentIndex, photos.length - 1)
     : 0;
@@ -1457,22 +1234,35 @@ function DamagePhotoCarousel({
 
   return (
     <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-md bg-slate-100">
-      <img
+      <RotatablePhoto
         alt={`${label}, photo ${safeIndex + 1}`}
-        className="h-full w-full object-cover"
+        key={currentPhoto.id}
+        rotation={rotation}
         src={cloudinaryThumbnailUrl(currentPhoto, 240)}
       />
+      <button
+        aria-label="Faire pivoter la photo de 90 degrés"
+        className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white"
+        title="Faire pivoter"
+        type="button"
+        onClick={() =>
+          setRotation((currentRotation) => (currentRotation + 90) % 360)
+        }
+      >
+        <RotateCw className="h-3 w-3" />
+      </button>
       {photos.length > 1 ? (
         <>
           <button
             aria-label="Photo précédente"
             className="absolute left-1 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white"
             type="button"
-            onClick={() =>
+            onClick={() => {
+              setRotation(0);
               setCurrentIndex((index) =>
                 index === 0 ? photos.length - 1 : index - 1,
-              )
-            }
+              );
+            }}
           >
             <ChevronLeft className="h-3.5 w-3.5" />
           </button>
@@ -1480,9 +1270,10 @@ function DamagePhotoCarousel({
             aria-label="Photo suivante"
             className="absolute right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white"
             type="button"
-            onClick={() =>
-              setCurrentIndex((index) => (index + 1) % photos.length)
-            }
+            onClick={() => {
+              setRotation(0);
+              setCurrentIndex((index) => (index + 1) % photos.length);
+            }}
           >
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
