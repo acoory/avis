@@ -297,7 +297,7 @@ export default function DashboardPage() {
         value: formatCompactMoney(difference),
       },
       {
-        description: "Pieces a commander",
+        description: "A commander",
         chartData: timelineChartData(timeline, "partOrdersToPlaceCount"),
         chartValueFormatter: formatInteger,
         icon: PackageCheck,

@@ -346,7 +346,7 @@ function PartOrderBadge({ item }: { item: VehicleCheckItem }) {
     return <Badge variant="success">Piece commandee</Badge>;
   }
 
-  return <Badge variant="warning">Piece a commander</Badge>;
+  return <Badge variant="warning">A commander</Badge>;
 }
 
 function formatShortDateTime(value: string) {

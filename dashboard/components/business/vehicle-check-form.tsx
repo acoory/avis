@@ -1746,7 +1746,7 @@ function RepairEditorFields({
           type="checkbox"
           onChange={(event) => onPatch({ partOrderRequired: event.target.checked })}
         />
-        <span>Pièce à commander</span>
+        <span>A commander</span>
       </label>
     </div>
   );
@@ -2316,7 +2316,7 @@ function DecisionSummaryPanel({
         <Summary label="Agence" value={agencyName} />
         <Summary label="Economie reference" value={formatMoney(preview.totalInternalSavingAmount)} />
         <Summary label="Franchise constructeur" value={formatMoney(preview.constructorAllowanceAmount)} />
-        <Summary label="Pieces a commander" value={partOrderSummaryLabel(preview.items)} />
+        <Summary label="A commander" value={partOrderSummaryLabel(preview.items)} />
       </div>
 
       <div className="rounded-md border border-gray-200">
@@ -2367,7 +2367,7 @@ function Summary({ label, value }: { label: string; value: string }) {
 function PartOrderDraftBadge({ inline = false }: { inline?: boolean }) {
   return (
     <span className={`${inline ? "" : "mt-2"} inline-flex rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800`}>
-      Pièce à commander
+      A commander
     </span>
   );
 }
@@ -2443,7 +2443,7 @@ function ValidationRecap({
             <RecapLine label="Ville" value={city} />
             <RecapLine label="Economie reference" value={formatMoney(preview?.totalInternalSavingAmount)} />
             <RecapLine label="Franchise constructeur" value={formatMoney(preview?.constructorAllowanceAmount)} />
-            <RecapLine label="Pieces a commander" value={partOrderSummaryLabel(preview?.items ?? [])} />
+            <RecapLine label="A commander" value={partOrderSummaryLabel(preview?.items ?? [])} />
           </div>
 
           <div className="rounded-md border border-gray-200">

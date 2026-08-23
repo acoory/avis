@@ -198,9 +198,9 @@ function VehicleChecksStats({ stats }: { stats: VehicleCheckListStats }) {
       value: formatInteger(stats.takenInChargeCount),
     },
     {
-      description: "Pieces a commander",
+      description: "A commander",
       icon: PackageCheck,
-      title: "Pieces a commander",
+      title: "A commander",
       tone: "blue",
       value: formatInteger(stats.toOrderCount),
     },

@@ -142,7 +142,7 @@ export default function VehicleCheckPrintPage() {
         <section className="mt-3 grid gap-1.5 sm:grid-cols-2">
           <Metric label="Franchise constructeur" value={formatMoney(vehicleCheck.constructorAllowanceAmount)} />
           <Metric
-            label="Pieces a commander"
+            label="A commander"
             value={
               !partOrderSummary.required
                 ? "Aucune"
@@ -283,5 +283,5 @@ function PartOrderBadge({ item }: { item: NonNullable<VehicleCheck["items"]>[num
     return <Badge variant="success">Piece commandee</Badge>;
   }
 
-  return <Badge variant="warning">Piece a commander</Badge>;
+  return <Badge variant="warning">A commander</Badge>;
 }

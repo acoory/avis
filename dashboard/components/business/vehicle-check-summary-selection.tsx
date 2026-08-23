@@ -1,12 +1,18 @@
 "use client";
 
-import { CarFront, CheckCircle2, CheckSquare2, ChevronDown, Clock, Download, Info, Mail, Maximize2, Package, Pencil, RefreshCw, Wrench, X } from "lucide-react";
+import { CarFront, CheckCircle2, CheckSquare2, ChevronDown, Clock, Download, Info, Mail, Maximize2, MoreHorizontal, Package, Pencil, RefreshCw, Wrench, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DamagePhotoGallery } from "@/components/business/damage-photo-gallery";
 import { RepairRequestEmailDialog } from "@/components/business/repair-request-email-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cloudinaryThumbnailUrl } from "@/lib/damage-photo";
 import { downloadVehicleCheckPdf } from "@/lib/vehicle-check-pdf";
 import { businessService } from "@/services/business.service";
@@ -245,6 +251,10 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
               const isEditingExecutionMode = editingExecutionModeItemIds.has(item.id);
               const showsOnSiteStatus = checked && executionMode === "ON_SITE" && isSummaryReady;
               const showsPartOrderStatus = item.partOrderRequired && item.operationalStatus === "ACTIVE";
+              const isPartOrderPending = showsPartOrderStatus && item.partOrderStatus !== "ORDERED";
+              const isPartOrdered = showsPartOrderStatus && item.partOrderStatus === "ORDERED";
+              const isOnSitePending = showsOnSiteStatus && !item.executionCompletedAt;
+              const isOnSiteCompleted = showsOnSiteStatus && Boolean(item.executionCompletedAt);
 
               return (
                 <div
@@ -308,7 +318,7 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
                       </span>
                     </button>
                   ) : null}
-                  <div className="min-w-0 flex-1 lg:grid lg:grid-cols-[minmax(190px,.75fr)_minmax(190px,.7fr)_minmax(420px,1.55fr)] lg:items-center lg:gap-4 2xl:grid-cols-[minmax(220px,.65fr)_minmax(220px,.6fr)_minmax(620px,1.75fr)] 2xl:gap-5">
+                  <div className="min-w-0 flex-1 lg:grid lg:grid-cols-[minmax(190px,.9fr)_minmax(170px,.65fr)_minmax(280px,1fr)] lg:items-center lg:gap-4 2xl:grid-cols-[minmax(220px,.8fr)_minmax(190px,.6fr)_minmax(360px,1fr)] 2xl:gap-5">
                     <div className="min-w-0">
                       <p className="text-[13px] font-semibold leading-5 text-gray-950">{item.vehiclePart.name}</p>
                       <p className="text-xs leading-4 text-gray-500">
@@ -322,7 +332,7 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
 
                     {checked ? (
                       <div className="mt-3 min-w-0 lg:mt-0">
-                        <p className="mb-1 text-[11px] font-medium leading-4 text-gray-500">Lieu d’intervention</p>
+                        <p className="mb-1 text-[11px] font-medium leading-4 text-gray-500">Intervention</p>
                         {!executionMode || isEditingExecutionMode ? (
                           <>
                             <div className="flex flex-wrap gap-2" role="group" aria-label={`Lieu de l'intervention pour ${item.vehiclePart.name}`}>
@@ -362,9 +372,16 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
                               {executionMode === "ON_SITE" ? "Sur place" : "Chez un prestataire"}
                             </span>
                             {!isCompleted ? (
-                              <Button className="h-7 px-1.5 text-xs text-gray-600" size="sm" type="button" variant="ghost" onClick={() => editExecutionMode(item.id)}>
+                              <Button
+                                aria-label={`Modifier le lieu d'intervention de ${item.vehiclePart.name}`}
+                                className="h-7 w-7 p-0 text-gray-500"
+                                size="icon"
+                                title="Modifier le lieu"
+                                type="button"
+                                variant="ghost"
+                                onClick={() => editExecutionMode(item.id)}
+                              >
                                 <Pencil className="h-3.5 w-3.5" />
-                                Modifier
                               </Button>
                             ) : null}
                           </div>
@@ -376,71 +393,101 @@ export function VehicleCheckSummarySelection({ vehicleCheck, onUpdated }: Vehicl
                       {showsOnSiteStatus || showsPartOrderStatus ? (
                         <>
                           <p className="mb-1 text-[11px] font-medium leading-4 text-gray-500">État</p>
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            {showsOnSiteStatus ? (
-                              <>
-                                <span
-                                  className={[
-                                    "inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium",
-                                    item.executionCompletedAt
-                                      ? "bg-emerald-50 text-emerald-800"
-                                      : "bg-amber-50 text-amber-900",
-                                  ].join(" ")}
-                                >
-                                  {item.executionCompletedAt ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-                                  {item.executionCompletedAt ? "Réparation terminée" : "À réparer sur place"}
-                                </span>
-                                {!isCompleted ? (
-                                  <Button
-                                    className="h-8 px-2.5 text-xs"
-                                    disabled={executionSavingId === item.id || isSelectionChanged}
-                                    size="sm"
-                                    type="button"
-                                    variant={item.executionCompletedAt ? "outline" : "default"}
-                                    onClick={() => void updateExecutionStatus(item)}
-                                  >
-                                    <CheckCircle2 className="h-3.5 w-3.5" />
-                                    {executionSavingId === item.id
-                                      ? "Mise à jour..."
-                                      : item.executionCompletedAt
-                                        ? "Remettre à faire"
-                                        : "Marquer terminée"}
-                                  </Button>
-                                ) : null}
-                              </>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={[
+                                "inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium",
+                                isPartOrderPending
+                                  ? "bg-orange-50 text-orange-700"
+                                  : isOnSitePending
+                                    ? "bg-amber-50 text-amber-900"
+                                    : "bg-emerald-50 text-emerald-800",
+                              ].join(" ")}
+                            >
+                              {isPartOrderPending ? (
+                                <Package className="h-3.5 w-3.5" />
+                              ) : isOnSitePending ? (
+                                <Clock className="h-3.5 w-3.5" />
+                              ) : (
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                              )}
+                              {isPartOrderPending
+                                ? "A commander"
+                                : isOnSitePending
+                                  ? "À terminer"
+                                  : isOnSiteCompleted
+                                    ? "Terminée"
+                                    : "Pièce commandée"}
+                            </span>
+
+                            {!isCompleted && isPartOrderPending ? (
+                              <Button
+                                className="h-8 px-2.5 text-xs"
+                                disabled={partOrderSavingId === item.id}
+                                size="sm"
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  void updatePartOrder(item, "ORDERED");
+                                }}
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                {partOrderSavingId === item.id ? "Mise à jour..." : "Marquer commandée"}
+                              </Button>
                             ) : null}
-                            {showsPartOrderStatus ? (
-                              <>
-                                <span
-                                  className={[
-                                    "inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium",
-                                    item.partOrderStatus === "ORDERED" ? "bg-emerald-50 text-emerald-800" : "bg-orange-50 text-orange-700",
-                                  ].join(" ")}
-                                >
-                                  {item.partOrderStatus === "ORDERED" ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Package className="h-3.5 w-3.5" />}
-                                  {item.partOrderStatus === "ORDERED" ? "Pièce commandée" : "Pièce à commander"}
-                                </span>
-                                {!isCompleted ? (
+
+                            {!isCompleted && !isPartOrderPending && isOnSitePending ? (
+                              <Button
+                                className="h-8 px-2.5 text-xs"
+                                disabled={executionSavingId === item.id || isSelectionChanged}
+                                size="sm"
+                                type="button"
+                                onClick={() => void updateExecutionStatus(item)}
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                {executionSavingId === item.id ? "Mise à jour..." : "Marquer terminée"}
+                              </Button>
+                            ) : null}
+
+                            {!isCompleted && (isPartOrdered || isOnSiteCompleted) ? (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
                                   <Button
-                                    className="h-8 px-2.5 text-xs"
-                                    disabled={partOrderSavingId === item.id}
-                                    size="sm"
+                                    aria-label={`Actions secondaires pour ${item.vehiclePart.name}`}
+                                    className="h-8 w-8 p-0 text-gray-500"
+                                    size="icon"
+                                    title="Actions secondaires"
                                     type="button"
-                                    variant={item.partOrderStatus === "ORDERED" ? "outline" : "default"}
-                                    onClick={(event) => {
-                                      event.preventDefault();
-                                      event.stopPropagation();
-                                      void updatePartOrder(item, item.partOrderStatus === "ORDERED" ? "TO_ORDER" : "ORDERED");
-                                    }}
+                                    variant="ghost"
                                   >
-                                    <CheckCircle2 className="h-3.5 w-3.5" />
-                                    {partOrderSavingId === item.id ? "Mise à jour..." : item.partOrderStatus === "ORDERED" ? "Remettre à commander" : "Marquer commandée"}
+                                    <MoreHorizontal className="h-4 w-4" />
                                   </Button>
-                                ) : null}
-                              </>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {isPartOrdered ? (
+                                    <DropdownMenuItem
+                                      disabled={partOrderSavingId === item.id}
+                                      onSelect={() => void updatePartOrder(item, "TO_ORDER")}
+                                    >
+                                      <Package className="h-4 w-4" />
+                                      Remettre à commander
+                                    </DropdownMenuItem>
+                                  ) : null}
+                                  {isOnSiteCompleted ? (
+                                    <DropdownMenuItem
+                                      disabled={executionSavingId === item.id || isSelectionChanged}
+                                      onSelect={() => void updateExecutionStatus(item)}
+                                    >
+                                      <Clock className="h-4 w-4" />
+                                      Remettre à faire
+                                    </DropdownMenuItem>
+                                  ) : null}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             ) : null}
                           </div>
-                          {showsOnSiteStatus && isSelectionChanged ? (
+                          {isOnSitePending && isSelectionChanged ? (
                             <p className="mt-1.5 text-xs text-amber-700">Enregistre la sélection avant de mettre à jour la réparation.</p>
                           ) : null}
                         </>
