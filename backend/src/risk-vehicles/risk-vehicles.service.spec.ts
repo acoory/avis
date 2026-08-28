@@ -175,12 +175,14 @@ describe('RiskVehiclesService', () => {
       fileName: 'RISK_AA-111-AA.zip',
       photos: [
         {
-          archivePath: 'RISK_AA-111-AA/Exterieur/01-vue-3-4-avant.webp',
-          secureUrl: 'https://res.cloudinary.com/demo/image/upload/front.webp',
+          archivePath: 'RISK_AA-111-AA/Exterieur/01-vue-3-4-avant.jpg',
+          downloadUrl:
+            'https://res.cloudinary.com/demo/image/upload/f_jpg,q_auto:good,c_limit,w_2048/front.webp',
         },
         {
           archivePath: 'RISK_AA-111-AA/Dommages/02-vue-rapprochee.jpg',
-          secureUrl: 'https://res.cloudinary.com/demo/image/upload/damage.jpg',
+          downloadUrl:
+            'https://res.cloudinary.com/demo/image/upload/f_jpg,q_auto:good,c_limit,w_2048/damage.jpg',
         },
       ],
     });

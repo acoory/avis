@@ -1225,7 +1225,12 @@ function RiskPhotoGallery({
               <Download className="h-3.5 w-3.5" />
             )}
             <span className="hidden sm:inline">
-              {isDownloading ? "Préparation…" : "Télécharger"}
+              {isDownloading
+                ? `Préparation de ${sections.reduce(
+                    (total, section) => total + section.items.length,
+                    0,
+                  )} photos…`
+                : "Télécharger"}
             </span>
           </Button>
           <span className="shrink-0 rounded-md bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">

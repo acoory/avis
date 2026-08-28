@@ -107,6 +107,8 @@ const PHOTO_ARCHIVE_DETAILS: Record<
   },
 };
 
+const PHOTO_ARCHIVE_TRANSFORMATION = 'f_jpg,q_auto:good,c_limit,w_2048';
+
 const TIRE_WEAR_SLOT_PATTERN =
   /^tire:(front-left|front-right|rear-left|rear-right):wear$/;
 const TIRE_DAMAGE_SLOT_PATTERN =
@@ -362,12 +364,14 @@ export class RiskVehiclesService {
         }
 
         const details = PHOTO_ARCHIVE_DETAILS[photo.category];
-        const extension = photo.format.toLowerCase().replace(/[^a-z0-9]/g, '');
         const position = String(index + 1).padStart(2, '0');
 
         return {
-          archivePath: `${archiveBaseName}/${details.folder}/${position}-${details.name}.${extension || 'jpg'}`,
-          secureUrl: photo.secureUrl,
+          archivePath: `${archiveBaseName}/${details.folder}/${position}-${details.name}.jpg`,
+          downloadUrl: photo.secureUrl.replace(
+            '/upload/',
+            `/upload/${PHOTO_ARCHIVE_TRANSFORMATION}/`,
+          ),
         };
       }),
     };

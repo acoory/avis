@@ -13,8 +13,6 @@ import {
 } from '@nestjs/common';
 import archiver from 'archiver';
 import type { Response } from 'express';
-import { Readable } from 'node:stream';
-import type { ReadableStream } from 'node:stream/web';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -68,7 +66,17 @@ export class RiskVehiclesController {
     @Res() response: Response,
   ) {
     const manifest = await this.riskVehiclesService.photoArchive(id, user);
-    const archive = archiver('zip', { zlib: { level: 6 } });
+    let photos: Awaited<ReturnType<typeof downloadArchivePhotos>>;
+
+    try {
+      photos = await downloadArchivePhotos(manifest.photos);
+    } catch {
+      throw new BadGatewayException(
+        'Impossible de recuperer les photos du dossier Risk',
+      );
+    }
+
+    const archive = archiver('zip', { store: true });
 
     response.setHeader('Content-Type', 'application/zip');
     response.setHeader(
@@ -79,16 +87,8 @@ export class RiskVehiclesController {
     archive.pipe(response);
 
     try {
-      for (const photo of manifest.photos) {
-        const photoResponse = await fetch(photo.secureUrl, {
-          signal: AbortSignal.timeout(30_000),
-        });
-        if (!photoResponse.ok || !photoResponse.body) {
-          throw new Error(`Cloudinary returned ${photoResponse.status}`);
-        }
-        archive.append(Readable.fromWeb(photoResponse.body as ReadableStream), {
-          name: photo.archivePath,
-        });
+      for (const photo of photos) {
+        archive.append(photo.content, { name: photo.archivePath });
       }
       await archive.finalize();
     } catch (error) {
@@ -165,4 +165,57 @@ export class RiskVehiclesController {
   ) {
     return this.riskVehiclesService.createMessage(id, dto, user);
   }
+}
+
+const ARCHIVE_DOWNLOAD_CONCURRENCY = 4;
+const MAX_ARCHIVE_PHOTO_BYTES = 8 * 1024 * 1024;
+const MAX_ARCHIVE_TOTAL_BYTES = 80 * 1024 * 1024;
+
+async function downloadArchivePhotos(
+  photos: Array<{ archivePath: string; downloadUrl: string }>,
+) {
+  const downloaded = new Array<{ archivePath: string; content: Buffer }>(
+    photos.length,
+  );
+  let cursor = 0;
+  let totalBytes = 0;
+
+  async function worker() {
+    while (cursor < photos.length) {
+      const index = cursor;
+      cursor += 1;
+      const photo = photos[index];
+      const photoResponse = await fetch(photo.downloadUrl, {
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!photoResponse.ok) {
+        throw new Error(`Cloudinary returned ${photoResponse.status}`);
+      }
+
+      const declaredSize = Number(
+        photoResponse.headers.get('content-length') ?? 0,
+      );
+      if (declaredSize > MAX_ARCHIVE_PHOTO_BYTES) {
+        throw new Error('An optimized Risk photo is too large');
+      }
+
+      const content = Buffer.from(await photoResponse.arrayBuffer());
+      totalBytes += content.byteLength;
+      if (
+        content.byteLength > MAX_ARCHIVE_PHOTO_BYTES ||
+        totalBytes > MAX_ARCHIVE_TOTAL_BYTES
+      ) {
+        throw new Error('The Risk photo archive is too large');
+      }
+      downloaded[index] = { archivePath: photo.archivePath, content };
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(ARCHIVE_DOWNLOAD_CONCURRENCY, photos.length) },
+      () => worker(),
+    ),
+  );
+  return downloaded;
 }
