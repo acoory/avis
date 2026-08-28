@@ -41,6 +41,7 @@ export function ReadylineBrand({
         aria-hidden="true"
         className={cn("shrink-0 rounded-xl object-contain", style.image)}
         height={96}
+        unoptimized
         priority={priority}
         src="/favicon/favicon-96x96.png"
         width={96}
