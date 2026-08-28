@@ -48,6 +48,65 @@ const DAMAGE_CATEGORIES = new Set<RiskPhotoCategory>([
   RiskPhotoCategory.DAMAGE_CLOSE_UP,
 ]);
 
+const PHOTO_ARCHIVE_DETAILS: Record<
+  RiskPhotoCategory,
+  { folder: string; name: string }
+> = {
+  [RiskPhotoCategory.EXTERIOR_FRONT_THREE_QUARTER]: {
+    folder: 'Exterieur',
+    name: 'vue-3-4-avant',
+  },
+  [RiskPhotoCategory.EXTERIOR_REAR_THREE_QUARTER]: {
+    folder: 'Exterieur',
+    name: 'vue-3-4-arriere',
+  },
+  [RiskPhotoCategory.DASHBOARD]: {
+    folder: 'Interieur',
+    name: 'compteur-allume',
+  },
+  [RiskPhotoCategory.INTERIOR_FRONT]: {
+    folder: 'Interieur',
+    name: 'interieur-avant',
+  },
+  [RiskPhotoCategory.INTERIOR_REAR]: {
+    folder: 'Interieur',
+    name: 'interieur-arriere',
+  },
+  [RiskPhotoCategory.TRUNK]: { folder: 'Interieur', name: 'coffre' },
+  [RiskPhotoCategory.WHEEL_FRONT_LEFT]: {
+    folder: 'Pneus',
+    name: 'pneu-avant-gauche',
+  },
+  [RiskPhotoCategory.WHEEL_FRONT_RIGHT]: {
+    folder: 'Pneus',
+    name: 'pneu-avant-droit',
+  },
+  [RiskPhotoCategory.WHEEL_REAR_LEFT]: {
+    folder: 'Pneus',
+    name: 'pneu-arriere-gauche',
+  },
+  [RiskPhotoCategory.WHEEL_REAR_RIGHT]: {
+    folder: 'Pneus',
+    name: 'pneu-arriere-droit',
+  },
+  [RiskPhotoCategory.TIRE_WEAR]: {
+    folder: 'Pneus',
+    name: 'usure-pneu',
+  },
+  [RiskPhotoCategory.TIRE_DAMAGE]: {
+    folder: 'Pneus',
+    name: 'dommage-pneu',
+  },
+  [RiskPhotoCategory.DAMAGE_WIDE]: {
+    folder: 'Dommages',
+    name: 'vue-generale',
+  },
+  [RiskPhotoCategory.DAMAGE_CLOSE_UP]: {
+    folder: 'Dommages',
+    name: 'vue-rapprochee',
+  },
+};
+
 const TIRE_WEAR_SLOT_PATTERN =
   /^tire:(front-left|front-right|rear-left|rear-right):wear$/;
 const TIRE_DAMAGE_SLOT_PATTERN =
@@ -275,6 +334,43 @@ export class RiskVehiclesService {
     });
     if (!riskVehicle) throw new NotFoundException('Risk vehicle not found');
     return riskVehicle;
+  }
+
+  async photoArchive(id: string, user: CurrentUserPayload) {
+    const vehicle = await this.findOne(id, user);
+    if (!vehicle.photos.length) {
+      throw new BadRequestException('Ce dossier Risk ne contient aucune photo');
+    }
+
+    const archiveBaseName = sanitizeArchiveName(
+      `RISK_${formatLicensePlate(
+        vehicle.licensePlate,
+        vehicle.licensePlateCountry,
+        vehicle.licensePlateRaw,
+      )}`,
+    );
+
+    return {
+      fileName: `${archiveBaseName}.zip`,
+      photos: vehicle.photos.map((photo, index) => {
+        const url = new URL(photo.secureUrl);
+        if (
+          url.protocol !== 'https:' ||
+          url.hostname !== 'res.cloudinary.com'
+        ) {
+          throw new BadRequestException('Invalid Cloudinary photo URL');
+        }
+
+        const details = PHOTO_ARCHIVE_DETAILS[photo.category];
+        const extension = photo.format.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const position = String(index + 1).padStart(2, '0');
+
+        return {
+          archivePath: `${archiveBaseName}/${details.folder}/${position}-${details.name}.${extension || 'jpg'}`,
+          secureUrl: photo.secureUrl,
+        };
+      }),
+    };
   }
 
   async create(user: CurrentUserPayload, dto: CreateRiskVehicleDto) {
@@ -1032,4 +1128,14 @@ export class RiskVehiclesService {
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&#039;');
   }
+}
+
+function sanitizeArchiveName(value: string) {
+  return (
+    value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'dossier-risk'
+  );
 }

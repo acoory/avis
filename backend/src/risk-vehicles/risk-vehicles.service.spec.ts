@@ -17,6 +17,7 @@ jest.mock(
       EXTERIOR_REAR_THREE_QUARTER: 'EXTERIOR_REAR_THREE_QUARTER',
       INTERIOR_FRONT: 'INTERIOR_FRONT',
       INTERIOR_REAR: 'INTERIOR_REAR',
+      TRUNK: 'TRUNK',
       TIRE_DAMAGE: 'TIRE_DAMAGE',
       TIRE_WEAR: 'TIRE_WEAR',
       WHEEL_FRONT_LEFT: 'WHEEL_FRONT_LEFT',
@@ -133,6 +134,56 @@ describe('RiskVehiclesService', () => {
         slotKey: 'tire:front-left:damage:photo',
       }),
     ).toThrow(BadRequestException);
+  });
+
+  it('prepares a categorized photo archive for an authorized user', async () => {
+    const archiveService = new RiskVehiclesService(
+      {
+        riskVehicle: {
+          findFirst: jest.fn().mockResolvedValue({
+            licensePlate: 'AA111AA',
+            photos: [
+              {
+                category: RiskPhotoCategory.EXTERIOR_FRONT_THREE_QUARTER,
+                format: 'webp',
+                secureUrl:
+                  'https://res.cloudinary.com/demo/image/upload/front.webp',
+              },
+              {
+                category: RiskPhotoCategory.DAMAGE_CLOSE_UP,
+                format: 'jpg',
+                secureUrl:
+                  'https://res.cloudinary.com/demo/image/upload/damage.jpg',
+              },
+            ],
+            riskNumber: 'RISK-20260828-0001',
+          }),
+        },
+      } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+
+    await expect(
+      archiveService.photoArchive('risk-1', {
+        email: 'admin@example.com',
+        role: Role.ADMIN,
+        sub: 'admin-1',
+      }),
+    ).resolves.toEqual({
+      fileName: 'RISK_AA-111-AA.zip',
+      photos: [
+        {
+          archivePath: 'RISK_AA-111-AA/Exterieur/01-vue-3-4-avant.webp',
+          secureUrl: 'https://res.cloudinary.com/demo/image/upload/front.webp',
+        },
+        {
+          archivePath: 'RISK_AA-111-AA/Dommages/02-vue-rapprochee.jpg',
+          secureUrl: 'https://res.cloudinary.com/demo/image/upload/damage.jpg',
+        },
+      ],
+    });
   });
 
   it('identifies the author, comment and files in a Risk response email', () => {

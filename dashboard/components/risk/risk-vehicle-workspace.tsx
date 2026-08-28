@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  Download,
   FileText,
   Images,
   ImagePlus,
@@ -69,6 +70,11 @@ type GallerySection = {
   items: GalleryPhoto[];
   title: string;
 };
+
+type CommentDraftStatus = "error" | "idle" | "restored" | "saved" | "saving";
+
+const COMMENT_DRAFT_SAVE_DELAY_MS = 500;
+const COMMENT_DRAFT_STORAGE_PREFIX = "readyline:risk-comment-draft";
 
 const photoStepLabels = [
   { compact: "Ext.", label: "Extérieur" },
@@ -232,6 +238,7 @@ export function RiskVehicleWorkspace({
   const [showVehicleInfo, setShowVehicleInfo] = useState(false);
   const [isPlateCopied, setIsPlateCopied] = useState(false);
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
+  const [isDownloadingPhotos, setIsDownloadingPhotos] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const isCreator = vehicle.creatorId === user?.id;
@@ -371,6 +378,26 @@ export function RiskVehicleWorkspace({
       }));
     } catch {
       toast.error("Impossible de supprimer cette photo.");
+    }
+  }
+
+  async function downloadPhotos() {
+    setIsDownloadingPhotos(true);
+    try {
+      const archive = await riskService.downloadPhotoArchive(vehicle.id);
+      const archiveUrl = window.URL.createObjectURL(archive);
+      const link = document.createElement("a");
+      link.href = archiveUrl;
+      link.download = `RISK_${plate}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => window.URL.revokeObjectURL(archiveUrl), 0);
+      toast.success("Le dossier de photos a été téléchargé.");
+    } catch {
+      toast.error("Impossible de télécharger les photos.");
+    } finally {
+      setIsDownloadingPhotos(false);
     }
   }
 
@@ -530,9 +557,6 @@ export function RiskVehicleWorkspace({
                   <Copy className="h-3.5 w-3.5" />
                 )}
               </button>
-              <span className="hidden shrink-0 text-xs font-medium text-gray-400 lg:inline">
-                {vehicle.riskNumber}
-              </span>
             </div>
             <p className="truncate text-[10px] leading-3 text-gray-500 sm:text-xs sm:leading-4">
               {vehicle.manufacturer.name} · Risk Showroom
@@ -650,7 +674,9 @@ export function RiskVehicleWorkspace({
           <div className="min-w-0 space-y-5">
             {workspaceHeader}
             <RiskPhotoGallery
+              isDownloading={isDownloadingPhotos}
               sections={gallerySections}
+              onDownload={() => void downloadPhotos()}
               onOpen={(photoId) =>
                 setViewerPhotoIndex(
                   galleryPhotos.findIndex((item) => item.photo.id === photoId),
@@ -1146,9 +1172,13 @@ export function RiskVehicleWorkspace({
 }
 
 function RiskPhotoGallery({
+  isDownloading,
+  onDownload,
   onOpen,
   sections,
 }: {
+  isDownloading: boolean;
+  onDownload: () => void;
   onOpen: (photoId: string) => void;
   sections: GallerySection[];
 }) {
@@ -1178,10 +1208,34 @@ function RiskPhotoGallery({
             </p>
           </div>
         </div>
-        <span className="shrink-0 rounded-md bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
-          {sections.reduce((total, section) => total + section.items.length, 0)}
-          &nbsp;photos
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            aria-label="Télécharger toutes les photos"
+            className="h-8 px-2.5"
+            disabled={isDownloading}
+            size="sm"
+            title="Télécharger toutes les photos dans un fichier ZIP"
+            type="button"
+            variant="outline"
+            onClick={onDownload}
+          >
+            {isDownloading ? (
+              <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Download className="h-3.5 w-3.5" />
+            )}
+            <span className="hidden sm:inline">
+              {isDownloading ? "Préparation…" : "Télécharger"}
+            </span>
+          </Button>
+          <span className="shrink-0 rounded-md bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
+            {sections.reduce(
+              (total, section) => total + section.items.length,
+              0,
+            )}
+            &nbsp;photos
+          </span>
+        </div>
       </div>
 
       <div className="divide-y divide-gray-100">
@@ -1781,13 +1835,80 @@ function RiskConversationPanel({
   const currentUserId = useAuthStore((state) => state.user?.id);
   const [body, setBody] = useState("");
   const [attachments, setAttachments] = useState<ConversationAttachment[]>([]);
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftStatus, setDraftStatus] =
+    useState<CommentDraftStatus>("idle");
   const [isUploading, setIsUploading] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const bodyRef = useRef("");
+  const lastPersistedBodyRef = useRef("");
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const hasPositionedMessages = useRef(false);
   const messages = vehicle.conversation?.messages ?? [];
   const canPost = vehicle.status === "SUBMITTED";
   const lastMessageId = messages.at(-1)?.id;
+  const draftStorageKey = useMemo(
+    () =>
+      currentUserId
+        ? `${COMMENT_DRAFT_STORAGE_PREFIX}:${currentUserId}:${vehicle.id}`
+        : null,
+    [currentUserId, vehicle.id],
+  );
+
+  useEffect(() => {
+    bodyRef.current = body;
+  }, [body]);
+
+  useEffect(() => {
+    const draft = draftStorageKey ? readCommentDraft(draftStorageKey) : "";
+    bodyRef.current = draft;
+    lastPersistedBodyRef.current = draft;
+
+    const frame = window.requestAnimationFrame(() => {
+      setDraftReady(Boolean(draftStorageKey));
+      setBody(draft);
+      setDraftStatus(draft.trim() ? "restored" : "idle");
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [draftStorageKey]);
+
+  useEffect(() => {
+    if (
+      !draftReady ||
+      !draftStorageKey ||
+      body === lastPersistedBodyRef.current
+    ) {
+      return;
+    }
+
+    setDraftStatus(body.trim() ? "saving" : "idle");
+    const timeout = window.setTimeout(() => {
+      if (!persistCommentDraft(draftStorageKey, body)) {
+        setDraftStatus("error");
+        return;
+      }
+
+      lastPersistedBodyRef.current = body.trim() ? body : "";
+      setDraftStatus(body.trim() ? "saved" : "idle");
+    }, COMMENT_DRAFT_SAVE_DELAY_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [body, draftReady, draftStorageKey]);
+
+  useEffect(() => {
+    if (!draftReady || !draftStorageKey) return;
+
+    const persistCurrentDraft = () => {
+      persistCommentDraft(draftStorageKey, bodyRef.current);
+    };
+
+    window.addEventListener("pagehide", persistCurrentDraft);
+    return () => {
+      persistCurrentDraft();
+      window.removeEventListener("pagehide", persistCurrentDraft);
+    };
+  }, [draftReady, draftStorageKey]);
 
   useEffect(() => {
     const container = messagesContainerRef.current;
@@ -1834,7 +1955,11 @@ function RiskConversationPanel({
         body: body.trim() || undefined,
       });
       onChange(updated);
+      bodyRef.current = "";
+      lastPersistedBodyRef.current = "";
+      if (draftStorageKey) removeCommentDraft(draftStorageKey);
       setBody("");
+      setDraftStatus("idle");
       setAttachments([]);
       toast.success("Commentaire envoye.");
     } catch {
@@ -1956,6 +2081,17 @@ function RiskConversationPanel({
             value={body}
             onChange={(event) => setBody(event.target.value)}
           />
+          {draftStatus !== "idle" ? (
+            <p
+              aria-live="polite"
+              className={cn(
+                "text-[11px] font-medium",
+                draftStatus === "error" ? "text-red-600" : "text-gray-500",
+              )}
+            >
+              {commentDraftStatusLabel(draftStatus)}
+            </p>
+          ) : null}
           {attachments.length ? (
             <div className="space-y-1.5">
               {attachments.map((attachment) => (
@@ -2024,6 +2160,39 @@ function RiskConversationPanel({
       ) : null}
     </Card>
   );
+}
+
+function commentDraftStatusLabel(status: Exclude<CommentDraftStatus, "idle">) {
+  if (status === "error") return "Brouillon non enregistré";
+  if (status === "restored") return "Brouillon restauré";
+  if (status === "saving") return "Enregistrement du brouillon…";
+  return "Brouillon enregistré";
+}
+
+function persistCommentDraft(storageKey: string, body: string) {
+  try {
+    if (body.trim()) window.localStorage.setItem(storageKey, body);
+    else window.localStorage.removeItem(storageKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function readCommentDraft(storageKey: string) {
+  try {
+    return window.localStorage.getItem(storageKey) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function removeCommentDraft(storageKey: string) {
+  try {
+    window.localStorage.removeItem(storageKey);
+  } catch {
+    // The message was sent even if local storage is unavailable.
+  }
 }
 
 function primaryName(vehicle: RiskVehicle) {

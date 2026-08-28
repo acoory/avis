@@ -137,6 +137,14 @@ export const riskService = {
     await api.delete(`/risk-vehicles/${id}/photos/${photoId}`);
   },
 
+  async downloadPhotoArchive(id: string) {
+    const { data } = await api.get<Blob>(
+      `/risk-vehicles/${id}/photos/archive.zip`,
+      { responseType: "blob" },
+    );
+    return data;
+  },
+
   async uploadAttachment(id: string, file: File) {
     const { data: signature } = await api.post<ConversationUploadSignature>(
       `/risk-vehicles/${id}/conversation/attachment-signature`,

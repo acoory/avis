@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   Body,
   Controller,
   Delete,
@@ -7,8 +8,13 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import archiver from 'archiver';
+import type { Response } from 'express';
+import { Readable } from 'node:stream';
+import type { ReadableStream } from 'node:stream/web';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -53,6 +59,49 @@ export class RiskVehiclesController {
   @Get(':id')
   findOne(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
     return this.riskVehiclesService.findOne(id, user);
+  }
+
+  @Get(':id/photos/archive.zip')
+  async downloadPhotoArchive(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Res() response: Response,
+  ) {
+    const manifest = await this.riskVehiclesService.photoArchive(id, user);
+    const archive = archiver('zip', { zlib: { level: 6 } });
+
+    response.setHeader('Content-Type', 'application/zip');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${manifest.fileName}"`,
+    );
+    archive.on('error', (error) => response.destroy(error));
+    archive.pipe(response);
+
+    try {
+      for (const photo of manifest.photos) {
+        const photoResponse = await fetch(photo.secureUrl, {
+          signal: AbortSignal.timeout(30_000),
+        });
+        if (!photoResponse.ok || !photoResponse.body) {
+          throw new Error(`Cloudinary returned ${photoResponse.status}`);
+        }
+        archive.append(Readable.fromWeb(photoResponse.body as ReadableStream), {
+          name: photo.archivePath,
+        });
+      }
+      await archive.finalize();
+    } catch (error) {
+      archive.unpipe(response);
+      archive.abort();
+      if (response.headersSent) {
+        response.destroy(error instanceof Error ? error : undefined);
+        return;
+      }
+      throw new BadGatewayException(
+        'Impossible de recuperer les photos du dossier Risk',
+      );
+    }
   }
 
   @Patch(':id')
