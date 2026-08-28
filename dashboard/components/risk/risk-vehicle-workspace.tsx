@@ -487,9 +487,14 @@ export function RiskVehicleWorkspace({
     vehicle.licensePlateRaw,
   );
 
-  return (
-    <div className={cn("space-y-4", isPhotoJourney && "pb-20 md:pb-0")}>
-      <div className="sticky top-14 z-20 -mx-4 -mt-4 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur md:top-16 md:-mx-6 md:-mt-6">
+  const workspaceHeader = (
+    <div
+      className={cn(
+        "sticky top-14 z-20 -mx-4 -mt-4 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur md:top-16 md:-mx-6 md:-mt-6",
+        !isPhotoJourney &&
+          "xl:mx-0 xl:mt-0 xl:overflow-hidden xl:rounded-lg xl:border xl:shadow-none",
+      )}
+    >
         <div className="flex h-16 min-w-0 items-center gap-2 px-4 md:gap-3 md:px-6">
           <Button
             aria-label="Retour à la liste Risk"
@@ -591,7 +596,12 @@ export function RiskVehicleWorkspace({
 
         {showVehicleInfo ? (
           <div className="max-h-[calc(100dvh-7.5rem)] overflow-y-auto border-t border-gray-200 bg-gray-50 px-3 py-2 md:px-5">
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 xl:grid-cols-6">
+            <div
+              className={cn(
+                "grid grid-cols-2 gap-1.5 sm:grid-cols-3",
+                isPhotoJourney && "xl:grid-cols-6",
+              )}
+            >
               <CompactInformation label="Dossier" value={vehicle.riskNumber} />
               <CompactInformation label="Agence" value={vehicle.agency.name} />
               <CompactInformation label="Ville" value={vehicle.agency.city} />
@@ -628,12 +638,34 @@ export function RiskVehicleWorkspace({
             ) : null}
           </div>
         ) : null}
-      </div>
+    </div>
+  );
 
-      <div
-        className={cn("space-y-5 pt-1", isPhotoJourney && "mx-auto max-w-4xl")}
-      >
-        {isPhotoJourney ? (
+  return (
+    <div className={cn("space-y-4", isPhotoJourney && "pb-20 md:pb-0")}>
+      {isPhotoJourney ? (
+        workspaceHeader
+      ) : (
+        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(440px,1fr)]">
+          <div className="min-w-0 space-y-5">
+            {workspaceHeader}
+            <RiskPhotoGallery
+              sections={gallerySections}
+              onOpen={(photoId) =>
+                setViewerPhotoIndex(
+                  galleryPhotos.findIndex((item) => item.photo.id === photoId),
+                )
+              }
+            />
+          </div>
+          <div className="xl:sticky xl:top-20">
+            <RiskConversationPanel vehicle={vehicle} onChange={setVehicle} />
+          </div>
+        </div>
+      )}
+
+      {isPhotoJourney ? (
+        <div className="mx-auto max-w-4xl space-y-5 pt-1">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -721,23 +753,6 @@ export function RiskVehicleWorkspace({
               })}
             </div>
           </div>
-        ) : null}
-
-        {!isPhotoJourney ? (
-          <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(360px,.75fr)]">
-            <RiskPhotoGallery
-              sections={gallerySections}
-              onOpen={(photoId) =>
-                setViewerPhotoIndex(
-                  galleryPhotos.findIndex((item) => item.photo.id === photoId),
-                )
-              }
-            />
-            <div className="xl:sticky xl:top-20">
-              <RiskConversationPanel vehicle={vehicle} onChange={setVehicle} />
-            </div>
-          </div>
-        ) : null}
 
         {photoSections.map((section, sectionIndex) =>
           sectionIndex !== 2 &&
@@ -1117,6 +1132,7 @@ export function RiskVehicleWorkspace({
           </div>
         ) : null}
       </div>
+      ) : null}
       {viewerPhotoIndex !== null && galleryCarouselItems[viewerPhotoIndex] ? (
         <PhotoCarousel
           currentIndex={viewerPhotoIndex}
@@ -1829,8 +1845,8 @@ function RiskConversationPanel({
   }
 
   return (
-    <Card className="overflow-hidden border-gray-200 shadow-none">
-      <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3.5">
+    <Card className="overflow-hidden border-gray-200 shadow-none xl:flex xl:h-[calc(100dvh-5rem)] xl:min-h-[32rem] xl:flex-col">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-100 px-4 py-3.5">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-teal-50 text-teal-700">
             <MessageSquareText className="h-4 w-4" />
@@ -1849,7 +1865,7 @@ function RiskConversationPanel({
         </span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-gray-100 px-4 py-3">
+      <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-gray-100 px-4 py-3">
         <UsersRound className="mr-1 h-3.5 w-3.5 text-gray-400" />
         {vehicle.assignments.map((assignment) => (
           <span
@@ -1869,7 +1885,7 @@ function RiskConversationPanel({
       ) : messages.length ? (
         <div
           aria-live="polite"
-          className="h-[clamp(20rem,52vh,34rem)] space-y-3 overflow-y-auto overscroll-contain bg-gray-50/60 p-4 [scrollbar-gutter:stable]"
+          className="h-[clamp(20rem,52vh,34rem)] space-y-3 overflow-y-auto overscroll-contain bg-gray-50/60 p-4 [scrollbar-gutter:stable] xl:h-auto xl:min-h-0 xl:flex-1"
           ref={messagesContainerRef}
         >
           {messages.map((message) => {
@@ -1933,9 +1949,9 @@ function RiskConversationPanel({
       )}
 
       {canPost ? (
-        <div className="space-y-3 border-t border-gray-100 bg-white p-4">
+        <div className="shrink-0 space-y-3 border-t border-gray-100 bg-white p-4">
           <textarea
-            className="min-h-20 w-full resize-y rounded-md border border-gray-200 p-3 text-sm outline-none focus:ring-2 focus:ring-teal-500"
+            className="min-h-24 max-h-36 w-full resize-y rounded-md border border-gray-200 p-3 text-sm outline-none focus:ring-2 focus:ring-teal-500"
             placeholder="Écrire un commentaire sur le véhicule…"
             value={body}
             onChange={(event) => setBody(event.target.value)}

@@ -13,6 +13,11 @@ import { RotatablePhoto } from "@/components/business/rotatable-photo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+const imagePreloadTtlMs = 10 * 60 * 1000;
+const maximumCachedPreloads = 200;
+const completedImagePreloads = new Map<string, number>();
+const pendingImagePreloads = new Map<string, Promise<void>>();
+
 export type PhotoCarouselItem = {
   id: string;
   label: string;
@@ -29,6 +34,80 @@ type PhotoCarouselProps = {
   title?: string;
 };
 
+type PreloadState = {
+  complete: boolean;
+  failed: number;
+  loaded: number;
+  ready: boolean;
+  total: number;
+};
+
+function isImagePreloaded(url: string) {
+  const loadedAt = completedImagePreloads.get(url);
+  if (loadedAt === undefined) return false;
+
+  if (Date.now() - loadedAt > imagePreloadTtlMs) {
+    completedImagePreloads.delete(url);
+    return false;
+  }
+
+  return true;
+}
+
+function rememberImagePreload(url: string) {
+  completedImagePreloads.delete(url);
+  completedImagePreloads.set(url, Date.now());
+
+  while (completedImagePreloads.size > maximumCachedPreloads) {
+    const oldestUrl = completedImagePreloads.keys().next().value;
+    if (oldestUrl === undefined) break;
+    completedImagePreloads.delete(oldestUrl);
+  }
+}
+
+function preloadImage(url: string) {
+  if (isImagePreloaded(url)) return Promise.resolve();
+
+  const pendingPreload = pendingImagePreloads.get(url);
+  if (pendingPreload) return pendingPreload;
+
+  const image = new Image();
+  const preload = new Promise<void>((resolve, reject) => {
+    image.onload = () => {
+      if (typeof image.decode !== "function") {
+        resolve();
+        return;
+      }
+
+      void image.decode().then(resolve).catch(resolve);
+    };
+    image.onerror = () => reject(new Error(`Unable to preload image: ${url}`));
+    image.src = url;
+  })
+    .then(() => {
+      rememberImagePreload(url);
+    })
+    .finally(() => {
+      pendingImagePreloads.delete(url);
+    });
+
+  pendingImagePreloads.set(url, preload);
+  return preload;
+}
+
+function initialPreloadState(urls: string[]): PreloadState {
+  const loaded = urls.filter(isImagePreloaded).length;
+  const ready = loaded === urls.length;
+
+  return {
+    complete: ready,
+    failed: 0,
+    loaded,
+    ready,
+    total: urls.length,
+  };
+}
+
 export function PhotoCarousel({
   currentIndex,
   items,
@@ -43,47 +122,53 @@ export function PhotoCarousel({
   );
   const [preloadAttempt, setPreloadAttempt] = useState(0);
   const [rotation, setRotation] = useState(0);
-  const [preloadState, setPreloadState] = useState({
-    complete: false,
-    failed: 0,
-    loaded: 0,
-    ready: false,
-    total: previewUrls.length,
-  });
+  const [preloadState, setPreloadState] = useState<PreloadState>(() =>
+    initialPreloadState(previewUrls),
+  );
 
   useEffect(() => {
     let cancelled = false;
-    let completed = 0;
+    const missingUrls = previewUrls.filter((url) => !isImagePreloaded(url));
+    let completed = previewUrls.length - missingUrls.length;
     let failed = 0;
 
-    for (const url of previewUrls) {
-      const image = new Image();
-      let settled = false;
-      const finish = (didFail: boolean) => {
-        if (cancelled || settled) return;
-        settled = true;
-        completed += 1;
-        if (didFail) failed += 1;
-        setPreloadState({
-          complete: completed === previewUrls.length,
-          failed,
-          loaded: completed - failed,
-          ready: completed === previewUrls.length && failed === 0,
-          total: previewUrls.length,
-        });
-      };
-      image.onload = () => {
-        if (typeof image.decode === "function") {
-          void image
-            .decode()
-            .then(() => finish(false))
-            .catch(() => finish(false));
-          return;
-        }
-        finish(false);
-      };
-      image.onerror = () => finish(true);
-      image.src = url;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setPreloadState({
+        complete: completed === previewUrls.length,
+        failed: 0,
+        loaded: completed,
+        ready: completed === previewUrls.length,
+        total: previewUrls.length,
+      });
+    });
+
+    for (const url of missingUrls) {
+      void preloadImage(url).then(
+        () => {
+          if (cancelled) return;
+          completed += 1;
+          setPreloadState({
+            complete: completed === previewUrls.length,
+            failed,
+            loaded: completed - failed,
+            ready: completed === previewUrls.length && failed === 0,
+            total: previewUrls.length,
+          });
+        },
+        () => {
+          if (cancelled) return;
+          completed += 1;
+          failed += 1;
+          setPreloadState({
+            complete: completed === previewUrls.length,
+            failed,
+            loaded: completed - failed,
+            ready: false,
+            total: previewUrls.length,
+          });
+        },
+      );
     }
 
     return () => {

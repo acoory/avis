@@ -1027,3 +1027,31 @@ export function exportVehicleChecksUrl(params?: {
 
   return url.toString();
 }
+
+export function exportDashboardKpisUrl(params: {
+  collaboratorId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  groupBy?: "agency" | "collaborator" | "manufacturer" | "none";
+  kpis: string[];
+  partCodes?: string[];
+}) {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/exports/dashboard-kpis.xlsx`,
+  );
+
+  if (params.collaboratorId) {
+    url.searchParams.set("collaboratorId", params.collaboratorId);
+  }
+  if (params.dateFrom) url.searchParams.set("dateFrom", params.dateFrom);
+  if (params.dateTo) url.searchParams.set("dateTo", params.dateTo);
+  if (params.groupBy && params.groupBy !== "none") {
+    url.searchParams.set("groupBy", params.groupBy);
+  }
+  if (params.kpis.length) url.searchParams.set("kpis", params.kpis.join(","));
+  if (params.partCodes?.length) {
+    url.searchParams.set("partCodes", params.partCodes.join(","));
+  }
+
+  return url.toString();
+}

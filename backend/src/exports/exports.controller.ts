@@ -3,6 +3,7 @@ import type { Response } from 'express';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { ExportDashboardKpisQueryDto } from './dto/export-dashboard-kpis-query.dto';
 import { ExportVehicleChecksQueryDto } from './dto/export-vehicle-checks-query.dto';
 import { ExportsService } from './exports.service';
 
@@ -10,6 +11,26 @@ import { ExportsService } from './exports.service';
 @Controller('exports')
 export class ExportsController {
   constructor(private readonly exportsService: ExportsService) {}
+
+  @Get('dashboard-kpis.xlsx')
+  async exportDashboardKpis(
+    @CurrentUser() user: CurrentUserPayload,
+    @Query() query: ExportDashboardKpisQueryDto,
+    @Res() response: Response,
+  ) {
+    const buffer = await this.exportsService.dashboardKpisWorkbook(query, user);
+    const filename = `dashboard-kpis-${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+    response.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${filename}"`,
+    );
+    response.send(buffer);
+  }
 
   @Get('vehicle-checks.xlsx')
   async exportVehicleChecks(
@@ -24,7 +45,10 @@ export class ExportsController {
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
-    response.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${filename}"`,
+    );
     response.send(buffer);
   }
 }

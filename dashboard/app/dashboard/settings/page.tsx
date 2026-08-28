@@ -4,13 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function SettingsPage() {
   const appVersion = process.env.NEXT_PUBLIC_APP_DISPLAY_VERSION ?? "0.1.0";
-  const buildDate = process.env.NEXT_PUBLIC_APP_BUILD_DATE;
-  const formattedBuildDate = buildDate
-    ? new Intl.DateTimeFormat("fr-FR", {
-        dateStyle: "long",
-        timeStyle: "short",
-      }).format(new Date(buildDate))
-    : null;
 
   return (
     <>
@@ -27,14 +20,6 @@ export default function SettingsPage() {
               <dt className="text-sm text-gray-500">Version</dt>
               <dd className="text-sm font-medium text-gray-950">v{appVersion}</dd>
             </div>
-            {formattedBuildDate ? (
-              <div className="flex items-center justify-between gap-4 px-4 py-3">
-                <dt className="text-sm text-gray-500">Publication</dt>
-                <dd className="text-right text-sm font-medium text-gray-950">
-                  {formattedBuildDate}
-                </dd>
-              </div>
-            ) : null}
             <div className="flex items-center justify-between gap-4 px-4 py-3">
               <dt className="text-sm text-gray-500">Mises à jour</dt>
               <dd className="text-sm font-medium text-teal-700">Automatiques</dd>

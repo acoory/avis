@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Eye, Plus } from "lucide-react";
+import { Eye, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { DataTable } from "@/components/dashboard/data-table";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -29,9 +30,10 @@ const editableStatuses: Array<{ value: ManufacturerRepairRuleStatus; label: stri
 
 export default function ManufacturersPage() {
   const user = useAuthStore((state) => state.user);
-  const canCreateManufacturer = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const canCreateManufacturer = user?.role === "ADMIN";
   const canEditRules = user?.role === "ADMIN";
   const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newManufacturerName, setNewManufacturerName] = useState("");
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [isCreating, setIsCreating] = useState(false);
@@ -54,11 +56,20 @@ export default function ManufacturersPage() {
       return;
     }
 
+    const existingManufacturer = manufacturers.find(
+      (manufacturer) => manufacturerNameKey(manufacturer.name) === manufacturerNameKey(name),
+    );
+    if (existingManufacturer) {
+      toast.error(`Le constructeur « ${existingManufacturer.name} » existe déjà.`);
+      return;
+    }
+
     setIsCreating(true);
     try {
       const savedManufacturer = await businessService.createManufacturer({ name });
       setManufacturers((current) => sortManufacturers([...current, toManufacturerListItem(savedManufacturer)]));
       setNewManufacturerName("");
+      setCreateDialogOpen(false);
       toast.success("Constructeur cree.");
     } catch {
       toast.error("Impossible de creer ce constructeur. Il existe peut-etre deja.");
@@ -111,32 +122,30 @@ export default function ManufacturersPage() {
 
   return (
     <>
-      <PageHeader title="Constructeurs" description="Matrice Buy Back par constructeur." />
-      {canCreateManufacturer ? (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Nouveau constructeur</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              <Input
-                placeholder="Nom du constructeur"
-                value={newManufacturerName}
-                onChange={(event) => setNewManufacturerName(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    void createManufacturer();
-                  }
-                }}
-              />
-              <Button disabled={isCreating} onClick={() => void createManufacturer()}>
-                <Plus className="h-4 w-4" />
-                Ajouter
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : null}
+      <PageHeader
+        action={
+          canCreateManufacturer ? (
+            <Button type="button" onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Ajouter une marque
+            </Button>
+          ) : undefined
+        }
+        title="Constructeurs"
+        description="Matrice Buy Back par constructeur."
+      />
+      <CreateManufacturerDialog
+        isCreating={isCreating}
+        name={newManufacturerName}
+        open={createDialogOpen}
+        onNameChange={setNewManufacturerName}
+        onOpenChange={(open) => {
+          if (isCreating) return;
+          setCreateDialogOpen(open);
+          if (!open) setNewManufacturerName("");
+        }}
+        onSubmit={() => void createManufacturer()}
+      />
       <DataTable
         data={manufacturers}
         emptyMessage="Aucun constructeur pour le moment."
@@ -250,6 +259,120 @@ export default function ManufacturersPage() {
   );
 }
 
+function CreateManufacturerDialog({
+  isCreating,
+  name,
+  onNameChange,
+  onOpenChange,
+  onSubmit,
+  open,
+}: {
+  isCreating: boolean;
+  name: string;
+  onNameChange: (name: string) => void;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: () => void;
+  open: boolean;
+}) {
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !isCreating) onOpenChange(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isCreating, onOpenChange, open]);
+
+  if (!open || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      aria-labelledby="create-manufacturer-title"
+      aria-modal="true"
+      className="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-slate-950/45 p-0 sm:items-center sm:p-4"
+      role="dialog"
+      onClick={() => !isCreating && onOpenChange(false)}
+    >
+      <form
+        className="w-full rounded-t-xl bg-white p-5 shadow-2xl sm:max-w-md sm:rounded-xl"
+        onClick={(event) => event.stopPropagation()}
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit();
+        }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2
+              className="text-lg font-semibold text-gray-950"
+              id="create-manufacturer-title"
+            >
+              Ajouter une marque
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-gray-500">
+              La marque sera immédiatement disponible dans les contrôles Buy
+              Back.
+            </p>
+          </div>
+          <Button
+            aria-label="Fermer"
+            disabled={isCreating}
+            size="icon"
+            type="button"
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <label
+          className="mt-5 block text-sm font-medium text-gray-800"
+          htmlFor="new-manufacturer-name"
+        >
+          Nom de la marque
+        </label>
+        <Input
+          autoFocus
+          className="mt-2"
+          disabled={isCreating}
+          id="new-manufacturer-name"
+          placeholder="Ex. Lynk & Co"
+          value={name}
+          onChange={(event) => onNameChange(event.target.value)}
+        />
+        <p className="mt-2 text-xs leading-5 text-gray-500">
+          Les majuscules, accents, espaces et tirets sont ignorés lors de la
+          recherche de doublons.
+        </p>
+
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            disabled={isCreating}
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            Annuler
+          </Button>
+          <Button disabled={isCreating || !name.trim()} type="submit">
+            <Plus className="h-4 w-4" />
+            {isCreating ? "Ajout en cours…" : "Ajouter la marque"}
+          </Button>
+        </div>
+      </form>
+    </div>,
+    document.body,
+  );
+}
+
 function RuleStatusSelect({
   disabled,
   isSaving,
@@ -321,4 +444,12 @@ function sortManufacturers(manufacturers: Manufacturer[]) {
   return [...manufacturers].sort((first, second) =>
     first.name.localeCompare(second.name, "fr", { sensitivity: "base" }),
   );
+}
+
+function manufacturerNameKey(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("fr")
+    .replace(/[^a-z0-9]+/g, "");
 }

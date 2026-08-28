@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '../../prisma/generated/client.cjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateManufacturerDto } from './dto/create-manufacturer.dto';
@@ -15,7 +19,10 @@ export class ManufacturersService {
         rule: true,
         repairRules: {
           include: { repairType: true, vehiclePart: true },
-          orderBy: [{ repairType: { name: 'asc' } }, { vehiclePart: { displayOrder: 'asc' } }],
+          orderBy: [
+            { repairType: { name: 'asc' } },
+            { vehiclePart: { displayOrder: 'asc' } },
+          ],
         },
       },
       orderBy: { name: 'asc' },
@@ -30,7 +37,10 @@ export class ManufacturersService {
         rule: true,
         repairRules: {
           include: { repairType: true, vehiclePart: true },
-          orderBy: [{ repairType: { name: 'asc' } }, { vehiclePart: { displayOrder: 'asc' } }],
+          orderBy: [
+            { repairType: { name: 'asc' } },
+            { vehiclePart: { displayOrder: 'asc' } },
+          ],
         },
       },
     });
@@ -43,10 +53,27 @@ export class ManufacturersService {
   }
 
   async create(dto: CreateManufacturerDto) {
+    const manufacturers = await this.prisma.manufacturer.findMany({
+      select: { name: true },
+    });
+    const normalizedName = this.normalizedName(dto.name);
+
+    if (
+      manufacturers.some(
+        (manufacturer) =>
+          this.normalizedName(manufacturer.name) === normalizedName,
+      )
+    ) {
+      throw new ConflictException('Manufacturer already exists');
+    }
+
     try {
       return await this.prisma.manufacturer.create({ data: dto });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Manufacturer already exists');
       }
       throw error;
@@ -57,9 +84,15 @@ export class ManufacturersService {
     await this.findOne(id);
 
     try {
-      return await this.prisma.manufacturer.update({ where: { id }, data: dto });
+      return await this.prisma.manufacturer.update({
+        where: { id },
+        data: dto,
+      });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Manufacturer already exists');
       }
       throw error;
@@ -70,5 +103,13 @@ export class ManufacturersService {
     await this.findOne(id);
     await this.prisma.manufacturer.delete({ where: { id } });
     return { success: true };
+  }
+
+  private normalizedName(value: string) {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('fr')
+      .replace(/[^a-z0-9]+/g, '');
   }
 }
