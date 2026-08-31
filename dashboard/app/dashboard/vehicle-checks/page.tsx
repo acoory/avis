@@ -138,6 +138,8 @@ const vehicleCheckSortFields = new Set([
   "checkNumber",
   "city",
   "licensePlate",
+  "partOrders",
+  "publicShare",
   "status",
   "totalInternalSavingAmount",
 ]);

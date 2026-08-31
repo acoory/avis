@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Clock3,
-  Euro,
   FileText,
   ListChecks,
   MessageSquareText,
@@ -16,6 +15,7 @@ import {
   Plus,
   TrendingUp,
   Users,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -33,10 +33,11 @@ import {
   YAxis,
 } from "recharts";
 import { ExportButton } from "@/components/business/export-button";
+import { VehicleCheckStatusBadge } from "@/components/business/decision-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { formatDate, formatLicensePlate, formatMoney } from "@/lib/format";
+import { formatDate, formatLicensePlate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { businessService } from "@/services/business.service";
 import { riskService } from "@/services/risk.service";
@@ -118,13 +119,6 @@ export default function DashboardPage() {
   const [previousSummary, setPreviousSummary] =
     useState<DashboardSummary | null>(null);
   const [timeline, setTimeline] = useState<DashboardTimelinePoint[]>([]);
-  const [byManufacturer, setByManufacturer] = useState<
-    Array<{
-      manufacturerName: string;
-      totalInternalSavingAmount: string;
-      vehicleChecksCount: number;
-    }>
-  >([]);
   const [byCollaborator, setByCollaborator] = useState<CollaboratorSaving[]>(
     [],
   );
@@ -176,20 +170,12 @@ export default function DashboardPage() {
       businessService.dashboardSummary(params),
       businessService.dashboardSummary(previousParams),
       businessService.dashboardTimeline(params),
-      businessService.savingsByManufacturer(params),
       businessService.savingsByCollaborator(params),
     ]).then(
-      ([
-        summaryData,
-        previousSummaryData,
-        timelineData,
-        manufacturerData,
-        collaboratorData,
-      ]) => {
+      ([summaryData, previousSummaryData, timelineData, collaboratorData]) => {
         setSummary(summaryData);
         setPreviousSummary(previousSummaryData);
         setTimeline(timelineData);
-        setByManufacturer(manufacturerData);
         setByCollaborator(collaboratorData);
       },
     );
@@ -218,21 +204,11 @@ export default function DashboardPage() {
       summary?.completedVehicleChecksCount ?? 0;
     const vehicleChecksToAnalyzeCount =
       summary?.vehicleChecksToAnalyzeCount ?? 0;
-    const savings = numberValue(summary?.totalInternalSavingAmount);
-    const difference = numberValue(summary?.totalDifferenceAmount);
-    const orders = summary?.partOrdersToPlaceCount ?? 0;
     const previousVehicleChecksCount = previousSummary?.vehicleChecksCount ?? 0;
     const previousCompletedVehicleChecksCount =
       previousSummary?.completedVehicleChecksCount ?? 0;
     const previousVehicleChecksToAnalyzeCount =
       previousSummary?.vehicleChecksToAnalyzeCount ?? 0;
-    const previousSavings = numberValue(
-      previousSummary?.totalInternalSavingAmount,
-    );
-    const previousDifference = numberValue(
-      previousSummary?.totalDifferenceAmount,
-    );
-    const previousOrders = previousSummary?.partOrdersToPlaceCount ?? 0;
 
     return [
       {
@@ -274,49 +250,18 @@ export default function DashboardPage() {
         trendTooltip: comparisonTooltip,
         value: formatInteger(vehicleChecksToAnalyzeCount),
       },
-      {
-        description: "Gain interne estime",
-        chartData: timelineChartData(timeline, "totalInternalSavingAmount"),
-        chartValueFormatter: (amount: number) => formatMoney(amount),
-        icon: Euro,
-        title: "Economies",
-        tone: "emerald" as KpiTone,
-        trend: trendLabel(savings, previousSavings),
-        trendTooltip: comparisonTooltip,
-        value: formatCompactMoney(savings),
-      },
-      {
-        description: "Ecart total observe",
-        chartData: timelineChartData(timeline, "totalDifferenceAmount"),
-        chartValueFormatter: (amount: number) => formatMoney(amount),
-        icon: TrendingUp,
-        title: "Difference",
-        tone: difference >= 0 ? ("emerald" as KpiTone) : ("red" as KpiTone),
-        trend: trendLabel(difference, previousDifference),
-        trendTooltip: comparisonTooltip,
-        value: formatCompactMoney(difference),
-      },
-      {
-        description: "A commander",
-        chartData: timelineChartData(timeline, "partOrdersToPlaceCount"),
-        chartValueFormatter: formatInteger,
-        icon: PackageCheck,
-        title: "Commandes pieces",
-        tone: "amber" as KpiTone,
-        trend: trendLabel(orders, previousOrders),
-        trendTooltip: comparisonTooltip,
-        value: formatInteger(orders),
-      },
     ];
   }, [comparisonTooltip, previousSummary, summary, timeline]);
 
-  const manufacturerChartData = useMemo(
+  const repairManufacturerChartData = useMemo(
     () =>
-      byManufacturer.slice(0, 6).map((row) => ({
-        amount: numberValue(row.totalInternalSavingAmount),
-        name: row.manufacturerName,
-      })),
-    [byManufacturer],
+      (summary?.repairInsights.repairsByManufacturer ?? [])
+        .slice(0, 6)
+        .map((row) => ({
+          repairs: row.quantity,
+          name: row.name,
+        })),
+    [summary?.repairInsights.repairsByManufacturer],
   );
 
   const filteredRiskVehicles = useMemo(
@@ -391,7 +336,7 @@ export default function DashboardPage() {
             </h1>
             <p className="mt-2 max-w-2xl text-sm font-medium text-slate-600">
               {activeTab === "buy-back"
-                ? "Pilotage des contrôles, économies internes et commandes de pièces Buy Back."
+                ? "Pilotage des contrôles et des réparations réalisées en Buy Back."
                 : "Suivi des dossiers photographiques, analyses et échanges Risk Showroom."}
             </p>
           </div>
@@ -447,7 +392,8 @@ export default function DashboardPage() {
           byCollaborator={byCollaborator}
           isManager={isManager}
           kpis={buyBackKpis}
-          manufacturerChartData={manufacturerChartData}
+          repairManufacturerChartData={repairManufacturerChartData}
+          repairInsights={summary?.repairInsights}
           recentChecks={recentChecks}
         />
       ) : (
@@ -511,13 +457,15 @@ function BuyBackDashboard({
   byCollaborator,
   isManager,
   kpis,
-  manufacturerChartData,
+  repairManufacturerChartData,
+  repairInsights,
   recentChecks,
 }: {
   byCollaborator: CollaboratorSaving[];
   isManager: boolean;
   kpis: DashboardKpi[];
-  manufacturerChartData: Array<{ amount: number; name: string }>;
+  repairManufacturerChartData: Array<{ name: string; repairs: number }>;
+  repairInsights?: DashboardSummary["repairInsights"];
   recentChecks: VehicleCheck[];
 }) {
   return (
@@ -527,6 +475,8 @@ function BuyBackDashboard({
           <KpiCard {...kpi} key={kpi.title} />
         ))}
       </section>
+
+      <RepairInsightsPanel insights={repairInsights} />
 
       <section className="grid gap-4 xl:grid-cols-[1.1fr_1fr_1.1fr]">
         <DashboardPanel
@@ -545,15 +495,15 @@ function BuyBackDashboard({
         </DashboardPanel>
 
         <DashboardPanel
-          icon={Euro}
-          subtitle="Économies internes par marque"
+          icon={Wrench}
+          subtitle="Nombre de réparations terminées par marque"
           title="Constructeurs"
         >
-          {manufacturerChartData.length ? (
+          {repairManufacturerChartData.length ? (
             <div className="h-56">
               <ResponsiveContainer height="100%" width="100%">
                 <BarChart
-                  data={manufacturerChartData}
+                  data={repairManufacturerChartData}
                   layout="vertical"
                   margin={{ bottom: 8, left: 0, right: 16, top: 8 }}
                 >
@@ -567,9 +517,14 @@ function BuyBackDashboard({
                     type="category"
                     width={92}
                   />
-                  <Tooltip formatter={(value) => formatMoney(Number(value))} />
-                  <Bar dataKey="amount" radius={[0, 7, 7, 0]}>
-                    {manufacturerChartData.map((entry, index) => (
+                  <Tooltip
+                    formatter={(value) => [
+                      formatInteger(Number(value)),
+                      "Réparations",
+                    ]}
+                  />
+                  <Bar dataKey="repairs" radius={[0, 7, 7, 0]}>
+                    {repairManufacturerChartData.map((entry, index) => (
                       <Cell
                         fill={index % 2 === 0 ? "#14b8a6" : "#2563eb"}
                         key={entry.name}
@@ -580,7 +535,7 @@ function BuyBackDashboard({
               </ResponsiveContainer>
             </div>
           ) : (
-            <EmptyState label="Aucune économie constructeur pour le moment." />
+            <EmptyState label="Aucune réparation terminée sur cette période." />
           )}
         </DashboardPanel>
 
@@ -604,6 +559,97 @@ function BuyBackDashboard({
         </DashboardPanel>
       </section>
     </div>
+  );
+}
+
+function RepairInsightsPanel({
+  insights,
+}: {
+  insights?: DashboardSummary["repairInsights"];
+}) {
+  const tiles: Array<{
+    description: string;
+    icon: LucideIcon;
+    label: string;
+    tone: KpiTone;
+    value: string;
+  }> = [
+    {
+      description: "Interventions réellement terminées",
+      icon: Wrench,
+      label: "Réparations réalisées",
+      tone: "emerald",
+      value: formatInteger(insights?.repairsPerformedCount ?? 0),
+    },
+    {
+      description: "Pièces neuves utilisées",
+      icon: PackageCheck,
+      label: "Pièces remplacées",
+      tone: "amber",
+      value: formatInteger(insights?.replacedPartsCount ?? 0),
+    },
+    {
+      description: insights?.topRepair
+        ? quantityLabel(insights.topRepair.quantity, "intervention")
+        : "Aucune intervention terminée",
+      icon: TrendingUp,
+      label: "Réparation la plus fréquente",
+      tone: "teal",
+      value: insights?.topRepair?.name ?? "Aucune donnée",
+    },
+    {
+      description: insights?.topManufacturer
+        ? quantityLabel(insights.topManufacturer.quantity, "réparation")
+        : "Aucune réparation terminée",
+      icon: Car,
+      label: "Marque la plus réparée",
+      tone: "blue",
+      value: insights?.topManufacturer?.name ?? "Aucune donnée",
+    },
+  ];
+
+  return (
+    <DashboardPanel
+      icon={Wrench}
+      subtitle="Vue opérationnelle des interventions terminées sur la période"
+      title="Analyse des réparations"
+    >
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {tiles.map((tile) => {
+          const Icon = tile.icon;
+
+          return (
+            <div
+              className="min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 p-4"
+              key={tile.label}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset",
+                    toneStyles[tile.tone].icon,
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <p className="text-[11px] font-bold uppercase leading-4 text-slate-500">
+                  {tile.label}
+                </p>
+              </div>
+              <p
+                className="mt-4 truncate text-2xl font-bold text-slate-950"
+                title={tile.value}
+              >
+                {tile.value}
+              </p>
+              <p className="mt-1 truncate text-xs font-semibold text-slate-500">
+                {tile.description}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </DashboardPanel>
   );
 }
 
@@ -1009,7 +1055,10 @@ function KpiCard({
             <p className="truncate text-[11px] font-bold uppercase text-slate-500">
               {title}
             </p>
-            <p className="mt-1 text-2xl font-bold tracking-wide text-slate-950">
+            <p
+              className="mt-1 truncate text-2xl font-bold tracking-wide text-slate-950"
+              title={value}
+            >
               {value}
             </p>
           </div>
@@ -1156,8 +1205,6 @@ function ActivityRow({ check, index }: { check: VehicleCheck; index: number }) {
   const damageCount = check.items?.length ?? 0;
   const selectedDamageCount =
     check.items?.filter((item) => item.selectedForSummary).length ?? 0;
-  const status = statusLabel(check);
-
   return (
     <Link
       aria-label={`Ouvrir le controle du vehicule ${check.licensePlate}`}
@@ -1172,14 +1219,12 @@ function ActivityRow({ check, index }: { check: VehicleCheck; index: number }) {
           <p className="truncate text-sm font-bold text-slate-900">
             {check.licensePlate}
           </p>
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5 text-[11px] font-semibold",
-              status.className,
-            )}
-          >
-            {status.label}
-          </span>
+          <VehicleCheckStatusBadge
+            items={check.items}
+            publicShare={check.publicShare}
+            status={check.status}
+            workflowStage
+          />
         </div>
         <p className="mt-1 truncate text-xs font-medium text-slate-500">
           {check.manufacturer?.name ?? "Constructeur"}{" "}
@@ -1316,28 +1361,6 @@ function trendLabel(current: number, previous: number): KpiTrend {
   };
 }
 
-function statusLabel(check: VehicleCheck) {
-  const { publicShare, status } = check;
-
-  if (
-    status === "CLOSED_NO_DAMAGE" ||
-    status === "COMPLETED" ||
-    publicShare?.vehicleRecoveredAt
-  ) {
-    return { className: "bg-blue-50 text-blue-700", label: "Terminé" };
-  }
-  if (status === "SUMMARY_READY") {
-    return publicShare?.takenInChargeAt
-      ? { className: "bg-amber-50 text-amber-700", label: "Récupération" }
-      : { className: "bg-amber-50 text-amber-700", label: "Dépôt à confirmer" };
-  }
-  if (status === "TO_ANALYZE")
-    return { className: "bg-amber-50 text-amber-700", label: "A analyser" };
-  if (status === "CANCELLED")
-    return { className: "bg-red-50 text-red-700", label: "Annule" };
-  return { className: "bg-slate-100 text-slate-600", label: "Brouillon" };
-}
-
 function riskStatusLabel(vehicle: RiskVehicle, userId?: string) {
   if (vehicle.status === "DRAFT")
     return { className: "bg-slate-100 text-slate-600", label: "Brouillon" };
@@ -1412,6 +1435,10 @@ function numberValue(value: string | number | null | undefined) {
 
 function formatInteger(value: number) {
   return new Intl.NumberFormat("fr-FR").format(value);
+}
+
+function quantityLabel(quantity: number, singular: string) {
+  return `${formatInteger(quantity)} ${singular}${quantity > 1 ? "s" : ""}`;
 }
 
 function formatSignedNumber(value: number) {

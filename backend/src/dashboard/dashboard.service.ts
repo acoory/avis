@@ -4,6 +4,7 @@ import {
   PartOrderStatus,
   Prisma,
   RepairDecisionStatus,
+  RepairExecutionMode,
   Role,
   VehicleCheckItemOperationalStatus,
   VehicleCheckStatus,
@@ -29,6 +30,7 @@ export class DashboardService {
       partOrdersToPlaceCount,
       recentVehicleChecks,
       repairRequestNotifications,
+      performedRepairItems,
     ] = await Promise.all([
       this.prisma.vehicleCheck.count({ where: vehicleCheckScope }),
       this.prisma.vehicleCheck.count({
@@ -136,7 +138,22 @@ export class DashboardService {
           },
         },
       }),
+      this.prisma.vehicleCheckItem.findMany({
+        where: this.performedRepairItemScope(user, query),
+        select: {
+          partOrderRequired: true,
+          quantity: true,
+          repairType: { select: { id: true, name: true } },
+          vehicleCheck: {
+            select: {
+              manufacturer: { select: { id: true, name: true } },
+            },
+          },
+        },
+      }),
     ]);
+
+    const repairInsights = this.repairInsights(performedRepairItems);
 
     return {
       vehicleChecksCount,
@@ -151,6 +168,7 @@ export class DashboardService {
       totalDifferenceAmount: this.money(totals._sum.totalDifferenceAmount),
       alertItemsCount,
       partOrdersToPlaceCount,
+      repairInsights,
       repairRequestNotifications: repairRequestNotifications
         .flatMap((share) => {
           const vehicleCheck = {
@@ -526,6 +544,85 @@ export class DashboardService {
     return {
       ...baseWhere,
       vehicleCheck: vehicleCheckScope,
+    };
+  }
+
+  private performedRepairItemScope(
+    user: CurrentUserPayload,
+    query: DashboardQueryDto = {},
+  ): Prisma.VehicleCheckItemWhereInput {
+    return {
+      ...this.vehicleCheckItemScope(user, query),
+      selectedForSummary: true,
+      OR: [
+        { executionCompletedAt: { not: null } },
+        { vehicleCheck: { status: VehicleCheckStatus.COMPLETED } },
+        {
+          executionMode: RepairExecutionMode.EXTERNAL_PROVIDER,
+          vehicleCheck: {
+            publicShare: { is: { vehicleRecoveredAt: { not: null } } },
+          },
+        },
+      ],
+    };
+  }
+
+  private repairInsights(
+    items: Array<{
+      partOrderRequired: boolean;
+      quantity: number;
+      repairType: { id: string; name: string };
+      vehicleCheck: { manufacturer: { id: string; name: string } };
+    }>,
+  ) {
+    const repairsByType = new Map<
+      string,
+      { id: string; name: string; quantity: number }
+    >();
+    const repairsByManufacturer = new Map<
+      string,
+      { id: string; name: string; quantity: number }
+    >();
+    let repairsPerformedCount = 0;
+    let replacedPartsCount = 0;
+
+    items.forEach((item) => {
+      repairsPerformedCount += item.quantity;
+      if (item.partOrderRequired) replacedPartsCount += item.quantity;
+
+      const repairType = repairsByType.get(item.repairType.id) ?? {
+        ...item.repairType,
+        quantity: 0,
+      };
+      repairType.quantity += item.quantity;
+      repairsByType.set(repairType.id, repairType);
+
+      const manufacturer = item.vehicleCheck.manufacturer;
+      const manufacturerRepairs = repairsByManufacturer.get(
+        manufacturer.id,
+      ) ?? {
+        ...manufacturer,
+        quantity: 0,
+      };
+      manufacturerRepairs.quantity += item.quantity;
+      repairsByManufacturer.set(manufacturer.id, manufacturerRepairs);
+    });
+
+    const byQuantityThenName = (
+      left: { name: string; quantity: number },
+      right: { name: string; quantity: number },
+    ) => right.quantity - left.quantity || left.name.localeCompare(right.name);
+    const repairTypes = [...repairsByType.values()].sort(byQuantityThenName);
+    const manufacturers = [...repairsByManufacturer.values()].sort(
+      byQuantityThenName,
+    );
+
+    return {
+      repairsPerformedCount,
+      replacedPartsCount,
+      topRepair: repairTypes[0] ?? null,
+      topManufacturer: manufacturers[0] ?? null,
+      repairsByManufacturer: manufacturers,
     };
   }
 

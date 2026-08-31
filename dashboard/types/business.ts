@@ -13,7 +13,10 @@ export type RepairDecisionStatus =
   | "MANDATORY"
   | "WARNING";
 export type PartOrderStatus = "NOT_REQUIRED" | "TO_ORDER" | "ORDERED";
-export type VehicleCheckItemOperationalStatus = "ACTIVE" | "IMPOSSIBLE" | "CANCELLED";
+export type VehicleCheckItemOperationalStatus =
+  | "ACTIVE"
+  | "IMPOSSIBLE"
+  | "CANCELLED";
 export type RepairExecutionMode = "ON_SITE" | "EXTERNAL_PROVIDER";
 export type ManufacturerRepairRuleStatus =
   | "ALLOWED"
@@ -366,7 +369,10 @@ export type PublicVehicleCheckShare = {
   takenInChargeAt?: string | null;
   vehicleRecoveredAt?: string | null;
   token: string;
-  vehicleCheck: Omit<VehicleCheck, "collaborator" | "externalQuotes" | "items"> & {
+  vehicleCheck: Omit<
+    VehicleCheck,
+    "collaborator" | "externalQuotes" | "items"
+  > & {
     items: VehicleCheckItem[];
   };
 };
@@ -416,6 +422,17 @@ export type DashboardSummary = {
   totalDifferenceAmount: string;
   alertItemsCount: number;
   partOrdersToPlaceCount?: number;
+  repairInsights: {
+    repairsPerformedCount: number;
+    replacedPartsCount: number;
+    topRepair: { id: string; name: string; quantity: number } | null;
+    topManufacturer: { id: string; name: string; quantity: number } | null;
+    repairsByManufacturer: Array<{
+      id: string;
+      name: string;
+      quantity: number;
+    }>;
+  };
   repairRequestNotifications?: Array<{
     eventAt: string;
     externalRepairContact?: ExternalRepairContact | null;

@@ -41,6 +41,8 @@ export class ListVehicleChecksQueryDto {
     'checkNumber',
     'city',
     'licensePlate',
+    'partOrders',
+    'publicShare',
     'status',
     'totalInternalSavingAmount',
   ])

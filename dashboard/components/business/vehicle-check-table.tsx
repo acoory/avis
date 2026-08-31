@@ -151,27 +151,23 @@ export function VehicleCheckTable({
             id: "partOrders",
             header: "Commandes",
             cell: (check) => <PartOrderSummaryBadge vehicleCheck={check} />,
-            sortValue: serverPagination
-              ? undefined
-              : (check) => partOrderSummary(check).toOrder,
+            sortValue: (check) => partOrderSummary(check).toOrder,
             searchValue: (check) => partOrderSummaryText(check),
           },
           {
             id: "publicShare",
             header: "Prestataire",
             cell: (check) => <PublicShareStatusBadge vehicleCheck={check} />,
-            sortValue: serverPagination
-              ? undefined
-              : (check) =>
-                  check.status === "CLOSED_NO_DAMAGE"
-                    ? 4
-                    : check.publicShare?.vehicleRecoveredAt
-                      ? 3
-                      : check.publicShare?.takenInChargeAt
-                        ? 2
-                        : check.publicShare
-                          ? 1
-                          : 0,
+            sortValue: (check) =>
+              check.status === "CLOSED_NO_DAMAGE"
+                ? 4
+                : check.publicShare?.vehicleRecoveredAt
+                  ? 3
+                  : check.publicShare?.takenInChargeAt
+                    ? 2
+                    : check.publicShare
+                      ? 1
+                      : 0,
             searchValue: (check) =>
               check.status === "CLOSED_NO_DAMAGE"
                 ? "Non requis"

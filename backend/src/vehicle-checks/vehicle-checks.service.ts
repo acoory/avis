@@ -199,18 +199,23 @@ export class VehicleChecksService {
       where.AND = this.vehicleSearchConditions(searchTerms);
     }
 
+    const skip = (query.page - 1) * query.pageSize;
+    const specialSortPageIds = await this.specialSortPageIds(
+      where,
+      query.sortBy,
+      query.sortDirection,
+      skip,
+      query.pageSize,
+    );
+    const hasSpecialSort = specialSortPageIds !== null;
     const orderBy: Prisma.VehicleCheckOrderByWithRelationInput[] = [
       {
         [query.sortBy]: query.sortDirection,
-      } as Prisma.VehicleCheckOrderByWithRelationInput,
-      ...(query.sortBy === 'createdAt'
-        ? []
-        : [{ createdAt: 'desc' as const }]),
+      },
+      ...(query.sortBy === 'createdAt' ? [] : [{ createdAt: 'desc' as const }]),
     ];
-
-    const skip = (query.page - 1) * query.pageSize;
     const [
-      items,
+      unorderedItems,
       total,
       saving,
       draftCount,
@@ -221,55 +226,59 @@ export class VehicleChecksService {
       recoveredCount,
       toOrderCount,
     ] = await this.prisma.$transaction([
-        this.prisma.vehicleCheck.findMany({
-          where,
-          include: vehicleCheckInclude,
-          orderBy,
-          skip,
-          take: query.pageSize,
-        }),
-        this.prisma.vehicleCheck.count({ where }),
-        this.prisma.vehicleCheck.aggregate({
-          where,
-          _sum: { totalInternalSavingAmount: true },
-        }),
-        this.prisma.vehicleCheck.count({
-          where: { ...where, status: VehicleCheckStatus.DRAFT },
-        }),
-        this.prisma.vehicleCheck.count({
-          where: { ...where, status: VehicleCheckStatus.TO_ANALYZE },
-        }),
-        this.prisma.vehicleCheck.count({
-          where: { ...where, status: VehicleCheckStatus.COMPLETED },
-        }),
-        this.prisma.vehicleCheck.count({
-          where: { ...where, status: VehicleCheckStatus.CLOSED_NO_DAMAGE },
-        }),
-        this.prisma.vehicleCheck.count({
-          where: {
-            ...where,
-            publicShare: {
-              is: {
-                takenInChargeAt: { not: null },
-                vehicleRecoveredAt: null,
-              },
+      this.prisma.vehicleCheck.findMany({
+        where: hasSpecialSort
+          ? { ...where, id: { in: specialSortPageIds } }
+          : where,
+        include: vehicleCheckInclude,
+        ...(hasSpecialSort ? {} : { orderBy, skip, take: query.pageSize }),
+      }),
+      this.prisma.vehicleCheck.count({ where }),
+      this.prisma.vehicleCheck.aggregate({
+        where,
+        _sum: { totalInternalSavingAmount: true },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: { ...where, status: VehicleCheckStatus.DRAFT },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: { ...where, status: VehicleCheckStatus.TO_ANALYZE },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: { ...where, status: VehicleCheckStatus.COMPLETED },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: { ...where, status: VehicleCheckStatus.CLOSED_NO_DAMAGE },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: {
+          ...where,
+          publicShare: {
+            is: {
+              takenInChargeAt: { not: null },
+              vehicleRecoveredAt: null,
             },
           },
-        }),
-        this.prisma.vehicleCheck.count({
-          where: {
-            ...where,
-            publicShare: { is: { vehicleRecoveredAt: { not: null } } },
-          },
-        }),
-        this.prisma.vehicleCheckItem.count({
-          where: {
-            operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
-            partOrderStatus: PartOrderStatus.TO_ORDER,
-            vehicleCheck: where,
-          },
-        }),
-      ]);
+        },
+      }),
+      this.prisma.vehicleCheck.count({
+        where: {
+          ...where,
+          publicShare: { is: { vehicleRecoveredAt: { not: null } } },
+        },
+      }),
+      this.prisma.vehicleCheckItem.count({
+        where: {
+          operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+          partOrderStatus: PartOrderStatus.TO_ORDER,
+          vehicleCheck: where,
+        },
+      }),
+    ]);
+
+    const items = hasSpecialSort
+      ? this.orderByPageIds(unorderedItems, specialSortPageIds)
+      : unorderedItems;
 
     return {
       items,
@@ -288,6 +297,115 @@ export class VehicleChecksService {
         toOrderCount,
       },
     };
+  }
+
+  private async specialSortPageIds(
+    where: Prisma.VehicleCheckWhereInput,
+    sortBy: string,
+    sortDirection: 'asc' | 'desc',
+    skip: number,
+    pageSize: number,
+  ): Promise<string[] | null> {
+    if (sortBy === 'partOrders') {
+      const candidates = await this.prisma.vehicleCheck.findMany({
+        where,
+        select: {
+          id: true,
+          createdAt: true,
+          _count: {
+            select: {
+              items: {
+                where: {
+                  operationalStatus: VehicleCheckItemOperationalStatus.ACTIVE,
+                  partOrderStatus: PartOrderStatus.TO_ORDER,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return this.sortedPageIds(
+        candidates.map((candidate) => ({
+          id: candidate.id,
+          createdAt: candidate.createdAt,
+          value: candidate._count.items,
+        })),
+        sortDirection,
+        skip,
+        pageSize,
+      );
+    }
+
+    if (sortBy === 'publicShare') {
+      const candidates = await this.prisma.vehicleCheck.findMany({
+        where,
+        select: {
+          id: true,
+          createdAt: true,
+          status: true,
+          publicShare: {
+            select: {
+              takenInChargeAt: true,
+              vehicleRecoveredAt: true,
+            },
+          },
+        },
+      });
+
+      return this.sortedPageIds(
+        candidates.map((candidate) => ({
+          id: candidate.id,
+          createdAt: candidate.createdAt,
+          value:
+            candidate.status === VehicleCheckStatus.CLOSED_NO_DAMAGE
+              ? 4
+              : candidate.publicShare?.vehicleRecoveredAt
+                ? 3
+                : candidate.publicShare?.takenInChargeAt
+                  ? 2
+                  : candidate.publicShare
+                    ? 1
+                    : 0,
+        })),
+        sortDirection,
+        skip,
+        pageSize,
+      );
+    }
+
+    return null;
+  }
+
+  private sortedPageIds(
+    candidates: Array<{ id: string; createdAt: Date; value: number }>,
+    sortDirection: 'asc' | 'desc',
+    skip: number,
+    pageSize: number,
+  ) {
+    const direction = sortDirection === 'asc' ? 1 : -1;
+
+    return candidates
+      .sort(
+        (left, right) =>
+          (left.value - right.value) * direction ||
+          right.createdAt.getTime() - left.createdAt.getTime() ||
+          left.id.localeCompare(right.id),
+      )
+      .slice(skip, skip + pageSize)
+      .map((candidate) => candidate.id);
+  }
+
+  private orderByPageIds<T extends { id: string }>(
+    items: T[],
+    pageIds: string[],
+  ) {
+    const positions = new Map(pageIds.map((id, index) => [id, index]));
+    return items.sort(
+      (left, right) =>
+        (positions.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
+        (positions.get(right.id) ?? Number.MAX_SAFE_INTEGER),
+    );
   }
 
   search(query: SearchVehicleChecksQueryDto, user: CurrentUserPayload) {
