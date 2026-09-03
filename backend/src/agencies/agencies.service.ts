@@ -1,4 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import ExcelJS from 'exceljs';
 import { randomBytes } from 'node:crypto';
 import { Prisma, VehicleCheckStatus } from '../../prisma/generated/client.cjs';
 import { PrismaService } from '../prisma/prisma.service';
@@ -178,6 +179,120 @@ export class AgenciesService {
       total,
       totalPages: Math.max(1, Math.ceil(total / query.pageSize)),
     };
+  }
+
+  async publicVehicleStatusesWorkbook(token: string, query: PublicVehicleStatusQueryDto) {
+    const share = await this.prisma.agencyVehicleStatusShare.findUnique({
+      where: { token },
+      select: {
+        isEnabled: true,
+        agency: {
+          select: { city: true, id: true, isActive: true, name: true },
+        },
+      },
+    });
+    if (!share?.isEnabled || !share.agency.isActive) {
+      throw new NotFoundException('Public vehicle status page not found');
+    }
+
+    const visibleStatuses = [...inProgressStatuses, ...completedStatuses];
+    const filteredStatuses =
+      query.status === 'IN_PROGRESS'
+        ? inProgressStatuses
+        : query.status === 'COMPLETED'
+          ? completedStatuses
+          : visibleStatuses;
+    const normalizedSearch = query.search
+      ?.trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '');
+    const where: Prisma.VehicleCheckWhereInput = {
+      agencyId: share.agency.id,
+      status: { in: filteredStatuses },
+      ...(normalizedSearch
+        ? {
+            OR: [
+              { licensePlate: { contains: normalizedSearch, mode: 'insensitive' } },
+              { licensePlateRaw: { contains: query.search?.trim(), mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
+    const vehicles = await this.prisma.vehicleCheck.findMany({
+      where,
+      orderBy: [{ updatedAt: 'desc' }, { licensePlate: 'asc' }],
+      select: {
+        licensePlate: true,
+        licensePlateRaw: true,
+        manufacturer: { select: { name: true } },
+        publicShare: {
+          select: {
+            takenInChargeAt: true,
+            vehicleRecoveredAt: true,
+          },
+        },
+        status: true,
+        updatedAt: true,
+        vehicleModel: { select: { name: true } },
+      },
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Readyline';
+    workbook.created = new Date();
+    workbook.modified = new Date();
+
+    const worksheet = workbook.addWorksheet('Suivi des véhicules', {
+      views: [{ state: 'frozen', ySplit: 4 }],
+    });
+    worksheet.columns = [
+      { key: 'licensePlate', width: 18 },
+      { key: 'manufacturer', width: 20 },
+      { key: 'model', width: 24 },
+      { key: 'status', width: 20 },
+      { key: 'location', width: 20 },
+      { key: 'updatedAt', width: 20 },
+    ];
+    worksheet.mergeCells('A1:F1');
+    worksheet.getCell('A1').value = `Suivi des véhicules — ${share.agency.city} · ${share.agency.name}`;
+    worksheet.getCell('A1').font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 14 };
+    worksheet.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } };
+    worksheet.getCell('A1').alignment = { vertical: 'middle' };
+    worksheet.getRow(1).height = 28;
+    worksheet.mergeCells('A2:F2');
+    worksheet.getCell('A2').value = `Exporté le ${new Intl.DateTimeFormat('fr-FR', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+    }).format(new Date())}`;
+    worksheet.getCell('A2').font = { italic: true, color: { argb: 'FF64748B' } };
+    worksheet.getRow(4).values = ['Plaque', 'Marque', 'Modèle', 'Statut', 'Emplacement', 'Mis à jour'];
+    worksheet.getRow(4).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    worksheet.getRow(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF334155' } };
+    worksheet.getRow(4).alignment = { vertical: 'middle' };
+
+    for (const vehicle of vehicles) {
+      const isInProgress = inProgressStatuses.includes(vehicle.status);
+      const isAtProvider =
+        vehicle.publicShare?.takenInChargeAt && !vehicle.publicShare.vehicleRecoveredAt;
+      worksheet.addRow({
+        licensePlate: vehicle.licensePlateRaw || vehicle.licensePlate,
+        manufacturer: vehicle.manufacturer?.name ?? 'Marque non renseignée',
+        model: vehicle.vehicleModel?.name ?? '',
+        status: isInProgress ? 'Travaux en cours' : 'Terminé',
+        location: isAtProvider ? 'Chez prestataire' : 'Sur parc',
+        updatedAt: vehicle.updatedAt,
+      });
+    }
+
+    worksheet.autoFilter = { from: 'A4', to: 'F4' };
+    worksheet.getColumn('updatedAt').numFmt = 'dd/mm/yyyy hh:mm';
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber > 4) {
+        row.alignment = { vertical: 'middle' };
+      }
+    });
+
+    return Buffer.from(await workbook.xlsx.writeBuffer());
   }
 
   async create(dto: CreateAgencyDto) {

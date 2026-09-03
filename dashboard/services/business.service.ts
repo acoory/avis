@@ -1028,6 +1028,23 @@ export function exportVehicleChecksUrl(params?: {
   return url.toString();
 }
 
+export function publicVehicleStatusExportUrl(
+  token: string,
+  params?: {
+    search?: string;
+    status?: "IN_PROGRESS" | "COMPLETED" | "ALL";
+  },
+) {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/public/vehicle-status/${encodeURIComponent(token)}/export.xlsx`,
+  );
+
+  if (params?.search) url.searchParams.set("search", params.search);
+  if (params?.status) url.searchParams.set("status", params.status);
+
+  return url.toString();
+}
+
 export function exportDashboardKpisUrl(params: {
   collaboratorId?: string;
   dateFrom?: string;

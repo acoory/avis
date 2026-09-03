@@ -1,13 +1,13 @@
 "use client";
 
-import { CarFront, ChevronLeft, ChevronRight, RefreshCw, Search } from "lucide-react";
+import { CarFront, ChevronLeft, ChevronRight, Download, RefreshCw, Search } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ReadylineBrand } from "@/components/branding/readyline-brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatLicensePlate } from "@/lib/format";
-import { businessService } from "@/services/business.service";
+import { businessService, publicVehicleStatusExportUrl } from "@/services/business.service";
 import { PublicAgencyVehicleStatus, PublicAgencyVehicleStatusResponse } from "@/types/business";
 
 type StatusFilter = "IN_PROGRESS" | "COMPLETED" | "ALL";
@@ -26,6 +26,7 @@ export default function PublicVehicleStatusPage() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [isUnavailable, setIsUnavailable] = useState(false);
 
   const loadVehicles = useCallback(
@@ -61,6 +62,29 @@ export default function PublicVehicleStatusPage() {
     void loadVehicles();
   }, [loadVehicles]);
 
+  async function exportVehicles() {
+    setIsExporting(true);
+    try {
+      const response = await fetch(
+        publicVehicleStatusExportUrl(params.token, {
+          search: search || undefined,
+          status: filter,
+        }),
+      );
+      if (!response.ok) throw new Error("Unable to export vehicle statuses");
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `suivi-vehicules-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   useEffect(() => {
     const interval = window.setInterval(() => void loadVehicles(true), 60000);
     return () => window.clearInterval(interval);
@@ -92,17 +116,28 @@ export default function PublicVehicleStatusPage() {
                 </h1>
               </div>
             </div>
-            <Button
-              className="self-start"
-              disabled={isLoading}
-              size="sm"
-              type="button"
-              variant="outline"
-              onClick={() => void loadVehicles()}
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-              Actualiser
-            </Button>
+            <div className="flex self-start gap-2">
+              <Button
+                disabled={isExporting || !data}
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() => void exportVehicles()}
+              >
+                <Download className={`h-4 w-4 ${isExporting ? "animate-pulse" : ""}`} />
+                {isExporting ? "Export en cours" : "Export Excel"}
+              </Button>
+              <Button
+                disabled={isLoading}
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() => void loadVehicles()}
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                Actualiser
+              </Button>
+            </div>
           </div>
         </header>
 
