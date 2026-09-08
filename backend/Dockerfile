@@ -16,4 +16,5 @@ RUN pnpm build
 
 EXPOSE 3001
 
-CMD ["node", "dist/src/main"]
+# Apply pending migrations before accepting requests with the new Prisma client.
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && exec node dist/src/main"]

@@ -22,3 +22,9 @@ Vérifier que `NEXT_PUBLIC_API_URL` désigne l’API publique accessible aux ach
 ## Réconciliation de l’historique de développement
 
 La migration `20260816150000_risk_showroom` a été restaurée à la version exacte appliquée à la base de développement (SHA-256 `5777fff9349ec0a139eb9c0b12f66be63cd271dd0d993be11dee7014287f1b30`). Cette version inclut `mileage`, `vin` et la relation `vehicleModelId`, réintégrés dans le schéma Prisma. `TIRE_DAMAGE` reste ajouté par la migration suivante. Aucun checksum en base n’a été réécrit. Une comparaison en lecture seule confirme que les seules différences restantes sont les additions de la fonctionnalité commerciale.
+
+## Correction des bases de production sans les champs historiques
+
+La migration `20260909090000_reconcile_risk_vehicle_fields` ajoute `vehicleModelId`, `mileage`, `vin`, l’index et la clé étrangère seulement s’ils sont absents. Elle préserve les données des bases où ils existent déjà. Elle est nécessaire car la version historique appliquée en production diffère de celle appliquée en développement.
+
+Le conteneur exécute maintenant `pnpm exec prisma migrate deploy` au démarrage avant de lancer l’API. Un échec de migration empêche le démarrage. Pour un déploiement qui remplace la commande Docker, exécuter cette commande dans l’environnement de production avant de redémarrer l’API. Ne pas utiliser `migrate dev` ou `migrate reset` en production.
