@@ -1,3 +1,4 @@
+import { RiskCommercialPublicController } from './risk-commercial-public.controller';
 import { Module } from '@nestjs/common';
 import { DamagePhotosModule } from '../damage-photos/damage-photos.module';
 import { NotificationsModule } from '../notifications/notifications.module';
@@ -6,7 +7,7 @@ import { RiskVehiclesService } from './risk-vehicles.service';
 
 @Module({
   imports: [DamagePhotosModule, NotificationsModule],
-  controllers: [RiskVehiclesController],
+  controllers: [RiskVehiclesController, RiskCommercialPublicController],
   providers: [RiskVehiclesService],
 })
 export class RiskVehiclesModule {}

@@ -214,3 +214,8 @@ export type ExternalQuote = Prisma.ExternalQuoteModel
  *
  */
 export type ExternalQuoteItem = Prisma.ExternalQuoteItemModel
+/**
+ * Model RiskCommercialPhoto
+ *
+ */
+export type RiskCommercialPhoto = Prisma.RiskCommercialPhotoModel

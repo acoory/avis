@@ -278,6 +278,7 @@ export default function DashboardPage() {
         .length;
 
     return {
+      commercial: countStatus("COMMERCIAL_PHOTOS"),
       closed: countStatus("CLOSED"),
       comments: filteredRiskVehicles.reduce(
         (total, vehicle) =>
@@ -654,6 +655,7 @@ function RepairInsightsPanel({
 }
 
 type RiskDashboardStats = {
+  commercial: number;
   closed: number;
   comments: number;
   created: number;
@@ -663,6 +665,7 @@ type RiskDashboardStats = {
 };
 
 type RiskAssigneeActivity = {
+  commercial: number;
   closed: number;
   id: string;
   name: string;
@@ -714,7 +717,14 @@ function RiskDashboard({
       value: stats.submitted,
     },
     {
-      description: "Analyses terminées",
+      description: "Photos à compléter avant clôture",
+      icon: Camera,
+      label: "Photos commerciales",
+      tone: "teal",
+      value: stats.commercial,
+    },
+    {
+      description: "Photos commerciales validées",
       icon: CheckCircle2,
       label: "Dossiers clos",
       tone: "emerald",
@@ -738,6 +748,7 @@ function RiskDashboard({
   const statusData = [
     { color: "#64748b", name: "Brouillons", value: stats.draft },
     { color: "#f59e0b", name: "À analyser", value: stats.submitted },
+    { color: "#0f766e", name: "Photos commerciales", value: stats.commercial },
     { color: "#10b981", name: "Clos", value: stats.closed },
   ];
 
@@ -965,7 +976,7 @@ function RiskAssigneeRow({
           {row.submitted} à analyser
         </p>
         <p className="text-xs font-medium text-emerald-600">
-          {row.closed} clos
+          {row.commercial} en photos commerciales · {row.closed} clos
         </p>
       </div>
     </div>
@@ -1362,6 +1373,11 @@ function trendLabel(current: number, previous: number): KpiTrend {
 }
 
 function riskStatusLabel(vehicle: RiskVehicle, userId?: string) {
+  if (vehicle.status === "COMMERCIAL_PHOTOS")
+    return {
+      className: "bg-teal-50 text-teal-700",
+      label: "Photos commerciales",
+    };
   if (vehicle.status === "DRAFT")
     return { className: "bg-slate-100 text-slate-600", label: "Brouillon" };
   if (vehicle.status === "CLOSED")
@@ -1391,6 +1407,7 @@ function riskActivityByAssignee(
     if (!primary) return;
 
     const row = activity.get(primary.id) ?? {
+      commercial: 0,
       closed: 0,
       id: primary.id,
       name: `${primary.firstName} ${primary.lastName}`.trim() || primary.email,
@@ -1398,6 +1415,7 @@ function riskActivityByAssignee(
       total: 0,
     };
     row.total += 1;
+    if (vehicle.status === "COMMERCIAL_PHOTOS") row.commercial += 1;
     if (vehicle.status === "SUBMITTED") row.submitted += 1;
     if (vehicle.status === "CLOSED") row.closed += 1;
     activity.set(primary.id, row);

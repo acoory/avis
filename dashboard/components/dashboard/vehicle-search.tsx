@@ -428,6 +428,8 @@ function riskStatusLabel(
 ) {
   if (vehicle.status === "DRAFT") return "Brouillon";
   if (vehicle.status === "CLOSED") return "Clos";
+  if (vehicle.status === "COMMERCIAL_PHOTOS")
+    return "Photos commerciales à réaliser";
   return vehicle.creatorId === currentUserId ? "Transmis" : "À analyser";
 }
 

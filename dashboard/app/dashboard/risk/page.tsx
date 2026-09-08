@@ -34,6 +34,9 @@ export default function RiskPage() {
 
   const stats = useMemo(
     () => ({
+      commercial: vehicles.filter(
+        (vehicle) => vehicle.status === "COMMERCIAL_PHOTOS",
+      ).length,
       closed: vehicles.filter((vehicle) => vehicle.status === "CLOSED").length,
       draft: vehicles.filter((vehicle) => vehicle.status === "DRAFT").length,
       submitted: vehicles.filter((vehicle) => vehicle.status === "SUBMITTED")
@@ -57,12 +60,17 @@ export default function RiskPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <MiniStat icon={Camera} label="Brouillons" value={stats.draft} />
         <MiniStat
           icon={Clock3}
           label="Transmis / A analyser"
           value={stats.submitted}
+        />
+        <MiniStat
+          icon={Camera}
+          label="Photos commerciales"
+          value={stats.commercial}
         />
         <MiniStat icon={CheckCircle2} label="Clos" value={stats.closed} />
       </div>
@@ -307,6 +315,8 @@ function messageCount(vehicle: RiskVehicle) {
 function statusLabel(vehicle: RiskVehicle, userId?: string) {
   if (vehicle.status === "DRAFT") return "Brouillon";
   if (vehicle.status === "CLOSED") return "Clos";
+  if (vehicle.status === "COMMERCIAL_PHOTOS")
+    return "Photos commerciales à réaliser";
   return vehicle.creatorId === userId ? "Transmis" : "À analyser";
 }
 

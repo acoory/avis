@@ -85,6 +85,7 @@ enum NotificationType {
 enum RiskVehicleStatus {
   DRAFT
   SUBMITTED
+  COMMERCIAL_PHOTOS
   CLOSED
 }
 
@@ -266,6 +267,8 @@ model VehicleModel {
 
   @@unique([manufacturerId, name])
   @@index([manufacturerId])
+  riskVehicles RiskVehicle[]
+
 }
 
 model RepairType {
@@ -585,6 +588,9 @@ model RiskVehicle {
   creatorId                         String
   agencyId                          String
   manufacturerId                    String
+  vehicleModelId                    String?
+  mileage                           Int?
+  vin                               String?
   licensePlate                      String
   licensePlateRaw                   String?
   licensePlateCountry               String            @default("FR")
@@ -600,7 +606,12 @@ model RiskVehicle {
   closedBy      User?                   @relation("RiskVehicleClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
   agency        Agency                  @relation(fields: [agencyId], references: [id], onDelete: Restrict)
   manufacturer  Manufacturer            @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  vehicleModel  VehicleModel?           @relation(fields: [vehicleModelId], references: [id], onDelete: SetNull)
   assignments   RiskVehicleAssignment[]
+  commercialMileage Int?
+  commercialEquipment Json?
+  commercialShareToken String? @unique
+  commercialPhotos RiskCommercialPhoto[]
   photos        RiskPhoto[]
   conversation  RiskConversation?
   statusHistory RiskStatusHistory[]
@@ -610,6 +621,7 @@ model RiskVehicle {
   @@index([creatorId])
   @@index([agencyId])
   @@index([manufacturerId])
+  @@index([vehicleModelId])
   @@index([status])
   @@index([updatedAt])
 }
@@ -883,4 +895,20 @@ model ExternalQuoteItem {
 
   @@index([externalQuoteId])
   @@index([repairTypeId])
+}
+
+model RiskCommercialPhoto {
+  id String @id @default(uuid())
+  riskVehicleId String
+  slotKey String
+  publicId String @unique
+  assetId String?
+  secureUrl String
+  width Int
+  height Int
+  bytes Int
+  format String
+  createdAt DateTime @default(now())
+  riskVehicle RiskVehicle @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+  @@unique([riskVehicleId, slotKey])
 }

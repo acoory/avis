@@ -4,7 +4,11 @@ import {
   ConversationUser,
 } from "@/types/conversations";
 
-export type RiskVehicleStatus = "DRAFT" | "SUBMITTED" | "CLOSED";
+export type RiskVehicleStatus =
+  | "DRAFT"
+  | "SUBMITTED"
+  | "COMMERCIAL_PHOTOS"
+  | "CLOSED";
 export type RiskAssignmentRole = "PRIMARY" | "PARTICIPANT";
 export type RiskPhotoCategory =
   | "EXTERIOR_FRONT_THREE_QUARTER"
@@ -56,7 +60,26 @@ export type RiskMessage = {
   id: string;
 };
 
+export type CommercialEquipment = Record<
+  "sunroof" | "serviceBook" | "manual" | "accessories",
+  "PRESENT" | "ABSENT" | "TO_CHECK"
+>;
+export type CommercialPhoto = Omit<
+  RiskPhoto,
+  "category" | "damageGroupId" | "sortOrder"
+>;
+export type PublicCommercialGallery = {
+  manufacturer: string;
+  licensePlate: string;
+  mileage: number;
+  photos: Pick<CommercialPhoto, "id" | "slotKey" | "secureUrl">[];
+};
+
 export type RiskVehicle = {
+  commercialMileage: number | null;
+  commercialEquipment: CommercialEquipment | null;
+  commercialShareToken: string | null;
+  commercialPhotos: CommercialPhoto[];
   agency: Agency;
   agencyId: string;
   assignments: RiskAssignment[];

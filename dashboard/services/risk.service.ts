@@ -4,6 +4,8 @@ import {
   ConversationUploadSignature,
 } from "@/types/conversations";
 import {
+  CommercialEquipment,
+  CommercialPhoto,
   CreateRiskVehiclePayload,
   RiskAssignee,
   RiskPhoto,
@@ -131,6 +133,76 @@ export const riskService = {
       width: uploaded.width,
     });
     return data;
+  },
+
+  async uploadCommercialPhoto(
+    id: string,
+    file: File,
+    input: {
+      slotKey: string;
+    },
+  ) {
+    const { data: signature } = await api.post<ImageUploadSignature>(
+      `/risk-vehicles/${id}/commercial/upload-signature`,
+      {},
+    );
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", signature.apiKey);
+    formData.append("folder", signature.folder);
+    formData.append("overwrite", "false");
+    formData.append("public_id", signature.publicId);
+    formData.append("signature", signature.signature);
+    formData.append("timestamp", String(signature.timestamp));
+    const response = await fetch(signature.uploadUrl, {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) throw new Error("Cloudinary upload failed");
+    const uploaded = (await response.json()) as {
+      asset_id?: string;
+      bytes: number;
+      format: string;
+      height: number;
+      public_id: string;
+      secure_url: string;
+      width: number;
+    };
+    const { data } = await api.post<CommercialPhoto>(
+      `/risk-vehicles/${id}/commercial/photos`,
+      {
+        assetId: uploaded.asset_id,
+        bytes: uploaded.bytes,
+        format: uploaded.format,
+        height: uploaded.height,
+        publicId: uploaded.public_id,
+        secureUrl: uploaded.secure_url,
+        slotKey: input.slotKey,
+        width: uploaded.width,
+      },
+    );
+    return data;
+  },
+
+  async startCommercial(id: string) {
+    const { data } = await api.post<RiskVehicle>(
+      `/risk-vehicles/${id}/treated`,
+    );
+    return data;
+  },
+  async saveCommercialDetails(
+    id: string,
+    mileage: number,
+    equipment: CommercialEquipment,
+  ) {
+    const { data } = await api.patch<RiskVehicle>(
+      `/risk-vehicles/${id}/commercial`,
+      { mileage, equipment },
+    );
+    return data;
+  },
+  async removeCommercialPhoto(id: string, photoId: string) {
+    await api.delete(`/risk-vehicles/${id}/commercial/photos/${photoId}`);
   },
 
   async removePhoto(id: string, photoId: string) {

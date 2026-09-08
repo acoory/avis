@@ -76,11 +76,15 @@ export class CloudinaryService {
     };
   }
 
-  createRiskPhotoUploadSignature(riskVehicleId: string, userId: string) {
+  createRiskPhotoUploadSignature(
+    riskVehicleId: string,
+    userId: string,
+    commercial = false,
+  ) {
     this.ensureConfigured();
     const timestamp = Math.floor(Date.now() / 1000);
     const publicId = randomUUID();
-    const folder = `${this.riskFolder}/${riskVehicleId}/photos/${userId}`;
+    const folder = `${this.riskFolder}/${riskVehicleId}/${commercial ? 'commercial-photos' : 'photos'}/${userId}`;
     const params = {
       folder,
       overwrite: 'false',
@@ -137,9 +141,14 @@ export class CloudinaryService {
     );
   }
 
-  isRiskPhotoAsset(publicId: string, riskVehicleId: string, userId: string) {
+  isRiskPhotoAsset(
+    publicId: string,
+    riskVehicleId: string,
+    userId: string,
+    commercial = false,
+  ) {
     return publicId.startsWith(
-      `${this.riskFolder}/${riskVehicleId}/photos/${userId}/`,
+      `${this.riskFolder}/${riskVehicleId}/${commercial ? 'commercial-photos' : 'photos'}/${userId}/`,
     );
   }
 

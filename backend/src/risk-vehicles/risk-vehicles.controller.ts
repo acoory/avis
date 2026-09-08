@@ -1,3 +1,5 @@
+import { CreateCommercialPhotoDto } from './dto/create-commercial-photo.dto';
+import { UpdateCommercialDetailsDto } from './dto/update-commercial-details.dto';
 import {
   BadGatewayException,
   Body,
@@ -118,6 +120,46 @@ export class RiskVehiclesController {
     return this.riskVehiclesService.submit(id, user);
   }
 
+  @Post(':id/treated')
+  treated(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.riskVehiclesService.startCommercial(id, user);
+  }
+
+  @Patch(':id/commercial')
+  commercialDetails(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: UpdateCommercialDetailsDto,
+  ) {
+    return this.riskVehiclesService.updateCommercialDetails(id, dto, user);
+  }
+
+  @Post(':id/commercial/upload-signature')
+  commercialSignature(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+  ) {
+    return this.riskVehiclesService.commercialSignature(id, user);
+  }
+
+  @Post(':id/commercial/photos')
+  addCommercialPhoto(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: CreateCommercialPhotoDto,
+  ) {
+    return this.riskVehiclesService.addCommercialPhoto(id, dto, user);
+  }
+
+  @Delete(':id/commercial/photos/:photoId')
+  removeCommercialPhoto(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Param('photoId') photoId: string,
+  ) {
+    return this.riskVehiclesService.removeCommercialPhoto(id, photoId, user);
+  }
+
   @Post(':id/close')
   close(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
     return this.riskVehiclesService.close(id, user);
@@ -171,7 +213,7 @@ const ARCHIVE_DOWNLOAD_CONCURRENCY = 4;
 const MAX_ARCHIVE_PHOTO_BYTES = 8 * 1024 * 1024;
 const MAX_ARCHIVE_TOTAL_BYTES = 80 * 1024 * 1024;
 
-async function downloadArchivePhotos(
+export async function downloadArchivePhotos(
   photos: Array<{ archivePath: string; downloadUrl: string }>,
 ) {
   const downloaded = new Array<{ archivePath: string; content: Buffer }>(

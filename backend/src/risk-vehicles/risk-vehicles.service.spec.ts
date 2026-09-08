@@ -27,6 +27,7 @@ jest.mock(
     },
     RiskVehicleStatus: {
       CLOSED: 'CLOSED',
+      COMMERCIAL_PHOTOS: 'COMMERCIAL_PHOTOS',
       DRAFT: 'DRAFT',
       SUBMITTED: 'SUBMITTED',
     },
@@ -323,3 +324,335 @@ function requiredPhotos() {
     RiskPhotoCategory.WHEEL_REAR_RIGHT,
   ].map((category) => ({ category, damageGroupId: null }));
 }
+
+describe('Risk commercial workflow', () => {
+  const user = {
+    sub: 'manager-1',
+    email: 'manager@example.com',
+    role: Role.MANAGER,
+  };
+  const slots = [
+    'front-left',
+    'front-right',
+    'rear-left',
+    'rear-right',
+    'dashboard',
+    'interior-front',
+    'interior-rear',
+    'wheel-front-left',
+    'wheel-front-right',
+    'wheel-rear-left',
+    'wheel-rear-right',
+    'trunk',
+  ];
+  function vehicle() {
+    return {
+      id: 'risk-1',
+      status: RiskVehicleStatus.COMMERCIAL_PHOTOS,
+      commercialMileage: 45200,
+      commercialEquipment: {
+        sunroof: 'ABSENT',
+        serviceBook: 'ABSENT',
+        manual: 'ABSENT',
+        accessories: 'ABSENT',
+      },
+      commercialPhotos: slots.map((slotKey) => ({ slotKey })),
+      assignments: [
+        {
+          userId: user.sub,
+          role: 'PRIMARY',
+          user: { id: user.sub, isActive: true },
+        },
+      ],
+      creator: { id: user.sub, isActive: true },
+    };
+  }
+  function validate(record: unknown) {
+    const service = new RiskVehiclesService(
+      {} as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    return (
+      service as unknown as {
+        validateCommercialCompleteness(value: unknown): void;
+      }
+    ).validateCommercialCompleteness(record);
+  }
+  it('accepts all mandatory commercial views and checked absent equipment', () => {
+    expect(() => validate(vehicle())).not.toThrow();
+  });
+  it('does not accept treatment photos in place of commercial photos', () => {
+    expect(() =>
+      validate({
+        ...vehicle(),
+        photos: requiredPhotos(),
+        commercialPhotos: [],
+      }),
+    ).toThrow(BadRequestException);
+  });
+  it('requires a photo for a present document and rejects unchecked equipment', () => {
+    for (const manual of ['PRESENT', 'TO_CHECK']) {
+      const record = vehicle();
+      record.commercialEquipment.manual = manual;
+      expect(() => validate(record)).toThrow(BadRequestException);
+    }
+  });
+  it('rejects missing mileage and contradictory absent equipment photos', () => {
+    expect(() => validate({ ...vehicle(), commercialMileage: null })).toThrow(
+      BadRequestException,
+    );
+    const record = vehicle();
+    record.commercialPhotos.push({ slotKey: 'manual' });
+    expect(() => validate(record)).toThrow(BadRequestException);
+  });
+  it('prevents direct closure from the treatment stage', async () => {
+    const prisma = {
+      riskVehicle: {
+        findFirst: jest.fn().mockResolvedValue({
+          ...vehicle(),
+          status: RiskVehicleStatus.SUBMITTED,
+        }),
+      },
+    };
+    const service = new RiskVehiclesService(
+      prisma as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    await expect(service.close('risk-1', user)).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+  it('restricts starting commercial photography to the primary assignee or administrator', async () => {
+    const prisma = {
+      riskVehicle: {
+        findFirst: jest.fn().mockResolvedValue({
+          ...vehicle(),
+          status: RiskVehicleStatus.SUBMITTED,
+        }),
+      },
+    };
+    const service = new RiskVehiclesService(
+      prisma as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    await expect(
+      service.startCommercial('risk-1', { ...user, sub: 'participant' }),
+    ).rejects.toThrow('Seul le responsable');
+  });
+  it.each([Role.MANAGER, Role.ADMIN])(
+    'queues the commercial email for the primary assignee when %s closes',
+    async (role) => {
+      const record = {
+        ...vehicle(),
+        riskNumber: 'RISK-001',
+        licensePlate: 'AA123BB',
+        licensePlateCountry: 'FR',
+        manufacturer: { name: 'Renault' },
+      };
+      const responsible = {
+        id: user.sub,
+        firstName: 'Test',
+        lastName: 'User',
+        email: user.email,
+        isActive: true,
+      };
+      record.creator = responsible;
+      record.assignments[0].user = responsible;
+      const closer =
+        role === Role.ADMIN ? { ...user, sub: 'admin-1', role } : user;
+      const tx = {
+        notification: {
+          createManyAndReturn: jest
+            .fn()
+            .mockResolvedValue([
+              { id: 'notification-1', recipientId: user.sub },
+            ]),
+        },
+        notificationEmail: {
+          createMany: jest.fn().mockResolvedValue({ count: 1 }),
+        },
+        riskVehicle: {
+          updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+          findUniqueOrThrow: jest.fn().mockResolvedValue(record),
+          update: jest
+            .fn()
+            .mockImplementation(({ data }) =>
+              Promise.resolve({ ...record, ...data }),
+            ),
+        },
+      };
+      const prisma = {
+        riskVehicle: { findFirst: jest.fn().mockResolvedValue(record) },
+        user: {
+          findUniqueOrThrow: jest.fn().mockResolvedValue({
+            id: user.sub,
+            firstName: 'Test',
+            lastName: 'User',
+          }),
+        },
+        $transaction: jest.fn().mockImplementation((fn) => fn(tx)),
+      };
+      const service = new RiskVehiclesService(
+        prisma as never,
+        {} as never,
+        { get: () => 'https://readyline.example' } as never,
+        { kick: jest.fn() } as never,
+      );
+      const closed = await service.close('risk-1', closer);
+      expect(closed.status).toBe(RiskVehicleStatus.CLOSED);
+      expect(closed.commercialShareToken).toMatch(/^[a-f0-9]{64}$/);
+      expect(closed.closedById).toBe(closer.sub);
+      expect(tx.notificationEmail.createMany).toHaveBeenCalledTimes(1);
+      expect(tx.notificationEmail.createMany).toHaveBeenCalledWith({
+        data: [
+          expect.objectContaining({
+            recipientEmail: user.email,
+            notificationId: 'notification-1',
+            subject: expect.stringContaining('Photos commerciales disponibles'),
+            text: expect.stringContaining(
+              `https://readyline.example/commercial/${closed.commercialShareToken}`,
+            ),
+            html: expect.stringContaining('Voir les photos commerciales'),
+          }),
+        ],
+      });
+      expect(tx.notification.createManyAndReturn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: [
+            expect.objectContaining({
+              recipientId: user.sub,
+              type: NotificationType.RISK_CLOSED,
+              excerpt: expect.stringContaining(
+                'Les photos commerciales sont disponibles',
+              ),
+            }),
+          ],
+        }),
+      );
+      expect(tx.riskVehicle.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'risk-1', status: RiskVehicleStatus.COMMERCIAL_PHOTOS },
+        }),
+      );
+    },
+  );
+  it('rejects an invalid public token without querying dossiers', async () => {
+    const findFirst = jest.fn();
+    const service = new RiskVehiclesService(
+      { riskVehicle: { findFirst } } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    await expect(service.publicCommercialGallery('risk-1')).rejects.toThrow(
+      'Galerie introuvable',
+    );
+    expect(findFirst).not.toHaveBeenCalled();
+  });
+  it('only selects the public fields of a closed commercial gallery', async () => {
+    const findFirst = jest.fn().mockResolvedValue({
+      manufacturer: { name: 'Renault' },
+      licensePlate: 'AA123BB',
+      commercialMileage: 45200,
+      commercialPhotos: [],
+    });
+    const service = new RiskVehiclesService(
+      { riskVehicle: { findFirst } } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    const token = 'a'.repeat(64);
+    expect(await service.publicCommercialGallery(token)).toEqual({
+      manufacturer: 'Renault',
+      licensePlate: 'AA123BB',
+      mileage: 45200,
+      photos: [],
+    });
+    const query = findFirst.mock.calls[0][0];
+    expect(query.where).toEqual({
+      commercialShareToken: token,
+      status: RiskVehicleStatus.CLOSED,
+    });
+    expect(Object.keys(query.select).sort()).toEqual([
+      'commercialMileage',
+      'commercialPhotos',
+      'licensePlate',
+      'manufacturer',
+    ]);
+  });
+  it('accepts a commercial upload URL matching its asset and rejects a different asset', async () => {
+    const dto = {
+      slotKey: 'front-left',
+      publicId: 'risk/risk-1/commercial-photos/manager-1/asset',
+      format: 'jpg',
+      secureUrl:
+        'https://res.cloudinary.com/demo/image/upload/v123/risk/risk-1/commercial-photos/manager-1/asset.jpg',
+      width: 1200,
+      height: 900,
+      bytes: 1000,
+    };
+    const tx = {
+      riskVehicle: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+      riskCommercialPhoto: {
+        findUnique: jest.fn().mockResolvedValue(null),
+        upsert: jest.fn().mockResolvedValue(dto),
+      },
+    };
+    const prisma = {
+      riskVehicle: { findFirst: jest.fn().mockResolvedValue(vehicle()) },
+      $transaction: jest.fn().mockImplementation((fn) => fn(tx)),
+    };
+    const cloudinary = { isRiskPhotoAsset: jest.fn().mockReturnValue(true) };
+    const service = new RiskVehiclesService(
+      prisma as never,
+      cloudinary as never,
+      {} as never,
+      {} as never,
+    );
+    await expect(
+      service.addCommercialPhoto('risk-1', dto, user),
+    ).resolves.toEqual(dto);
+    expect(cloudinary.isRiskPhotoAsset).toHaveBeenCalledWith(
+      dto.publicId,
+      'risk-1',
+      user.sub,
+      true,
+    );
+    await expect(
+      service.addCommercialPhoto(
+        'risk-1',
+        {
+          ...dto,
+          secureUrl: dto.secureUrl.replace('asset.jpg', 'private-document.jpg'),
+        },
+        user,
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('does not allow replacing commercial photos once the dossier is closed', async () => {
+    const service = new RiskVehiclesService(
+      {
+        riskVehicle: {
+          findFirst: jest.fn().mockResolvedValue({
+            ...vehicle(),
+            status: RiskVehicleStatus.CLOSED,
+          }),
+        },
+      } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    await expect(service.commercialSignature('risk-1', user)).rejects.toThrow(
+      'ne sont pas modifiables',
+    );
+  });
+});

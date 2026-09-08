@@ -1,3 +1,11 @@
+import { randomBytes } from 'node:crypto';
+import { CreateCommercialPhotoDto } from './dto/create-commercial-photo.dto';
+import { UpdateCommercialDetailsDto } from './dto/update-commercial-details.dto';
+import {
+  COMMERCIAL_REQUIRED_SLOTS,
+  COMMERCIAL_OPTIONAL_SLOTS,
+  COMMERCIAL_SLOTS,
+} from './commercial-slots';
 import {
   BadRequestException,
   ConflictException,
@@ -126,6 +134,7 @@ const allowedAttachmentMimeTypes = new Set([
 ]);
 
 const riskVehicleInclude = {
+  commercialPhotos: { orderBy: { createdAt: 'asc' as const } },
   agency: true,
   manufacturer: true,
   creator: {
@@ -615,7 +624,10 @@ export class RiskVehiclesService {
 
   async attachmentSignature(id: string, user: CurrentUserPayload) {
     const vehicle = await this.findOne(id, user);
-    if (vehicle.status !== RiskVehicleStatus.SUBMITTED) {
+    if (
+      vehicle.status !== RiskVehicleStatus.SUBMITTED &&
+      vehicle.status !== RiskVehicleStatus.COMMERCIAL_PHOTOS
+    ) {
       throw new BadRequestException(
         'The Risk dossier is not open for comments',
       );
@@ -632,7 +644,10 @@ export class RiskVehiclesService {
     user: CurrentUserPayload,
   ) {
     const vehicle = await this.findOne(id, user);
-    if (vehicle.status !== RiskVehicleStatus.SUBMITTED) {
+    if (
+      vehicle.status !== RiskVehicleStatus.SUBMITTED &&
+      vehicle.status !== RiskVehicleStatus.COMMERCIAL_PHOTOS
+    ) {
       throw new BadRequestException(
         'The Risk dossier is not open for comments',
       );
@@ -696,9 +711,9 @@ export class RiskVehiclesService {
 
   async close(id: string, user: CurrentUserPayload) {
     const vehicle = await this.findOne(id, user);
-    if (vehicle.status !== RiskVehicleStatus.SUBMITTED) {
+    if (vehicle.status !== RiskVehicleStatus.COMMERCIAL_PHOTOS) {
       throw new BadRequestException(
-        'Only a submitted Risk dossier can be closed',
+        'Les photos commerciales doivent être réalisées avant la clôture',
       );
     }
     const isPrimary = vehicle.assignments.some(
@@ -718,21 +733,33 @@ export class RiskVehiclesService {
     ];
     const recipients = stakeholders.filter(
       (recipient, index, values) =>
-        recipient.id !== user.sub &&
+        (recipient.id !== user.sub ||
+          vehicle.assignments.some(
+            (assignment) =>
+              assignment.userId === recipient.id &&
+              assignment.role === RiskAssignmentRole.PRIMARY,
+          )) &&
         recipient.isActive !== false &&
         values.findIndex((item) => item.id === recipient.id) === index,
     );
     const updated = await this.prisma.$transaction(async (tx) => {
+      await this.lockCommercialVehicle(tx, id);
+      const current = await tx.riskVehicle.findUniqueOrThrow({
+        where: { id },
+        include: riskVehicleInclude,
+      });
+      this.validateCommercialCompleteness(current);
       const result = await tx.riskVehicle.update({
         where: { id },
         data: {
           closedAt: new Date(),
+          commercialShareToken: randomBytes(32).toString('hex'),
           closedById: user.sub,
           status: RiskVehicleStatus.CLOSED,
           statusHistory: {
             create: {
               actorId: user.sub,
-              fromStatus: RiskVehicleStatus.SUBMITTED,
+              fromStatus: RiskVehicleStatus.COMMERCIAL_PHOTOS,
               toStatus: RiskVehicleStatus.CLOSED,
             },
           },
@@ -740,14 +767,219 @@ export class RiskVehiclesService {
         include: riskVehicleInclude,
       });
       await this.createNotifications(tx, recipients, actor, result, {
-        excerpt: `${this.actorName(actor)} a clos le dossier Risk.`,
-        title: 'Dossier Risk clos',
+        excerpt: `${this.actorName(actor)} a clôturé le dossier Risk. Les photos commerciales sont disponibles.`,
+        title: 'Dossier clos · Photos commerciales disponibles',
         type: NotificationType.RISK_CLOSED,
       });
       return result;
     });
     this.notificationEmailWorker.kick();
     return updated;
+  }
+
+  async startCommercial(id: string, user: CurrentUserPayload) {
+    const vehicle = await this.findOne(id, user);
+    const isPrimary = vehicle.assignments.some(
+      (a) => a.userId === user.sub && a.role === RiskAssignmentRole.PRIMARY,
+    );
+    if (!isPrimary && user.role !== Role.ADMIN)
+      throw new ForbiddenException(
+        'Seul le responsable peut terminer le traitement',
+      );
+    if (vehicle.status !== RiskVehicleStatus.SUBMITTED)
+      throw new BadRequestException(
+        'Le dossier doit être en cours de traitement',
+      );
+    return this.prisma.riskVehicle.update({
+      where: { id, status: RiskVehicleStatus.SUBMITTED },
+      data: {
+        status: RiskVehicleStatus.COMMERCIAL_PHOTOS,
+        statusHistory: {
+          create: {
+            actorId: user.sub,
+            fromStatus: RiskVehicleStatus.SUBMITTED,
+            toStatus: RiskVehicleStatus.COMMERCIAL_PHOTOS,
+          },
+        },
+      },
+      include: riskVehicleInclude,
+    });
+  }
+
+  private async commercialEditable(id: string, user: CurrentUserPayload) {
+    const vehicle = await this.findOne(id, user);
+    if (vehicle.status !== RiskVehicleStatus.COMMERCIAL_PHOTOS)
+      throw new BadRequestException(
+        'Les photos commerciales ne sont pas modifiables à cette étape',
+      );
+    return vehicle;
+  }
+
+  private async lockCommercialVehicle(
+    tx: Prisma.TransactionClient,
+    id: string,
+  ) {
+    // Serialize edits and closure on the parent so the validated gallery is immutable.
+    const result = await tx.riskVehicle.updateMany({
+      where: { id, status: RiskVehicleStatus.COMMERCIAL_PHOTOS },
+      data: { updatedAt: new Date() },
+    });
+    if (result.count !== 1)
+      throw new BadRequestException('Le dossier ne peut plus être modifié');
+  }
+
+  async commercialSignature(id: string, user: CurrentUserPayload) {
+    await this.commercialEditable(id, user);
+    return this.cloudinaryService.createRiskPhotoUploadSignature(
+      id,
+      user.sub,
+      true,
+    );
+  }
+
+  async updateCommercialDetails(
+    id: string,
+    dto: UpdateCommercialDetailsDto,
+    user: CurrentUserPayload,
+  ) {
+    await this.commercialEditable(id, user);
+    return this.prisma.riskVehicle.update({
+      where: { id, status: RiskVehicleStatus.COMMERCIAL_PHOTOS },
+      data: {
+        commercialMileage: dto.mileage,
+        commercialEquipment: { ...dto.equipment },
+      },
+      include: riskVehicleInclude,
+    });
+  }
+
+  async addCommercialPhoto(
+    id: string,
+    dto: CreateCommercialPhotoDto,
+    user: CurrentUserPayload,
+  ) {
+    await this.commercialEditable(id, user);
+    const url = new URL(dto.secureUrl);
+    if (
+      !COMMERCIAL_SLOTS.includes(dto.slotKey) ||
+      !this.cloudinaryService.isRiskPhotoAsset(
+        dto.publicId,
+        id,
+        user.sub,
+        true,
+      ) ||
+      url.protocol !== 'https:' ||
+      url.hostname !== 'res.cloudinary.com' ||
+      decodeURIComponent(url.pathname)
+        .split('/upload/')[1]
+        ?.replace(/^v[0-9]+\//, '') !== `${dto.publicId}.${dto.format}`
+    ) {
+      throw new BadRequestException('Photo commerciale invalide');
+    }
+    const { previous, photo } = await this.prisma.$transaction(async (tx) => {
+      await this.lockCommercialVehicle(tx, id);
+      const where = {
+        riskVehicleId_slotKey: { riskVehicleId: id, slotKey: dto.slotKey },
+      };
+      const previous = await tx.riskCommercialPhoto.findUnique({ where });
+      const photo = await tx.riskCommercialPhoto.upsert({
+        where,
+        create: { ...dto, riskVehicleId: id },
+        update: dto,
+      });
+      return { previous, photo };
+    });
+    if (previous && previous.publicId !== photo.publicId)
+      await this.cloudinaryService
+        .destroy(previous.publicId)
+        .catch(() => undefined);
+    return photo;
+  }
+
+  async removeCommercialPhoto(
+    id: string,
+    photoId: string,
+    user: CurrentUserPayload,
+  ) {
+    await this.commercialEditable(id, user);
+    const photo = await this.prisma.$transaction(async (tx) => {
+      await this.lockCommercialVehicle(tx, id);
+      const photo = await tx.riskCommercialPhoto.findFirst({
+        where: { id: photoId, riskVehicleId: id },
+      });
+      if (!photo) throw new NotFoundException('Photo introuvable');
+      await tx.riskCommercialPhoto.delete({ where: { id: photo.id } });
+      return photo;
+    });
+    await this.cloudinaryService.destroy(photo.publicId).catch(() => undefined);
+    return { success: true };
+  }
+
+  private validateCommercialCompleteness(vehicle: RiskVehicleRecord) {
+    const equipment = (vehicle.commercialEquipment ?? {}) as Record<
+      string,
+      string
+    >;
+    const slots = new Set(vehicle.commercialPhotos.map((p) => p.slotKey));
+    const missing = COMMERCIAL_REQUIRED_SLOTS.filter(
+      (slot) => !slots.has(slot),
+    );
+    const unchecked = COMMERCIAL_OPTIONAL_SLOTS.filter(
+      (slot) =>
+        !['PRESENT', 'ABSENT'].includes(equipment[slot]) ||
+        (equipment[slot] === 'PRESENT' && !slots.has(slot)) ||
+        (equipment[slot] === 'ABSENT' && slots.has(slot)),
+    );
+    if (
+      vehicle.commercialMileage === null ||
+      missing.length ||
+      unchecked.length
+    )
+      throw new BadRequestException(
+        'Complétez le kilométrage, les photos obligatoires et les équipements présents avant de clôturer.',
+      );
+  }
+
+  async publicCommercialGallery(token: string) {
+    if (!/^[a-f0-9]{64}$/.test(token))
+      throw new NotFoundException('Galerie introuvable');
+    const vehicle = await this.prisma.riskVehicle.findFirst({
+      where: { commercialShareToken: token, status: RiskVehicleStatus.CLOSED },
+      select: {
+        manufacturer: { select: { name: true } },
+        licensePlate: true,
+        commercialMileage: true,
+        commercialPhotos: {
+          select: { id: true, slotKey: true, secureUrl: true },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
+    if (!vehicle) throw new NotFoundException('Galerie introuvable');
+    return {
+      manufacturer: vehicle.manufacturer.name,
+      licensePlate: vehicle.licensePlate,
+      mileage: vehicle.commercialMileage,
+      photos: vehicle.commercialPhotos.sort(
+        (a, b) =>
+          COMMERCIAL_SLOTS.indexOf(a.slotKey) -
+          COMMERCIAL_SLOTS.indexOf(b.slotKey),
+      ),
+    };
+  }
+
+  async commercialArchive(token: string) {
+    const gallery = await this.publicCommercialGallery(token);
+    return {
+      fileName: 'photos-commerciales.zip',
+      photos: gallery.photos.map((photo, index) => ({
+        archivePath: `${String(index + 1).padStart(2, '0')}-${photo.slotKey}.jpg`,
+        downloadUrl: photo.secureUrl.replace(
+          '/upload/',
+          `/upload/${PHOTO_ARCHIVE_TRANSFORMATION}/`,
+        ),
+      })),
+    };
   }
 
   private scopeWhere(user: CurrentUserPayload): Prisma.RiskVehicleWhereInput {
@@ -994,9 +1226,19 @@ export class RiskVehiclesService {
     const response = input.emailResponse;
     const isResponse =
       input.type === NotificationType.RISK_MESSAGE && response !== undefined;
-    const subject = isResponse
-      ? `Nouvelle réponse de ${actorName} - Risk ${vehicle.riskNumber} - ${plate}`
-      : `Risk ${vehicle.riskNumber} - ${plate}`;
+    const galleryUrl =
+      input.type === NotificationType.RISK_CLOSED &&
+      vehicle.commercialShareToken
+        ? new URL(
+            `/commercial/${vehicle.commercialShareToken}`,
+            this.frontendUrl(),
+          ).toString()
+        : null;
+    const subject = galleryUrl
+      ? `Photos commerciales disponibles - Risk ${vehicle.riskNumber} - ${plate}`
+      : isResponse
+        ? `Nouvelle réponse de ${actorName} - Risk ${vehicle.riskNumber} - ${plate}`
+        : `Risk ${vehicle.riskNumber} - ${plate}`;
     const attachmentCount = response?.attachments.length ?? 0;
     const attachmentLabel = `${attachmentCount} fichier${attachmentCount > 1 ? 's' : ''} ajouté${attachmentCount > 1 ? 's' : ''}`;
     const responseText = isResponse
@@ -1025,6 +1267,9 @@ export class RiskVehiclesService {
       `Vehicule : ${plate}${vehicleLabel ? ` - ${vehicleLabel}` : ''}`,
       `Dossier : ${vehicle.riskNumber}`,
       '',
+      ...(galleryUrl
+        ? [`Consulter les photos commerciales : ${galleryUrl}`, '']
+        : []),
       `Ouvrir le dossier : ${url}`,
     ].join('\n');
     const responseHtml = isResponse
@@ -1062,6 +1307,11 @@ export class RiskVehiclesService {
       `<p style="margin:4px 0 0;color:#64748b">Dossier ${this.escapeHtml(vehicle.riskNumber)}</p>`,
       '</div>',
       `<p><a href="${this.escapeHtml(url)}" style="display:inline-block;background:#0f766e;color:white;text-decoration:none;padding:10px 14px;border-radius:6px">Ouvrir le dossier</a></p>`,
+      ...(galleryUrl
+        ? [
+            `<p><a href="${this.escapeHtml(galleryUrl)}" style="display:inline-block;background:#0f766e;color:white;text-decoration:none;padding:10px 14px;border-radius:6px">Voir les photos commerciales</a></p>`,
+          ]
+        : []),
       '</div>',
     ].join('');
     return { html, subject, text };

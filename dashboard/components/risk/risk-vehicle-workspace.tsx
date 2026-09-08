@@ -1,5 +1,7 @@
 "use client";
 
+import { RiskCommercialPanel } from "./risk-commercial-panel";
+
 import {
   Camera,
   Check,
@@ -240,7 +242,7 @@ export function RiskVehicleWorkspace({
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
   const [isDownloadingPhotos, setIsDownloadingPhotos] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
+  const [isMarkingTreated, setIsMarkingTreated] = useState(false);
   const isCreator = vehicle.creatorId === user?.id;
   const canEditPhotos = isCreator && vehicle.status === "DRAFT";
   const isPhotoJourney = canEditPhotos;
@@ -471,18 +473,16 @@ export function RiskVehicleWorkspace({
     }
   }
 
-  async function closeDossier() {
-    if (!window.confirm("Clore ce dossier Risk ? Il passera en lecture seule."))
-      return;
-    setIsClosing(true);
+  async function markVehicleTreated() {
+    setIsMarkingTreated(true);
     try {
-      const updated = await riskService.close(vehicle.id);
+      const updated = await riskService.startCommercial(vehicle.id);
       setVehicle(updated);
-      toast.success("Dossier clos.");
+      toast.success("Véhicule traité. Complétez les photos commerciales.");
     } catch {
-      toast.error("Impossible de clore le dossier.");
+      toast.error("Impossible de terminer le traitement.");
     } finally {
-      setIsClosing(false);
+      setIsMarkingTreated(false);
     }
   }
 
@@ -505,9 +505,11 @@ export function RiskVehicleWorkspace({
       ? "Brouillon"
       : vehicle.status === "CLOSED"
         ? "Clos"
-        : isCreator
-          ? "Transmis"
-          : "À analyser";
+        : vehicle.status === "COMMERCIAL_PHOTOS"
+          ? "Photos commerciales à réaliser"
+          : isCreator
+            ? "Transmis"
+            : "À analyser";
   const plate = formatLicensePlate(
     vehicle.licensePlate,
     vehicle.licensePlateCountry,
@@ -568,30 +570,30 @@ export function RiskVehicleWorkspace({
           </div>
           <span
             className={cn(
-              "shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold md:hidden",
+              "max-w-28 shrink-0 rounded-md px-2 py-1 text-center text-[11px] leading-tight font-semibold whitespace-normal md:hidden",
               statusTone(vehicle.status),
             )}
           >
-            {statusLabel}
+            {vehicle.status === "COMMERCIAL_PHOTOS" ? "Photos commerciales" : statusLabel}
           </span>
 
           {vehicle.status === "SUBMITTED" &&
           (isPrimary || user?.role === "ADMIN") ? (
             <Button
-              aria-label="Clore le dossier"
+              aria-label="Véhicule traité"
               className="h-9 shrink-0 px-2 sm:px-3"
-              disabled={isClosing}
+              disabled={isMarkingTreated}
               size="sm"
-              title="Clore le dossier"
+              title="Véhicule traité : passer aux photos commerciales"
               type="button"
-              onClick={() => void closeDossier()}
+              onClick={() => void markVehicleTreated()}
             >
-              {isClosing ? (
+              {isMarkingTreated ? (
                 <LoaderCircle className="h-4 w-4 animate-spin" />
               ) : (
                 <CheckCircle2 className="h-4 w-4" />
               )}
-              <span className="hidden sm:inline">Clore</span>
+              <span className="hidden sm:inline">Véhicule traité</span>
             </Button>
           ) : null}
 
@@ -666,13 +668,21 @@ export function RiskVehicleWorkspace({
   );
 
   return (
-    <div className={cn("space-y-4", isPhotoJourney && "pb-20 md:pb-0")}>
+    <div className={cn("min-w-0 max-w-full space-y-4", isPhotoJourney && "pb-20 md:pb-0")}>
       {isPhotoJourney ? (
         workspaceHeader
       ) : (
-        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(440px,1fr)]">
+        <div className="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(440px,1fr)]">
           <div className="min-w-0 space-y-5">
             {workspaceHeader}
+            {(vehicle.status === "COMMERCIAL_PHOTOS" ||
+              (vehicle.status === "CLOSED" && vehicle.commercialShareToken)) && (
+              <RiskCommercialPanel
+                vehicle={vehicle}
+                canClose={isPrimary || user?.role === "ADMIN"}
+                onChange={setVehicle}
+              />
+            )}
             <RiskPhotoGallery
               isDownloading={isDownloadingPhotos}
               sections={gallerySections}
@@ -684,7 +694,7 @@ export function RiskVehicleWorkspace({
               }
             />
           </div>
-          <div className="xl:sticky xl:top-20">
+          <div className="min-w-0 xl:sticky xl:top-20">
             <RiskConversationPanel vehicle={vehicle} onChange={setVehicle} />
           </div>
         </div>
@@ -1850,7 +1860,8 @@ function RiskConversationPanel({
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const hasPositionedMessages = useRef(false);
   const messages = vehicle.conversation?.messages ?? [];
-  const canPost = vehicle.status === "SUBMITTED";
+  const canPost =
+    vehicle.status === "SUBMITTED" || vehicle.status === "COMMERCIAL_PHOTOS";
   const lastMessageId = messages.at(-1)?.id;
   const draftStorageKey = useMemo(
     () =>

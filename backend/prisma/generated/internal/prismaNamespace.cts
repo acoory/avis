@@ -418,7 +418,8 @@ export const ModelName = {
   VehicleCheckItemPhoto: 'VehicleCheckItemPhoto',
   VehicleCheckItemStatusHistory: 'VehicleCheckItemStatusHistory',
   ExternalQuote: 'ExternalQuote',
-  ExternalQuoteItem: 'ExternalQuoteItem'
+  ExternalQuoteItem: 'ExternalQuoteItem',
+  RiskCommercialPhoto: 'RiskCommercialPhoto'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -434,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "publicAccessSession" | "userManagerAssignment" | "agency" | "agencyVehicleStatusShare" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "externalRepairCompany" | "externalRepairContact" | "vehicleCheckPublicShare" | "vehicleCheckDecisionShare" | "vehicleCheckConversation" | "vehicleCheckConversationParticipant" | "vehicleCheckMessage" | "vehicleCheckMessageAttachment" | "vehicleCheckMessageMention" | "riskVehicle" | "riskVehicleAssignment" | "riskPhoto" | "riskConversation" | "riskMessage" | "riskMessageAttachment" | "riskStatusHistory" | "notification" | "notificationEmail" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem"
+    modelProps: "user" | "publicAccessSession" | "userManagerAssignment" | "agency" | "agencyVehicleStatusShare" | "manufacturer" | "vehicleModel" | "repairType" | "vehiclePart" | "manufacturerRule" | "manufacturerRepairRule" | "vehicleCheck" | "externalRepairCompany" | "externalRepairContact" | "vehicleCheckPublicShare" | "vehicleCheckDecisionShare" | "vehicleCheckConversation" | "vehicleCheckConversationParticipant" | "vehicleCheckMessage" | "vehicleCheckMessageAttachment" | "vehicleCheckMessageMention" | "riskVehicle" | "riskVehicleAssignment" | "riskPhoto" | "riskConversation" | "riskMessage" | "riskMessageAttachment" | "riskStatusHistory" | "notification" | "notificationEmail" | "vehicleCheckItem" | "vehicleCheckItemPhoto" | "vehicleCheckItemStatusHistory" | "externalQuote" | "externalQuoteItem" | "riskCommercialPhoto"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3028,6 +3029,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RiskCommercialPhoto: {
+      payload: Prisma.$RiskCommercialPhotoPayload<ExtArgs>
+      fields: Prisma.RiskCommercialPhotoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RiskCommercialPhotoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RiskCommercialPhotoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>
+        }
+        findFirst: {
+          args: Prisma.RiskCommercialPhotoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RiskCommercialPhotoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>
+        }
+        findMany: {
+          args: Prisma.RiskCommercialPhotoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>[]
+        }
+        create: {
+          args: Prisma.RiskCommercialPhotoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>
+        }
+        createMany: {
+          args: Prisma.RiskCommercialPhotoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RiskCommercialPhotoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>[]
+        }
+        delete: {
+          args: Prisma.RiskCommercialPhotoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>
+        }
+        update: {
+          args: Prisma.RiskCommercialPhotoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>
+        }
+        deleteMany: {
+          args: Prisma.RiskCommercialPhotoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RiskCommercialPhotoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RiskCommercialPhotoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>[]
+        }
+        upsert: {
+          args: Prisma.RiskCommercialPhotoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskCommercialPhotoPayload>
+        }
+        aggregate: {
+          args: Prisma.RiskCommercialPhotoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRiskCommercialPhoto>
+        }
+        groupBy: {
+          args: Prisma.RiskCommercialPhotoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskCommercialPhotoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RiskCommercialPhotoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskCommercialPhotoCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3403,6 +3478,9 @@ export const RiskVehicleScalarFieldEnum = {
   creatorId: 'creatorId',
   agencyId: 'agencyId',
   manufacturerId: 'manufacturerId',
+  vehicleModelId: 'vehicleModelId',
+  mileage: 'mileage',
+  vin: 'vin',
   licensePlate: 'licensePlate',
   licensePlateRaw: 'licensePlateRaw',
   licensePlateCountry: 'licensePlateCountry',
@@ -3412,7 +3490,10 @@ export const RiskVehicleScalarFieldEnum = {
   closedAt: 'closedAt',
   closedById: 'closedById',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  commercialMileage: 'commercialMileage',
+  commercialEquipment: 'commercialEquipment',
+  commercialShareToken: 'commercialShareToken'
 } as const
 
 export type RiskVehicleScalarFieldEnum = (typeof RiskVehicleScalarFieldEnum)[keyof typeof RiskVehicleScalarFieldEnum]
@@ -3629,12 +3710,37 @@ export const ExternalQuoteItemScalarFieldEnum = {
 export type ExternalQuoteItemScalarFieldEnum = (typeof ExternalQuoteItemScalarFieldEnum)[keyof typeof ExternalQuoteItemScalarFieldEnum]
 
 
+export const RiskCommercialPhotoScalarFieldEnum = {
+  id: 'id',
+  riskVehicleId: 'riskVehicleId',
+  slotKey: 'slotKey',
+  publicId: 'publicId',
+  assetId: 'assetId',
+  secureUrl: 'secureUrl',
+  width: 'width',
+  height: 'height',
+  bytes: 'bytes',
+  format: 'format',
+  createdAt: 'createdAt'
+} as const
+
+export type RiskCommercialPhotoScalarFieldEnum = (typeof RiskCommercialPhotoScalarFieldEnum)[keyof typeof RiskCommercialPhotoScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -3651,6 +3757,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -3817,6 +3932,20 @@ export type EnumRiskVehicleStatusFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'RiskVehicleStatus[]'
  */
 export type ListEnumRiskVehicleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RiskVehicleStatus[]'>
+
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
 
 
 
@@ -4076,6 +4205,7 @@ export type GlobalOmitConfig = {
   vehicleCheckItemStatusHistory?: Prisma.VehicleCheckItemStatusHistoryOmit
   externalQuote?: Prisma.ExternalQuoteOmit
   externalQuoteItem?: Prisma.ExternalQuoteItemOmit
+  riskCommercialPhoto?: Prisma.RiskCommercialPhotoOmit
 }
 
 /* Types for Logging */

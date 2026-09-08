@@ -16,7 +16,6 @@ CREATE TYPE "RiskPhotoCategory" AS ENUM (
   'WHEEL_REAR_LEFT',
   'WHEEL_REAR_RIGHT',
   'TIRE_WEAR',
-  'TIRE_DAMAGE',
   'DAMAGE_WIDE',
   'DAMAGE_CLOSE_UP'
 );
@@ -27,10 +26,13 @@ CREATE TABLE "RiskVehicle" (
   "creatorId" TEXT NOT NULL,
   "agencyId" TEXT NOT NULL,
   "manufacturerId" TEXT NOT NULL,
+  "vehicleModelId" TEXT,
   "licensePlate" TEXT NOT NULL,
   "licensePlateRaw" TEXT,
   "licensePlateCountry" TEXT NOT NULL DEFAULT 'FR',
   "licensePlateRecognitionConfidence" DOUBLE PRECISION,
+  "mileage" INTEGER,
+  "vin" TEXT,
   "status" "RiskVehicleStatus" NOT NULL DEFAULT 'DRAFT',
   "submittedAt" TIMESTAMP(3),
   "closedAt" TIMESTAMP(3),
@@ -119,6 +121,7 @@ CREATE UNIQUE INDEX "RiskVehicle_licensePlateCountry_licensePlate_key" ON "RiskV
 CREATE INDEX "RiskVehicle_creatorId_idx" ON "RiskVehicle"("creatorId");
 CREATE INDEX "RiskVehicle_agencyId_idx" ON "RiskVehicle"("agencyId");
 CREATE INDEX "RiskVehicle_manufacturerId_idx" ON "RiskVehicle"("manufacturerId");
+CREATE INDEX "RiskVehicle_vehicleModelId_idx" ON "RiskVehicle"("vehicleModelId");
 CREATE INDEX "RiskVehicle_status_idx" ON "RiskVehicle"("status");
 CREATE INDEX "RiskVehicle_updatedAt_idx" ON "RiskVehicle"("updatedAt");
 
@@ -147,6 +150,7 @@ ALTER TABLE "RiskVehicle" ADD CONSTRAINT "RiskVehicle_creatorId_fkey" FOREIGN KE
 ALTER TABLE "RiskVehicle" ADD CONSTRAINT "RiskVehicle_closedById_fkey" FOREIGN KEY ("closedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "RiskVehicle" ADD CONSTRAINT "RiskVehicle_agencyId_fkey" FOREIGN KEY ("agencyId") REFERENCES "Agency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "RiskVehicle" ADD CONSTRAINT "RiskVehicle_manufacturerId_fkey" FOREIGN KEY ("manufacturerId") REFERENCES "Manufacturer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RiskVehicle" ADD CONSTRAINT "RiskVehicle_vehicleModelId_fkey" FOREIGN KEY ("vehicleModelId") REFERENCES "VehicleModel"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "RiskVehicleAssignment" ADD CONSTRAINT "RiskVehicleAssignment_riskVehicleId_fkey" FOREIGN KEY ("riskVehicleId") REFERENCES "RiskVehicle"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "RiskVehicleAssignment" ADD CONSTRAINT "RiskVehicleAssignment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "RiskVehicleAssignment" ADD CONSTRAINT "RiskVehicleAssignment_assignedById_fkey" FOREIGN KEY ("assignedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
