@@ -30,16 +30,35 @@ export const commercialSlots = [
     hint: "Compteur allumé, kilométrage parfaitement lisible.",
   },
   {
-    key: "interior-front",
-    label: "Habitacle avant",
+    key: "secondScreen",
+    label: "Deuxième écran du tableau de bord",
     group: "Intérieur",
-    hint: "Montrer les sièges avant et le tableau de bord.",
+    hint: "Photographier l’autre écran allumé : écran central ou affichage derrière le volant. Les informations doivent être lisibles.",
+    optional: true,
+  },
+  {
+    key: "interior-front",
+    label: "Vue d’ensemble de l’habitacle avant",
+    group: "Intérieur",
+    hint: "Prendre une vue large de l’avant : tableau de bord, volant et sièges dans leur ensemble.",
   },
   {
     key: "interior-rear",
-    label: "Places arrière",
+    label: "Vue d’ensemble de l’habitacle arrière",
     group: "Intérieur",
-    hint: "Montrer les sièges et leur état.",
+    hint: "Prendre une vue large de tout l’habitacle arrière, avec les sièges et l’espace autour.",
+  },
+  {
+    key: "seats-front",
+    label: "Sièges avant · Vue de face détaillée",
+    group: "Intérieur",
+    hint: "Se placer face aux sièges avant et cadrer de près les assises et les dossiers pour montrer leur état.",
+  },
+  {
+    key: "seats-rear",
+    label: "Sièges arrière · Vue de face détaillée",
+    group: "Intérieur",
+    hint: "Se placer face à la banquette ou aux sièges arrière et cadrer de près les assises et les dossiers pour montrer leur état.",
   },
   {
     key: "wheel-front-left",
@@ -100,6 +119,18 @@ export const commercialSlots = [
     optional: true,
   },
 ];
+export function commercialJourneySlots(
+  secondScreen: string | undefined,
+  photos: { slotKey: string }[],
+) {
+  return commercialSlots.filter(
+    (slot) =>
+      slot.key !== "secondScreen" ||
+      secondScreen !== "ABSENT" ||
+      photos.some((photo) => photo.slotKey === "secondScreen"),
+  );
+}
+
 export const commercialApiUrl = (token: string) =>
   `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/public/risk-commercial/${encodeURIComponent(token)}`;
 

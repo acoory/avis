@@ -6,6 +6,8 @@ export const COMMERCIAL_REQUIRED_SLOTS = [
   'dashboard',
   'interior-front',
   'interior-rear',
+  'seats-front',
+  'seats-rear',
   'wheel-front-left',
   'wheel-front-right',
   'wheel-rear-left',
@@ -13,6 +15,7 @@ export const COMMERCIAL_REQUIRED_SLOTS = [
   'trunk',
 ];
 export const COMMERCIAL_OPTIONAL_SLOTS = [
+  'secondScreen',
   'sunroof',
   'serviceBook',
   'manual',

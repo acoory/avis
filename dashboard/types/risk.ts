@@ -61,7 +61,7 @@ export type RiskMessage = {
 };
 
 export type CommercialEquipment = Record<
-  "sunroof" | "serviceBook" | "manual" | "accessories",
+  "sunroof" | "serviceBook" | "manual" | "accessories" | "secondScreen",
   "PRESENT" | "ABSENT" | "TO_CHECK"
 >;
 export type CommercialPhoto = Omit<

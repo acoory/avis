@@ -3,7 +3,7 @@
 Le parcours est : DRAFT → SUBMITTED → COMMERCIAL_PHOTOS → CLOSED.
 Le créateur du dossier, le responsable principal ou un administrateur peut terminer le traitement et clôturer. Le créateur et les personnes assignées peuvent compléter les photos commerciales pendant cette étape.
 
-Les photos commerciales sont stockées séparément des photos de traitement. La clôture contrôle les 12 vues obligatoires, le kilométrage et les 4 éléments conditionnels. Les documents ou accessoires présents nécessitent une photo ; les éléments absents ne doivent pas en avoir.
+Les photos commerciales sont stockées séparément des photos de traitement. La clôture contrôle les 14 vues obligatoires, le kilométrage et les 5 éléments conditionnels. Le deuxième écran, les documents ou accessoires présents nécessitent une photo ; les éléments absents ne doivent pas en avoir.
 
 La clôture crée un jeton aléatoire de 256 bits. La galerie `/commercial/[token]` et son ZIP sont accessibles sans compte ; leur API ne sélectionne que la marque, la plaque, le kilométrage et les photos commerciales. Le lien reste permanent. Aucun mécanisme de désactivation n’est prévu. Les anciens dossiers déjà clos restent inchangés, sans lien commercial.
 

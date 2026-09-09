@@ -339,6 +339,8 @@ describe('Risk commercial workflow', () => {
     'dashboard',
     'interior-front',
     'interior-rear',
+    'seats-front',
+    'seats-rear',
     'wheel-front-left',
     'wheel-front-right',
     'wheel-rear-left',
@@ -351,6 +353,7 @@ describe('Risk commercial workflow', () => {
       status: RiskVehicleStatus.COMMERCIAL_PHOTOS,
       commercialMileage: 45200,
       commercialEquipment: {
+        secondScreen: 'ABSENT',
         sunroof: 'ABSENT',
         serviceBook: 'ABSENT',
         manual: 'ABSENT',
@@ -383,6 +386,25 @@ describe('Risk commercial workflow', () => {
   it('accepts all mandatory commercial views and checked absent equipment', () => {
     expect(() => validate(vehicle())).not.toThrow();
   });
+  it('requires a second display photo only when two screens are declared', () => {
+    const record = vehicle();
+    record.commercialEquipment.secondScreen = 'PRESENT';
+    expect(() => validate(record)).toThrow(BadRequestException);
+    record.commercialPhotos.push({ slotKey: 'secondScreen' });
+    expect(() => validate(record)).not.toThrow();
+    record.commercialEquipment.secondScreen = 'TO_CHECK';
+    expect(() => validate(record)).toThrow(BadRequestException);
+  });
+  it.each(['seats-front', 'seats-rear'])(
+    'requires the dedicated %s photo',
+    (slot) => {
+      const record = vehicle();
+      record.commercialPhotos = record.commercialPhotos.filter(
+        (photo) => photo.slotKey !== slot,
+      );
+      expect(() => validate(record)).toThrow(BadRequestException);
+    },
+  );
   it('does not accept treatment photos in place of commercial photos', () => {
     expect(() =>
       validate({
@@ -452,13 +474,11 @@ describe('Risk commercial workflow', () => {
       .mockResolvedValue({ status: RiskVehicleStatus.COMMERCIAL_PHOTOS });
     const prisma = {
       riskVehicle: {
-        findFirst: jest
-          .fn()
-          .mockResolvedValue({
-            ...vehicle(),
-            creatorId: creator.sub,
-            status: RiskVehicleStatus.SUBMITTED,
-          }),
+        findFirst: jest.fn().mockResolvedValue({
+          ...vehicle(),
+          creatorId: creator.sub,
+          status: RiskVehicleStatus.SUBMITTED,
+        }),
         update,
       },
     };

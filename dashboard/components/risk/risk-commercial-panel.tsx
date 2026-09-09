@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   commercialSlots,
+  commercialJourneySlots,
   downloadCommercialArchive,
 } from "@/lib/risk-commercial";
 import { cloudinaryImageUrl, optimizeDamagePhoto } from "@/lib/damage-photo";
@@ -34,21 +35,32 @@ export function RiskCommercialPanel({
   const [mileage, setMileage] = useState(
     vehicle.commercialMileage?.toString() ?? "",
   );
-  const [equipment, setEquipment] = useState<CommercialEquipment>(
-    vehicle.commercialEquipment ?? {
-      sunroof: "TO_CHECK",
-      serviceBook: "TO_CHECK",
-      manual: "TO_CHECK",
-      accessories: "TO_CHECK",
-    },
-  );
+  const [equipment, setEquipment] = useState<CommercialEquipment>({
+    sunroof: "TO_CHECK",
+    serviceBook: "TO_CHECK",
+    manual: "TO_CHECK",
+    accessories: "TO_CHECK",
+    secondScreen: "TO_CHECK",
+    ...vehicle.commercialEquipment,
+  });
   const heading = useRef<HTMLHeadingElement>(null);
   const [step, setStep] = useState(() => {
     if (vehicle.commercialMileage == null) return 0;
-    const missing = commercialSlots.findIndex((slot) => {
+    const initialSlots = commercialJourneySlots(
+      vehicle.commercialEquipment?.secondScreen,
+      vehicle.commercialPhotos ?? [],
+    );
+    const missing = initialSlots.findIndex((slot) => {
       const hasPhoto = vehicle.commercialPhotos?.some(
         (photo) => photo.slotKey === slot.key,
       );
+      if (
+        slot.key === "dashboard" &&
+        !["PRESENT", "ABSENT"].includes(
+          vehicle.commercialEquipment?.secondScreen ?? "TO_CHECK",
+        )
+      )
+        return true;
       if (!slot.optional) return !hasPhoto;
       const presence =
         vehicle.commercialEquipment?.[slot.key as keyof CommercialEquipment];
@@ -56,7 +68,7 @@ export function RiskCommercialPanel({
         ? !!hasPhoto
         : presence !== "PRESENT" || !hasPhoto;
     });
-    return missing < 0 ? commercialSlots.length + 1 : missing + 1;
+    return missing < 0 ? initialSlots.length + 1 : missing + 1;
   });
   const [reviewed, setReviewed] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -107,22 +119,28 @@ export function RiskCommercialPanel({
     onChange(updated);
   }
 
-  const lastStep = commercialSlots.length + 1;
-  const slot = step > 0 && step < lastStep ? commercialSlots[step - 1] : null;
+  const journeySlots = commercialJourneySlots(equipment.secondScreen, photos);
+  const lastStep = journeySlots.length + 1;
+  const slot = step > 0 && step < lastStep ? journeySlots[step - 1] : null;
   const photo = slot
     ? photos.find((item) => item.slotKey === slot.key)
     : undefined;
+  const screenQuestionAnswered = ["PRESENT", "ABSENT"].includes(
+    equipment.secondScreen,
+  );
   const presence = slot?.optional
     ? equipment[slot.key as keyof CommercialEquipment]
     : "PRESENT";
   const stepComplete =
     step === 0
       ? validMileage
-      : slot
-        ? presence === "ABSENT"
-          ? !photo
-          : presence === "PRESENT" && !!photo
-        : complete;
+      : slot?.key === "dashboard" && !screenQuestionAnswered
+        ? false
+        : slot
+          ? presence === "ABSENT"
+            ? !photo
+            : presence === "PRESENT" && !!photo
+          : complete;
 
   function goTo(next: number) {
     setStep(next);
@@ -235,7 +253,40 @@ export function RiskCommercialPanel({
             ) : slot ? (
               <>
                 <p className="text-sm text-slate-500">{slot.hint}</p>
-                {slot.optional && (
+                {slot.key === "dashboard" && (
+                  <fieldset className="min-w-0 space-y-2">
+                    <legend className="text-sm font-medium">
+                      Le véhicule a-t-il deux écrans séparés (compteur et écran
+                      central) ?
+                    </legend>
+                    <div className="grid grid-cols-2 gap-3">
+                      {(["PRESENT", "ABSENT"] as const).map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          disabled={!!busy}
+                          aria-pressed={equipment.secondScreen === value}
+                          className={`min-h-12 rounded-xl border p-3 text-sm font-semibold ${equipment.secondScreen === value ? "border-teal-700 bg-teal-50 text-teal-800" : "border-slate-200"}`}
+                          onClick={() => {
+                            setEquipment({ ...equipment, secondScreen: value });
+                            setReviewed(false);
+                          }}
+                        >
+                          {value === "PRESENT"
+                            ? "Oui, deux écrans"
+                            : "Non, un seul"}
+                        </button>
+                      ))}
+                    </div>
+                    {equipment.secondScreen === "PRESENT" && (
+                      <p className="text-sm text-slate-500">
+                        Prenez d’abord le compteur avec le kilométrage, puis
+                        l’autre écran à l’étape suivante.
+                      </p>
+                    )}
+                  </fieldset>
+                )}
+                {slot.optional && slot.key !== "secondScreen" && (
                   <fieldset className="min-w-0 space-y-2">
                     <legend className="text-sm font-medium">
                       Cet élément est-il présent ?
@@ -259,111 +310,112 @@ export function RiskCommercialPanel({
                     </div>
                   </fieldset>
                 )}
-                {(presence === "PRESENT" || photo) && (
-                  <>
-                    <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                      {photo ? (
-                        <a
-                          href={cloudinaryImageUrl(photo.secureUrl)}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            alt={slot.label}
-                            src={cloudinaryImageUrl(
-                              photo.secureUrl.replace(
-                                "/upload/",
-                                "/upload/f_auto,q_auto,c_limit,w_1000/",
-                              ),
+                {(presence === "PRESENT" || photo) &&
+                  (slot.key !== "dashboard" || screenQuestionAnswered) && (
+                    <>
+                      <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                        {photo ? (
+                          <a
+                            href={cloudinaryImageUrl(photo.secureUrl)}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              alt={slot.label}
+                              src={cloudinaryImageUrl(
+                                photo.secureUrl.replace(
+                                  "/upload/",
+                                  "/upload/f_auto,q_auto,c_limit,w_1000/",
+                                ),
+                              )}
+                              className="aspect-[4/3] max-h-[40vh] w-full object-contain"
+                            />
+                          </a>
+                        ) : (
+                          <div className="flex aspect-[4/3] max-h-[35vh] items-center justify-center">
+                            <Camera className="h-12 w-12 text-slate-300" />
+                          </div>
+                        )}
+                      </div>
+                      {presence === "PRESENT" && (
+                        <div className="grid min-w-0 grid-cols-1 gap-2">
+                          <label
+                            className={`flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-700 p-3 font-semibold text-white ${busy ? "opacity-50" : "cursor-pointer"}`}
+                          >
+                            {busy === slot.key ? (
+                              <LoaderCircle className="h-5 w-5 animate-spin" />
+                            ) : (
+                              <Camera className="h-5 w-5" />
                             )}
-                            className="aspect-[4/3] max-h-[40vh] w-full object-contain"
-                          />
-                        </a>
-                      ) : (
-                        <div className="flex aspect-[4/3] max-h-[35vh] items-center justify-center">
-                          <Camera className="h-12 w-12 text-slate-300" />
+                            {busy === slot.key
+                              ? "Enregistrement…"
+                              : photo
+                                ? "Reprendre la photo"
+                                : "Prendre la photo"}
+                            <input
+                              className="sr-only"
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              disabled={!!busy}
+                              onChange={(event) => {
+                                upload(event.target.files?.[0]);
+                                event.target.value = "";
+                              }}
+                            />
+                          </label>
+                          <label
+                            className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border p-2 text-sm ${busy ? "opacity-50" : "cursor-pointer"}`}
+                          >
+                            <ImagePlus className="h-4 w-4" />
+                            Choisir dans la galerie
+                            <input
+                              className="sr-only"
+                              type="file"
+                              accept="image/*"
+                              disabled={!!busy}
+                              onChange={(event) => {
+                                upload(event.target.files?.[0]);
+                                event.target.value = "";
+                              }}
+                            />
+                          </label>
                         </div>
                       )}
-                    </div>
-                    {presence === "PRESENT" && (
-                      <div className="grid min-w-0 grid-cols-1 gap-2">
-                        <label
-                          className={`flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-700 p-3 font-semibold text-white ${busy ? "opacity-50" : "cursor-pointer"}`}
-                        >
-                          {busy === slot.key ? (
-                            <LoaderCircle className="h-5 w-5 animate-spin" />
-                          ) : (
-                            <Camera className="h-5 w-5" />
-                          )}
-                          {busy === slot.key
-                            ? "Enregistrement…"
-                            : photo
-                              ? "Reprendre la photo"
-                              : "Prendre la photo"}
-                          <input
-                            className="sr-only"
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
+                      {photo && (
+                        <div className="flex items-center justify-between gap-2 text-sm">
+                          <span className="flex items-center gap-2 text-teal-700">
+                            <CheckCircle2 className="h-4 w-4" />
+                            Photo enregistrée
+                          </span>
+                          <button
+                            type="button"
+                            className="min-h-11 px-2 text-red-700 underline"
                             disabled={!!busy}
-                            onChange={(event) => {
-                              upload(event.target.files?.[0]);
-                              event.target.value = "";
-                            }}
-                          />
-                        </label>
-                        <label
-                          className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border p-2 text-sm ${busy ? "opacity-50" : "cursor-pointer"}`}
-                        >
-                          <ImagePlus className="h-4 w-4" />
-                          Choisir dans la galerie
-                          <input
-                            className="sr-only"
-                            type="file"
-                            accept="image/*"
-                            disabled={!!busy}
-                            onChange={(event) => {
-                              upload(event.target.files?.[0]);
-                              event.target.value = "";
-                            }}
-                          />
-                        </label>
-                      </div>
-                    )}
-                    {photo && (
-                      <div className="flex items-center justify-between gap-2 text-sm">
-                        <span className="flex items-center gap-2 text-teal-700">
-                          <CheckCircle2 className="h-4 w-4" />
-                          Photo enregistrée
-                        </span>
-                        <button
-                          type="button"
-                          className="min-h-11 px-2 text-red-700 underline"
-                          disabled={!!busy}
-                          onClick={() =>
-                            void run(slot.key, async () => {
-                              await riskService.removeCommercialPhoto(
-                                vehicle.id,
-                                photo.id,
-                              );
-                              onChange(await riskService.findOne(vehicle.id));
-                              setReviewed(false);
-                            })
-                          }
-                        >
-                          Supprimer
-                        </button>
-                      </div>
-                    )}
-                    {presence === "ABSENT" && photo && (
-                      <p role="alert" className="text-sm text-amber-700">
-                        Supprimez la photo pour confirmer que cet élément est
-                        absent.
-                      </p>
-                    )}
-                  </>
-                )}
+                            onClick={() =>
+                              void run(slot.key, async () => {
+                                await riskService.removeCommercialPhoto(
+                                  vehicle.id,
+                                  photo.id,
+                                );
+                                onChange(await riskService.findOne(vehicle.id));
+                                setReviewed(false);
+                              })
+                            }
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                      )}
+                      {presence === "ABSENT" && photo && (
+                        <p role="alert" className="text-sm text-amber-700">
+                          Supprimez la photo pour confirmer que cet élément est
+                          absent.
+                        </p>
+                      )}
+                    </>
+                  )}
                 {presence === "ABSENT" && !photo && (
                   <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
                     Aucune photo nécessaire. Vous pouvez passer à la suite.
@@ -382,7 +434,7 @@ export function RiskCommercialPanel({
                   <span className="text-teal-700">Modifier</span>
                 </button>
                 <div className="divide-y rounded-xl border">
-                  {commercialSlots.map((item, index) => {
+                  {journeySlots.map((item, index) => {
                     const itemPhoto = photos.find(
                       (p) => p.slotKey === item.key,
                     );
