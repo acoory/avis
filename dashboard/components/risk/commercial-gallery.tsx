@@ -19,7 +19,15 @@ export function CommercialGallery({
         id: photo.id,
         label: slot.label,
         section: slot.group,
-        previewUrl: cloudinaryImageUrl(photo.secureUrl),
+        downloadUrl: cloudinaryImageUrl(
+          photo.secureUrl.replace("/upload/", "/upload/fl_attachment/"),
+        ),
+        previewUrl: cloudinaryImageUrl(
+          photo.secureUrl.replace(
+            "/upload/",
+            "/upload/f_auto,q_auto,c_limit,w_1800/",
+          ),
+        ),
         thumbnailUrl: cloudinaryImageUrl(
           photo.secureUrl.replace(
             "/upload/",
@@ -56,10 +64,7 @@ export function CommercialGallery({
                   </button>
                   <a
                     className="mt-1 inline-block text-xs text-teal-700 underline"
-                    href={item.previewUrl.replace(
-                      "/upload/",
-                      "/upload/fl_attachment/",
-                    )}
+                    href={item.downloadUrl}
                   >
                     Télécharger la photo
                   </a>

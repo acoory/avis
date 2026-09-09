@@ -1277,6 +1277,8 @@ function RiskPhotoGallery({
                     <img
                       alt={item.label}
                       className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.03]"
+                      loading="lazy"
+                      decoding="async"
                       src={cloudinaryThumbnailUrl(item.photo, 400)}
                     />
                     <span className="absolute inset-0 bg-black/0 transition group-hover:bg-black/10" />

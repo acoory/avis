@@ -6,17 +6,14 @@ import {
   LoaderCircle,
   RotateCw,
   X,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { RotatablePhoto } from "@/components/business/rotatable-photo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const imagePreloadTtlMs = 10 * 60 * 1000;
-const maximumCachedPreloads = 200;
-const completedImagePreloads = new Map<string, number>();
-const pendingImagePreloads = new Map<string, Promise<void>>();
 
 export type PhotoCarouselItem = {
   id: string;
@@ -34,80 +31,6 @@ type PhotoCarouselProps = {
   title?: string;
 };
 
-type PreloadState = {
-  complete: boolean;
-  failed: number;
-  loaded: number;
-  ready: boolean;
-  total: number;
-};
-
-function isImagePreloaded(url: string) {
-  const loadedAt = completedImagePreloads.get(url);
-  if (loadedAt === undefined) return false;
-
-  if (Date.now() - loadedAt > imagePreloadTtlMs) {
-    completedImagePreloads.delete(url);
-    return false;
-  }
-
-  return true;
-}
-
-function rememberImagePreload(url: string) {
-  completedImagePreloads.delete(url);
-  completedImagePreloads.set(url, Date.now());
-
-  while (completedImagePreloads.size > maximumCachedPreloads) {
-    const oldestUrl = completedImagePreloads.keys().next().value;
-    if (oldestUrl === undefined) break;
-    completedImagePreloads.delete(oldestUrl);
-  }
-}
-
-function preloadImage(url: string) {
-  if (isImagePreloaded(url)) return Promise.resolve();
-
-  const pendingPreload = pendingImagePreloads.get(url);
-  if (pendingPreload) return pendingPreload;
-
-  const image = new Image();
-  const preload = new Promise<void>((resolve, reject) => {
-    image.onload = () => {
-      if (typeof image.decode !== "function") {
-        resolve();
-        return;
-      }
-
-      void image.decode().then(resolve).catch(resolve);
-    };
-    image.onerror = () => reject(new Error(`Unable to preload image: ${url}`));
-    image.src = url;
-  })
-    .then(() => {
-      rememberImagePreload(url);
-    })
-    .finally(() => {
-      pendingImagePreloads.delete(url);
-    });
-
-  pendingImagePreloads.set(url, preload);
-  return preload;
-}
-
-function initialPreloadState(urls: string[]): PreloadState {
-  const loaded = urls.filter(isImagePreloaded).length;
-  const ready = loaded === urls.length;
-
-  return {
-    complete: ready,
-    failed: 0,
-    loaded,
-    ready,
-    total: urls.length,
-  };
-}
-
 export function PhotoCarousel({
   currentIndex,
   items,
@@ -116,69 +39,13 @@ export function PhotoCarousel({
   title,
 }: PhotoCarouselProps) {
   const current = items[currentIndex];
-  const previewUrls = useMemo(
-    () => items.map((item) => item.previewUrl),
-    [items],
-  );
-  const [preloadAttempt, setPreloadAttempt] = useState(0);
   const [rotation, setRotation] = useState(0);
-  const [preloadState, setPreloadState] = useState<PreloadState>(() =>
-    initialPreloadState(previewUrls),
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-    const missingUrls = previewUrls.filter((url) => !isImagePreloaded(url));
-    let completed = previewUrls.length - missingUrls.length;
-    let failed = 0;
-
-    queueMicrotask(() => {
-      if (cancelled) return;
-      setPreloadState({
-        complete: completed === previewUrls.length,
-        failed: 0,
-        loaded: completed,
-        ready: completed === previewUrls.length,
-        total: previewUrls.length,
-      });
-    });
-
-    for (const url of missingUrls) {
-      void preloadImage(url).then(
-        () => {
-          if (cancelled) return;
-          completed += 1;
-          setPreloadState({
-            complete: completed === previewUrls.length,
-            failed,
-            loaded: completed - failed,
-            ready: completed === previewUrls.length && failed === 0,
-            total: previewUrls.length,
-          });
-        },
-        () => {
-          if (cancelled) return;
-          completed += 1;
-          failed += 1;
-          setPreloadState({
-            complete: completed === previewUrls.length,
-            failed,
-            loaded: completed - failed,
-            ready: false,
-            total: previewUrls.length,
-          });
-        },
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [preloadAttempt, previewUrls]);
+  const [zoom, setZoom] = useState(1);
 
   const changePhoto = useCallback(
     (index: number) => {
       setRotation(0);
+      setZoom(1);
       onIndexChange(index);
     },
     [onIndexChange],
@@ -190,13 +57,13 @@ export function PhotoCarousel({
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
-      if (preloadState.ready && event.key === "ArrowLeft") {
+      if (items.length > 0 && event.key === "ArrowLeft") {
         changePhoto(currentIndex === 0 ? items.length - 1 : currentIndex - 1);
       }
-      if (preloadState.ready && event.key === "ArrowRight") {
+      if (items.length > 0 && event.key === "ArrowRight") {
         changePhoto((currentIndex + 1) % items.length);
       }
-      if (preloadState.ready && event.key.toLowerCase() === "r") {
+      if (items.length > 0 && event.key.toLowerCase() === "r") {
         setRotation((currentRotation) => (currentRotation + 90) % 360);
       }
     }
@@ -206,7 +73,7 @@ export function PhotoCarousel({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [changePhoto, currentIndex, items.length, onClose, preloadState.ready]);
+  }, [changePhoto, currentIndex, items.length, onClose]);
 
   if (!current || typeof document === "undefined") return null;
 
@@ -232,19 +99,40 @@ export function PhotoCarousel({
       >
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold sm:text-base">
-            {preloadState.ready ? headerTitle : "Chargement du carrousel"}
+            {headerTitle}
           </p>
-          <p className="text-xs text-white/60">
-            {preloadState.ready
-              ? headerDetails
-              : `${preloadState.loaded}/${preloadState.total} photos chargées`}
-          </p>
+          <p className="text-xs text-white/60">{headerDetails}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <button
+            aria-label={
+              zoom === 3 ? "Réinitialiser le zoom" : "Agrandir la photo"
+            }
+            aria-pressed={zoom > 1}
+            title={
+              zoom === 3
+                ? "Revenir à la vue complète"
+                : "Zoomer pour inspecter les détails"
+            }
+            className={cn(
+              "flex h-10 items-center gap-1.5 rounded-full px-3 text-xs font-semibold",
+              zoom > 1
+                ? "bg-teal-600 hover:bg-teal-500"
+                : "bg-white/10 hover:bg-white/20",
+            )}
+            type="button"
+            onClick={() => setZoom((value) => (value === 3 ? 1 : value + 1))}
+          >
+            {zoom === 3 ? (
+              <ZoomOut className="h-4 w-4" />
+            ) : (
+              <ZoomIn className="h-4 w-4" />
+            )}
+            <span aria-live="polite">×{zoom}</span>
+          </button>
+          <button
             aria-label="Faire pivoter la photo de 90 degrés"
             className="flex h-10 items-center gap-2 rounded-full bg-white/10 px-3 text-xs font-semibold hover:bg-white/20 disabled:cursor-wait disabled:opacity-40"
-            disabled={!preloadState.ready}
             title="Faire pivoter (R)"
             type="button"
             onClick={(event) => {
@@ -266,133 +154,166 @@ export function PhotoCarousel({
         </div>
       </div>
 
-      {!preloadState.ready ? (
-        <div
-          className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-4 text-center"
-          onClick={(event) => event.stopPropagation()}
-        >
-          {!preloadState.complete ? (
-            <>
-              <LoaderCircle className="h-10 w-10 animate-spin text-teal-400" />
-              <div>
-                <p className="font-semibold">Préparation des photos…</p>
-                <p className="mt-1 text-sm text-white/60">
-                  Le carrousel s’ouvrira quand toutes les images seront prêtes.
-                </p>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/15">
-                <div
-                  className="h-full rounded-full bg-teal-400 transition-all"
-                  style={{
-                    width: `${
-                      ((preloadState.loaded + preloadState.failed) /
-                        Math.max(1, preloadState.total)) *
-                      100
-                    }%`,
-                  }}
-                />
-              </div>
-              <p className="text-xs text-white/50">
-                {preloadState.loaded + preloadState.failed}/
-                {preloadState.total}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="font-semibold">
-                {preloadState.failed} photo
-                {preloadState.failed > 1 ? "s n’ont" : " n’a"} pas pu être
-                chargée{preloadState.failed > 1 ? "s" : ""}.
-              </p>
-              <p className="text-sm text-white/60">
-                Vérifiez la connexion puis relancez le chargement.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setPreloadState({
-                    complete: false,
-                    failed: 0,
-                    loaded: 0,
-                    ready: false,
-                    total: previewUrls.length,
-                  });
-                  setPreloadAttempt((attempt) => attempt + 1);
-                }}
-              >
-                Réessayer
-              </Button>
-            </>
-          )}
-        </div>
-      ) : (
-        <>
-          <div
-            className="relative mx-auto my-3 flex min-h-0 w-full max-w-6xl flex-1 items-center justify-center overflow-hidden"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <RotatablePhoto
-              alt={current.label}
-              className="rounded-lg"
-              key={current.id}
-              rotation={rotation}
-              src={current.previewUrl}
-            />
-            {items.length > 1 ? (
-              <>
-                <button
-                  aria-label="Photo précédente"
-                  className="absolute left-1 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75 sm:left-3"
-                  type="button"
-                  onClick={() =>
-                    changePhoto(
-                      currentIndex === 0 ? items.length - 1 : currentIndex - 1,
-                    )
-                  }
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-                <button
-                  aria-label="Photo suivante"
-                  className="absolute right-1 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75 sm:right-3"
-                  type="button"
-                  onClick={() => changePhoto((currentIndex + 1) % items.length)}
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-              </>
-            ) : null}
-          </div>
+      <div
+        className="relative mx-auto my-3 flex min-h-0 w-full max-w-6xl flex-1 items-center justify-center overflow-hidden"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <CurrentPhoto
+          key={current.previewUrl}
+          current={current}
+          rotation={rotation}
+          zoom={zoom}
+          nextUrl={
+            items.length > 1
+              ? items[(currentIndex + 1) % items.length]?.previewUrl
+              : undefined
+          }
+          previousUrl={
+            items.length > 2
+              ? items[(currentIndex + items.length - 1) % items.length]
+                  ?.previewUrl
+              : undefined
+          }
+        />
+        {zoom > 1 && (
+          <p className="pointer-events-none absolute bottom-2 z-10 rounded-full bg-black/60 px-3 py-1.5 text-center text-xs text-white/90">
+            Faites glisser la photo pour explorer les détails
+          </p>
+        )}
+        {items.length > 1 ? (
+          <>
+            <button
+              aria-label="Photo précédente"
+              className="absolute left-1 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75 sm:left-3"
+              type="button"
+              onClick={() =>
+                changePhoto(
+                  currentIndex === 0 ? items.length - 1 : currentIndex - 1,
+                )
+              }
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              aria-label="Photo suivante"
+              className="absolute right-1 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75 sm:right-3"
+              type="button"
+              onClick={() => changePhoto((currentIndex + 1) % items.length)}
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          </>
+        ) : null}
+      </div>
 
-          <div
-            className="mx-auto flex w-full max-w-6xl gap-2 overflow-x-auto pb-[max(0px,env(safe-area-inset-bottom))]"
-            onClick={(event) => event.stopPropagation()}
+      <div
+        className="mx-auto flex w-full max-w-6xl gap-2 overflow-x-auto pb-[max(0px,env(safe-area-inset-bottom))]"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {items.map((item, index) => (
+          <button
+            aria-label={`Afficher ${item.label}`}
+            className={cn(
+              "h-14 w-20 shrink-0 overflow-hidden rounded-md border-2 bg-slate-900",
+              index === currentIndex
+                ? "border-teal-400"
+                : "border-transparent opacity-60 hover:opacity-100",
+            )}
+            key={item.id}
+            type="button"
+            onClick={() => changePhoto(index)}
           >
-            {items.map((item, index) => (
-              <button
-                aria-label={`Afficher ${item.label}`}
-                className={cn(
-                  "h-14 w-20 shrink-0 overflow-hidden rounded-md border-2 bg-slate-900",
-                  index === currentIndex
-                    ? "border-teal-400"
-                    : "border-transparent opacity-60 hover:opacity-100",
-                )}
-                key={item.id}
-                type="button"
-                onClick={() => changePhoto(index)}
-              >
-                <img
-                  alt=""
-                  className="h-full w-full object-cover"
-                  src={item.thumbnailUrl}
-                />
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+            <img
+              alt=""
+              className="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+              src={item.thumbnailUrl}
+            />
+          </button>
+        ))}
+      </div>
     </div>,
     document.body,
+  );
+}
+
+// The displayed image loads independently; a slow or failed neighbour never blocks it.
+function CurrentPhoto({
+  current,
+  rotation,
+  zoom,
+  nextUrl,
+  previousUrl,
+}: {
+  current: PhotoCarouselItem;
+  rotation: number;
+  zoom: number;
+  nextUrl?: string;
+  previousUrl?: string;
+}) {
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    if (status !== "ready") return;
+    // Only warm the two adjacent previews after the selected image is visible.
+    const neighbours = [...new Set([nextUrl, previousUrl])]
+      .filter((url): url is string => !!url && url !== current.previewUrl)
+      .map((url) => {
+        const image = new Image();
+        image.fetchPriority = "low";
+        image.src = url;
+        return image;
+      });
+    return () => {
+      neighbours.forEach((image) => image.removeAttribute("src"));
+    };
+  }, [status, nextUrl, previousUrl, current.previewUrl]);
+
+  return (
+    <>
+      <RotatablePhoto
+        key={attempt}
+        alt={current.label}
+        className="rounded-lg"
+        rotation={rotation}
+        zoom={zoom}
+        src={current.previewUrl}
+        onLoad={() => setStatus("ready")}
+        onError={() => setStatus("error")}
+      />
+      {status === "loading" && (
+        <div
+          role="status"
+          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3"
+        >
+          <LoaderCircle className="h-8 w-8 animate-spin text-teal-400" />
+          <p className="text-sm">Chargement de la photo…</p>
+        </div>
+      )}
+      {status === "error" && (
+        <div
+          role="alert"
+          className="relative z-10 mx-14 flex max-w-sm flex-col items-center gap-3 text-center"
+        >
+          <p>Cette photo n’a pas pu être chargée.</p>
+          <p className="text-sm text-white/60">
+            Vous pouvez réessayer ou consulter une autre photo.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setStatus("loading");
+              setAttempt((value) => value + 1);
+            }}
+          >
+            Réessayer
+          </Button>
+        </div>
+      )}
+    </>
   );
 }
