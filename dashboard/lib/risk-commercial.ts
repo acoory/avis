@@ -109,7 +109,10 @@ export async function downloadCommercialArchive(token: string) {
   const url = URL.createObjectURL(await response.blob());
   const link = document.createElement("a");
   link.href = url;
-  link.download = "photos-commerciales.zip";
+  link.download =
+    response.headers
+      .get("content-disposition")
+      ?.match(/filename="([^"]+)"/i)?.[1] ?? "photos-commerciales.zip";
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

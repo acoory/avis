@@ -34,6 +34,7 @@ export class RiskCommercialPublicController {
       throw new BadGatewayException('Impossible de télécharger les photos');
     }
     response.setHeader('Content-Type', 'application/zip');
+    response.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
     response.setHeader(
       'Content-Disposition',
       `attachment; filename="${manifest.fileName}"`,

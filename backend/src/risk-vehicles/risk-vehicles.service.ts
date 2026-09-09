@@ -979,7 +979,7 @@ export class RiskVehiclesService {
   async commercialArchive(token: string) {
     const gallery = await this.publicCommercialGallery(token);
     return {
-      fileName: 'photos-commerciales.zip',
+      fileName: `${sanitizeArchiveName(gallery.licensePlate)}-photos-com.zip`,
       photos: gallery.photos.map((photo, index) => ({
         archivePath: `${String(index + 1).padStart(2, '0')}-${photo.slotKey}.jpg`,
         downloadUrl: photo.secureUrl.replace(
