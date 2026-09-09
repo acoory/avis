@@ -578,7 +578,7 @@ export function RiskVehicleWorkspace({
           </span>
 
           {vehicle.status === "SUBMITTED" &&
-          (isPrimary || user?.role === "ADMIN") ? (
+          (isCreator || isPrimary || user?.role === "ADMIN") ? (
             <Button
               aria-label="Véhicule traité"
               className="h-9 shrink-0 px-2 sm:px-3"
@@ -679,7 +679,7 @@ export function RiskVehicleWorkspace({
               (vehicle.status === "CLOSED" && vehicle.commercialShareToken)) && (
               <RiskCommercialPanel
                 vehicle={vehicle}
-                canClose={isPrimary || user?.role === "ADMIN"}
+                canClose={isCreator || isPrimary || user?.role === "ADMIN"}
                 onChange={setVehicle}
               />
             )}

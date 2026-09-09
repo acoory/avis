@@ -1,7 +1,7 @@
 # Photos commerciales RISK
 
 Le parcours est : DRAFT → SUBMITTED → COMMERCIAL_PHOTOS → CLOSED.
-Le responsable principal ou un administrateur termine le traitement et clôture. Le créateur et les personnes assignées peuvent compléter les photos commerciales pendant cette étape.
+Le créateur du dossier, le responsable principal ou un administrateur peut terminer le traitement et clôturer. Le créateur et les personnes assignées peuvent compléter les photos commerciales pendant cette étape.
 
 Les photos commerciales sont stockées séparément des photos de traitement. La clôture contrôle les 12 vues obligatoires, le kilométrage et les 4 éléments conditionnels. Les documents ou accessoires présents nécessitent une photo ; les éléments absents ne doivent pas en avoir.
 

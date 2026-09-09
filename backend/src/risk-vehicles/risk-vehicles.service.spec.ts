@@ -426,7 +426,7 @@ describe('Risk commercial workflow', () => {
       BadRequestException,
     );
   });
-  it('restricts starting commercial photography to the primary assignee or administrator', async () => {
+  it('rejects a participant who is neither creator nor primary assignee', async () => {
     const prisma = {
       riskVehicle: {
         findFirst: jest.fn().mockResolvedValue({
@@ -443,13 +443,77 @@ describe('Risk commercial workflow', () => {
     );
     await expect(
       service.startCommercial('risk-1', { ...user, sub: 'participant' }),
-    ).rejects.toThrow('Seul le responsable');
+    ).rejects.toThrow('Seuls le créateur');
   });
-  it.each([Role.MANAGER, Role.ADMIN])(
+  it('allows the collaborator who created the dossier to start commercial photography', async () => {
+    const creator = { ...user, sub: 'creator-1', role: Role.COLLABORATOR };
+    const update = jest
+      .fn()
+      .mockResolvedValue({ status: RiskVehicleStatus.COMMERCIAL_PHOTOS });
+    const prisma = {
+      riskVehicle: {
+        findFirst: jest
+          .fn()
+          .mockResolvedValue({
+            ...vehicle(),
+            creatorId: creator.sub,
+            status: RiskVehicleStatus.SUBMITTED,
+          }),
+        update,
+      },
+    };
+    const service = new RiskVehiclesService(
+      prisma as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    await expect(service.startCommercial('risk-1', creator)).resolves.toEqual({
+      status: RiskVehicleStatus.COMMERCIAL_PHOTOS,
+    });
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          statusHistory: {
+            create: {
+              actorId: creator.sub,
+              fromStatus: RiskVehicleStatus.SUBMITTED,
+              toStatus: RiskVehicleStatus.COMMERCIAL_PHOTOS,
+            },
+          },
+        }),
+      }),
+    );
+  });
+
+  it('does not allow an ordinary participant to close a dossier', async () => {
+    const service = new RiskVehiclesService(
+      {
+        riskVehicle: {
+          findFirst: jest
+            .fn()
+            .mockResolvedValue({ ...vehicle(), creatorId: 'creator-1' }),
+        },
+      } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    await expect(
+      service.close('risk-1', {
+        ...user,
+        sub: 'participant',
+        role: Role.COLLABORATOR,
+      }),
+    ).rejects.toThrow('Seuls le créateur');
+  });
+
+  it.each([Role.MANAGER, Role.ADMIN, Role.COLLABORATOR])(
     'queues the commercial email for the primary assignee when %s closes',
     async (role) => {
       const record = {
         ...vehicle(),
+        creatorId: role === Role.COLLABORATOR ? 'creator-1' : user.sub,
         riskNumber: 'RISK-001',
         licensePlate: 'AA123BB',
         licensePlateCountry: 'FR',
@@ -462,10 +526,17 @@ describe('Risk commercial workflow', () => {
         email: user.email,
         isActive: true,
       };
-      record.creator = responsible;
+      record.creator =
+        role === Role.COLLABORATOR
+          ? { ...responsible, id: 'creator-1' }
+          : responsible;
       record.assignments[0].user = responsible;
       const closer =
-        role === Role.ADMIN ? { ...user, sub: 'admin-1', role } : user;
+        role === Role.ADMIN
+          ? { ...user, sub: 'admin-1', role }
+          : role === Role.COLLABORATOR
+            ? { ...user, sub: 'creator-1', role }
+            : user;
       const tx = {
         notification: {
           createManyAndReturn: jest

@@ -721,9 +721,13 @@ export class RiskVehiclesService {
         assignment.userId === user.sub &&
         assignment.role === RiskAssignmentRole.PRIMARY,
     );
-    if (!isPrimary && user.role !== Role.ADMIN) {
+    if (
+      vehicle.creatorId !== user.sub &&
+      !isPrimary &&
+      user.role !== Role.ADMIN
+    ) {
       throw new ForbiddenException(
-        'Only the primary assignee can close this dossier',
+        'Seuls le créateur, le responsable ou un administrateur peuvent clôturer ce dossier',
       );
     }
     const actor = await this.findActor(user.sub);
@@ -782,9 +786,13 @@ export class RiskVehiclesService {
     const isPrimary = vehicle.assignments.some(
       (a) => a.userId === user.sub && a.role === RiskAssignmentRole.PRIMARY,
     );
-    if (!isPrimary && user.role !== Role.ADMIN)
+    if (
+      vehicle.creatorId !== user.sub &&
+      !isPrimary &&
+      user.role !== Role.ADMIN
+    )
       throw new ForbiddenException(
-        'Seul le responsable peut terminer le traitement',
+        'Seuls le créateur, le responsable ou un administrateur peuvent terminer le traitement',
       );
     if (vehicle.status !== RiskVehicleStatus.SUBMITTED)
       throw new BadRequestException(
