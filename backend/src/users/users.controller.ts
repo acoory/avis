@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from '../../prisma/generated/client.cjs';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
@@ -26,7 +35,10 @@ export class UsersController {
   }
 
   @Get(':id/collaborators')
-  findCollaborators(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+  findCollaborators(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+  ) {
     return this.usersService.findCollaborators(id, user);
   }
 
@@ -41,7 +53,11 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string, @Body() dto: UpdateUserDto) {
+  update(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: UpdateUserDto,
+  ) {
     return this.usersService.update(id, dto, user);
   }
 

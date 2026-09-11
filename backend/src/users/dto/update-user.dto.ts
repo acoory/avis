@@ -40,4 +40,9 @@ export class UpdateUserDto {
   @IsArray()
   @IsUUID('4', { each: true })
   managerIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  agencyIds?: string[];
 }

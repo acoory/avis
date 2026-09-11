@@ -377,6 +377,10 @@ export type UserWhereInput = {
   riskMessages?: Prisma.RiskMessageListRelationFilter
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentListRelationFilter
   riskStatusHistories?: Prisma.RiskStatusHistoryListRelationFilter
+  assignedVehicleDepartures?: Prisma.VehicleDepartureListRelationFilter
+  vehicleDepartureHistories?: Prisma.DepartureHistoryListRelationFilter
+  vehicleDepartureComments?: Prisma.DepartureCommentListRelationFilter
+  agencyAccesses?: Prisma.UserAgencyListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -426,6 +430,10 @@ export type UserOrderByWithRelationInput = {
   riskMessages?: Prisma.RiskMessageOrderByRelationAggregateInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentOrderByRelationAggregateInput
   riskStatusHistories?: Prisma.RiskStatusHistoryOrderByRelationAggregateInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureOrderByRelationAggregateInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryOrderByRelationAggregateInput
+  vehicleDepartureComments?: Prisma.DepartureCommentOrderByRelationAggregateInput
+  agencyAccesses?: Prisma.UserAgencyOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -478,6 +486,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   riskMessages?: Prisma.RiskMessageListRelationFilter
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentListRelationFilter
   riskStatusHistories?: Prisma.RiskStatusHistoryListRelationFilter
+  assignedVehicleDepartures?: Prisma.VehicleDepartureListRelationFilter
+  vehicleDepartureHistories?: Prisma.DepartureHistoryListRelationFilter
+  vehicleDepartureComments?: Prisma.DepartureCommentListRelationFilter
+  agencyAccesses?: Prisma.UserAgencyListRelationFilter
 }, "id" | "email" | "publicAccessCodeFingerprint">
 
 export type UserOrderByWithAggregationInput = {
@@ -583,6 +595,10 @@ export type UserCreateInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -632,6 +648,10 @@ export type UserUncheckedCreateInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -681,6 +701,10 @@ export type UserUpdateInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -730,6 +754,10 @@ export type UserUncheckedUpdateInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -888,14 +916,14 @@ export type UserSumOrderByAggregateInput = {
   publicAccessCodeEmailCount?: Prisma.SortOrder
 }
 
-export type UserScalarRelationFilter = {
-  is?: Prisma.UserWhereInput
-  isNot?: Prisma.UserWhereInput
-}
-
 export type UserNullableScalarRelationFilter = {
   is?: Prisma.UserWhereInput | null
   isNot?: Prisma.UserWhereInput | null
+}
+
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -928,6 +956,54 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutAssignedVehicleDeparturesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedVehicleDeparturesInput, Prisma.UserUncheckedCreateWithoutAssignedVehicleDeparturesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedVehicleDeparturesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAssignedVehicleDeparturesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedVehicleDeparturesInput, Prisma.UserUncheckedCreateWithoutAssignedVehicleDeparturesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedVehicleDeparturesInput
+  upsert?: Prisma.UserUpsertWithoutAssignedVehicleDeparturesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedVehicleDeparturesInput, Prisma.UserUpdateWithoutAssignedVehicleDeparturesInput>, Prisma.UserUncheckedUpdateWithoutAssignedVehicleDeparturesInput>
+}
+
+export type UserCreateNestedOneWithoutVehicleDepartureHistoriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureHistoriesInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureHistoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleDepartureHistoriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutVehicleDepartureHistoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureHistoriesInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureHistoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleDepartureHistoriesInput
+  upsert?: Prisma.UserUpsertWithoutVehicleDepartureHistoriesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleDepartureHistoriesInput, Prisma.UserUpdateWithoutVehicleDepartureHistoriesInput>, Prisma.UserUncheckedUpdateWithoutVehicleDepartureHistoriesInput>
+}
+
+export type UserCreateNestedOneWithoutVehicleDepartureCommentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureCommentsInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleDepartureCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutVehicleDepartureCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureCommentsInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVehicleDepartureCommentsInput
+  upsert?: Prisma.UserUpsertWithoutVehicleDepartureCommentsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleDepartureCommentsInput, Prisma.UserUpdateWithoutVehicleDepartureCommentsInput>, Prisma.UserUncheckedUpdateWithoutVehicleDepartureCommentsInput>
 }
 
 export type UserCreateNestedOneWithoutPublicAccessSessionsInput = {
@@ -986,6 +1062,20 @@ export type UserUpdateOneWithoutCreatedManagerAssignmentsNestedInput = {
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedManagerAssignmentsInput, Prisma.UserUpdateWithoutCreatedManagerAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutCreatedManagerAssignmentsInput>
+}
+
+export type UserCreateNestedOneWithoutAgencyAccessesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAgencyAccessesInput, Prisma.UserUncheckedCreateWithoutAgencyAccessesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAgencyAccessesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAgencyAccessesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAgencyAccessesInput, Prisma.UserUncheckedCreateWithoutAgencyAccessesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAgencyAccessesInput
+  upsert?: Prisma.UserUpsertWithoutAgencyAccessesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAgencyAccessesInput, Prisma.UserUpdateWithoutAgencyAccessesInput>, Prisma.UserUncheckedUpdateWithoutAgencyAccessesInput>
 }
 
 export type UserCreateNestedOneWithoutVehicleChecksInput = {
@@ -1312,6 +1402,678 @@ export type UserUpdateOneWithoutVehicleCheckItemStatusHistoriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVehicleCheckItemStatusHistoriesInput, Prisma.UserUpdateWithoutVehicleCheckItemStatusHistoriesInput>, Prisma.UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput>
 }
 
+export type UserCreateWithoutAssignedVehicleDeparturesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssignedVehicleDeparturesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAssignedVehicleDeparturesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedVehicleDeparturesInput, Prisma.UserUncheckedCreateWithoutAssignedVehicleDeparturesInput>
+}
+
+export type UserUpsertWithoutAssignedVehicleDeparturesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedVehicleDeparturesInput, Prisma.UserUncheckedUpdateWithoutAssignedVehicleDeparturesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedVehicleDeparturesInput, Prisma.UserUncheckedCreateWithoutAssignedVehicleDeparturesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignedVehicleDeparturesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedVehicleDeparturesInput, Prisma.UserUncheckedUpdateWithoutAssignedVehicleDeparturesInput>
+}
+
+export type UserUpdateWithoutAssignedVehicleDeparturesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignedVehicleDeparturesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutVehicleDepartureHistoriesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutVehicleDepartureHistoriesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutVehicleDepartureHistoriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureHistoriesInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureHistoriesInput>
+}
+
+export type UserUpsertWithoutVehicleDepartureHistoriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVehicleDepartureHistoriesInput, Prisma.UserUncheckedUpdateWithoutVehicleDepartureHistoriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureHistoriesInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureHistoriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVehicleDepartureHistoriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVehicleDepartureHistoriesInput, Prisma.UserUncheckedUpdateWithoutVehicleDepartureHistoriesInput>
+}
+
+export type UserUpdateWithoutVehicleDepartureHistoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVehicleDepartureHistoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutVehicleDepartureCommentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutVehicleDepartureCommentsInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutVehicleDepartureCommentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureCommentsInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureCommentsInput>
+}
+
+export type UserUpsertWithoutVehicleDepartureCommentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVehicleDepartureCommentsInput, Prisma.UserUncheckedUpdateWithoutVehicleDepartureCommentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVehicleDepartureCommentsInput, Prisma.UserUncheckedCreateWithoutVehicleDepartureCommentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVehicleDepartureCommentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVehicleDepartureCommentsInput, Prisma.UserUncheckedUpdateWithoutVehicleDepartureCommentsInput>
+}
+
+export type UserUpdateWithoutVehicleDepartureCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVehicleDepartureCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
+}
+
 export type UserCreateWithoutPublicAccessSessionsInput = {
   id?: string
   email: string
@@ -1358,6 +2120,10 @@ export type UserCreateWithoutPublicAccessSessionsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPublicAccessSessionsInput = {
@@ -1406,6 +2172,10 @@ export type UserUncheckedCreateWithoutPublicAccessSessionsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPublicAccessSessionsInput = {
@@ -1470,6 +2240,10 @@ export type UserUpdateWithoutPublicAccessSessionsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPublicAccessSessionsInput = {
@@ -1518,6 +2292,10 @@ export type UserUncheckedUpdateWithoutPublicAccessSessionsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutManagerAssignmentsInput = {
@@ -1566,6 +2344,10 @@ export type UserCreateWithoutManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutManagerAssignmentsInput = {
@@ -1614,6 +2396,10 @@ export type UserUncheckedCreateWithoutManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutManagerAssignmentsInput = {
@@ -1667,6 +2453,10 @@ export type UserCreateWithoutManagedCollaboratorAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutManagedCollaboratorAssignmentsInput = {
@@ -1715,6 +2505,10 @@ export type UserUncheckedCreateWithoutManagedCollaboratorAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutManagedCollaboratorAssignmentsInput = {
@@ -1768,6 +2562,10 @@ export type UserCreateWithoutCreatedManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedManagerAssignmentsInput = {
@@ -1816,6 +2614,10 @@ export type UserUncheckedCreateWithoutCreatedManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedManagerAssignmentsInput = {
@@ -1880,6 +2682,10 @@ export type UserUpdateWithoutManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagerAssignmentsInput = {
@@ -1928,6 +2734,10 @@ export type UserUncheckedUpdateWithoutManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutManagedCollaboratorAssignmentsInput = {
@@ -1987,6 +2797,10 @@ export type UserUpdateWithoutManagedCollaboratorAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagedCollaboratorAssignmentsInput = {
@@ -2035,6 +2849,10 @@ export type UserUncheckedUpdateWithoutManagedCollaboratorAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedManagerAssignmentsInput = {
@@ -2094,6 +2912,10 @@ export type UserUpdateWithoutCreatedManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedManagerAssignmentsInput = {
@@ -2142,6 +2964,234 @@ export type UserUncheckedUpdateWithoutCreatedManagerAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAgencyAccessesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAgencyAccessesInput = {
+  id?: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: $Enums.Role
+  refreshTokenHash?: string | null
+  publicAccessCodeHash?: string | null
+  publicAccessCodeEncrypted?: string | null
+  publicAccessCodeFingerprint?: string | null
+  publicAccessCodeVersion?: number
+  publicAccessCodeIssuedAt?: Date | string | null
+  publicAccessCodeFailedAttempts?: number
+  publicAccessCodeLockedUntil?: Date | string | null
+  publicAccessCodeLastEmailedAt?: Date | string | null
+  publicAccessCodeEmailWindowAt?: Date | string | null
+  publicAccessCodeEmailCount?: number
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedCreateNestedManyWithoutCollaboratorInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCollaboratorInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutManagerInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedCreateNestedManyWithoutUserInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedCreateNestedManyWithoutVehicleRecoveredByInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutManagerInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedCreateNestedManyWithoutCreatedByInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedCreateNestedManyWithoutUserInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutCreatorInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedCreateNestedManyWithoutClosedByInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAgencyAccessesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAgencyAccessesInput, Prisma.UserUncheckedCreateWithoutAgencyAccessesInput>
+}
+
+export type UserUpsertWithoutAgencyAccessesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAgencyAccessesInput, Prisma.UserUncheckedUpdateWithoutAgencyAccessesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAgencyAccessesInput, Prisma.UserUncheckedCreateWithoutAgencyAccessesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAgencyAccessesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAgencyAccessesInput, Prisma.UserUncheckedUpdateWithoutAgencyAccessesInput>
+}
+
+export type UserUpdateWithoutAgencyAccessesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAgencyAccessesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicAccessCodeVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeFailedAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  publicAccessCodeLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeLastEmailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailWindowAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publicAccessCodeEmailCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleChecks?: Prisma.VehicleCheckUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCollaboratorNestedInput
+  managedCollaboratorAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutManagerNestedInput
+  createdManagerAssignments?: Prisma.UserManagerAssignmentUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckItemStatusHistories?: Prisma.VehicleCheckItemStatusHistoryUncheckedUpdateManyWithoutUserNestedInput
+  externalRepairCompanies?: Prisma.ExternalRepairCompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  externalRepairContacts?: Prisma.ExternalRepairContactUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleRecoveredPublicShares?: Prisma.VehicleCheckPublicShareUncheckedUpdateManyWithoutVehicleRecoveredByNestedInput
+  vehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutManagerNestedInput
+  createdVehicleCheckDecisionShares?: Prisma.VehicleCheckDecisionShareUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdVehicleCheckConversations?: Prisma.VehicleCheckConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  vehicleCheckConversationParticipants?: Prisma.VehicleCheckConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  vehicleCheckMessages?: Prisma.VehicleCheckMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedVehicleCheckMessageAttachments?: Prisma.VehicleCheckMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  publicAccessSessions?: Prisma.PublicAccessSessionUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutCreatorNestedInput
+  closedRiskVehicles?: Prisma.RiskVehicleUncheckedUpdateManyWithoutClosedByNestedInput
+  riskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleChecksInput = {
@@ -2190,6 +3240,10 @@ export type UserCreateWithoutVehicleChecksInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleChecksInput = {
@@ -2238,6 +3292,10 @@ export type UserUncheckedCreateWithoutVehicleChecksInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleChecksInput = {
@@ -2302,6 +3360,10 @@ export type UserUpdateWithoutVehicleChecksInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleChecksInput = {
@@ -2350,6 +3412,10 @@ export type UserUncheckedUpdateWithoutVehicleChecksInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExternalRepairCompaniesInput = {
@@ -2398,6 +3464,10 @@ export type UserCreateWithoutExternalRepairCompaniesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExternalRepairCompaniesInput = {
@@ -2446,6 +3516,10 @@ export type UserUncheckedCreateWithoutExternalRepairCompaniesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExternalRepairCompaniesInput = {
@@ -2510,6 +3584,10 @@ export type UserUpdateWithoutExternalRepairCompaniesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExternalRepairCompaniesInput = {
@@ -2558,6 +3636,10 @@ export type UserUncheckedUpdateWithoutExternalRepairCompaniesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExternalRepairContactsInput = {
@@ -2606,6 +3688,10 @@ export type UserCreateWithoutExternalRepairContactsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExternalRepairContactsInput = {
@@ -2654,6 +3740,10 @@ export type UserUncheckedCreateWithoutExternalRepairContactsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExternalRepairContactsInput = {
@@ -2718,6 +3808,10 @@ export type UserUpdateWithoutExternalRepairContactsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExternalRepairContactsInput = {
@@ -2766,6 +3860,10 @@ export type UserUncheckedUpdateWithoutExternalRepairContactsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckPublicSharesInput = {
@@ -2814,6 +3912,10 @@ export type UserCreateWithoutVehicleCheckPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckPublicSharesInput = {
@@ -2862,6 +3964,10 @@ export type UserUncheckedCreateWithoutVehicleCheckPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckPublicSharesInput = {
@@ -2915,6 +4021,10 @@ export type UserCreateWithoutVehicleRecoveredPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput = {
@@ -2963,6 +4073,10 @@ export type UserUncheckedCreateWithoutVehicleRecoveredPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleRecoveredPublicSharesInput = {
@@ -3027,6 +4141,10 @@ export type UserUpdateWithoutVehicleCheckPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput = {
@@ -3075,6 +4193,10 @@ export type UserUncheckedUpdateWithoutVehicleCheckPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutVehicleRecoveredPublicSharesInput = {
@@ -3134,6 +4256,10 @@ export type UserUpdateWithoutVehicleRecoveredPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput = {
@@ -3182,6 +4308,10 @@ export type UserUncheckedUpdateWithoutVehicleRecoveredPublicSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckDecisionSharesInput = {
@@ -3230,6 +4360,10 @@ export type UserCreateWithoutVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckDecisionSharesInput = {
@@ -3278,6 +4412,10 @@ export type UserUncheckedCreateWithoutVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckDecisionSharesInput = {
@@ -3331,6 +4469,10 @@ export type UserCreateWithoutCreatedVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -3379,6 +4521,10 @@ export type UserUncheckedCreateWithoutCreatedVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -3443,6 +4589,10 @@ export type UserUpdateWithoutVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckDecisionSharesInput = {
@@ -3491,6 +4641,10 @@ export type UserUncheckedUpdateWithoutVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -3550,6 +4704,10 @@ export type UserUpdateWithoutCreatedVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedVehicleCheckDecisionSharesInput = {
@@ -3598,6 +4756,10 @@ export type UserUncheckedUpdateWithoutCreatedVehicleCheckDecisionSharesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCreatedVehicleCheckConversationsInput = {
@@ -3646,6 +4808,10 @@ export type UserCreateWithoutCreatedVehicleCheckConversationsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedVehicleCheckConversationsInput = {
@@ -3694,6 +4860,10 @@ export type UserUncheckedCreateWithoutCreatedVehicleCheckConversationsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedVehicleCheckConversationsInput = {
@@ -3758,6 +4928,10 @@ export type UserUpdateWithoutCreatedVehicleCheckConversationsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedVehicleCheckConversationsInput = {
@@ -3806,6 +4980,10 @@ export type UserUncheckedUpdateWithoutCreatedVehicleCheckConversationsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckConversationParticipantsInput = {
@@ -3854,6 +5032,10 @@ export type UserCreateWithoutVehicleCheckConversationParticipantsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckConversationParticipantsInput = {
@@ -3902,6 +5084,10 @@ export type UserUncheckedCreateWithoutVehicleCheckConversationParticipantsInput 
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckConversationParticipantsInput = {
@@ -3966,6 +5152,10 @@ export type UserUpdateWithoutVehicleCheckConversationParticipantsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckConversationParticipantsInput = {
@@ -4014,6 +5204,10 @@ export type UserUncheckedUpdateWithoutVehicleCheckConversationParticipantsInput 
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckMessagesInput = {
@@ -4062,6 +5256,10 @@ export type UserCreateWithoutVehicleCheckMessagesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckMessagesInput = {
@@ -4110,6 +5308,10 @@ export type UserUncheckedCreateWithoutVehicleCheckMessagesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckMessagesInput = {
@@ -4174,6 +5376,10 @@ export type UserUpdateWithoutVehicleCheckMessagesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckMessagesInput = {
@@ -4222,6 +5428,10 @@ export type UserUncheckedUpdateWithoutVehicleCheckMessagesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
@@ -4270,6 +5480,10 @@ export type UserCreateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
@@ -4318,6 +5532,10 @@ export type UserUncheckedCreateWithoutUploadedVehicleCheckMessageAttachmentsInpu
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUploadedVehicleCheckMessageAttachmentsInput = {
@@ -4382,6 +5600,10 @@ export type UserUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUploadedVehicleCheckMessageAttachmentsInput = {
@@ -4430,6 +5652,10 @@ export type UserUncheckedUpdateWithoutUploadedVehicleCheckMessageAttachmentsInpu
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCreatedRiskVehiclesInput = {
@@ -4478,6 +5704,10 @@ export type UserCreateWithoutCreatedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedRiskVehiclesInput = {
@@ -4526,6 +5756,10 @@ export type UserUncheckedCreateWithoutCreatedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedRiskVehiclesInput = {
@@ -4579,6 +5813,10 @@ export type UserCreateWithoutClosedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClosedRiskVehiclesInput = {
@@ -4627,6 +5865,10 @@ export type UserUncheckedCreateWithoutClosedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClosedRiskVehiclesInput = {
@@ -4691,6 +5933,10 @@ export type UserUpdateWithoutCreatedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedRiskVehiclesInput = {
@@ -4739,6 +5985,10 @@ export type UserUncheckedUpdateWithoutCreatedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutClosedRiskVehiclesInput = {
@@ -4798,6 +6048,10 @@ export type UserUpdateWithoutClosedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClosedRiskVehiclesInput = {
@@ -4846,6 +6100,10 @@ export type UserUncheckedUpdateWithoutClosedRiskVehiclesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRiskAssignmentsInput = {
@@ -4894,6 +6152,10 @@ export type UserCreateWithoutRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRiskAssignmentsInput = {
@@ -4942,6 +6204,10 @@ export type UserUncheckedCreateWithoutRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRiskAssignmentsInput = {
@@ -4995,6 +6261,10 @@ export type UserCreateWithoutCreatedRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedRiskAssignmentsInput = {
@@ -5043,6 +6313,10 @@ export type UserUncheckedCreateWithoutCreatedRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedRiskAssignmentsInput = {
@@ -5107,6 +6381,10 @@ export type UserUpdateWithoutRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRiskAssignmentsInput = {
@@ -5155,6 +6433,10 @@ export type UserUncheckedUpdateWithoutRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedRiskAssignmentsInput = {
@@ -5214,6 +6496,10 @@ export type UserUpdateWithoutCreatedRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedRiskAssignmentsInput = {
@@ -5262,6 +6548,10 @@ export type UserUncheckedUpdateWithoutCreatedRiskAssignmentsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRiskMessagesInput = {
@@ -5310,6 +6600,10 @@ export type UserCreateWithoutRiskMessagesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutAssignedByInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRiskMessagesInput = {
@@ -5358,6 +6652,10 @@ export type UserUncheckedCreateWithoutRiskMessagesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRiskMessagesInput = {
@@ -5422,6 +6720,10 @@ export type UserUpdateWithoutRiskMessagesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutAssignedByNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRiskMessagesInput = {
@@ -5470,6 +6772,10 @@ export type UserUncheckedUpdateWithoutRiskMessagesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUploadedRiskMessageAttachmentsInput = {
@@ -5518,6 +6824,10 @@ export type UserCreateWithoutUploadedRiskMessageAttachmentsInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutAssignedByInput
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUploadedRiskMessageAttachmentsInput = {
@@ -5566,6 +6876,10 @@ export type UserUncheckedCreateWithoutUploadedRiskMessageAttachmentsInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUploadedRiskMessageAttachmentsInput = {
@@ -5630,6 +6944,10 @@ export type UserUpdateWithoutUploadedRiskMessageAttachmentsInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutAssignedByNestedInput
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUploadedRiskMessageAttachmentsInput = {
@@ -5678,6 +6996,10 @@ export type UserUncheckedUpdateWithoutUploadedRiskMessageAttachmentsInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRiskStatusHistoriesInput = {
@@ -5726,6 +7048,10 @@ export type UserCreateWithoutRiskStatusHistoriesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentCreateNestedManyWithoutAssignedByInput
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRiskStatusHistoriesInput = {
@@ -5774,6 +7100,10 @@ export type UserUncheckedCreateWithoutRiskStatusHistoriesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRiskStatusHistoriesInput = {
@@ -5838,6 +7168,10 @@ export type UserUpdateWithoutRiskStatusHistoriesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUpdateManyWithoutAssignedByNestedInput
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRiskStatusHistoriesInput = {
@@ -5886,6 +7220,10 @@ export type UserUncheckedUpdateWithoutRiskStatusHistoriesInput = {
   createdRiskAssignments?: Prisma.RiskVehicleAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReceivedNotificationsInput = {
@@ -5934,6 +7272,10 @@ export type UserCreateWithoutReceivedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReceivedNotificationsInput = {
@@ -5982,6 +7324,10 @@ export type UserUncheckedCreateWithoutReceivedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReceivedNotificationsInput = {
@@ -6035,6 +7381,10 @@ export type UserCreateWithoutActedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutActedNotificationsInput = {
@@ -6083,6 +7433,10 @@ export type UserUncheckedCreateWithoutActedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutActedNotificationsInput = {
@@ -6147,6 +7501,10 @@ export type UserUpdateWithoutReceivedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReceivedNotificationsInput = {
@@ -6195,6 +7553,10 @@ export type UserUncheckedUpdateWithoutReceivedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutActedNotificationsInput = {
@@ -6254,6 +7616,10 @@ export type UserUpdateWithoutActedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutActedNotificationsInput = {
@@ -6302,6 +7668,10 @@ export type UserUncheckedUpdateWithoutActedNotificationsInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -6350,6 +7720,10 @@ export type UserCreateWithoutVehicleCheckItemStatusHistoriesInput = {
   riskMessages?: Prisma.RiskMessageCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -6398,6 +7772,10 @@ export type UserUncheckedCreateWithoutVehicleCheckItemStatusHistoriesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedCreateNestedManyWithoutAuthorInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedCreateNestedManyWithoutUploadedByInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedCreateNestedManyWithoutAssignedUserInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedCreateNestedManyWithoutUserInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedCreateNestedManyWithoutUserInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -6462,6 +7840,10 @@ export type UserUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
   riskMessages?: Prisma.RiskMessageUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
@@ -6510,6 +7892,10 @@ export type UserUncheckedUpdateWithoutVehicleCheckItemStatusHistoriesInput = {
   riskMessages?: Prisma.RiskMessageUncheckedUpdateManyWithoutAuthorNestedInput
   uploadedRiskMessageAttachments?: Prisma.RiskMessageAttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
   riskStatusHistories?: Prisma.RiskStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  assignedVehicleDepartures?: Prisma.VehicleDepartureUncheckedUpdateManyWithoutAssignedUserNestedInput
+  vehicleDepartureHistories?: Prisma.DepartureHistoryUncheckedUpdateManyWithoutUserNestedInput
+  vehicleDepartureComments?: Prisma.DepartureCommentUncheckedUpdateManyWithoutUserNestedInput
+  agencyAccesses?: Prisma.UserAgencyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -6543,6 +7929,10 @@ export type UserCountOutputType = {
   riskMessages: number
   uploadedRiskMessageAttachments: number
   riskStatusHistories: number
+  assignedVehicleDepartures: number
+  vehicleDepartureHistories: number
+  vehicleDepartureComments: number
+  agencyAccesses: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6571,6 +7961,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   riskMessages?: boolean | UserCountOutputTypeCountRiskMessagesArgs
   uploadedRiskMessageAttachments?: boolean | UserCountOutputTypeCountUploadedRiskMessageAttachmentsArgs
   riskStatusHistories?: boolean | UserCountOutputTypeCountRiskStatusHistoriesArgs
+  assignedVehicleDepartures?: boolean | UserCountOutputTypeCountAssignedVehicleDeparturesArgs
+  vehicleDepartureHistories?: boolean | UserCountOutputTypeCountVehicleDepartureHistoriesArgs
+  vehicleDepartureComments?: boolean | UserCountOutputTypeCountVehicleDepartureCommentsArgs
+  agencyAccesses?: boolean | UserCountOutputTypeCountAgencyAccessesArgs
 }
 
 /**
@@ -6758,6 +8152,34 @@ export type UserCountOutputTypeCountRiskStatusHistoriesArgs<ExtArgs extends runt
   where?: Prisma.RiskStatusHistoryWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssignedVehicleDeparturesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleDepartureWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVehicleDepartureHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DepartureHistoryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVehicleDepartureCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DepartureCommentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAgencyAccessesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserAgencyWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -6806,6 +8228,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   riskMessages?: boolean | Prisma.User$riskMessagesArgs<ExtArgs>
   uploadedRiskMessageAttachments?: boolean | Prisma.User$uploadedRiskMessageAttachmentsArgs<ExtArgs>
   riskStatusHistories?: boolean | Prisma.User$riskStatusHistoriesArgs<ExtArgs>
+  assignedVehicleDepartures?: boolean | Prisma.User$assignedVehicleDeparturesArgs<ExtArgs>
+  vehicleDepartureHistories?: boolean | Prisma.User$vehicleDepartureHistoriesArgs<ExtArgs>
+  vehicleDepartureComments?: boolean | Prisma.User$vehicleDepartureCommentsArgs<ExtArgs>
+  agencyAccesses?: boolean | Prisma.User$agencyAccessesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -6908,6 +8334,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   riskMessages?: boolean | Prisma.User$riskMessagesArgs<ExtArgs>
   uploadedRiskMessageAttachments?: boolean | Prisma.User$uploadedRiskMessageAttachmentsArgs<ExtArgs>
   riskStatusHistories?: boolean | Prisma.User$riskStatusHistoriesArgs<ExtArgs>
+  assignedVehicleDepartures?: boolean | Prisma.User$assignedVehicleDeparturesArgs<ExtArgs>
+  vehicleDepartureHistories?: boolean | Prisma.User$vehicleDepartureHistoriesArgs<ExtArgs>
+  vehicleDepartureComments?: boolean | Prisma.User$vehicleDepartureCommentsArgs<ExtArgs>
+  agencyAccesses?: boolean | Prisma.User$agencyAccessesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -6941,6 +8371,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     riskMessages: Prisma.$RiskMessagePayload<ExtArgs>[]
     uploadedRiskMessageAttachments: Prisma.$RiskMessageAttachmentPayload<ExtArgs>[]
     riskStatusHistories: Prisma.$RiskStatusHistoryPayload<ExtArgs>[]
+    assignedVehicleDepartures: Prisma.$VehicleDeparturePayload<ExtArgs>[]
+    vehicleDepartureHistories: Prisma.$DepartureHistoryPayload<ExtArgs>[]
+    vehicleDepartureComments: Prisma.$DepartureCommentPayload<ExtArgs>[]
+    agencyAccesses: Prisma.$UserAgencyPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -7383,6 +8817,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   riskMessages<T extends Prisma.User$riskMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$riskMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RiskMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   uploadedRiskMessageAttachments<T extends Prisma.User$uploadedRiskMessageAttachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$uploadedRiskMessageAttachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RiskMessageAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   riskStatusHistories<T extends Prisma.User$riskStatusHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$riskStatusHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RiskStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedVehicleDepartures<T extends Prisma.User$assignedVehicleDeparturesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedVehicleDeparturesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleDeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleDepartureHistories<T extends Prisma.User$vehicleDepartureHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleDepartureHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepartureHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleDepartureComments<T extends Prisma.User$vehicleDepartureCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vehicleDepartureCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepartureCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agencyAccesses<T extends Prisma.User$agencyAccessesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$agencyAccessesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserAgencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8423,6 +9861,102 @@ export type User$riskStatusHistoriesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.RiskStatusHistoryScalarFieldEnum | Prisma.RiskStatusHistoryScalarFieldEnum[]
+}
+
+/**
+ * User.assignedVehicleDepartures
+ */
+export type User$assignedVehicleDeparturesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleDeparture
+   */
+  select?: Prisma.VehicleDepartureSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleDeparture
+   */
+  omit?: Prisma.VehicleDepartureOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleDepartureInclude<ExtArgs> | null
+  where?: Prisma.VehicleDepartureWhereInput
+  orderBy?: Prisma.VehicleDepartureOrderByWithRelationInput | Prisma.VehicleDepartureOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleDepartureWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleDepartureScalarFieldEnum | Prisma.VehicleDepartureScalarFieldEnum[]
+}
+
+/**
+ * User.vehicleDepartureHistories
+ */
+export type User$vehicleDepartureHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DepartureHistory
+   */
+  select?: Prisma.DepartureHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DepartureHistory
+   */
+  omit?: Prisma.DepartureHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartureHistoryInclude<ExtArgs> | null
+  where?: Prisma.DepartureHistoryWhereInput
+  orderBy?: Prisma.DepartureHistoryOrderByWithRelationInput | Prisma.DepartureHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.DepartureHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DepartureHistoryScalarFieldEnum | Prisma.DepartureHistoryScalarFieldEnum[]
+}
+
+/**
+ * User.vehicleDepartureComments
+ */
+export type User$vehicleDepartureCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DepartureComment
+   */
+  select?: Prisma.DepartureCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DepartureComment
+   */
+  omit?: Prisma.DepartureCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartureCommentInclude<ExtArgs> | null
+  where?: Prisma.DepartureCommentWhereInput
+  orderBy?: Prisma.DepartureCommentOrderByWithRelationInput | Prisma.DepartureCommentOrderByWithRelationInput[]
+  cursor?: Prisma.DepartureCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DepartureCommentScalarFieldEnum | Prisma.DepartureCommentScalarFieldEnum[]
+}
+
+/**
+ * User.agencyAccesses
+ */
+export type User$agencyAccessesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserAgency
+   */
+  select?: Prisma.UserAgencySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserAgency
+   */
+  omit?: Prisma.UserAgencyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAgencyInclude<ExtArgs> | null
+  where?: Prisma.UserAgencyWhereInput
+  orderBy?: Prisma.UserAgencyOrderByWithRelationInput | Prisma.UserAgencyOrderByWithRelationInput[]
+  cursor?: Prisma.UserAgencyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserAgencyScalarFieldEnum | Prisma.UserAgencyScalarFieldEnum[]
 }
 
 /**

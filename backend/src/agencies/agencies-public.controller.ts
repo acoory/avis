@@ -23,14 +23,20 @@ export class AgenciesPublicController {
     @Query() query: PublicVehicleStatusQueryDto,
     @Res() response: Response,
   ) {
-    const buffer = await this.agenciesService.publicVehicleStatusesWorkbook(token, query);
+    const buffer = await this.agenciesService.publicVehicleStatusesWorkbook(
+      token,
+      query,
+    );
     const filename = `suivi-vehicules-${new Date().toISOString().slice(0, 10)}.xlsx`;
 
     response.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
-    response.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${filename}"`,
+    );
     response.send(buffer);
   }
 }

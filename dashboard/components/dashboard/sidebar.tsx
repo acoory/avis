@@ -6,6 +6,7 @@ import {
   Building2,
   Calculator,
   CarFront,
+  Columns3,
   ChevronDown,
   ChevronsUpDown,
   ClipboardList,
@@ -65,6 +66,12 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
         icon: CarFront,
       },
       {
+        label: "Départs véhicules",
+        sublabel: "(Prestataires)",
+        href: "/dashboard/departures",
+        icon: Columns3,
+      },
+      {
         label: "Pièces & Main-d'œuvre",
         sublabel: "(Estimation)",
         href: "/dashboard/estimation",
@@ -87,6 +94,12 @@ const navigationSections: Array<{ items: NavigationItem[]; label: string }> = [
         href: "/dashboard/manufacturers",
         icon: Building2,
         roles: ["ADMIN"],
+      },
+      {
+        label: "Prestataires",
+        href: "/dashboard/providers",
+        icon: Building2,
+        roles: ["ADMIN", "MANAGER"],
       },
     ],
   },

@@ -1,6 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from '../../prisma/generated/client.cjs';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { AgenciesService } from './agencies.service';
@@ -15,6 +26,11 @@ export class AgenciesController {
   @Get()
   findAll() {
     return this.agenciesService.findAll();
+  }
+
+  @Get('accessible/me')
+  findAccessible(@CurrentUser() user: CurrentUserPayload) {
+    return this.agenciesService.findAccessible(user);
   }
 
   @Roles(Role.ADMIN)

@@ -22,6 +22,9 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { VehicleCheckConversationsModule } from './vehicle-check-conversations/vehicle-check-conversations.module';
 import { SalvageEvaluationsModule } from './salvage-evaluations/salvage-evaluations.module';
 import { RiskVehiclesModule } from './risk-vehicles/risk-vehicles.module';
+import { DeparturesModule } from './departures/departures.module';
+import { ProvidersModule } from './providers/providers.module';
+import { VehiclesModule } from './vehicles/vehicles.module';
 
 @Module({
   imports: [
@@ -50,6 +53,9 @@ import { RiskVehiclesModule } from './risk-vehicles/risk-vehicles.module';
     VehicleCheckConversationsModule,
     SalvageEvaluationsModule,
     RiskVehiclesModule,
+    ProvidersModule,
+    VehiclesModule,
+    DeparturesModule,
   ],
 })
 export class AppModule {}

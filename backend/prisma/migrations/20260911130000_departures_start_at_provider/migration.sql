@@ -1,0 +1,2 @@
+ALTER TABLE "VehicleDeparture"
+ALTER COLUMN "status" SET DEFAULT 'AT_PROVIDER';

@@ -40,6 +40,13 @@ const userSelect = {
     },
     orderBy: [{ isPrimary: 'desc' as const }, { assignedAt: 'asc' as const }],
   },
+  agencyAccesses: {
+    select: {
+      agencyId: true,
+      agency: { select: { id: true, code: true, name: true, city: true } },
+    },
+    orderBy: { agency: { name: 'asc' as const } },
+  },
   isActive: true,
   lastLoginAt: true,
   createdAt: true,
@@ -132,6 +139,11 @@ export class UsersService {
     }
 
     await this.validateManagerAssignments(role, managerIds);
+    const agencyIds =
+      requester.role === Role.MANAGER
+        ? await this.managerAgencyIds(requester.sub, dto.agencyIds)
+        : (dto.agencyIds ?? []);
+    await this.validateAgencyIds(agencyIds);
     const password = await bcrypt.hash(dto.password, 12);
 
     return this.prisma.$transaction(async (tx) => {
@@ -154,6 +166,15 @@ export class UsersService {
             createdById: requester.sub,
             isPrimary: index === 0,
             managerId,
+          })),
+        });
+      }
+
+      if (agencyIds.length) {
+        await tx.userAgency.createMany({
+          data: agencyIds.map((agencyId) => ({
+            userId: created.id,
+            agencyId,
           })),
         });
       }
@@ -203,6 +224,13 @@ export class UsersService {
     }
 
     await this.validateManagerAssignments(nextRole, nextManagerIds, id);
+    const nextAgencyIds =
+      dto.agencyIds === undefined
+        ? existingUser.agencyAccesses.map((access) => access.agencyId)
+        : requester.role === Role.MANAGER
+          ? await this.managerAgencyIds(requester.sub, dto.agencyIds)
+          : dto.agencyIds;
+    await this.validateAgencyIds(nextAgencyIds);
 
     const data: Prisma.UserUpdateInput = {
       email: dto.email,
@@ -258,6 +286,15 @@ export class UsersService {
             nextManagerIds,
             requester.sub,
           );
+        }
+
+        if (dto.agencyIds !== undefined) {
+          await tx.userAgency.deleteMany({ where: { userId: id } });
+          if (nextAgencyIds.length) {
+            await tx.userAgency.createMany({
+              data: nextAgencyIds.map((agencyId) => ({ userId: id, agencyId })),
+            });
+          }
         }
 
         return tx.user.findUniqueOrThrow({ where: { id }, select: userSelect });
@@ -341,6 +378,37 @@ export class UsersService {
     if (managers.length !== managerIds.length) {
       throw new BadRequestException('Every selected manager must be active');
     }
+  }
+
+  private async validateAgencyIds(agencyIds: string[]) {
+    const uniqueIds = [...new Set(agencyIds)];
+    if (uniqueIds.length !== agencyIds.length) {
+      throw new BadRequestException(
+        'Une agence ne peut être attribuée qu’une fois.',
+      );
+    }
+    if (!agencyIds.length) return;
+    const count = await this.prisma.agency.count({
+      where: { id: { in: agencyIds }, isActive: true },
+    });
+    if (count !== agencyIds.length) {
+      throw new BadRequestException('Toutes les agences doivent être actives.');
+    }
+  }
+
+  private async managerAgencyIds(managerId: string, requested?: string[]) {
+    const accesses = await this.prisma.userAgency.findMany({
+      where: { userId: managerId },
+      select: { agencyId: true },
+    });
+    const allowed = accesses.map((access) => access.agencyId);
+    const selected = requested ?? allowed;
+    if (selected.some((agencyId) => !allowed.includes(agencyId))) {
+      throw new ForbiddenException(
+        'Vous ne pouvez attribuer que vos propres agences.',
+      );
+    }
+    return selected;
   }
 
   private async syncManagerAssignments(

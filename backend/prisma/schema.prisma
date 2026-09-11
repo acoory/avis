@@ -118,6 +118,57 @@ enum NotificationEmailStatus {
   FAILED
 }
 
+enum ProviderType {
+  DEALERSHIP
+  BODYSHOP
+  GARAGE
+  TIRE_SHOP
+  ASSISTANCE
+  OTHER
+}
+
+enum InterventionType {
+  BODYWORK
+  DENT_REMOVAL
+  TIRES
+  MECHANICAL
+  SERVICE
+  WINDSHIELD
+  CLEANING
+  UPHOLSTERY
+  DIAGNOSTIC
+  EXPERTISE
+  ASSISTANCE
+  OTHER
+}
+
+enum DepartureStatus {
+  PLANNED
+  TO_PREPARE
+  READY_TO_LEAVE
+  DEPARTED
+  AT_PROVIDER
+  WORK_IN_PROGRESS
+  READY_FOR_PICKUP
+  PICKUP_PLANNED
+  RETURNED
+  CANCELLED
+}
+
+enum DeparturePriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum DepartureAttachmentType {
+  PHOTO
+  DOCUMENT
+  QUOTE
+  OTHER
+}
+
 model User {
   id                             String    @id @default(uuid())
   email                          String    @unique
@@ -166,9 +217,128 @@ model User {
   riskMessages                           RiskMessage[]                         @relation("RiskMessageAuthor")
   uploadedRiskMessageAttachments         RiskMessageAttachment[]               @relation("RiskMessageAttachmentUploadedBy")
   riskStatusHistories                    RiskStatusHistory[]                   @relation("RiskStatusHistoryActor")
+  assignedVehicleDepartures              VehicleDeparture[]                    @relation("VehicleDepartureAssignee")
+  vehicleDepartureHistories              DepartureHistory[]                    @relation("DepartureHistoryActor")
+  vehicleDepartureComments               DepartureComment[]                    @relation("DepartureCommentAuthor")
+  agencyAccesses                         UserAgency[]
 
   @@index([role])
   @@index([isActive])
+}
+
+model Vehicle {
+  id           String             @id @default(uuid())
+  registration String             @unique
+  brand        String?
+  model        String?
+  departures   VehicleDeparture[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([registration])
+}
+
+model Provider {
+  id           String             @id @default(uuid())
+  name         String
+  type         ProviderType
+  address      String?
+  phone        String?
+  email        String?
+  contactName  String?
+  notes        String?
+  displayOrder Int                @default(0)
+  isActive     Boolean            @default(true)
+  agencyId     String?
+  agency       Agency?            @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  departures   VehicleDeparture[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@unique([agencyId, name])
+  @@index([agencyId])
+  @@index([isActive, displayOrder])
+}
+
+model VehicleDeparture {
+  id                 String            @id @default(uuid())
+  vehicleId          String
+  providerId         String
+  interventionType   InterventionType
+  status             DepartureStatus   @default(AT_PROVIDER)
+  description        String?
+  priority           DeparturePriority @default(NORMAL)
+  appointmentAt      DateTime?
+  plannedDepartureAt DateTime?
+  departedAt         DateTime?
+  estimatedReturnAt  DateTime?
+  readyAt            DateTime?
+  returnedAt         DateTime?
+  estimatedCost      Decimal?          @db.Decimal(12, 2)
+  quotedCost         Decimal?          @db.Decimal(12, 2)
+  actualCost         Decimal?          @db.Decimal(12, 2)
+  assignedUserId     String?
+  agencyId           String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  vehicle      Vehicle               @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  provider     Provider              @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  agency       Agency?               @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  assignedUser User?                 @relation("VehicleDepartureAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  histories    DepartureHistory[]
+  comments     DepartureComment[]
+  attachments  DepartureAttachment[]
+
+  @@index([vehicleId, status])
+  @@index([agencyId, status])
+  @@index([providerId, status])
+  @@index([status, createdAt])
+  @@index([estimatedReturnAt])
+}
+
+model DepartureHistory {
+  id          String   @id @default(uuid())
+  departureId String
+  userId      String?
+  action      String
+  oldValue    Json?
+  newValue    Json?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  departure VehicleDeparture @relation(fields: [departureId], references: [id], onDelete: Cascade)
+  user      User?            @relation("DepartureHistoryActor", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([departureId, createdAt])
+  @@index([userId])
+}
+
+model DepartureComment {
+  id          String   @id @default(uuid())
+  departureId String
+  userId      String?
+  message     String
+  createdAt   DateTime @default(now())
+
+  departure VehicleDeparture @relation(fields: [departureId], references: [id], onDelete: Cascade)
+  user      User?            @relation("DepartureCommentAuthor", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([departureId, createdAt])
+  @@index([userId])
+}
+
+model DepartureAttachment {
+  id          String                  @id @default(uuid())
+  departureId String
+  type        DepartureAttachmentType
+  name        String
+  url         String
+  createdAt   DateTime                @default(now())
+
+  departure VehicleDeparture @relation(fields: [departureId], references: [id], onDelete: Cascade)
+
+  @@index([departureId, createdAt])
 }
 
 model PublicAccessSession {
@@ -221,11 +391,26 @@ model Agency {
   vehicleChecks      VehicleCheck[]
   vehicleStatusShare AgencyVehicleStatusShare?
   riskVehicles       RiskVehicle[]
+  userAccesses       UserAgency[]
+  providers          Provider[]
+  vehicleDepartures  VehicleDeparture[]
 
   @@unique([name, city])
   @@index([city])
   @@index([region])
   @@index([isActive])
+}
+
+model UserAgency {
+  userId    String
+  agencyId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, agencyId])
+  @@index([agencyId])
 }
 
 model AgencyVehicleStatusShare {
@@ -264,11 +449,10 @@ model VehicleModel {
 
   manufacturer Manufacturer   @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
   checks       VehicleCheck[]
+  riskVehicles RiskVehicle[]
 
   @@unique([manufacturerId, name])
   @@index([manufacturerId])
-  riskVehicles RiskVehicle[]
-
 }
 
 model RepairType {
@@ -602,20 +786,20 @@ model RiskVehicle {
   createdAt                         DateTime          @default(now())
   updatedAt                         DateTime          @updatedAt
 
-  creator       User                    @relation("RiskVehicleCreator", fields: [creatorId], references: [id], onDelete: Restrict)
-  closedBy      User?                   @relation("RiskVehicleClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
-  agency        Agency                  @relation(fields: [agencyId], references: [id], onDelete: Restrict)
-  manufacturer  Manufacturer            @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
-  vehicleModel  VehicleModel?           @relation(fields: [vehicleModelId], references: [id], onDelete: SetNull)
-  assignments   RiskVehicleAssignment[]
-  commercialMileage Int?
-  commercialEquipment Json?
-  commercialShareToken String? @unique
-  commercialPhotos RiskCommercialPhoto[]
-  photos        RiskPhoto[]
-  conversation  RiskConversation?
-  statusHistory RiskStatusHistory[]
-  notifications Notification[]
+  creator              User                    @relation("RiskVehicleCreator", fields: [creatorId], references: [id], onDelete: Restrict)
+  closedBy             User?                   @relation("RiskVehicleClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  agency               Agency                  @relation(fields: [agencyId], references: [id], onDelete: Restrict)
+  manufacturer         Manufacturer            @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  vehicleModel         VehicleModel?           @relation(fields: [vehicleModelId], references: [id], onDelete: SetNull)
+  assignments          RiskVehicleAssignment[]
+  commercialMileage    Int?
+  commercialEquipment  Json?
+  commercialShareToken String?                 @unique
+  commercialPhotos     RiskCommercialPhoto[]
+  photos               RiskPhoto[]
+  conversation         RiskConversation?
+  statusHistory        RiskStatusHistory[]
+  notifications        Notification[]
 
   @@unique([licensePlateCountry, licensePlate])
   @@index([creatorId])
@@ -898,17 +1082,18 @@ model ExternalQuoteItem {
 }
 
 model RiskCommercialPhoto {
-  id String @id @default(uuid())
+  id            String      @id @default(uuid())
   riskVehicleId String
-  slotKey String
-  publicId String @unique
-  assetId String?
-  secureUrl String
-  width Int
-  height Int
-  bytes Int
-  format String
-  createdAt DateTime @default(now())
-  riskVehicle RiskVehicle @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+  slotKey       String
+  publicId      String      @unique
+  assetId       String?
+  secureUrl     String
+  width         Int
+  height        Int
+  bytes         Int
+  format        String
+  createdAt     DateTime    @default(now())
+  riskVehicle   RiskVehicle @relation(fields: [riskVehicleId], references: [id], onDelete: Cascade)
+
   @@unique([riskVehicleId, slotKey])
 }

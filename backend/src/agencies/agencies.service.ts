@@ -1,7 +1,14 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import ExcelJS from 'exceljs';
 import { randomBytes } from 'node:crypto';
 import { Prisma, VehicleCheckStatus } from '../../prisma/generated/client.cjs';
+import { Role } from '../../prisma/generated/client.cjs';
+import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAgencyDto } from './dto/create-agency.dto';
 import { PublicVehicleStatusQueryDto } from './dto/public-vehicle-status-query.dto';
@@ -25,6 +32,18 @@ export class AgenciesService {
   findAll() {
     return this.prisma.agency.findMany({
       where: { isActive: true },
+      orderBy: [{ region: 'asc' }, { city: 'asc' }, { name: 'asc' }],
+    });
+  }
+
+  findAccessible(user: CurrentUserPayload) {
+    return this.prisma.agency.findMany({
+      where: {
+        isActive: true,
+        ...(user.role === Role.ADMIN
+          ? {}
+          : { userAccesses: { some: { userId: user.sub } } }),
+      },
       orderBy: [{ region: 'asc' }, { city: 'asc' }, { name: 'asc' }],
     });
   }
@@ -81,13 +100,22 @@ export class AgenciesService {
     return { success: true };
   }
 
-  async findPublicVehicleStatuses(token: string, query: PublicVehicleStatusQueryDto) {
+  async findPublicVehicleStatuses(
+    token: string,
+    query: PublicVehicleStatusQueryDto,
+  ) {
     const share = await this.prisma.agencyVehicleStatusShare.findUnique({
       where: { token },
       select: {
         isEnabled: true,
         agency: {
-          select: { code: true, city: true, id: true, isActive: true, name: true },
+          select: {
+            code: true,
+            city: true,
+            id: true,
+            isActive: true,
+            name: true,
+          },
         },
       },
     });
@@ -112,45 +140,62 @@ export class AgenciesService {
       ...(normalizedSearch
         ? {
             OR: [
-              { licensePlate: { contains: normalizedSearch, mode: 'insensitive' } },
-              { licensePlateRaw: { contains: query.search?.trim(), mode: 'insensitive' } },
+              {
+                licensePlate: {
+                  contains: normalizedSearch,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                licensePlateRaw: {
+                  contains: query.search?.trim(),
+                  mode: 'insensitive',
+                },
+              },
             ],
           }
         : {}),
     };
     const skip = (query.page - 1) * query.pageSize;
 
-    const [items, total, inProgressCount, completedCount] = await this.prisma.$transaction([
-      this.prisma.vehicleCheck.findMany({
-        where,
-        orderBy: [{ updatedAt: 'desc' }, { licensePlate: 'asc' }],
-        skip,
-        take: query.pageSize,
-        select: {
-          id: true,
-          licensePlate: true,
-          licensePlateCountry: true,
-          licensePlateRaw: true,
-          manufacturer: { select: { name: true } },
-          publicShare: {
-            select: {
-              takenInChargeAt: true,
-              vehicleRecoveredAt: true,
+    const [items, total, inProgressCount, completedCount] =
+      await this.prisma.$transaction([
+        this.prisma.vehicleCheck.findMany({
+          where,
+          orderBy: [{ updatedAt: 'desc' }, { licensePlate: 'asc' }],
+          skip,
+          take: query.pageSize,
+          select: {
+            id: true,
+            licensePlate: true,
+            licensePlateCountry: true,
+            licensePlateRaw: true,
+            manufacturer: { select: { name: true } },
+            publicShare: {
+              select: {
+                takenInChargeAt: true,
+                vehicleRecoveredAt: true,
+              },
             },
+            status: true,
+            updatedAt: true,
+            vehicleModel: { select: { name: true } },
           },
-          status: true,
-          updatedAt: true,
-          vehicleModel: { select: { name: true } },
-        },
-      }),
-      this.prisma.vehicleCheck.count({ where }),
-      this.prisma.vehicleCheck.count({
-        where: { agencyId: share.agency.id, status: { in: inProgressStatuses } },
-      }),
-      this.prisma.vehicleCheck.count({
-        where: { agencyId: share.agency.id, status: { in: completedStatuses } },
-      }),
-    ]);
+        }),
+        this.prisma.vehicleCheck.count({ where }),
+        this.prisma.vehicleCheck.count({
+          where: {
+            agencyId: share.agency.id,
+            status: { in: inProgressStatuses },
+          },
+        }),
+        this.prisma.vehicleCheck.count({
+          where: {
+            agencyId: share.agency.id,
+            status: { in: completedStatuses },
+          },
+        }),
+      ]);
 
     return {
       agency: {
@@ -166,10 +211,13 @@ export class AgenciesService {
         licensePlateRaw: item.licensePlateRaw,
         manufacturer: item.manufacturer,
         location:
-          item.publicShare?.takenInChargeAt && !item.publicShare.vehicleRecoveredAt
+          item.publicShare?.takenInChargeAt &&
+          !item.publicShare.vehicleRecoveredAt
             ? 'AT_PROVIDER'
             : 'ON_SITE',
-        publicStatus: inProgressStatuses.includes(item.status) ? 'IN_PROGRESS' : 'COMPLETED',
+        publicStatus: inProgressStatuses.includes(item.status)
+          ? 'IN_PROGRESS'
+          : 'COMPLETED',
         updatedAt: item.updatedAt,
         vehicleModel: item.vehicleModel,
       })),
@@ -181,7 +229,10 @@ export class AgenciesService {
     };
   }
 
-  async publicVehicleStatusesWorkbook(token: string, query: PublicVehicleStatusQueryDto) {
+  async publicVehicleStatusesWorkbook(
+    token: string,
+    query: PublicVehicleStatusQueryDto,
+  ) {
     const share = await this.prisma.agencyVehicleStatusShare.findUnique({
       where: { token },
       select: {
@@ -212,8 +263,18 @@ export class AgenciesService {
       ...(normalizedSearch
         ? {
             OR: [
-              { licensePlate: { contains: normalizedSearch, mode: 'insensitive' } },
-              { licensePlateRaw: { contains: query.search?.trim(), mode: 'insensitive' } },
+              {
+                licensePlate: {
+                  contains: normalizedSearch,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                licensePlateRaw: {
+                  contains: query.search?.trim(),
+                  mode: 'insensitive',
+                },
+              },
             ],
           }
         : {}),
@@ -254,26 +315,53 @@ export class AgenciesService {
       { key: 'updatedAt', width: 20 },
     ];
     worksheet.mergeCells('A1:F1');
-    worksheet.getCell('A1').value = `Suivi des véhicules — ${share.agency.city} · ${share.agency.name}`;
-    worksheet.getCell('A1').font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 14 };
-    worksheet.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } };
+    worksheet.getCell('A1').value =
+      `Suivi des véhicules — ${share.agency.city} · ${share.agency.name}`;
+    worksheet.getCell('A1').font = {
+      bold: true,
+      color: { argb: 'FFFFFFFF' },
+      size: 14,
+    };
+    worksheet.getCell('A1').fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF0F766E' },
+    };
     worksheet.getCell('A1').alignment = { vertical: 'middle' };
     worksheet.getRow(1).height = 28;
     worksheet.mergeCells('A2:F2');
-    worksheet.getCell('A2').value = `Exporté le ${new Intl.DateTimeFormat('fr-FR', {
-      dateStyle: 'long',
-      timeStyle: 'short',
-    }).format(new Date())}`;
-    worksheet.getCell('A2').font = { italic: true, color: { argb: 'FF64748B' } };
-    worksheet.getRow(4).values = ['Plaque', 'Marque', 'Modèle', 'Statut', 'Emplacement', 'Mis à jour'];
+    worksheet.getCell('A2').value = `Exporté le ${new Intl.DateTimeFormat(
+      'fr-FR',
+      {
+        dateStyle: 'long',
+        timeStyle: 'short',
+      },
+    ).format(new Date())}`;
+    worksheet.getCell('A2').font = {
+      italic: true,
+      color: { argb: 'FF64748B' },
+    };
+    worksheet.getRow(4).values = [
+      'Plaque',
+      'Marque',
+      'Modèle',
+      'Statut',
+      'Emplacement',
+      'Mis à jour',
+    ];
     worksheet.getRow(4).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    worksheet.getRow(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF334155' } };
+    worksheet.getRow(4).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF334155' },
+    };
     worksheet.getRow(4).alignment = { vertical: 'middle' };
 
     for (const vehicle of vehicles) {
       const isInProgress = inProgressStatuses.includes(vehicle.status);
       const isAtProvider =
-        vehicle.publicShare?.takenInChargeAt && !vehicle.publicShare.vehicleRecoveredAt;
+        vehicle.publicShare?.takenInChargeAt &&
+        !vehicle.publicShare.vehicleRecoveredAt;
       worksheet.addRow({
         licensePlate: vehicle.licensePlateRaw || vehicle.licensePlate,
         manufacturer: vehicle.manufacturer?.name ?? 'Marque non renseignée',
@@ -320,7 +408,10 @@ export class AgenciesService {
     try {
       return await this.prisma.agency.create({ data });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Agency code or city/name already exists');
       }
       throw error;
@@ -331,9 +422,15 @@ export class AgenciesService {
     await this.ensureExists(id);
 
     try {
-      return await this.prisma.agency.update({ where: { id }, data: this.normalizeUpdateDto(dto) });
+      return await this.prisma.agency.update({
+        where: { id },
+        data: this.normalizeUpdateDto(dto),
+      });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Agency code or city/name already exists');
       }
       throw error;
@@ -342,12 +439,18 @@ export class AgenciesService {
 
   async remove(id: string) {
     await this.ensureExists(id);
-    await this.prisma.agency.update({ where: { id }, data: { isActive: false } });
+    await this.prisma.agency.update({
+      where: { id },
+      data: { isActive: false },
+    });
     return { success: true };
   }
 
   private async ensureExists(id: string) {
-    const agency = await this.prisma.agency.findUnique({ where: { id }, select: { id: true } });
+    const agency = await this.prisma.agency.findUnique({
+      where: { id },
+      select: { id: true },
+    });
     if (!agency) {
       throw new NotFoundException('Agency not found');
     }
@@ -372,7 +475,11 @@ export class AgenciesService {
   }
 
   private normalizeCode(code: string) {
-    const normalizedCode = code.trim().toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const normalizedCode = code
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
     if (!normalizedCode) {
       throw new BadRequestException('Agency code is required');
     }

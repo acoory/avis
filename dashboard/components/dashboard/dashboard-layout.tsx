@@ -14,11 +14,12 @@ export function DashboardLayout({ children }: PropsWithChildren) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const isPrintPage = pathname?.includes("/print");
+  const isWallPage = pathname?.includes("/departures/wall");
 
   return (
     <ProtectedRoute>
-      {isPrintPage ? <div className="min-h-screen bg-gray-50">{children}</div> : null}
-      {!isPrintPage ? (
+      {isPrintPage || isWallPage ? <div className="min-h-screen bg-gray-50">{children}</div> : null}
+      {!isPrintPage && !isWallPage ? (
         <div className="flex min-h-screen bg-gray-50">
           <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
           <div className="flex min-w-0 flex-1 flex-col">
