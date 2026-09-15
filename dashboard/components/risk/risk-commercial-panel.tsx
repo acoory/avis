@@ -74,7 +74,9 @@ export function RiskCommercialPanel({
   const [busy, setBusy] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState("");
   const photos = vehicle.commercialPhotos ?? [];
-  const editable = vehicle.status === "COMMERCIAL_PHOTOS";
+  const isClosed = vehicle.status === "CLOSED";
+  const editable =
+    vehicle.status === "COMMERCIAL_PHOTOS" || vehicle.status === "CLOSED";
   const required = commercialSlots.filter(
     (slot) =>
       !slot.optional ||
@@ -179,12 +181,71 @@ export function RiskCommercialPanel({
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-semibold">Photos commerciales</h2>
           <p className="mt-1 text-sm text-slate-500">
-            {editable
-              ? "Le véhicule est traité. Complétez les photos, puis clôturez le dossier."
-              : "Photos validées à la clôture du dossier."}
+            {isClosed
+              ? "Le dossier est clos. Vous pouvez encore corriger ou remplacer ses photos commerciales."
+              : "Le véhicule est traité. Complétez les photos, puis clôturez le dossier."}
           </p>
         </div>
       </div>
+      {isClosed && vehicle.commercialShareToken ? (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            disabled={!!busy}
+            onClick={() =>
+              void run("share", async () => {
+                const url = `${window.location.origin}/commercial/${vehicle.commercialShareToken}`;
+                setShareUrl(url);
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Lien copié, prêt à partager.");
+                } catch {
+                  toast.info("Le lien est affiché ci-dessous pour le copier.");
+                }
+              })
+            }
+          >
+            <LinkIcon className="h-4 w-4" />
+            Partager les photos commerciales
+          </Button>
+          <Button
+            variant="outline"
+            disabled={!!busy}
+            onClick={() =>
+              void run("download", () =>
+                downloadCommercialArchive(vehicle.commercialShareToken!),
+              )
+            }
+          >
+            <Download className="h-4 w-4" />
+            {busy === "download"
+              ? "Téléchargement…"
+              : "Télécharger toutes les photos"}
+          </Button>
+        </div>
+      ) : null}
+      {shareUrl && (
+        <div className="space-y-2">
+          <input
+            aria-label="Lien de partage"
+            className="w-full rounded-lg border p-2 text-sm"
+            readOnly
+            value={shareUrl}
+            onFocus={(event) => event.target.select()}
+          />
+          <a
+            href={shareUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm text-teal-700 underline"
+          >
+            Ouvrir la galerie publique
+          </a>
+          <p className="text-xs text-slate-500">
+            Toute personne disposant de ce lien peut consulter les photos sans
+            connexion.
+          </p>
+        </div>
+      )}
       {editable ? (
         <>
           <div className="space-y-2">
@@ -487,12 +548,12 @@ export function RiskCommercialPanel({
                   J’ai vérifié la netteté, le kilométrage et masqué les données
                   personnelles sur les documents.
                 </label>
-                {!complete && (
+                {!complete && !isClosed && (
                   <p role="alert" className="text-sm text-amber-700">
                     Complétez les éléments manquants avant la clôture.
                   </p>
                 )}
-                {!canClose && (
+                {!canClose && !isClosed && (
                   <p className="text-sm text-slate-500">
                     Les photos sont enregistrées. Le responsable du dossier
                     pourra les valider et clôturer.
@@ -523,7 +584,7 @@ export function RiskCommercialPanel({
                 {step === lastStep - 1 ? "Voir le récapitulatif" : "Suivant"}
                 <ChevronRight className="h-4 w-4" />
               </Button>
-            ) : canClose ? (
+            ) : canClose && !isClosed ? (
               <Button
                 className="min-h-12 flex-1 whitespace-normal"
                 disabled={!!busy || !complete || !reviewed}

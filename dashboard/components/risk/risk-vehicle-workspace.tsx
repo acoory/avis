@@ -676,7 +676,7 @@ export function RiskVehicleWorkspace({
           <div className="min-w-0 space-y-5">
             {workspaceHeader}
             {(vehicle.status === "COMMERCIAL_PHOTOS" ||
-              (vehicle.status === "CLOSED" && vehicle.commercialShareToken)) && (
+              vehicle.status === "CLOSED") && (
               <RiskCommercialPanel
                 vehicle={vehicle}
                 canClose={isCreator || isPrimary || user?.role === "ADMIN"}

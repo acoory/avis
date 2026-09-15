@@ -697,7 +697,12 @@ describe('Risk commercial workflow', () => {
       },
     };
     const prisma = {
-      riskVehicle: { findFirst: jest.fn().mockResolvedValue(vehicle()) },
+      riskVehicle: {
+        findFirst: jest.fn().mockResolvedValue({
+          ...vehicle(),
+          status: RiskVehicleStatus.CLOSED,
+        }),
+      },
       $transaction: jest.fn().mockImplementation((fn) => fn(tx)),
     };
     const cloudinary = { isRiskPhotoAsset: jest.fn().mockReturnValue(true) };
@@ -716,6 +721,16 @@ describe('Risk commercial workflow', () => {
       user.sub,
       true,
     );
+    expect(tx.riskVehicle.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: 'risk-1',
+          status: {
+            in: [RiskVehicleStatus.COMMERCIAL_PHOTOS, RiskVehicleStatus.CLOSED],
+          },
+        },
+      }),
+    );
     await expect(
       service.addCommercialPhoto(
         'risk-1',
@@ -728,7 +743,9 @@ describe('Risk commercial workflow', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('does not allow replacing commercial photos once the dossier is closed', async () => {
+  it('allows replacing commercial photos once the dossier is closed', async () => {
+    const signature = { signature: 'signed' };
+    const createRiskPhotoUploadSignature = jest.fn().mockReturnValue(signature);
     const service = new RiskVehiclesService(
       {
         riskVehicle: {
@@ -738,12 +755,17 @@ describe('Risk commercial workflow', () => {
           }),
         },
       } as never,
-      {} as never,
+      { createRiskPhotoUploadSignature } as never,
       {} as never,
       {} as never,
     );
-    await expect(service.commercialSignature('risk-1', user)).rejects.toThrow(
-      'ne sont pas modifiables',
+    await expect(service.commercialSignature('risk-1', user)).resolves.toEqual(
+      signature,
+    );
+    expect(createRiskPhotoUploadSignature).toHaveBeenCalledWith(
+      'risk-1',
+      user.sub,
+      true,
     );
   });
 });

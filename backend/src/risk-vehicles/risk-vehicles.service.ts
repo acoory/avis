@@ -816,7 +816,10 @@ export class RiskVehiclesService {
 
   private async commercialEditable(id: string, user: CurrentUserPayload) {
     const vehicle = await this.findOne(id, user);
-    if (vehicle.status !== RiskVehicleStatus.COMMERCIAL_PHOTOS)
+    if (
+      vehicle.status !== RiskVehicleStatus.COMMERCIAL_PHOTOS &&
+      vehicle.status !== RiskVehicleStatus.CLOSED
+    )
       throw new BadRequestException(
         'Les photos commerciales ne sont pas modifiables à cette étape',
       );
@@ -826,10 +829,21 @@ export class RiskVehiclesService {
   private async lockCommercialVehicle(
     tx: Prisma.TransactionClient,
     id: string,
+    allowClosed = false,
   ) {
-    // Serialize edits and closure on the parent so the validated gallery is immutable.
+    // Serialize gallery edits and closure on the parent dossier.
     const result = await tx.riskVehicle.updateMany({
-      where: { id, status: RiskVehicleStatus.COMMERCIAL_PHOTOS },
+      where: {
+        id,
+        status: allowClosed
+          ? {
+              in: [
+                RiskVehicleStatus.COMMERCIAL_PHOTOS,
+                RiskVehicleStatus.CLOSED,
+              ],
+            }
+          : RiskVehicleStatus.COMMERCIAL_PHOTOS,
+      },
       data: { updatedAt: new Date() },
     });
     if (result.count !== 1)
@@ -852,7 +866,12 @@ export class RiskVehiclesService {
   ) {
     await this.commercialEditable(id, user);
     return this.prisma.riskVehicle.update({
-      where: { id, status: RiskVehicleStatus.COMMERCIAL_PHOTOS },
+      where: {
+        id,
+        status: {
+          in: [RiskVehicleStatus.COMMERCIAL_PHOTOS, RiskVehicleStatus.CLOSED],
+        },
+      },
       data: {
         commercialMileage: dto.mileage,
         commercialEquipment: { ...dto.equipment },
@@ -885,7 +904,7 @@ export class RiskVehiclesService {
       throw new BadRequestException('Photo commerciale invalide');
     }
     const { previous, photo } = await this.prisma.$transaction(async (tx) => {
-      await this.lockCommercialVehicle(tx, id);
+      await this.lockCommercialVehicle(tx, id, true);
       const where = {
         riskVehicleId_slotKey: { riskVehicleId: id, slotKey: dto.slotKey },
       };
@@ -911,7 +930,7 @@ export class RiskVehiclesService {
   ) {
     await this.commercialEditable(id, user);
     const photo = await this.prisma.$transaction(async (tx) => {
-      await this.lockCommercialVehicle(tx, id);
+      await this.lockCommercialVehicle(tx, id, true);
       const photo = await tx.riskCommercialPhoto.findFirst({
         where: { id: photoId, riskVehicleId: id },
       });
