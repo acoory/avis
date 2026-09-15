@@ -10,6 +10,7 @@ import {
   Download,
   Link as LinkIcon,
   LoaderCircle,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -73,10 +74,11 @@ export function RiskCommercialPanel({
   const [reviewed, setReviewed] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState("");
+  const [editingClosed, setEditingClosed] = useState(false);
   const photos = vehicle.commercialPhotos ?? [];
   const isClosed = vehicle.status === "CLOSED";
   const editable =
-    vehicle.status === "COMMERCIAL_PHOTOS" || vehicle.status === "CLOSED";
+    vehicle.status === "COMMERCIAL_PHOTOS" || (isClosed && editingClosed);
   const required = commercialSlots.filter(
     (slot) =>
       !slot.optional ||
@@ -181,71 +183,26 @@ export function RiskCommercialPanel({
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-semibold">Photos commerciales</h2>
           <p className="mt-1 text-sm text-slate-500">
-            {isClosed
+            {isClosed && editingClosed
               ? "Le dossier est clos. Vous pouvez encore corriger ou remplacer ses photos commerciales."
-              : "Le véhicule est traité. Complétez les photos, puis clôturez le dossier."}
+              : isClosed
+                ? "Photos validées à la clôture du dossier."
+                : "Le véhicule est traité. Complétez les photos, puis clôturez le dossier."}
           </p>
         </div>
-      </div>
-      {isClosed && vehicle.commercialShareToken ? (
-        <div className="flex flex-wrap gap-2">
+        {isClosed && editingClosed ? (
           <Button
+            className="shrink-0"
             disabled={!!busy}
-            onClick={() =>
-              void run("share", async () => {
-                const url = `${window.location.origin}/commercial/${vehicle.commercialShareToken}`;
-                setShareUrl(url);
-                try {
-                  await navigator.clipboard.writeText(url);
-                  toast.success("Lien copié, prêt à partager.");
-                } catch {
-                  toast.info("Le lien est affiché ci-dessous pour le copier.");
-                }
-              })
-            }
-          >
-            <LinkIcon className="h-4 w-4" />
-            Partager les photos commerciales
-          </Button>
-          <Button
+            size="sm"
+            type="button"
             variant="outline"
-            disabled={!!busy}
-            onClick={() =>
-              void run("download", () =>
-                downloadCommercialArchive(vehicle.commercialShareToken!),
-              )
-            }
+            onClick={() => setEditingClosed(false)}
           >
-            <Download className="h-4 w-4" />
-            {busy === "download"
-              ? "Téléchargement…"
-              : "Télécharger toutes les photos"}
+            Terminer
           </Button>
-        </div>
-      ) : null}
-      {shareUrl && (
-        <div className="space-y-2">
-          <input
-            aria-label="Lien de partage"
-            className="w-full rounded-lg border p-2 text-sm"
-            readOnly
-            value={shareUrl}
-            onFocus={(event) => event.target.select()}
-          />
-          <a
-            href={shareUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-teal-700 underline"
-          >
-            Ouvrir la galerie publique
-          </a>
-          <p className="text-xs text-slate-500">
-            Toute personne disposant de ce lien peut consulter les photos sans
-            connexion.
-          </p>
-        </div>
-      )}
+        ) : null}
+      </div>
       {editable ? (
         <>
           <div className="space-y-2">
@@ -607,40 +564,55 @@ export function RiskCommercialPanel({
       ) : (
         <>
           <div className="flex flex-wrap gap-2">
-            <Button
-              disabled={!!busy}
-              onClick={() =>
-                void run("share", async () => {
-                  const url = `${window.location.origin}/commercial/${vehicle.commercialShareToken}`;
-                  setShareUrl(url);
-                  try {
-                    await navigator.clipboard.writeText(url);
-                    toast.success("Lien copié, prêt à partager.");
-                  } catch {
-                    toast.info(
-                      "Le lien est affiché ci-dessous pour le copier.",
-                    );
+            {isClosed ? (
+              <Button
+                disabled={!!busy}
+                type="button"
+                variant="outline"
+                onClick={() => setEditingClosed(true)}
+              >
+                <Pencil className="h-4 w-4" />
+                Modifier les photos
+              </Button>
+            ) : null}
+            {vehicle.commercialShareToken ? (
+              <>
+                <Button
+                  disabled={!!busy}
+                  onClick={() =>
+                    void run("share", async () => {
+                      const url = `${window.location.origin}/commercial/${vehicle.commercialShareToken}`;
+                      setShareUrl(url);
+                      try {
+                        await navigator.clipboard.writeText(url);
+                        toast.success("Lien copié, prêt à partager.");
+                      } catch {
+                        toast.info(
+                          "Le lien est affiché ci-dessous pour le copier.",
+                        );
+                      }
+                    })
                   }
-                })
-              }
-            >
-              <LinkIcon className="h-4 w-4" />
-              Partager les photos commerciales
-            </Button>
-            <Button
-              variant="outline"
-              disabled={!!busy}
-              onClick={() =>
-                void run("download", () =>
-                  downloadCommercialArchive(vehicle.commercialShareToken!),
-                )
-              }
-            >
-              <Download className="h-4 w-4" />
-              {busy === "download"
-                ? "Téléchargement…"
-                : "Télécharger toutes les photos"}
-            </Button>
+                >
+                  <LinkIcon className="h-4 w-4" />
+                  Partager les photos commerciales
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={!!busy}
+                  onClick={() =>
+                    void run("download", () =>
+                      downloadCommercialArchive(vehicle.commercialShareToken!),
+                    )
+                  }
+                >
+                  <Download className="h-4 w-4" />
+                  {busy === "download"
+                    ? "Téléchargement…"
+                    : "Télécharger toutes les photos"}
+                </Button>
+              </>
+            ) : null}
           </div>
           {shareUrl && (
             <div className="space-y-2">
